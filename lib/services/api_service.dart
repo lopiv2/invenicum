@@ -1,0 +1,117 @@
+import 'package:dio/dio.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../config/environment.dart';
+import '../models/login_response.dart';
+
+class ApiService {
+  static final ApiService _instance = ApiService._internal();
+  final Dio _dio = Dio();
+  final _storage = const FlutterSecureStorage();
+
+  factory ApiService() {
+    return _instance;
+  }
+
+  ApiService._internal() {
+    _dio.options.baseUrl = '${Environment.apiUrl}${Environment.apiVersion}';
+    _dio.options.connectTimeout = Duration(
+      milliseconds: Environment.connectTimeout,
+    );
+    _dio.options.receiveTimeout = Duration(
+      milliseconds: Environment.receiveTimeout,
+    );
+    print(_dio.options.baseUrl);
+
+    // Interceptor para agregar el token a las peticiones
+    _dio.interceptors.addAll([
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await _storage.read(key: Environment.authTokenKey);
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+      ),
+      LogInterceptor(requestBody: true, responseBody: true, error: true),
+    ]);
+  }
+
+  Future<LoginResponse> login(String username, String password) async {
+    try {
+      final response = await _dio.post(
+        Environment.loginEndpoint,
+        data: {'username': username, 'password': password},
+      );
+
+
+      if (response.data is! Map<String, dynamic>) {
+        return LoginResponse(
+          success: false,
+          message: 'Error en el formato de la respuesta del servidor',
+        );
+      }
+
+      Map<String, dynamic> responseData = response.data;
+
+      // Si hay un objeto data, usamos esos valores
+      if (responseData['data'] is Map) {
+        final data = responseData['data'] as Map<String, dynamic>;
+      }
+
+      final loginResponse = LoginResponse.fromJson(responseData);
+
+      if (loginResponse.success && loginResponse.token != null) {
+        await _storage.write(
+          key: Environment.authTokenKey,
+          value: loginResponse.token!,
+        );
+        print('Token guardado: ${loginResponse.token}'); // Para depuración
+      }
+
+      return loginResponse;
+    } on DioException catch (e) {
+      String message;
+
+      if (e.response != null) {
+        // Si hay una respuesta del servidor, lee el mensaje de error directamente
+        message =
+            e.response!.data['message'] ?? 'Error en la respuesta del servidor';
+
+        // Y retorna una respuesta de LoginResponse con el error
+        return LoginResponse(success: false, message: message);
+      } else {
+        // Si no hay respuesta del servidor (timeout, conexión perdida, etc.)
+        switch (e.type) {
+          case DioExceptionType.connectionTimeout:
+          case DioExceptionType.sendTimeout:
+          case DioExceptionType.receiveTimeout:
+            message =
+                'Tiempo de espera agotado. Por favor, verifica tu conexión.';
+            break;
+          case DioExceptionType.connectionError:
+            message = 'Error de conexión. Verifica tu conexión a internet.';
+            break;
+          default:
+            message = 'Error desconocido. Por favor, intenta de nuevo.';
+        }
+        return LoginResponse(success: false, message: message);
+      }
+    } catch (e) {
+      // Para cualquier otro tipo de error inesperado
+      return LoginResponse(
+        success: false,
+        message: 'Error inesperado: ${e.toString()}',
+      );
+    }
+  }
+
+  Future<bool> isAuthenticated() async {
+    final token = await _storage.read(key: Environment.authTokenKey);
+    return token != null;
+  }
+
+  Future<void> logout() async {
+    await _storage.delete(key: Environment.authTokenKey);
+  }
+}
