@@ -20,7 +20,6 @@ class ApiService {
     dio.options.receiveTimeout = Duration(
       milliseconds: Environment.receiveTimeout,
     );
-    print(dio.options.baseUrl);
 
     // Interceptor para agregar el token a las peticiones
     dio.interceptors.addAll([
@@ -38,7 +37,6 @@ class ApiService {
   }
 
   Future<LoginResponse> login(String username, String password) async {
-    final fullUrl = '${dio.options.baseUrl}${Environment.loginEndpoint}';
 
     // 2. Imprime la URL para verificarla
     try {

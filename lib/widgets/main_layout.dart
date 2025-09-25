@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/widgets/sidebar.dart';
+import 'package:provider/provider.dart'; // NECESARIO
 import '../services/api_service.dart';
-import '../services/container_service.dart';
-import '../models/container_model.dart';
+import '../providers/container_provider.dart'; // NECESARIO
 import '../widgets/container_tree_view.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget child;
 
-  const MainLayout({
-    super.key,
-    required this.child,
-  });
+  const MainLayout({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +22,7 @@ class MainLayout extends StatelessWidget {
               children: [
                 _Sidebar(),
                 Expanded(
-                  child: Container(
-                    color: Colors.grey[100],
-                    child: child,
-                  ),
+                  child: Container(color: Colors.grey[100], child: child),
                 ),
               ],
             ),
@@ -39,6 +34,7 @@ class MainLayout extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
+  // ... (Sin cambios)
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -60,6 +56,8 @@ class _Header extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () async {
+              // NOTA: Si ApiService() se crea aquí, debe ser singleton o inyectado.
+              // Asumiendo que funciona por ahora, pero idealmente se inyectaría.
               await ApiService().logout();
               if (context.mounted) {
                 context.go('/login');
@@ -72,22 +70,43 @@ class _Header extends StatelessWidget {
   }
 }
 
+// -------------------------------------------------------------------
+// CLASE _SIDEBAR (REFRACTORIZADA PARA USAR PROVIDER)
+// -------------------------------------------------------------------
+
 class _Sidebar extends StatefulWidget {
   @override
   State<_Sidebar> createState() => _SidebarState();
 }
 
 class _SidebarState extends State<_Sidebar> {
-  final List<ContainerNode> containers = [];
+  // 1. Eliminamos el estado local `containers` y la instancia de `ContainerService`.
+
+  @override
+  void initState() {
+    super.initState();
+    // 2. Disparamos la carga de contenedores una vez, después de que el widget se haya montado.
+    // Usamos context.read porque no queremos que initState reaccione a los cambios futuros,
+    // solo queremos iniciar la acción.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ContainerProvider>().loadContainers();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    // 3. Observamos (watch) el ContainerProvider para reconstruir automáticamente
+    //    el widget cuando la lista de contenedores o el estado de carga cambien.
+    final containerProvider = context.watch<ContainerProvider>();
+    final containers = containerProvider.containers;
+    final isLoading = containerProvider.isLoading;
+
     return Container(
       width: 250,
       color: Colors.white,
       child: Column(
         children: [
-          _SidebarItem(
+          Sidebar(
             icon: Icons.dashboard,
             title: 'Dashboard',
             onTap: () => context.go('/dashboard'),
@@ -99,66 +118,64 @@ class _SidebarState extends State<_Sidebar> {
               children: [
                 const Text(
                   'Contenedores',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
                 const Spacer(),
+                // Botón Añadir: Muestra un indicador de carga si está activo.
                 IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => _showNewContainerDialog(context),
+                  icon: isLoading
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.add),
+                  onPressed: isLoading
+                      ? null
+                      : () => _showNewContainerDialog(context),
                   tooltip: 'Añadir contenedor',
+                ),
+                // Botón de Recarga (opcional)
+                IconButton(
+                  icon: const Icon(Icons.refresh, size: 20),
+                  onPressed: isLoading
+                      ? null
+                      : containerProvider.loadContainers,
+                  tooltip: 'Recargar contenedores',
                 ),
               ],
             ),
           ),
+
+          // 4. Se muestra el estado de carga o la lista
           Expanded(
-            child: ContainerTreeView(
-              containers: containers,
-              onContainerTap: (container, subSection) {
-                // TODO: Implementar navegación al contenedor y sus secciones
-                if (subSection != null) {
-                  print('Navegando a la sección $subSection del contenedor ${container.name}');
-                } else {
-                  print('Navegando al contenedor ${container.name}');
-                }
-              },
-            ),
+            child: isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : containers.isEmpty
+                ? const Center(child: Text('Crea tu primer contenedor.'))
+                : ContainerTreeView(
+                    containers: containers, // La lista viene del Provider
+                    onContainerTap: (container, subSection) {
+                      if (subSection != null) {
+                        print(
+                          'Navegando a la sección $subSection del contenedor ${container.name}',
+                        );
+                      } else {
+                        print('Navegando al contenedor ${container.name}');
+                      }
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
 
-  final ContainerService _containerService = ContainerService();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadContainers();
-  }
-
-  Future<void> _loadContainers() async {
-    try {
-      final loadedContainers = await _containerService.getContainers();
-      setState(() {
-        containers.clear();
-        containers.addAll(loadedContainers);
-      });
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al cargar los contenedores: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
+  // 5. El diálogo ahora llama al método del Provider.
   Future<void> _showNewContainerDialog(BuildContext context) async {
+    // Usamos context.read para la acción, ya que no queremos reconstruir aquí.
+    final containerProvider = context.read<ContainerProvider>();
+
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
 
@@ -198,9 +215,9 @@ class _SidebarState extends State<_Sidebar> {
               if (nameController.text.isNotEmpty) {
                 Navigator.pop(context, {
                   'name': nameController.text,
-                  'description': descriptionController.text.isEmpty 
-                    ? null 
-                    : descriptionController.text,
+                  'description': descriptionController.text.isEmpty
+                      ? null
+                      : descriptionController.text,
                 });
               }
             },
@@ -212,19 +229,20 @@ class _SidebarState extends State<_Sidebar> {
 
     if (result != null) {
       try {
-        final newContainer = await _containerService.createContainer(
+        // Llama al Provider, que ejecuta la lógica de la API y llama a notifyListeners().
+        await containerProvider.createNewContainer(
           result['name']!,
           result['description'],
         );
-        
-        setState(() {
-          containers.add(newContainer);
-        });
-        
+
+        // ¡El setState() ya no es necesario! La llamada al Provider lo maneja.
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Contenedor creado exitosamente'),
+            SnackBar(
+              content: Text(
+                'Contenedor "${result['name']}" creado exitosamente',
+              ),
               backgroundColor: Colors.green,
             ),
           );
@@ -240,52 +258,5 @@ class _SidebarState extends State<_Sidebar> {
         }
       }
     }
-  }
-}
-
-class _SidebarItem extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final VoidCallback onTap;
-
-  const _SidebarItem({
-    required this.icon,
-    required this.title,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-    final isSelected = location == '/$title'.toLowerCase();
-
-    return Material(
-      color: isSelected ? Colors.grey[100] : Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 12,
-          ),
-          child: Row(
-            children: [
-              Icon(
-                icon,
-                color: isSelected ? Theme.of(context).primaryColor : Colors.grey,
-              ),
-              const SizedBox(width: 16),
-              Text(
-                title,
-                style: TextStyle(
-                  color: isSelected ? Theme.of(context).primaryColor : Colors.grey,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

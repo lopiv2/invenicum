@@ -1,10 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/providers/container_provider.dart';
+import 'package:invenicum/services/container_service.dart';
 import 'routing/app_router.dart';
 import 'package:provider/provider.dart';
 import 'services/api_service.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        // 1. Provee el ApiService (Configuración base de Dio)
+        Provider(create: (_) => ApiService()),
+
+        // 2. Provee el ContainerService, inyectando el ApiService
+        Provider(
+          create: (context) => ContainerService(context.read<ApiService>()),
+        ),
+
+        // 3. Provee el ContainerProvider, inyectando el ContainerService
+        ChangeNotifierProvider(
+          create: (context) =>
+              ContainerProvider(context.read<ContainerService>()),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -17,10 +38,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         debugShowCheckedModeBanner: false,
         title: 'Invenicum',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          useMaterial3: true,
-        ),
+        theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),
         routerConfig: router,
       ),
     );

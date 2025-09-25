@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../services/api_service.dart';
-import '../models/login_response.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
