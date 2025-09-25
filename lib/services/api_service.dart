@@ -5,7 +5,7 @@ import '../models/login_response.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
-  final Dio _dio = Dio();
+  final Dio dio = Dio();
   final _storage = const FlutterSecureStorage();
 
   factory ApiService() {
@@ -13,17 +13,17 @@ class ApiService {
   }
 
   ApiService._internal() {
-    _dio.options.baseUrl = '${Environment.apiUrl}${Environment.apiVersion}';
-    _dio.options.connectTimeout = Duration(
+    dio.options.baseUrl = '${Environment.apiUrl}${Environment.apiVersion}';
+    dio.options.connectTimeout = Duration(
       milliseconds: Environment.connectTimeout,
     );
-    _dio.options.receiveTimeout = Duration(
+    dio.options.receiveTimeout = Duration(
       milliseconds: Environment.receiveTimeout,
     );
-    print(_dio.options.baseUrl);
+    print(dio.options.baseUrl);
 
     // Interceptor para agregar el token a las peticiones
-    _dio.interceptors.addAll([
+    dio.interceptors.addAll([
       InterceptorsWrapper(
         onRequest: (options, handler) async {
           final token = await _storage.read(key: Environment.authTokenKey);
@@ -38,12 +38,14 @@ class ApiService {
   }
 
   Future<LoginResponse> login(String username, String password) async {
+    final fullUrl = '${dio.options.baseUrl}${Environment.loginEndpoint}';
+
+    // 2. Imprime la URL para verificarla
     try {
-      final response = await _dio.post(
+      final response = await dio.post(
         Environment.loginEndpoint,
         data: {'username': username, 'password': password},
       );
-
 
       if (response.data is! Map<String, dynamic>) {
         return LoginResponse(
