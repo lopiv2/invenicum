@@ -1,8 +1,9 @@
 // providers/container_provider.dart
 
 import 'package:flutter/foundation.dart';
+import 'package:invenicum/models/asset_type_model.dart';
+import 'package:invenicum/models/container_node.dart';
 import 'package:invenicum/services/container_service.dart';
-import '../models/container_model.dart';
 
 class ContainerProvider with ChangeNotifier {
   // Renombramos la variable a _containerService para mayor claridad.
@@ -50,4 +51,40 @@ class ContainerProvider with ChangeNotifier {
       rethrow; 
     }
   }
+
+  Future<void> addNewAssetTypeToContainer({
+    required int containerId,
+    required AssetType newAssetType,
+  }) async {
+    // 1. Encontrar el índice del contenedor
+    final index = _containers.indexWhere((c) => c.id == containerId);
+
+    if (index == -1) {
+      print('Error: Contenedor con ID $containerId no encontrado para añadir AssetType.');
+      return;
+    }
+
+    // 2. Obtener el contenedor original
+    final originalContainer = _containers[index];
+    
+    // Clonar la lista de assetTypes y añadir el nuevo elemento
+    final updatedAssetTypes = List<AssetType>.from(originalContainer.assetTypes)
+      ..add(newAssetType);
+
+    // 3. Crear una nueva instancia de ContainerNode (inmutabilidad)
+    final updatedContainer = originalContainer.copyWith(
+      assetTypes: updatedAssetTypes,
+    );
+
+    // 4. Reemplazar el contenedor antiguo con el nuevo
+    _containers[index] = updatedContainer;
+
+    // TODO: PRÓXIMO PASO: Aquí iría la llamada al API para guardar el cambio en la BBDD
+    // Por ahora, solo actualizamos el estado local.
+    // await _containerService.saveAssetType(containerId, newAssetType);
+    
+    // 5. Notificar a los listeners para que la Sidebar y el Grid se actualicen
+    notifyListeners();
+  }
+  
 }

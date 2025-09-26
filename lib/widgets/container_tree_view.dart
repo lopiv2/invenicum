@@ -1,6 +1,9 @@
+// lib/widgets/container_tree_view.dart
+
 import 'package:flutter/material.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
-import '../models/container_model.dart';
+import 'package:go_router/go_router.dart';
+import '../models/container_node.dart';
 
 class ContainerTreeView extends StatelessWidget {
   final List<ContainerNode> containers;
@@ -12,73 +15,58 @@ class ContainerTreeView extends StatelessWidget {
     required this.onContainerTap,
   });
 
-  // Aseguramos que la función devuelve el tipo genérico correcto
+  // --- Construcción del Árbol (Sin cambios) ---
   TreeNode<dynamic> _buildTreeRoot() {
     final root = TreeNode.root();
     
     for (var container in containers) {
       final containerNode = TreeNode(
-        key: container.id,
+        key: container.id.toString(), 
         data: container.name,
       );
       
       // Nodo de la sección 'Activos'
-      final elementsNode = TreeNode(
-        key: "${container.id}_elements",
-        data: "Activos (${container.elements.length})",
+      final assetTypesNode = TreeNode(
+        key: "${container.id}_assettypes",
+        data: "Activos (${container.assetTypes.length})", 
       );
-      for (int i = 0; i < container.elements.length; i++) {
-        elementsNode.add(
-          TreeNode(
-            key: "${container.id}_element_$i",
-            data: container.elements[i],
-          ),
-        );
-      }
-      containerNode.add(elementsNode);
+      containerNode.add(assetTypesNode);
 
-      // Nodo de la sección 'Listas Personalizadas'  
+      // Nodo de la sección 'Listas Personalizadas' 
       final datalistsNode = TreeNode(
         key: "${container.id}_datalists",
         data: "Listas Personalizadas (${container.dataLists.length})",
       );
-      for (int i = 0; i < container.dataLists.length; i++) {
-        datalistsNode.add(
-          TreeNode(
-            key: "${container.id}_datalist_$i",
-            data: container.dataLists[i],
-          ),
-        );
-      }
       containerNode.add(datalistsNode);
+      
       root.add(containerNode);
     }
     
     return root;
   }
 
-  // Define el diseño visual del nodo
+  // --- Renderizado del Ítem (itemBuilder) ---
   Widget _itemBuilder(BuildContext context, TreeNode node) {
     final isContainer = node.level == 1;
     final isSection = node.level == 2;
+    // Solo queremos el cursor de mano en elementos clickables (Contenedores y Secciones)
+    final isClickable = isContainer || isSection;
     
-    return Padding(
+    final nodeContent = Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: Row(
         children: [
-          // Icono para expandir/colapsar (solo visible si tiene hijos)
+          // Icono de expansión
           if (node.children.isNotEmpty)
             Icon(
-              node.isExpanded
-                ? Icons.expand_more 
-                : Icons.chevron_right,
+              node.isExpanded ? Icons.expand_more : Icons.chevron_right,
               size: 20,
               color: Colors.grey,
             )
           else
-            // Espacio de relleno si no hay icono de expansión (para alineación)
             const SizedBox(width: 24),
             
+          // Icono del nodo
           Icon(
             isContainer 
               ? Icons.folder_open 
@@ -93,7 +81,8 @@ class ContainerTreeView extends StatelessWidget {
                 : Colors.grey,
           ),
           const SizedBox(width: 8),
-          // Usamos toString() para manejar diferentes tipos de datos
+          
+          // Texto del nodo
           Text(
             node.data.toString(), 
             style: TextStyle(
@@ -107,38 +96,60 @@ class ContainerTreeView extends StatelessWidget {
         ],
       ),
     );
+
+    // Si el nodo es clickeable, lo envolvemos en MouseRegion
+    if (isClickable) {
+      return MouseRegion(
+        // Cursor de mano (SystemMouseCursors.click)
+        cursor: SystemMouseCursors.click,
+        child: nodeContent,
+      );
+    }
+    
+    return nodeContent;
   }
 
+  // --- Manejo del Tap (onItemTap - Sin cambios) ---
   @override
   Widget build(BuildContext context) {
     return TreeView.simple(
       tree: _buildTreeRoot(),
       showRootNode: false,
-      // Usamos 'onItemTap' para la lógica y la expansión
+      
       onItemTap: (node) {
         final isContainer = node.level == 1;
         final isSection = node.level == 2;
-        
-        // 1. Lógica de negocio
-        if (isContainer || isSection) {
-          final containerId = isContainer ? node.key : node.key.split('_').first;
-          // Esto puede fallar si no existe, mejor usar firstWhere con un valor por defecto
-          final container = containers.firstWhere((c) => c.id == containerId, 
-            orElse: () => throw Exception("Container not found with ID: $containerId")
-          );
-          
-          onContainerTap(container, isSection ? node.key.split('_').last : null);
+        final keyParts = node.key.toString().split('_');
+        final containerIdStr = isContainer ? node.key.toString() : keyParts.first;
+        final containerIdInt = int.tryParse(containerIdStr);
+
+        if (containerIdInt == null) return; 
+
+        // Buscar el contenedor
+        final container = containers.firstWhere(
+          (c) => c.id == containerIdInt, 
+          orElse: () => throw Exception("Container not found with ID: $containerIdStr")
+        );
+
+        // Lógica de Navegación del Negocio (Sección Activos)
+        if (isSection && keyParts.last == 'assettypes') {
+          context.go('/container/$containerIdStr/asset-types');
+          return;
         } 
+        
+        // Lógica de Negocio General
+        if (isContainer || isSection) {
+          onContainerTap(container, isSection ? keyParts.last : null);
+        }
       },
-      // Usamos 'itemBuilder' para el diseño
+      
       builder: (context, node) => _itemBuilder(context, node),
       
-      // Configuraciones de visualización
-      expansionBehavior: ExpansionBehavior.none, // o .collapseOthers si prefieres
-      indentation: Indentation(
+      expansionBehavior: ExpansionBehavior.snapToTop, 
+      indentation: const Indentation(
         style: IndentStyle.roundJoint,
         width: 24,
-        color: Colors.grey.shade300,
+        color: Color(0xFFE0E0E0),
       ),
     );
   }

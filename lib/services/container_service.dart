@@ -1,7 +1,7 @@
 // services/container_service.dart
 
 import 'package:dio/dio.dart';
-import '../models/container_model.dart'; // Asumiendo que ahora es ContainerNode
+import 'package:invenicum/models/container_node.dart';
 import 'api_service.dart';
 
 class ContainerService {
