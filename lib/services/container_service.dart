@@ -55,8 +55,17 @@ class ContainerService {
     }
   }
 
+  Future<void> deleteContainer(int containerId) async {
+        try {
+            // Llama al DELETE /api/v1/containers/:containerId
+            await _dio.delete('/containers/$containerId');
+        } catch (e) {
+            // Manejo de errores específicos (ej. 404, 401)
+            rethrow; 
+        }
+    }
+
   Future<List<ContainerNode>> getContainers() async {
-    // ... (Tu código es perfecto aquí, ya resuelve el doble 'data')
     try {
       final response = await _dio.get('/containers');
 

@@ -3,13 +3,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/models/container_node.dart';
+import 'package:invenicum/models/custom_field_definition_model.dart';
+import 'package:invenicum/services/asset_type_service.dart';
 import 'package:invenicum/services/container_service.dart';
 
 class ContainerProvider with ChangeNotifier {
   // Renombramos la variable a _containerService para mayor claridad.
   final ContainerService _containerService;
+  final AssetTypeService _assetTypeService; 
 
-  ContainerProvider(this._containerService); // Recibe el ContainerService
+  ContainerProvider(this._containerService, this._assetTypeService);
 
   // 1. La variable de estado privada que almacena los datos
   List<ContainerNode> _containers = [];
@@ -52,39 +55,75 @@ class ContainerProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addNewAssetTypeToContainer({
-    required int containerId,
-    required AssetType newAssetType,
-  }) async {
-    // 1. Encontrar el índice del contenedor
-    final index = _containers.indexWhere((c) => c.id == containerId);
+  Future<void> deleteContainer(int containerId) async {
+        // Opción 1: Optimista (quitarlo antes de la API y luego revertir si falla)
+        // Opción 2: Pesimista (quitarlo solo si la API tiene éxito)
+        // Usaremos la opción 2 para mayor seguridad.
+        
+        try {
+            // 1. Llamar al servicio de la API para eliminar en el backend
+            await _containerService.deleteContainer(containerId);
 
-    if (index == -1) {
-      print('Error: Contenedor con ID $containerId no encontrado para añadir AssetType.');
-      return;
+            // 2. Actualizar el estado local (eliminar de la lista)
+            // Usamos where para crear una nueva lista sin el contenedor eliminado
+            _containers = _containers.where((c) => c.id != containerId).toList();
+            
+            // 3. Notificar a la UI
+            notifyListeners();
+
+        } catch (e) {
+            print('Error al eliminar contenedor $containerId: $e');
+            // Es vital relanzar el error para que el widget (ContainerTreeView)
+            // pueda atraparlo y mostrar una notificación al usuario.
+            rethrow;
+        }
     }
+  
 
-    // 2. Obtener el contenedor original
-    final originalContainer = _containers[index];
-    
-    // Clonar la lista de assetTypes y añadir el nuevo elemento
-    final updatedAssetTypes = List<AssetType>.from(originalContainer.assetTypes)
-      ..add(newAssetType);
+  Future<void> addNewAssetTypeToContainer({
+ required int containerId,
+ required String name,
+ required String? imageUrl,
+ required List<CustomFieldDefinition> fieldDefinitions,
+ }) async {
+    try {
+      // 1. Convertir la lista de modelos de Dart a la lista de JSON que espera la API
+      final fieldDefinitionsJson = fieldDefinitions.map((def) => def.toJson()).toList();
 
-    // 3. Crear una nueva instancia de ContainerNode (inmutabilidad)
-    final updatedContainer = originalContainer.copyWith(
-      assetTypes: updatedAssetTypes,
-    );
+      // 2. LLAMAR AL SERVICIO DE API para crear el AssetType en el backend
+      final AssetType newAssetTypeFromApi = await _assetTypeService.createAssetType(
+        containerId: containerId,
+        name: name,
+        imageUrl: imageUrl,
+        fieldDefinitionsJson: fieldDefinitionsJson, // JSON para la API
+      );
+      
+      // 3. Actualizar el estado local (igual que antes, pero con el objeto real de la API)
+      final index = _containers.indexWhere((c) => c.id == containerId);
 
-    // 4. Reemplazar el contenedor antiguo con el nuevo
-    _containers[index] = updatedContainer;
+      if (index == -1) {
+        // Esto puede ocurrir si el contenedor se eliminó o si loadContainers aún no ha terminado.
+        throw Exception('Contenedor con ID $containerId no encontrado.');
+      }
 
-    // TODO: PRÓXIMO PASO: Aquí iría la llamada al API para guardar el cambio en la BBDD
-    // Por ahora, solo actualizamos el estado local.
-    // await _containerService.saveAssetType(containerId, newAssetType);
-    
-    // 5. Notificar a los listeners para que la Sidebar y el Grid se actualicen
-    notifyListeners();
-  }
+      final originalContainer = _containers[index];
+      
+      final updatedAssetTypes = List<AssetType>.from(originalContainer.assetTypes)
+        ..add(newAssetTypeFromApi); // Usamos el objeto devuelto por la API
+
+      final updatedContainer = originalContainer.copyWith(
+        assetTypes: updatedAssetTypes,
+      );
+
+      _containers[index] = updatedContainer;
+
+      // 4. Notificar a los listeners
+      notifyListeners();
+
+    } catch (e) {
+      // Propagar el error de la API o cualquier otro error para que la pantalla lo muestre.
+      rethrow;
+    }
+ }
   
 }

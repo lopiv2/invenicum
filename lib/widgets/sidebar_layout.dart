@@ -84,8 +84,9 @@ class _SidebarLayoutState extends State<SidebarLayout> {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : containers.isEmpty
-                    ? const Center(child: Text('Crea tu primer contenedor.'))
+                ? const Center(child: Text('Crea tu primer contenedor.'))
                 : ContainerTreeView(
+                    onDeleteContainer: _handleDeleteContainer,
                     containers: containers, // La lista viene del Provider
                     onContainerTap: (container, String? subSection) {
                       if (subSection != null) {
@@ -101,6 +102,15 @@ class _SidebarLayoutState extends State<SidebarLayout> {
         ],
       ),
     );
+  }
+
+  Future<void> _handleDeleteContainer(int containerId) async {
+    final containerNotifier = Provider.of<ContainerProvider>(
+      context,
+      listen: false,
+    );
+
+    await containerNotifier.deleteContainer(containerId);
   }
 
   Future<void> _showNewContainerDialog(BuildContext context) async {

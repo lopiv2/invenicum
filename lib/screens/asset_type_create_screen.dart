@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:invenicum/models/asset_type_model.dart';
+import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/widgets/custom_field_editor.dart';
 import 'package:provider/provider.dart';
@@ -102,24 +102,20 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       final newImageUrl =
           _currentImageUrl; // Usamos la URL validada para el AssetType
 
-      final tempAssetType = AssetType(
-        id: DateTime.now().millisecondsSinceEpoch * -1,
-        name: newTypeName,
-        imageUrl: newImageUrl, // Asignamos la URL de la imagen
-        fieldDefinitions: _fieldDefinitions,
-      );
-
       try {
         await containerProvider.addNewAssetTypeToContainer(
           containerId: containerIdInt,
-          newAssetType: tempAssetType,
+          name: newTypeName,
+          imageUrl: newImageUrl,
+          fieldDefinitions:
+              _fieldDefinitions, // Pasamos la lista de definiciones
         );
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Tipo de Activo "${newTypeName}" creado y agregado localmente.',
+                'Tipo de Activo "${newTypeName}" creado exitosamente en el servidor.',
               ),
               backgroundColor: Colors.green,
             ),
