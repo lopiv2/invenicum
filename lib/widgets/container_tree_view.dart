@@ -8,29 +8,30 @@ enum ContainerAction { rename, delete }
 class ContainerTreeView extends StatelessWidget {
   final List<ContainerNode> containers;
   final Function(ContainerNode, String? subSection) onContainerTap;
-  final Future<void> Function(int containerId) onDeleteContainer; 
-  // TODO: Añadir callback para Renombrar si es necesario
+  final Future<void> Function(int containerId) onDeleteContainer;
+  final Future<void> Function(int containerId, String newName) onRenameContainer;
 
   const ContainerTreeView({
     super.key,
     required this.containers,
     required this.onContainerTap,
-    required this.onDeleteContainer, 
+    required this.onDeleteContainer,
+    required this.onRenameContainer,
   });
 
   // --- Construcción del Árbol (Sin cambios) ---
   TreeNode<dynamic> _buildTreeRoot() {
     final root = TreeNode.root();
-    
+
     for (var container in containers) {
       final containerNode = TreeNode(
-        key: container.id.toString(), 
+        key: container.id.toString(),
         data: container.name,
       );
-      
+
       final assetTypesNode = TreeNode(
         key: "${container.id}_assettypes",
-        data: "Activos (${container.assetTypes.length})", 
+        data: "Activos (${container.assetTypes.length})",
       );
       containerNode.add(assetTypesNode);
 
@@ -39,35 +40,125 @@ class ContainerTreeView extends StatelessWidget {
         data: "Listas Personalizadas (${container.dataLists.length})",
       );
       containerNode.add(datalistsNode);
-      
+
       root.add(containerNode);
     }
-    
+
     return root;
   }
-  
+
   // --- Lógica de Manejo de Acciones (NUEVO) ---
-  void _handleMenuAction(BuildContext context, ContainerAction action, ContainerNode container) {
+  void _handleMenuAction(
+    BuildContext context,
+    ContainerAction action,
+    ContainerNode container,
+  ) {
     switch (action) {
       case ContainerAction.delete:
         _showDeleteConfirmationDialog(context, container);
         break;
       case ContainerAction.rename:
-        // TODO: Implementar el diálogo para Renombrar
-        print('Renombrar contenedor ${container.name}');
+        _showRenameDialog(context, container); 
         break;
     }
   }
 
+  // --- NUEVA FUNCIÓN: Diálogo para Renombrar ---
+Future<void> _showRenameDialog(
+  BuildContext context,
+  ContainerNode container,
+) async {
+  final TextEditingController controller =
+      TextEditingController(text: container.name);
+  final formKey = GlobalKey<FormState>();
+
+  final bool? confirmed = await showDialog<bool>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Renombrar Contenedor'),
+        content: Form(
+          key: formKey,
+          child: TextFormField(
+            controller: controller,
+            autofocus: true,
+            decoration: const InputDecoration(
+              labelText: 'Nuevo nombre',
+              border: OutlineInputBorder(),
+            ),
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'El nombre no puede estar vacío';
+              }
+              if (value.trim() == container.name) {
+                return 'El nombre es el mismo que el actual';
+              }
+              return null;
+            },
+            onFieldSubmitted: (value) {
+              // Permite enviar al presionar Enter si es válido
+              if (formKey.currentState!.validate()) {
+                Navigator.of(context).pop(true);
+              }
+            },
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (formKey.currentState!.validate()) {
+                Navigator.of(context).pop(true);
+              }
+            },
+            child: const Text('Renombrar'),
+          ),
+        ],
+      );
+    },
+  );
+
+  // 3. Manejo de la Lógica de Renombrar
+  if (confirmed == true) {
+    final newName = controller.text.trim();
+    if (newName.isEmpty || newName == container.name) return;
+
+    try {
+      // Llama al callback proporcionado por el padre
+      await onRenameContainer(container.id, newName);
+      
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Contenedor renombrado a "$newName".')),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text('Error al renombrar: ${e.toString()}'),
+            backgroundColor: Colors.red),
+      );
+    }
+  }
+}
+
   // --- Lógica para mostrar el menú contextual (NUEVO) ---
-  void _showContextMenu(BuildContext context, Offset position, ContainerNode container) {
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject()! as RenderBox;
-    
+  void _showContextMenu(
+    BuildContext context,
+    Offset position,
+    ContainerNode container,
+  ) {
+    final RenderBox overlay =
+        Overlay.of(context).context.findRenderObject()! as RenderBox;
+
     showMenu<ContainerAction>(
       context: context,
       position: RelativeRect.fromRect(
-        position & const Size(40, 40), 
-        Offset.zero & overlay.size,   
+        position & const Size(40, 40),
+        Offset.zero & overlay.size,
       ),
       items: <PopupMenuEntry<ContainerAction>>[
         const PopupMenuItem<ContainerAction>(
@@ -87,14 +178,19 @@ class ContainerTreeView extends StatelessWidget {
   }
 
   // --- Diálogo de Confirmación (SIN CAMBIOS ESTRUCTURALES) ---
-  Future<void> _showDeleteConfirmationDialog(BuildContext context, ContainerNode container) async {
+  Future<void> _showDeleteConfirmationDialog(
+    BuildContext context,
+    ContainerNode container,
+  ) async {
     // ... (El cuerpo de esta función se mantiene como está)
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Confirmar Eliminación'),
-          content: Text('¿Estás seguro de que quieres eliminar el contenedor "${container.name}"? Esta acción es irreversible y eliminará todos sus activos y datos.'),
+          content: Text(
+            '¿Estás seguro de que quieres eliminar el contenedor "${container.name}"? Esta acción es irreversible y eliminará todos sus activos y datos.',
+          ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
@@ -103,7 +199,10 @@ class ContainerTreeView extends StatelessWidget {
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Eliminar',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -126,100 +225,111 @@ class ContainerTreeView extends StatelessWidget {
     }
   }
 
-
   // --- Renderizado del Ítem (itemBuilder MODIFICADO) ---
+  // --- Renderizado del Ítem (itemBuilder CORREGIDO) ---
   Widget _itemBuilder(BuildContext context, TreeNode node) {
     final isContainer = node.level == 1;
     final isSection = node.level == 2;
     final isClickable = isContainer || isSection;
-    
-    // Buscar el objeto ContainerNode si es un contenedor
+
     ContainerNode? container;
     if (isContainer) {
       final containerIdInt = int.tryParse(node.key.toString());
       if (containerIdInt != null) {
         try {
-          // Acceder a la lista 'containers' de la clase StatelessWidget
           container = containers.firstWhere((c) => c.id == containerIdInt);
         } catch (_) {}
       }
     }
 
-    // 1. Contenido visual del nodo (SIN BOTÓN DE BORRAR)
+    // 1. Contenido visual del nodo (La estructura de iconos y texto)
     final nodeContent = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0), 
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Row(
         children: [
-          // 1. Icono de expansión
-          /*if (node.children.isNotEmpty)
-            Icon(
-              node.isExpanded ? Icons.expand_more : Icons.chevron_right,
-              size: 20,
-              color: Colors.grey,
-            )
-          else
-            const SizedBox(width: 24),*/
-            
+          // 1. Icono de expansión: El TreeView se encarga de este espacio,
+          // ¡pero necesitamos el icono si no usamos el widget por defecto!
+          // Dejaré el icono de expansión COMENTADO, ya que el Indentation
+          // de animated_tree_view generalmente proporciona el espacio.
+          // Si necesitas un icono customizado, mira el siguiente bloque.
+
+          /* if (node.children.isNotEmpty)
+          Icon(
+            node.isExpanded ? Icons.expand_more : Icons.chevron_right,
+            size: 20,
+            color: Colors.grey,
+          )
+        else
+          const SizedBox(width: 24), */
+
           // 2. Icono del nodo
           Icon(
-            isContainer 
-              ? Icons.folder_open 
-              : isSection 
-                ? Icons.list_alt 
+            isContainer
+                ? Icons.folder_open
+                : isSection
+                ? Icons.list_alt
                 : Icons.fiber_manual_record,
-            size: isContainer ? 20 : isSection ? 16 : 8,
-            color: isContainer 
-              ? Theme.of(context).primaryColor
-              : isSection 
+            size: isContainer
+                ? 20
+                : isSection
+                ? 16
+                : 8,
+            color: isContainer
+                ? Theme.of(context).primaryColor
+                : isSection
                 ? Colors.grey[700]
                 : Colors.grey,
           ),
           const SizedBox(width: 8),
-          
+
           // 3. Texto del nodo
           Expanded(
             child: Text(
-              node.data.toString(), 
+              node.data.toString(),
               style: TextStyle(
                 fontSize: isContainer ? 14 : 12,
                 fontWeight: isSection ? FontWeight.bold : FontWeight.normal,
-                color: isContainer 
-                  ? Theme.of(context).primaryColor 
-                  : Colors.grey[900],
+                color: isContainer
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey[900],
               ),
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          
-          // *** ELIMINAMOS EL ICONBUTTON DE BORRAR ***
         ],
       ),
     );
 
-    // 2. Manejo de Clicks y Menú Contextual
     if (!isClickable) {
       return nodeContent;
     }
-    
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        // Clic Izquierdo: Expande/Colapsa y navega. 
-        // Usamos el onTap para simular la expansión (menos confiable sin controller)
-        onTap: () {
-          // Llama al onItemTap, que se encarga de la expansión si el TreeView lo soporta
-          // Y luego maneja la navegación.
-          //TreeView.of(context)!.onItemTap.call(node);
-        },
-        
-        // Clic Secundario (Botón Derecho): Muestra el menú contextual
-        onSecondaryTapDown: isContainer && container != null
-          ? (details) => _showContextMenu(context, details.globalPosition, container!)
-          : null,
-          
+
+    // 2. Manejo de Menú Contextual para Contenedores (Clic Derecho)
+    Widget finalWidget = nodeContent;
+
+    if (isContainer && container != null) {
+      // Si es un contenedor, lo envolvemos para detectar el clic derecho
+      finalWidget = MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          // onSecondaryTapDown para el menú contextual
+          onSecondaryTapDown: (details) =>
+              _showContextMenu(context, details.globalPosition, container!),
+          // No definimos onTap aquí, permitiendo que el TreeView.simple.onItemTap
+          // gestione la expansión y la navegación del clic primario.
+          child: nodeContent,
+        ),
+      );
+    } else {
+      // Si es una sección (Activos/Listas) o un nodo simple
+      // No necesita GestureDetector, solo el cursor de mouse.
+      finalWidget = MouseRegion(
+        cursor: SystemMouseCursors.click,
         child: nodeContent,
-      ),
-    );
+      );
+    }
+
+    return finalWidget;
   }
 
   // --- Manejo del Tap (onItemTap - Se mantiene la lógica de navegación) ---
@@ -228,37 +338,40 @@ class ContainerTreeView extends StatelessWidget {
     return TreeView.simple(
       tree: _buildTreeRoot(),
       showRootNode: false,
-      
+
       // onItemTap ahora manejará tanto la expansión (si es posible) como la navegación
       onItemTap: (node) {
         final isContainer = node.level == 1;
         final isSection = node.level == 2;
         final keyParts = node.key.toString().split('_');
-        final containerIdStr = isContainer ? node.key.toString() : keyParts.first;
+        final containerIdStr = isContainer
+            ? node.key.toString()
+            : keyParts.first;
         final containerIdInt = int.tryParse(containerIdStr);
 
-        if (containerIdInt == null) return; 
+        if (containerIdInt == null) return;
 
         final container = containers.firstWhere(
-          (c) => c.id == containerIdInt, 
-          orElse: () => throw Exception("Container not found with ID: $containerIdStr")
+          (c) => c.id == containerIdInt,
+          orElse: () =>
+              throw Exception("Container not found with ID: $containerIdStr"),
         );
 
         // Lógica de Navegación del Negocio
         if (isSection && keyParts.last == 'assettypes') {
           context.go('/container/$containerIdStr/asset-types');
           return;
-        } 
-        
+        }
+
         // Lógica de Negocio General: Tap en el contenedor o sección general
         if (isContainer || isSection) {
           onContainerTap(container, isSection ? keyParts.last : null);
         }
       },
-      
+
       builder: (context, node) => _itemBuilder(context, node),
-      
-      expansionBehavior: ExpansionBehavior.snapToTop, 
+
+      expansionBehavior: ExpansionBehavior.snapToTop,
       indentation: const Indentation(
         style: IndentStyle.roundJoint,
         width: 24,

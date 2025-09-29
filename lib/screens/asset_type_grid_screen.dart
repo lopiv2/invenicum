@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart'; // NECESARIO para la navegación
+import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/widgets/asset_type_card.dart';
 import 'package:provider/provider.dart';
 import '../providers/container_provider.dart';
@@ -10,15 +11,16 @@ import '../models/container_node.dart';
 class AssetTypeGridScreen extends StatelessWidget {
   final String containerId;
 
-  const AssetTypeGridScreen({
-    super.key,
-    required this.containerId,
-  });
+  const AssetTypeGridScreen({super.key, required this.containerId});
 
   // Método de acción para redirigir a la pantalla de creación
   void _goToCreateAssetType(BuildContext context) {
     // La ruta debe ser algo como: /container/123/asset-types/new
     context.go('/container/$containerId/asset-types/new');
+  }
+
+  void _goToAssetList(BuildContext context, AssetType assetType) {
+    context.go('/container/$containerId/asset-types/${assetType.id}/assets');
   }
 
   @override
@@ -32,16 +34,15 @@ class AssetTypeGridScreen extends StatelessWidget {
 
     final ContainerNode? container = containerProvider.containers
         .cast<ContainerNode?>()
-        .firstWhere(
-          (c) => c?.id == containerIdInt,
-          orElse: () => null,
-        );
+        .firstWhere((c) => c?.id == containerIdInt, orElse: () => null);
 
     if (container == null) {
       if (containerProvider.isLoading) {
         return const Center(child: CircularProgressIndicator());
       }
-      return Center(child: Text('Contenedor con ID $containerId no encontrado.'));
+      return Center(
+        child: Text('Contenedor con ID $containerId no encontrado.'),
+      );
     }
 
     final assetTypes = container.assetTypes;
@@ -57,9 +58,11 @@ class AssetTypeGridScreen extends StatelessWidget {
               // Título dinámico
               Text(
                 'Tipos de Activo en "${container.name}"',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              
+
               // >>> BOTÓN DE CREAR NUEVO TIPO DE ACTIVO <<<
               ElevatedButton.icon(
                 onPressed: () => _goToCreateAssetType(context),
@@ -69,7 +72,7 @@ class AssetTypeGridScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 20),
-          
+
           if (assetTypes.isEmpty)
             const Expanded(
               child: Center(
@@ -84,7 +87,7 @@ class AssetTypeGridScreen extends StatelessWidget {
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 300, 
+                  maxCrossAxisExtent: 300,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
                   childAspectRatio: 3 / 2,
@@ -95,7 +98,8 @@ class AssetTypeGridScreen extends StatelessWidget {
                   return AssetTypeCard(
                     containerId: containerId,
                     assetType: assetType,
-                    assetCount: 0, 
+                    assetCount: 0,
+                    onTap: () => _goToAssetList(context, assetType),
                   );
                 },
               ),

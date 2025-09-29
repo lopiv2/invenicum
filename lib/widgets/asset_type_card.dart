@@ -8,11 +8,13 @@ class AssetTypeCard extends StatelessWidget {
   final String containerId;
   final AssetType assetType;
   final int assetCount;
+  final VoidCallback? onTap;
 
   const AssetTypeCard({
     required this.containerId,
     required this.assetType,
     required this.assetCount,
+    this.onTap,
   });
 
   @override
@@ -22,13 +24,7 @@ class AssetTypeCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          // 3. Lógica de Navegación al hacer clic
-          // Navegar a: /container/:containerId/asset-types/:assetTypeId/assets
-          context.go(
-            '/container/$containerId/asset-types/${assetType.id}/assets',
-          );
-        },
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -52,7 +48,7 @@ class AssetTypeCard extends StatelessWidget {
                   const Icon(Icons.inventory_2_outlined, color: Colors.indigo),
                 ],
               ),
-              
+
               // Número de activos (Placeholder, necesitarás una API para el conteo real)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

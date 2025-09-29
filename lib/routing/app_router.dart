@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/screens/asset_list_screen.dart';
 import 'package:invenicum/screens/asset_type_create_screen.dart';
 import 'package:invenicum/screens/asset_type_grid_screen.dart';
 import 'package:invenicum/screens/dashboard_screen.dart';
@@ -22,8 +23,7 @@ final router = GoRouter(
 
         // --- RUTAS DE GESTIÓN DE INVENTARIO ---
 
-        // 1. Vista de Grid de Tipos de Activo
-        // Cuando se hace clic en 'Activos' en la Sidebar.
+        // 1. Vista de Grid de Tipos de Activo (RUTA BASE / PADRE)
         GoRoute(
           path: '/container/:containerId/asset-types',
           builder: (context, state) {
@@ -31,11 +31,10 @@ final router = GoRouter(
             return AssetTypeGridScreen(containerId: containerId);
           },
           routes: [
-            // 1a. RUTA DE CREACIÓN DE TIPO DE ACTIVO
-            // Path relativo a '/container/:containerId/asset-types'
+            // 1a. RUTA DE CREACIÓN DE TIPO DE ACTIVO (ANIDADA)
+            // Path final: /container/:containerId/asset-types/new
             GoRoute(
-              path:
-                  'new', // Esto se resuelve a /container/:containerId/asset-types/new
+              path: 'new',
               builder: (context, state) {
                 final containerId = state.pathParameters['containerId']!;
                 return AssetTypeCreateScreen(containerId: containerId);
@@ -44,25 +43,41 @@ final router = GoRouter(
           ],
         ),
 
-        // 2. Vista de Lista de Activos Individuales
-        // Cuando se hace clic en un Tipo de Activo del grid (ej: 'Ordenadores').
+        // 2. Vista de Lista de Activos Individuales (RUTA COMPLETA)
+        // La ruta se declara con el path ABSOLUTO para evitar problemas de resolución de anidación.
+        // Path final: /container/:containerId/asset-types/:assetTypeId/assets
         GoRoute(
-          path: '/container/:containerId/asset-types/:assetTypeId/assets',
+          path: '/container/:containerId/asset-types/:assetTypeId/assets', 
           builder: (context, state) {
             final containerId = state.pathParameters['containerId']!;
             final assetTypeId = state.pathParameters['assetTypeId']!;
 
-            return Center(
-              child: Text(
-                'Activos de Tipo $assetTypeId en Contenedor $containerId',
-              ),
+            return AssetListScreen(
+              containerId: containerId,
+              assetTypeId: assetTypeId,
             );
-
-            // return AssetListScreen(containerId: containerId, assetTypeId: assetTypeId);
           },
+          routes: [
+            // 2a. Ruta para CREAR un nuevo activo (ANIDADA)
+            // Path final: /container/:containerId/asset-types/:assetTypeId/assets/new
+            GoRoute(
+              path: 'new',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                final assetTypeId = state.pathParameters['assetTypeId']!;
+                
+                // Placeholder para AssetFormScreen
+                return Center(
+                  child: Text(
+                    'Pantalla de Creación de Activo para Tipo $assetTypeId en Contenedor $containerId',
+                  ),
+                );
+              },
+            ),
+          ],
         ),
-
-        // 3. Vista de Listas Personalizadas
+        
+        // 3. Vista de Listas Personalizadas (Mantenidas)
         GoRoute(
           path: '/container/:containerId/datalists',
           builder: (context, state) {
@@ -73,7 +88,7 @@ final router = GoRouter(
           },
         ),
 
-        // 4. Vista de Categorías
+        // 4. Vista de Categorías (Mantenidas)
         GoRoute(
           path: '/container/:containerId/categories',
           builder: (context, state) {

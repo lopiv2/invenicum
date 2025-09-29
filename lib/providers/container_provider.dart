@@ -10,7 +10,7 @@ import 'package:invenicum/services/container_service.dart';
 class ContainerProvider with ChangeNotifier {
   // Renombramos la variable a _containerService para mayor claridad.
   final ContainerService _containerService;
-  final AssetTypeService _assetTypeService; 
+  final AssetTypeService _assetTypeService;
 
   ContainerProvider(this._containerService, this._assetTypeService);
 
@@ -24,19 +24,19 @@ class ContainerProvider with ChangeNotifier {
 
   // --- Lógica de Obtener Contenedores ---
   Future<void> loadContainers() async {
-  _isLoading = true;
-  notifyListeners(); // 1. Muestra la carga
+    _isLoading = true;
+    notifyListeners(); // 1. Muestra la carga
 
-  try {
-    final loadedContainers = await _containerService.getContainers();
-    _containers = loadedContainers;
-  } catch (e) {
-    print('Error al cargar contenedores: $e');
-  } finally {
-    _isLoading = false;
-    notifyListeners(); // 2. Oculta la carga y muestra la lista (ya sea nueva o la antigua si falló).
+    try {
+      final loadedContainers = await _containerService.getContainers();
+      _containers = loadedContainers;
+    } catch (e) {
+      print('Error al cargar contenedores: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners(); // 2. Oculta la carga y muestra la lista (ya sea nueva o la antigua si falló).
+    }
   }
-}
 
   // --- Lógica de Crear Contenedor ---
   Future<ContainerNode?> createNewContainer(
@@ -44,60 +44,85 @@ class ContainerProvider with ChangeNotifier {
     String? description,
   ) async {
     try {
-      final newContainer = await _containerService.createContainer(name, description);
+      final newContainer = await _containerService.createContainer(
+        name,
+        description,
+      );
       await loadContainers();
 
       return newContainer;
     } catch (e) {
       print('Error al crear contenedor: $e');
       // Es vital que si el try falla, el error se propague para que el Sidebar lo maneje.
-      rethrow; 
+      rethrow;
     }
   }
 
   Future<void> deleteContainer(int containerId) async {
-        // Opción 1: Optimista (quitarlo antes de la API y luego revertir si falla)
-        // Opción 2: Pesimista (quitarlo solo si la API tiene éxito)
-        // Usaremos la opción 2 para mayor seguridad.
-        
-        try {
-            // 1. Llamar al servicio de la API para eliminar en el backend
-            await _containerService.deleteContainer(containerId);
-
-            // 2. Actualizar el estado local (eliminar de la lista)
-            // Usamos where para crear una nueva lista sin el contenedor eliminado
-            _containers = _containers.where((c) => c.id != containerId).toList();
-            
-            // 3. Notificar a la UI
-            notifyListeners();
-
-        } catch (e) {
-            print('Error al eliminar contenedor $containerId: $e');
-            // Es vital relanzar el error para que el widget (ContainerTreeView)
-            // pueda atraparlo y mostrar una notificación al usuario.
-            rethrow;
-        }
+    try {
+      await _containerService.deleteContainer(containerId);
+      _containers = _containers.where((c) => c.id != containerId).toList();
+      notifyListeners();
+    } catch (e) {
+      print('Error al eliminar contenedor $containerId: $e');
+      rethrow;
     }
-  
+  }
+
+  Future<void> renameContainer(int containerId, String newName) async {
+    try {
+      final updatedContainerFromApi = await _containerService.updateContainer(
+        containerId,
+        newName,
+      );
+
+      // 2. Encontrar el índice del contenedor original en la lista local
+      final index = _containers.indexWhere((c) => c.id == containerId);
+
+      if (index == -1) {
+        throw Exception(
+          'Contenedor con ID $containerId no encontrado en el estado local.',
+        );
+      }
+
+      final originalContainer = _containers[index];
+
+      final updatedContainer = originalContainer.copyWith(
+        name: updatedContainerFromApi.name,
+      );
+
+      // 4. Reemplazar el contenedor antiguo por el nuevo en la lista (inmutabilidad)
+      _containers[index] = updatedContainer;
+
+      // 5. Notificar a la UI
+      notifyListeners();
+    } catch (e) {
+      print('Error al renombrar contenedor $containerId a "$newName": $e');
+      rethrow;
+    }
+  }
 
   Future<void> addNewAssetTypeToContainer({
- required int containerId,
- required String name,
- required String? imageUrl,
- required List<CustomFieldDefinition> fieldDefinitions,
- }) async {
+    required int containerId,
+    required String name,
+    required String? imageUrl,
+    required List<CustomFieldDefinition> fieldDefinitions,
+  }) async {
     try {
       // 1. Convertir la lista de modelos de Dart a la lista de JSON que espera la API
-      final fieldDefinitionsJson = fieldDefinitions.map((def) => def.toJson()).toList();
+      final fieldDefinitionsJson = fieldDefinitions
+          .map((def) => def.toJson())
+          .toList();
 
       // 2. LLAMAR AL SERVICIO DE API para crear el AssetType en el backend
-      final AssetType newAssetTypeFromApi = await _assetTypeService.createAssetType(
-        containerId: containerId,
-        name: name,
-        imageUrl: imageUrl,
-        fieldDefinitionsJson: fieldDefinitionsJson, // JSON para la API
-      );
-      
+      final AssetType newAssetTypeFromApi = await _assetTypeService
+          .createAssetType(
+            containerId: containerId,
+            name: name,
+            imageUrl: imageUrl,
+            fieldDefinitionsJson: fieldDefinitionsJson, // JSON para la API
+          );
+
       // 3. Actualizar el estado local (igual que antes, pero con el objeto real de la API)
       final index = _containers.indexWhere((c) => c.id == containerId);
 
@@ -107,9 +132,10 @@ class ContainerProvider with ChangeNotifier {
       }
 
       final originalContainer = _containers[index];
-      
-      final updatedAssetTypes = List<AssetType>.from(originalContainer.assetTypes)
-        ..add(newAssetTypeFromApi); // Usamos el objeto devuelto por la API
+
+      final updatedAssetTypes = List<AssetType>.from(
+        originalContainer.assetTypes,
+      )..add(newAssetTypeFromApi); // Usamos el objeto devuelto por la API
 
       final updatedContainer = originalContainer.copyWith(
         assetTypes: updatedAssetTypes,
@@ -119,11 +145,9 @@ class ContainerProvider with ChangeNotifier {
 
       // 4. Notificar a los listeners
       notifyListeners();
-
     } catch (e) {
       // Propagar el error de la API o cualquier otro error para que la pantalla lo muestre.
       rethrow;
     }
- }
-  
+  }
 }

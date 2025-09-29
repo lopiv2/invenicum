@@ -87,6 +87,7 @@ class _SidebarLayoutState extends State<SidebarLayout> {
                 ? const Center(child: Text('Crea tu primer contenedor.'))
                 : ContainerTreeView(
                     onDeleteContainer: _handleDeleteContainer,
+                    onRenameContainer: _handleRenameContainer,
                     containers: containers, // La lista viene del Provider
                     onContainerTap: (container, String? subSection) {
                       if (subSection != null) {
@@ -111,6 +112,15 @@ class _SidebarLayoutState extends State<SidebarLayout> {
     );
 
     await containerNotifier.deleteContainer(containerId);
+  }
+
+  Future<void> _handleRenameContainer(int containerId, String newName) async {
+    final containerNotifier = Provider.of<ContainerProvider>(
+      context,
+      listen: false,
+    );
+
+    await containerNotifier.renameContainer(containerId, newName);
   }
 
   Future<void> _showNewContainerDialog(BuildContext context) async {

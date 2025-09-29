@@ -56,14 +56,14 @@ class ContainerService {
   }
 
   Future<void> deleteContainer(int containerId) async {
-        try {
-            // Llama al DELETE /api/v1/containers/:containerId
-            await _dio.delete('/containers/$containerId');
-        } catch (e) {
-            // Manejo de errores específicos (ej. 404, 401)
-            rethrow; 
-        }
+    try {
+      // Llama al DELETE /api/v1/containers/:containerId
+      await _dio.delete('/containers/$containerId');
+    } catch (e) {
+      // Manejo de errores específicos (ej. 404, 401)
+      rethrow;
     }
+  }
 
   Future<List<ContainerNode>> getContainers() async {
     try {
@@ -88,6 +88,44 @@ class ContainerService {
       throw Exception('Error de conexión: ${e.message}');
     } catch (e) {
       throw Exception('Error inesperado: $e');
+    }
+  }
+
+  Future<ContainerNode> updateContainer(int containerId, String name) async {
+    try {
+      final response = await _dio.patch(
+        '/containers/$containerId', // Usar PATCH para actualizar parcialmente
+        data: {
+          'name': name,
+          // Nota: Si quieres actualizar la descripción, puedes incluirla aquí también.
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = response.data;
+        if (responseData.containsKey('data') && responseData['data'] != null) {
+          return ContainerNode.fromJson(responseData['data']);
+        } else {
+          throw Exception(
+            'Respuesta de API exitosa, pero el objeto contenedor actualizado ("data") está ausente o es nulo.',
+          );
+        }
+      } else {
+        throw Exception(
+          'Error al actualizar el contenedor: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+      }
+      if (e.response?.statusCode == 404) {
+        throw Exception('Contenedor no encontrado.');
+      }
+      // Re-lanza el error para que el ContainerProvider lo maneje.
+      throw Exception('Error de conexión al renombrar: ${e.message}');
+    } catch (e) {
+      throw Exception('Error inesperado al renombrar: $e');
     }
   }
 }
