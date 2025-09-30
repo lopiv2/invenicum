@@ -10,7 +10,6 @@ class InventoryItemProvider with ChangeNotifier {
   InventoryItemProvider(this._itemService);
 
   // Mapa para almacenar los ítems por la clave ContainerId-AssetTypeId
-  // Esto evita recargar datos innecesariamente al cambiar de pantalla.
   final Map<String, List<InventoryItem>> _itemsCache = {};
   bool _isLoading = false;
 
@@ -27,38 +26,122 @@ class InventoryItemProvider with ChangeNotifier {
     return _itemsCache[key] ?? [];
   }
 
-  // --- Lógica de Carga de Ítems ---
+  // --- 1. READ (Lectura) ---
   Future<void> loadInventoryItems({
     required int containerId,
     required int assetTypeId,
     bool forceReload = false,
   }) async {
     final key = _getCacheKey(containerId, assetTypeId);
-    
-    // Si ya están cargados y no se fuerza la recarga, salimos.
+
     if (_itemsCache.containsKey(key) && !forceReload) {
       return;
     }
-    
+
     _isLoading = true;
     notifyListeners();
 
     try {
-      final loadedItems = await _itemService.getInventoryItems(
+      // Nota: Cambié _itemService.getInventoryItems por el nombre que implementaste antes (fetchInventoryItems)
+      final loadedItems = await _itemService.fetchInventoryItems( 
         containerId: containerId,
         assetTypeId: assetTypeId,
       );
-      
-      // Actualizar la caché y notificar
+
       _itemsCache[key] = loadedItems;
     } catch (e) {
-      print('Error al cargar ítems para $key: $e');
-      // Podrías limpiar el caché aquí si la carga falla
+      if (kDebugMode) {
+        print('Error al cargar ítems para $key: $e');
+      }
+      rethrow; // Re-lanzar el error para manejo en UI
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-  
-  // --- Futuras funciones: createItem, updateItem, deleteItem irían aquí ---
+
+  // --- 2. CREATE (Creación) ---
+  Future<void> createInventoryItem(InventoryItem newItem) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // Llama al servicio para guardar y obtener el ítem con el ID de la API
+      final createdItem = await _itemService.createInventoryItem(newItem);
+      
+      final key = _getCacheKey(createdItem.containerId, createdItem.assetTypeId);
+      
+      // Aseguramos que la lista exista y añadimos el nuevo ítem
+      _itemsCache.putIfAbsent(key, () => []);
+      _itemsCache[key]!.add(createdItem);
+
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error creating inventory item: $e");
+      }
+      rethrow; 
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // --- 3. UPDATE (Actualización) ---
+  Future<void> updateInventoryItem(InventoryItem updatedItem) async {
+    _isLoading = true;
+    notifyListeners();
+    
+    final key = _getCacheKey(updatedItem.containerId, updatedItem.assetTypeId);
+    final itemsList = _itemsCache[key];
+
+    try {
+      // 1. Llama al servicio para actualizar la API
+      final resultItem = await _itemService.updateInventoryItem(updatedItem);
+
+      // 2. Actualiza el ítem en la caché si la lista existe
+      if (itemsList != null) {
+        final index = itemsList.indexWhere((item) => item.id == resultItem.id);
+        if (index != -1) {
+          itemsList[index] = resultItem;
+        }
+      }
+
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error updating inventory item: $e");
+      }
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // --- 4. DELETE (Borrado) ---
+  Future<void> deleteInventoryItem(int itemId, int containerId, int assetTypeId) async {
+    _isLoading = true;
+    notifyListeners();
+    
+    final key = _getCacheKey(containerId, assetTypeId);
+    final itemsList = _itemsCache[key];
+
+    try {
+      // 1. Llama al servicio para borrar en la API
+      await _itemService.deleteInventoryItem(itemId);
+
+      // 2. Elimina el ítem de la caché si la lista existe
+      if (itemsList != null) {
+        itemsList.removeWhere((item) => item.id == itemId);
+      }
+
+    } catch (e) {
+      if (kDebugMode) {
+        print("Error deleting inventory item: $e");
+      }
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 }
