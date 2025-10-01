@@ -1,5 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/models/inventory_item.dart';
+import 'package:invenicum/screens/asset_create_screen.dart';
+import 'package:invenicum/screens/asset_edit_screen.dart';
 import 'package:invenicum/screens/asset_list_screen.dart';
 import 'package:invenicum/screens/asset_type_create_screen.dart';
 import 'package:invenicum/screens/asset_type_grid_screen.dart';
@@ -47,7 +50,7 @@ final router = GoRouter(
         // La ruta se declara con el path ABSOLUTO para evitar problemas de resolución de anidación.
         // Path final: /container/:containerId/asset-types/:assetTypeId/assets
         GoRoute(
-          path: '/container/:containerId/asset-types/:assetTypeId/assets', 
+          path: '/container/:containerId/asset-types/:assetTypeId/assets',
           builder: (context, state) {
             final containerId = state.pathParameters['containerId']!;
             final assetTypeId = state.pathParameters['assetTypeId']!;
@@ -65,18 +68,38 @@ final router = GoRouter(
               builder: (context, state) {
                 final containerId = state.pathParameters['containerId']!;
                 final assetTypeId = state.pathParameters['assetTypeId']!;
-                
-                // Placeholder para AssetFormScreen
-                return Center(
-                  child: Text(
-                    'Pantalla de Creación de Activo para Tipo $assetTypeId en Contenedor $containerId',
-                  ),
+
+                return AssetCreateScreen(
+                  containerId: containerId,
+                  assetTypeId: assetTypeId,
+                );
+              },
+            ),
+            GoRoute(
+              path: ':assetItemId/edit', // <-- Captura el ID del ítem
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                final assetTypeId = state.pathParameters['assetTypeId']!;
+                final assetItemId =
+                    state.pathParameters['assetItemId']!; // <-- Nuevo ID
+
+                // Recuperamos el objeto InventoryItem que se pasó con `extra`
+                final InventoryItem? initialItem =
+                    state.extra as InventoryItem?;
+
+                // 💡 Aquí debes usar tu pantalla de edición
+                return AssetEditScreen(
+                  containerId: containerId,
+                  assetTypeId: assetTypeId,
+                  assetItemId: assetItemId,
+                  initialItem:
+                      initialItem, // Pasamos el ítem para pre-rellenar el formulario
                 );
               },
             ),
           ],
         ),
-        
+
         // 3. Vista de Listas Personalizadas (Mantenidas)
         GoRoute(
           path: '/container/:containerId/datalists',

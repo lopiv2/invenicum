@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/services/asset_type_service.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
     return Provider(
       create: (_) => ApiService(),
       child: MaterialApp.router(
+        builder: FToastBuilder(),
         debugShowCheckedModeBanner: false,
         title: 'Invenicum',
         theme: ThemeData(primarySwatch: Colors.blue, useMaterial3: true),

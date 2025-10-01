@@ -43,7 +43,7 @@ class InventoryItemProvider with ChangeNotifier {
 
     try {
       // Nota: Cambié _itemService.getInventoryItems por el nombre que implementaste antes (fetchInventoryItems)
-      final loadedItems = await _itemService.fetchInventoryItems( 
+      final loadedItems = await _itemService.fetchInventoryItems(
         containerId: containerId,
         assetTypeId: assetTypeId,
       );
@@ -68,47 +68,18 @@ class InventoryItemProvider with ChangeNotifier {
     try {
       // Llama al servicio para guardar y obtener el ítem con el ID de la API
       final createdItem = await _itemService.createInventoryItem(newItem);
-      
-      final key = _getCacheKey(createdItem.containerId, createdItem.assetTypeId);
-      
+
+      final key = _getCacheKey(
+        createdItem.containerId,
+        createdItem.assetTypeId,
+      );
+
       // Aseguramos que la lista exista y añadimos el nuevo ítem
       _itemsCache.putIfAbsent(key, () => []);
       _itemsCache[key]!.add(createdItem);
-
     } catch (e) {
       if (kDebugMode) {
         print("Error creating inventory item: $e");
-      }
-      rethrow; 
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-
-  // --- 3. UPDATE (Actualización) ---
-  Future<void> updateInventoryItem(InventoryItem updatedItem) async {
-    _isLoading = true;
-    notifyListeners();
-    
-    final key = _getCacheKey(updatedItem.containerId, updatedItem.assetTypeId);
-    final itemsList = _itemsCache[key];
-
-    try {
-      // 1. Llama al servicio para actualizar la API
-      final resultItem = await _itemService.updateInventoryItem(updatedItem);
-
-      // 2. Actualiza el ítem en la caché si la lista existe
-      if (itemsList != null) {
-        final index = itemsList.indexWhere((item) => item.id == resultItem.id);
-        if (index != -1) {
-          itemsList[index] = resultItem;
-        }
-      }
-
-    } catch (e) {
-      if (kDebugMode) {
-        print("Error updating inventory item: $e");
       }
       rethrow;
     } finally {
@@ -117,11 +88,55 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
-  // --- 4. DELETE (Borrado) ---
-  Future<void> deleteInventoryItem(int itemId, int containerId, int assetTypeId) async {
+  // --- 3. UPDATE (Actualización) ---
+  Future<void> updateInventoryItem(
+    InventoryItem updatedItem,
+    int assetTypeId, // <--- NUEVO PARÁMETRO REQUERIDO
+  ) async {
     _isLoading = true;
     notifyListeners();
-    
+
+    // Usamos el assetTypeId pasado en el argumento
+    final key = _getCacheKey(updatedItem.containerId, assetTypeId);
+    final itemsList = _itemsCache[key];
+
+    try {
+      // 1. Llama al servicio para actualizar la API
+      // (Asegúrate de que tu service.updateInventoryItem use el updatedItem completo)
+      final resultItem = await _itemService.updateInventoryItem(updatedItem);
+
+      // 2. Actualiza el ítem en la caché si la lista existe
+      if (itemsList != null) {
+        final index = itemsList.indexWhere((item) => item.id == resultItem.id);
+        if (index != -1) {
+          itemsList[index] = resultItem;
+        } else {
+          // En caso de que el ítem no se encontrara (raro en edición),
+          // podrías considerarlo un nuevo ítem y añadirlo, pero es menos común.
+        }
+      }
+      // Nota: Si itemsList es nulo, significa que esa caché aún no se ha cargado/inicializado.
+    } catch (e) {
+      // Usamos `kDebugMode` si está disponible, sino `dart:developer` o solo `print`.
+      // if (kDebugMode) {
+      //   print("Error updating inventory item: $e");
+      // }
+      rethrow;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // --- 4. DELETE (Borrado) ---
+  Future<void> deleteInventoryItem(
+    int itemId,
+    int containerId,
+    int assetTypeId,
+  ) async {
+    _isLoading = true;
+    notifyListeners();
+
     final key = _getCacheKey(containerId, assetTypeId);
     final itemsList = _itemsCache[key];
 
@@ -133,7 +148,6 @@ class InventoryItemProvider with ChangeNotifier {
       if (itemsList != null) {
         itemsList.removeWhere((item) => item.id == itemId);
       }
-
     } catch (e) {
       if (kDebugMode) {
         print("Error deleting inventory item: $e");

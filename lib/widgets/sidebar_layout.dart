@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/container_provider.dart';
+import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/widgets/container_tree_view.dart';
 import 'package:invenicum/widgets/sidebar.dart';
 import 'package:provider/provider.dart';
@@ -189,23 +190,11 @@ class _SidebarLayoutState extends State<SidebarLayout> {
         // ¡El setState() ya no es necesario! La llamada al Provider lo maneja.
 
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Contenedor "${result['name']}" creado exitosamente',
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ToastService.success('Contenedor "${result['name']}" creado correctamente.');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al crear el contenedor: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ToastService.error('Error al crear el contenedor: ${e.toString()}', 5);
         }
       }
     }

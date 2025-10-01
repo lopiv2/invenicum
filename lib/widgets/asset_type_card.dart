@@ -1,7 +1,6 @@
 // lib/screens/asset_type_grid_screen.dart (como un widget privado en el mismo archivo)
 
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/asset_type_model.dart';
 
 class AssetTypeCard extends StatelessWidget {

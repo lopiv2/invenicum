@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
+import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/widgets/custom_field_editor.dart';
 import 'package:provider/provider.dart';
 import '../models/list_data.dart'; // Necesitas el modelo de Lista de Datos
@@ -112,26 +113,12 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
         );
 
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Tipo de Activo "${newTypeName}" creado exitosamente en el servidor.',
-              ),
-              backgroundColor: Colors.green,
-            ),
-          );
+          ToastService.success('Tipo de Activo "${newTypeName}" creado exitosamente en el servidor.');
           context.go('/container/${widget.containerId}/asset-types');
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Error al crear el Tipo de Activo: ${e.toString()}',
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ToastService.error('Error al crear el Tipo de Activo: ${e.toString()}', 5);
         }
       }
     }

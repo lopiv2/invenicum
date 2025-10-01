@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/container_node.dart';
+import 'package:invenicum/services/toast_service.dart';
 import 'package:provider/provider.dart';
 
 import '../models/asset_type_model.dart';
@@ -40,7 +41,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     super.initState();
     _containerId = int.tryParse(widget.containerId);
     _assetTypeId = int.tryParse(widget.assetTypeId);
-    
+
     // Programamos la inicialización después del primer frame para usar context
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeForm();
@@ -52,25 +53,32 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
     // Obtenemos el tipo de activo de forma no reactiva
     final containerProvider = context.read<ContainerProvider>();
-    final container = containerProvider.containers
- .firstWhere((c) => c.id == _containerId, orElse: () => ContainerNode(id: -1, name: '', description: '', assetTypes: [], dataLists: [], status: '')); // Proporcionar un valor predeterminado
+    final container = containerProvider.containers.firstWhere(
+      (c) => c.id == _containerId,
+      orElse: () => ContainerNode(
+        id: -1,
+        name: '',
+        description: '',
+        assetTypes: [],
+        dataLists: [],
+        status: '',
+      ),
+    ); // Proporcionar un valor predeterminado
 
-    if (container != null) {
-      final assetType = container.assetTypes
- .firstWhere((at) => at.id == _assetTypeId, orElse: () => AssetType(id: -1, name: '', fieldDefinitions: [])); // Proporcionar un valor predeterminado
+    final assetType = container.assetTypes.firstWhere(
+      (at) => at.id == _assetTypeId,
+      orElse: () => AssetType(id: -1, name: '', fieldDefinitions: []),
+    ); // Proporcionar un valor predeterminado
 
-      if (assetType != null) {
-        setState(() {
-          _assetType = assetType;
-          // Inicializa los controladores para cada campo custom
-          for (var field in assetType.fieldDefinitions) {
-            _customControllers[field.id ?? 0] = TextEditingController();
-          }
-        });
+    setState(() {
+      _assetType = assetType;
+      // Inicializa los controladores para cada campo custom
+      for (var field in assetType.fieldDefinitions) {
+        _customControllers[field.id ?? 0] = TextEditingController();
       }
-    }
+    });
   }
-  
+
   // Limpia los controladores cuando el widget es desechado
   @override
   void dispose() {
@@ -87,7 +95,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     }
 
     final itemProvider = context.read<InventoryItemProvider>();
-    
+
     // 1. Recoger los valores custom
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
@@ -101,7 +109,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     // 2. Crear el nuevo objeto InventoryItem
     final newItem = InventoryItem(
       // El ID será generado por la DB/API
-      id: 0, 
+      id: 0,
       containerId: _containerId!,
       assetTypeId: _assetTypeId!,
       name: _nameController.text.trim(),
@@ -115,20 +123,18 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     // 3. Llamar al proveedor para guardar (simulado o real)
     try {
       await itemProvider.createInventoryItem(newItem);
-      
+
       // 4. Navegar de vuelta al listado
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Activo creado con éxito!')),
-        );
+        ToastService.success('Activo creado con éxito!');
         // Regresa a la lista de activos
-        context.go('/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets');
+        context.go(
+          '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
+        );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al crear activo: ${e.toString()}')),
-        );
+        ToastService.error('Error al crear activo: ${e.toString()}');
       }
     }
   }
@@ -136,14 +142,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   @override
   Widget build(BuildContext context) {
     if (_assetType == null) {
-      // Usamos el watch para que si el provider carga los contenedores tarde, 
+      // Usamos el watch para que si el provider carga los contenedores tarde,
       // la pantalla intente inicializarse de nuevo.
-      context.watch<ContainerProvider>(); 
+      context.watch<ContainerProvider>();
       if (_containerId == null || _assetTypeId == null) {
         return const Center(child: Text('IDs no válidos.'));
       }
       // Reintentamos la inicialización si el tipo de activo aún no está cargado
-      _initializeForm(); 
+      _initializeForm();
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -157,9 +163,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
             // --- TÍTULO ---
             Text(
               'Crear Activo: ${_assetType!.name}',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
@@ -170,11 +176,20 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // --- CAMPOS COMUNES ---
-                    const Text('Datos Comunes', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Datos Comunes',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const Divider(),
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Nombre del Activo', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                        labelText: 'Nombre del Activo',
+                        border: OutlineInputBorder(),
+                      ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Por favor introduce un nombre.';
@@ -185,16 +200,27 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(labelText: 'Descripción (Opcional)', border: OutlineInputBorder()),
+                      decoration: const InputDecoration(
+                        labelText: 'Descripción (Opcional)',
+                        border: OutlineInputBorder(),
+                      ),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 30),
 
                     // --- CAMPOS CUSTOM (DINÁMICOS) ---
-                    const Text('Campos Personalizados', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                    const Text(
+                      'Campos Personalizados',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     const Divider(),
                     if (_assetType!.fieldDefinitions.isEmpty)
-                      const Text('Este tipo de activo no tiene campos personalizados.'),
+                      const Text(
+                        'Este tipo de activo no tiene campos personalizados.',
+                      ),
 
                     ..._assetType!.fieldDefinitions.map((fieldDef) {
                       final controller = _customControllers[fieldDef.id];
@@ -204,12 +230,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                         padding: const EdgeInsets.only(bottom: 16),
                         child: TextFormField(
                           controller: controller,
-                          keyboardType: _getKeyboardType(fieldDef.type.toString()),
+                          keyboardType: _getKeyboardType(
+                            fieldDef.type.toString(),
+                          ),
                           decoration: InputDecoration(
                             labelText: fieldDef.name,
-                            hintText: 'Tipo: ${fieldDef.type.toString().toLowerCase()}',
+                            hintText:
+                                'Tipo: ${fieldDef.type.toString().toLowerCase()}',
                             border: const OutlineInputBorder(),
-                            helperText: fieldDef.isRequired ? 'Obligatorio' : null,
+                            helperText: fieldDef.isRequired
+                                ? 'Obligatorio'
+                                : null,
                           ),
                           validator: fieldDef.isRequired
                               ? (value) {
@@ -226,16 +257,22 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                 ),
               ),
             ),
-            
+
             // --- BOTÓN DE GUARDAR ---
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton.icon(
                 onPressed: _saveAsset,
                 icon: const Icon(Icons.save),
-                label: const Text('Guardar Activo', style: TextStyle(fontSize: 16)),
+                label: const Text(
+                  'Guardar Activo',
+                  style: TextStyle(fontSize: 16),
+                ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 25,
+                    vertical: 15,
+                  ),
                 ),
               ),
             ),

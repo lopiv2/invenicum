@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/services/toast_service.dart';
 import '../models/container_node.dart';
 
 enum ContainerAction { rename, delete }
@@ -9,7 +10,8 @@ class ContainerTreeView extends StatelessWidget {
   final List<ContainerNode> containers;
   final Function(ContainerNode, String? subSection) onContainerTap;
   final Future<void> Function(int containerId) onDeleteContainer;
-  final Future<void> Function(int containerId, String newName) onRenameContainer;
+  final Future<void> Function(int containerId, String newName)
+  onRenameContainer;
 
   const ContainerTreeView({
     super.key,
@@ -31,7 +33,7 @@ class ContainerTreeView extends StatelessWidget {
 
       final assetTypesNode = TreeNode(
         key: "${container.id}_assettypes",
-        data: "Activos (${container.assetTypes.length})",
+        data: "Tipos de activos (${container.assetTypes.length})",
       );
       containerNode.add(assetTypesNode);
 
@@ -58,92 +60,87 @@ class ContainerTreeView extends StatelessWidget {
         _showDeleteConfirmationDialog(context, container);
         break;
       case ContainerAction.rename:
-        _showRenameDialog(context, container); 
+        _showRenameDialog(context, container);
         break;
     }
   }
 
   // --- NUEVA FUNCIÓN: Diálogo para Renombrar ---
-Future<void> _showRenameDialog(
-  BuildContext context,
-  ContainerNode container,
-) async {
-  final TextEditingController controller =
-      TextEditingController(text: container.name);
-  final formKey = GlobalKey<FormState>();
+  Future<void> _showRenameDialog(
+    BuildContext context,
+    ContainerNode container,
+  ) async {
+    final TextEditingController controller = TextEditingController(
+      text: container.name,
+    );
+    final formKey = GlobalKey<FormState>();
 
-  final bool? confirmed = await showDialog<bool>(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('Renombrar Contenedor'),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: controller,
-            autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'Nuevo nombre',
-              border: OutlineInputBorder(),
+    final bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Renombrar Contenedor'),
+          content: Form(
+            key: formKey,
+            child: TextFormField(
+              controller: controller,
+              autofocus: true,
+              decoration: const InputDecoration(
+                labelText: 'Nuevo nombre',
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'El nombre no puede estar vacío';
+                }
+                if (value.trim() == container.name) {
+                  return 'El nombre es el mismo que el actual';
+                }
+                return null;
+              },
+              onFieldSubmitted: (value) {
+                // Permite enviar al presionar Enter si es válido
+                if (formKey.currentState!.validate()) {
+                  Navigator.of(context).pop(true);
+                }
+              },
             ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'El nombre no puede estar vacío';
-              }
-              if (value.trim() == container.name) {
-                return 'El nombre es el mismo que el actual';
-              }
-              return null;
-            },
-            onFieldSubmitted: (value) {
-              // Permite enviar al presionar Enter si es válido
-              if (formKey.currentState!.validate()) {
-                Navigator.of(context).pop(true);
-              }
-            },
           ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancelar'),
-          ),
-          FilledButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                Navigator.of(context).pop(true);
-              }
-            },
-            child: const Text('Renombrar'),
-          ),
-        ],
-      );
-    },
-  );
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancelar'),
+            ),
+            FilledButton(
+              onPressed: () {
+                if (formKey.currentState!.validate()) {
+                  Navigator.of(context).pop(true);
+                }
+              },
+              child: const Text('Renombrar'),
+            ),
+          ],
+        );
+      },
+    );
 
-  // 3. Manejo de la Lógica de Renombrar
-  if (confirmed == true) {
-    final newName = controller.text.trim();
-    if (newName.isEmpty || newName == container.name) return;
+    // 3. Manejo de la Lógica de Renombrar
+    if (confirmed == true) {
+      final newName = controller.text.trim();
+      if (newName.isEmpty || newName == container.name) return;
 
-    try {
-      // Llama al callback proporcionado por el padre
-      await onRenameContainer(container.id, newName);
-      
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Contenedor renombrado a "$newName".')),
-      );
-    } catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('Error al renombrar: ${e.toString()}'),
-            backgroundColor: Colors.red),
-      );
+      try {
+        // Llama al callback proporcionado por el padre
+        await onRenameContainer(container.id, newName);
+
+        if (!context.mounted) return;
+        ToastService.success('Contenedor renombrado a "$newName".');
+      } catch (e) {
+        if (!context.mounted) return;
+        ToastService.error('Error al renombrar: ${e.toString()}');
+      }
     }
   }
-}
 
   // --- Lógica para mostrar el menú contextual (NUEVO) ---
   void _showContextMenu(
@@ -213,14 +210,10 @@ Future<void> _showRenameDialog(
       try {
         await onDeleteContainer(container.id);
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Contenedor "${container.name}" eliminado.')),
-        );
+        ToastService.success('Contenedor "${container.name}" eliminado.');
       } catch (e) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al eliminar: ${e.toString()}')),
-        );
+        ToastService.error('Error al eliminar: ${e.toString()}');
       }
     }
   }

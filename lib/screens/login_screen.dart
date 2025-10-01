@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/services/toast_service.dart';
 import '../services/api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,41 +29,26 @@ class _LoginScreenState extends State<LoginScreen> {
         _usernameController.text,
         _passwordController.text,
       );
-      
+
       if (mounted) {
         if (result.success && result.token != null) {
           // Mostrar mensaje de éxito
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Inicio de sesión exitoso'),
-              backgroundColor: Colors.green,
-              duration: Duration(seconds: 1),
-            ),
-          );
-          
+          ToastService.success('Inicio de sesión exitoso');
           // Pequeña pausa para mostrar el mensaje de éxito
           await Future.delayed(const Duration(seconds: 1));
-          
+
           if (mounted) {
             context.go('/dashboard');
           }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(result.message),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ToastService.error(result.message);
+          // Mostrar mensaje de error);
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error inesperado: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ToastService.error('Error inesperado: ${e.toString()}');
+        // Mostrar mensaje de error
       }
     } finally {
       if (mounted) {
@@ -89,10 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   const Text(
                     'Iniciar Sesión',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 32),
                   TextFormField(
