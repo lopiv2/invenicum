@@ -32,6 +32,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   // Mapa para los controladores de campos custom
   final Map<int, TextEditingController> _customControllers = {};
 
+  // NUEVO: Estado para gestionar las URLs de las imágenes
+  final List<String> _imageUrls = [];
+  
   AssetType? _assetType;
   int? _containerId;
   int? _assetTypeId;
@@ -42,7 +45,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     _containerId = int.tryParse(widget.containerId);
     _assetTypeId = int.tryParse(widget.assetTypeId);
 
-    // Programamos la inicialización después del primer frame para usar context
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeForm();
     });
@@ -51,7 +53,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   void _initializeForm() {
     if (_containerId == null || _assetTypeId == null) return;
 
-    // Obtenemos el tipo de activo de forma no reactiva
     final containerProvider = context.read<ContainerProvider>();
     final container = containerProvider.containers.firstWhere(
       (c) => c.id == _containerId,
@@ -63,23 +64,23 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         dataLists: [],
         status: '',
       ),
-    ); // Proporcionar un valor predeterminado
+    );
 
     final assetType = container.assetTypes.firstWhere(
       (at) => at.id == _assetTypeId,
       orElse: () => AssetType(id: -1, name: '', fieldDefinitions: []),
-    ); // Proporcionar un valor predeterminado
+    );
 
     setState(() {
       _assetType = assetType;
       // Inicializa los controladores para cada campo custom
       for (var field in assetType.fieldDefinitions) {
-        _customControllers[field.id ?? 0] = TextEditingController();
+        // Usamos field.id como clave; asumimos que no es nulo en un modelo AssetType válido
+        _customControllers[field.id!] = TextEditingController(); 
       }
     });
   }
 
-  // Limpia los controladores cuando el widget es desechado
   @override
   void dispose() {
     _nameController.dispose();
@@ -88,7 +89,55 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     super.dispose();
   }
 
-  // Lógica para guardar el nuevo activo
+  // --- LÓGICA DE GESTIÓN DE IMÁGENES (Simulación) ---
+
+  /// Muestra un diálogo para simular la subida y captura de la URL de la imagen.
+  void _addImage() {
+    final urlController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Añadir Imagen (URL de prueba)'),
+          content: TextField(
+            controller: urlController,
+            decoration: const InputDecoration(
+              hintText: 'Introduce la URL o ruta de la imagen',
+              labelText: 'URL de Imagen',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                final url = urlController.text.trim();
+                if (url.isNotEmpty) {
+                  setState(() {
+                    _imageUrls.add(url);
+                  });
+                }
+                Navigator.of(context).pop();
+              },
+              child: const Text('Añadir'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _removeImage(String url) {
+    setState(() {
+      _imageUrls.remove(url);
+    });
+  }
+
+  // --- LÓGICA DE GUARDADO ---
+
   Future<void> _saveAsset() async {
     if (!_formKey.currentState!.validate() || _assetType == null) {
       return;
@@ -107,27 +156,36 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     }
 
     // 2. Crear el nuevo objeto InventoryItem
+    // NOTA: El modelo InventoryItem actual de Flutter no incluye una lista de URLs de imágenes
+    // directamente. En un entorno real, pasarías la lista de URLs al método del Provider/Service,
+    // y este se encargaría de crear los modelos InventoryItemImage en el backend.
+    
     final newItem = InventoryItem(
-      // El ID será generado por la DB/API
       id: 0,
       containerId: _containerId!,
       assetTypeId: _assetTypeId!,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: customFieldValues,
-      // Los campos de fecha se establecerán en la API
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      // Aquí el InventoryItem debería incluir un campo para las imágenes,
+      // pero como tu modelo Flutter no lo tiene, lo pasamos aparte:
     );
 
-    // 3. Llamar al proveedor para guardar (simulado o real)
+    // 3. Llamar al proveedor para guardar (se debe extender el provider para aceptar las URLs)
     try {
-      await itemProvider.createInventoryItem(newItem);
+      // 🛑 NOTA IMPORTANTE: Si `createInventoryItem` solo acepta `InventoryItem`,
+      // tendrás que modificar `InventoryItemProvider` para aceptar las URLs.
+      // Por ahora, asumimos una nueva función para simular esto:
+      await itemProvider.createInventoryItem(
+        newItem,
+        imageUrls: _imageUrls, // Pasamos las URLs para que el servicio las maneje
+      ); 
 
       // 4. Navegar de vuelta al listado
       if (mounted) {
         ToastService.success('Activo creado con éxito!');
-        // Regresa a la lista de activos
         context.go(
           '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
         );
@@ -139,16 +197,101 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     }
   }
 
+  // --- WIDGET DE IMÁGENES ---
+
+  Widget _buildImageSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Imágenes del Activo',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+        const Divider(),
+        
+        // Botón para añadir imagen
+        ElevatedButton.icon(
+          onPressed: _addImage,
+          icon: const Icon(Icons.image),
+          label: const Text('Añadir Imagen'),
+        ),
+        const SizedBox(height: 10),
+
+        // Previsualización de imágenes (Grid)
+        if (_imageUrls.isNotEmpty)
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: _imageUrls.map((url) {
+              return Stack(
+                children: [
+                  Container(
+                    width: 150,
+                    height: 150,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.network(
+                      url,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Muestra un placeholder si la URL no es una imagen válida
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.broken_image, size: 40, color: Colors.red),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  url.substring(0, 10) + '...',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 10),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
+                      onPressed: () => _removeImage(url),
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white70,
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(30, 30),
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
+          )
+        else
+          const Padding(
+            padding: EdgeInsets.only(top: 8.0),
+            child: Text('No hay imágenes añadidas.'),
+          ),
+      ],
+    );
+  }
+
+  // --- WIDGET PRINCIPAL (BUILD) ---
+
   @override
   Widget build(BuildContext context) {
     if (_assetType == null) {
-      // Usamos el watch para que si el provider carga los contenedores tarde,
-      // la pantalla intente inicializarse de nuevo.
       context.watch<ContainerProvider>();
       if (_containerId == null || _assetTypeId == null) {
         return const Center(child: Text('IDs no válidos.'));
       }
-      // Reintentamos la inicialización si el tipo de activo aún no está cargado
       _initializeForm();
       return const Center(child: CircularProgressIndicator());
     }
@@ -163,9 +306,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
             // --- TÍTULO ---
             Text(
               'Crear Activo: ${_assetType!.name}',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
@@ -178,10 +319,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                     // --- CAMPOS COMUNES ---
                     const Text(
                       'Datos Comunes',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const Divider(),
                     TextFormField(
@@ -208,19 +346,18 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                     ),
                     const SizedBox(height: 30),
 
+                    // --- SECCIÓN DE IMÁGENES ---
+                    _buildImageSection(),
+                    const SizedBox(height: 30),
+
                     // --- CAMPOS CUSTOM (DINÁMICOS) ---
                     const Text(
                       'Campos Personalizados',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const Divider(),
                     if (_assetType!.fieldDefinitions.isEmpty)
-                      const Text(
-                        'Este tipo de activo no tiene campos personalizados.',
-                      ),
+                      const Text('Este tipo de activo no tiene campos personalizados.'),
 
                     ..._assetType!.fieldDefinitions.map((fieldDef) {
                       final controller = _customControllers[fieldDef.id];
@@ -230,17 +367,12 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                         padding: const EdgeInsets.only(bottom: 16),
                         child: TextFormField(
                           controller: controller,
-                          keyboardType: _getKeyboardType(
-                            fieldDef.type.toString(),
-                          ),
+                          keyboardType: _getKeyboardType(fieldDef.type.toString()),
                           decoration: InputDecoration(
                             labelText: fieldDef.name,
-                            hintText:
-                                'Tipo: ${fieldDef.type.toString().toLowerCase()}',
+                            hintText: 'Tipo: ${fieldDef.type.toString().toLowerCase()}',
                             border: const OutlineInputBorder(),
-                            helperText: fieldDef.isRequired
-                                ? 'Obligatorio'
-                                : null,
+                            helperText: fieldDef.isRequired ? 'Obligatorio' : null,
                           ),
                           validator: fieldDef.isRequired
                               ? (value) {
@@ -269,10 +401,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                   style: TextStyle(fontSize: 16),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 25,
-                    vertical: 15,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
                 ),
               ),
             ),
@@ -290,7 +419,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         return TextInputType.number;
       case 'date':
         return TextInputType.datetime;
-      // case 'boolean': // Los booleanos se manejarían con Checkbox/Switch, no con TextFormField
       default:
         return TextInputType.text;
     }

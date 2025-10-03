@@ -40,6 +40,7 @@ dependencies:
   flutter_secure_storage: ^9.2.4
   animated_tree_view: ^2.3.0
   fluttertoast: ^9.0.0
+  data_table_2: ^2.6.0
 
 dev_dependencies:
   flutter_test:

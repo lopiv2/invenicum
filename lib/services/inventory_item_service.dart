@@ -13,8 +13,6 @@ class InventoryItemService {
 
   // --- 1. READ (Lectura) ---
   /// Obtiene la lista de ítems de inventario para un tipo de activo específico.
-  ///
-  /// Usado por el Provider como: fetchInventoryItems
   Future<List<InventoryItem>> fetchInventoryItems({
     required int containerId,
     required int assetTypeId,
@@ -46,11 +44,17 @@ class InventoryItemService {
     }
   }
 
-  // --- 2. CREATE (Creación) ---
-  /// Crea un nuevo ítem de inventario en la base de datos.
+  // ------------------------------------
+  // --- 2. CREATE (Creación) (CORREGIDO) ---
+  // ------------------------------------
+  /// Crea un nuevo ítem de inventario, incluyendo opcionalmente URLs de imágenes.
   ///
   /// Ruta esperada en el backend: POST /items
-  Future<InventoryItem> createInventoryItem(InventoryItem item) async {
+  Future<InventoryItem> createInventoryItem(
+    InventoryItem item, {
+    // ACEPTA LAS NUEVAS URLS DE IMAGEN
+    List<String> imageUrls = const [], 
+  }) async {
     try {
       // Usamos toMap() para serializar el objeto InventoryItem sin el ID (que es nuevo)
       final data = {
@@ -59,17 +63,21 @@ class InventoryItemService {
         'containerId': item.containerId,
         'assetTypeId': item.assetTypeId,
         'customFieldValues': item.customFieldValues,
-        // Agrega otros campos aquí si es necesario (e.g., purchaseDate)
+        // AÑADIMOS LAS URLS DE IMAGEN PARA QUE EL BACKEND LAS PROCESE
+        'imageUrls': imageUrls, 
       };
 
       final response = await _dio.post('/items', data: data);
 
       if (response.statusCode == 201) {
         // 201 Created
-        // El backend debe devolver el objeto completo, incluyendo el nuevo ID.
+        // El backend debe devolver el objeto completo, incluyendo el nuevo ID y las imágenes.
         return InventoryItem.fromJson(response.data);
       } else {
-        throw Exception('Error al crear activo: Código ${response.statusCode}');
+        // Mejor manejo de errores para incluir detalles del backend si están disponibles
+        throw Exception(
+          'Error al crear activo: Código ${response.statusCode} - ${response.statusMessage}',
+        );
       }
     } on DioException catch (e) {
       rethrow;
@@ -78,13 +86,18 @@ class InventoryItemService {
     }
   }
 
-  // --- 3. UPDATE (Actualización) ---
-  /// Actualiza un ítem de inventario existente.
+  // -------------------------------------
+  // --- 3. UPDATE (Actualización) (MODIFICADO) ---
+  // -------------------------------------
+  /// Actualiza un ítem de inventario existente, incluyendo la gestión de imágenes.
   ///
   /// Ruta esperada en el backend: PUT/PATCH /items/:id
   Future<InventoryItem> updateInventoryItem(InventoryItem item) async {
     try {
-      // Usamos PUT para enviar el objeto completo para la actualización.
+      // Preparamos las URLs existentes para enviarlas de vuelta
+      final currentImageUrls = item.images.map((img) => img.url).toList();
+      
+      // Usamos PUT/PATCH para enviar el objeto completo para la actualización.
       final data = {
         'id': item.id,
         'name': item.name,
@@ -92,7 +105,10 @@ class InventoryItemService {
         'containerId': item.containerId,
         'assetTypeId': item.assetTypeId,
         'customFieldValues': item.customFieldValues,
-        // Incluye los demás campos de fecha/gestión
+        
+        // Asumimos que el backend recibirá la lista COMPLETA de URLs y 
+        // gestionará las adiciones/eliminaciones.
+        'imageUrls': currentImageUrls, 
       };
 
       final response = await _dio.put('/items/${item.id}', data: data);

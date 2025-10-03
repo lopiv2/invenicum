@@ -1,5 +1,3 @@
-// lib/providers/inventory_item_provider.dart
-
 import 'package:flutter/foundation.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
@@ -7,26 +5,180 @@ import 'package:invenicum/services/inventory_item_service.dart';
 class InventoryItemProvider with ChangeNotifier {
   final InventoryItemService _itemService;
 
-  InventoryItemProvider(this._itemService);
+  // Estado de Filtrado y Ordenamiento
+  Map<String, String> _filters = {};
+  Map<String, String> get filters => _filters;
+  String? _globalSearchTerm;
+  String? get globalSearchTerm => _globalSearchTerm;
 
-  // Mapa para almacenar los ítems por la clave ContainerId-AssetTypeId
+  String sortKey = 'name';
+  bool sortAscending = true;
+
+  // Estado de Paginación
+  int _currentPage = 1;
+  static const int _itemsPerPage = 10;
+
+  int get currentPage => _currentPage;
+  int get itemsPerPage => _itemsPerPage;
+
   final Map<String, List<InventoryItem>> _itemsCache = {};
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
 
-  /// Genera una clave única para la caché.
+  InventoryItemProvider(this._itemService);
+
   String _getCacheKey(int containerId, int assetTypeId) {
     return '$containerId-$assetTypeId';
   }
 
-  /// Getter: Obtiene los ítems del inventario para un AssetType específico.
-  List<InventoryItem> getInventoryItems(int containerId, int assetTypeId) {
-    final key = _getCacheKey(containerId, assetTypeId);
-    return _itemsCache[key] ?? [];
+  // --- FUNCIÓN AUXILIAR DE FILTRADO (Deduplicación) ---
+
+  /// Aplica el filtro global y los filtros por columna a la lista de ítems.
+  Iterable<InventoryItem> _applyFilters(List<InventoryItem> items) {
+    Iterable<InventoryItem> processedItems = items;
+
+    // 1. FILTRO GLOBAL (Busca en todas las propiedades)
+    if (_globalSearchTerm != null) {
+      final searchTerm = _globalSearchTerm!;
+      processedItems = processedItems.where((item) {
+        // Comprobar campos fijos
+        if (item.name.toLowerCase().contains(searchTerm)) return true;
+        if ((item.description ?? '').toLowerCase().contains(searchTerm))
+          return true;
+
+        // Comprobar campos personalizados
+        return item.customFieldValues.values.any((value) {
+          return (value?.toString().toLowerCase() ?? '').contains(searchTerm);
+        });
+      });
+    }
+
+    // 2. FILTRADO POR COLUMNA (Aplicado después del global)
+    if (_filters.isNotEmpty) {
+      processedItems = processedItems.where((item) {
+        // El ítem debe cumplir con TODOS los criterios de filtro por columna
+        return _filters.entries.every((filterEntry) {
+          final filterKey = filterEntry.key;
+          final filterValue = filterEntry.value.toLowerCase();
+          String itemValue;
+
+          // a) Campos fijos
+          if (filterKey == 'name') {
+            itemValue = item.name.toLowerCase();
+          } else if (filterKey == 'description') {
+            itemValue = (item.description ?? '').toLowerCase();
+          }
+          // b) Campos personalizados
+          else {
+            final rawValue = item.customFieldValues[filterKey];
+            itemValue = (rawValue?.toString() ?? '').toLowerCase();
+          }
+
+          return itemValue.contains(filterValue);
+        });
+      });
+    }
+
+    return processedItems;
   }
 
-  // --- 1. READ (Lectura) ---
+  // --- GETTER PRINCIPAL (MODIFICADO) ---
+
+  /// Obtiene los ítems del inventario, aplicando filtros, ordenamiento y PAGINACIÓN.
+  List<InventoryItem> getInventoryItems(int containerId, int assetTypeId) {
+    final key = _getCacheKey(containerId, assetTypeId);
+    final items = _itemsCache[key] ?? [];
+
+    // Aplicar todos los filtros
+    Iterable<InventoryItem> processedItems = _applyFilters(items);
+
+    // 3. ORDENAMIENTO
+    final sortedList = processedItems.toList();
+
+    sortedList.sort((a, b) {
+      Comparable aValue;
+      Comparable bValue;
+
+      if (sortKey == 'name') {
+        aValue = a.name;
+        bValue = b.name;
+      } else if (sortKey == 'description') {
+        aValue = a.description ?? '';
+        bValue = b.description ?? '';
+      } else {
+        aValue = a.customFieldValues[sortKey]?.toString() ?? '';
+        bValue = b.customFieldValues[sortKey]?.toString() ?? '';
+      }
+
+      final comparison = aValue.compareTo(bValue);
+
+      return sortAscending ? comparison : -comparison;
+    });
+
+    // 4. PAGINACIÓN
+    final totalItems = sortedList.length;
+    final startIndex = (_currentPage - 1) * _itemsPerPage;
+    final endIndex = startIndex + _itemsPerPage;
+
+    if (startIndex >= totalItems) {
+      return [];
+    }
+
+    return sortedList.sublist(
+      startIndex,
+      endIndex < totalItems ? endIndex : totalItems,
+    );
+  }
+
+  /// NUEVO GETTER: Devuelve el total de ítems filtrados (antes de la paginación)
+  int getTotalFilteredItems(int containerId, int assetTypeId) {
+    final key = _getCacheKey(containerId, assetTypeId);
+    final items = _itemsCache[key] ?? [];
+
+    // Reutilizamos la función de filtrado
+    final processedItems = _applyFilters(items);
+
+    return processedItems.length;
+  }
+
+  // --- LÓGICA DE FILTROS Y ORDENAMIENTO ---
+
+  void setFilter(String key, String? value) {
+    if (value == null || value.isEmpty) {
+      _filters.remove(key);
+    } else {
+      _filters[key] = value;
+    }
+    notifyListeners();
+  }
+
+  void setGlobalSearchTerm(String? term) {
+    if (term == null || term.trim().isEmpty) {
+      _globalSearchTerm = null;
+    } else {
+      _globalSearchTerm = term.trim().toLowerCase();
+    }
+    notifyListeners();
+  }
+
+  void sortInventoryItems({required String dataKey, required bool ascending}) {
+    sortKey = dataKey;
+    sortAscending = ascending;
+    notifyListeners();
+  }
+
+  // --- LÓGICA DE PAGINACIÓN ---
+
+  void goToPage(int page) {
+    if (_currentPage != page && page >= 1) {
+      _currentPage = page;
+      notifyListeners();
+    }
+  }
+
+  // --- LÓGICA DE CRUD (Sin cambios mayores) ---
+
   Future<void> loadInventoryItems({
     required int containerId,
     required int assetTypeId,
@@ -35,6 +187,7 @@ class InventoryItemProvider with ChangeNotifier {
     final key = _getCacheKey(containerId, assetTypeId);
 
     if (_itemsCache.containsKey(key) && !forceReload) {
+      notifyListeners();
       return;
     }
 
@@ -42,7 +195,6 @@ class InventoryItemProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // Nota: Cambié _itemService.getInventoryItems por el nombre que implementaste antes (fetchInventoryItems)
       final loadedItems = await _itemService.fetchInventoryItems(
         containerId: containerId,
         assetTypeId: assetTypeId,
@@ -53,30 +205,42 @@ class InventoryItemProvider with ChangeNotifier {
       if (kDebugMode) {
         print('Error al cargar ítems para $key: $e');
       }
-      rethrow; // Re-lanzar el error para manejo en UI
+      rethrow;
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  // --- 2. CREATE (Creación) ---
-  Future<void> createInventoryItem(InventoryItem newItem) async {
+  Future<void> createInventoryItem(
+    InventoryItem newItem, {
+    // Argumento opcional para las URLs de las imágenes
+    List<String> imageUrls = const [],
+  }) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Llama al servicio para guardar y obtener el ítem con el ID de la API
-      final createdItem = await _itemService.createInventoryItem(newItem);
+      // Asumimos que tu InventoryItemService (en el backend)
+      // ahora acepta las URLs para crear los registros InventoryItemImage.
+      final createdItem = await _itemService.createInventoryItem(
+        newItem,
+        imageUrls: imageUrls, // <--- PASAMOS LAS URLS AL SERVICIO
+      );
 
       final key = _getCacheKey(
         createdItem.containerId,
         createdItem.assetTypeId,
       );
 
-      // Aseguramos que la lista exista y añadimos el nuevo ítem
       _itemsCache.putIfAbsent(key, () => []);
+      // Si el servicio devuelve el ítem con las imágenes ya cargadas, mejor.
+      // Si no, la próxima carga de la lista lo actualizará.
       _itemsCache[key]!.add(createdItem);
+
+      // **IMPORTANTE**: Al crear un nuevo activo, normalmente queremos que el usuario
+      // regrese a la página 1 de la lista para ver el nuevo registro inmediatamente.
+      goToPage(1);
     } catch (e) {
       if (kDebugMode) {
         print("Error creating inventory item: $e");
@@ -88,39 +252,26 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
-  // --- 3. UPDATE (Actualización) ---
   Future<void> updateInventoryItem(
     InventoryItem updatedItem,
-    int assetTypeId, // <--- NUEVO PARÁMETRO REQUERIDO
+    int assetTypeId,
   ) async {
     _isLoading = true;
     notifyListeners();
 
-    // Usamos el assetTypeId pasado en el argumento
     final key = _getCacheKey(updatedItem.containerId, assetTypeId);
     final itemsList = _itemsCache[key];
 
     try {
-      // 1. Llama al servicio para actualizar la API
-      // (Asegúrate de que tu service.updateInventoryItem use el updatedItem completo)
       final resultItem = await _itemService.updateInventoryItem(updatedItem);
 
-      // 2. Actualiza el ítem en la caché si la lista existe
       if (itemsList != null) {
         final index = itemsList.indexWhere((item) => item.id == resultItem.id);
         if (index != -1) {
           itemsList[index] = resultItem;
-        } else {
-          // En caso de que el ítem no se encontrara (raro en edición),
-          // podrías considerarlo un nuevo ítem y añadirlo, pero es menos común.
         }
       }
-      // Nota: Si itemsList es nulo, significa que esa caché aún no se ha cargado/inicializado.
     } catch (e) {
-      // Usamos `kDebugMode` si está disponible, sino `dart:developer` o solo `print`.
-      // if (kDebugMode) {
-      //   print("Error updating inventory item: $e");
-      // }
       rethrow;
     } finally {
       _isLoading = false;
@@ -128,7 +279,6 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
-  // --- 4. DELETE (Borrado) ---
   Future<void> deleteInventoryItem(
     int itemId,
     int containerId,
@@ -141,10 +291,8 @@ class InventoryItemProvider with ChangeNotifier {
     final itemsList = _itemsCache[key];
 
     try {
-      // 1. Llama al servicio para borrar en la API
       await _itemService.deleteInventoryItem(itemId);
 
-      // 2. Elimina el ítem de la caché si la lista existe
       if (itemsList != null) {
         itemsList.removeWhere((item) => item.id == itemId);
       }
