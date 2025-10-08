@@ -368,8 +368,6 @@ class _AssetDataTableState extends State<AssetDataTable> {
             ? '${Environment.apiUrl}$imageUrl'
             : ''; // Si no hay imagen, string vacío
 
-        print('Cargando imagen para item ID ${item.id}: $fullImageUrl');
-
         final List<DataCell> cells = [
           DataCell(
             Center(
