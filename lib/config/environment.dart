@@ -5,6 +5,8 @@ class Environment {
   );
 
   static const String apiVersion = '/api/v1';
+
+  static String get baseUrl => '$apiUrl$apiVersion';
   
   // Timeouts
   static const int connectTimeout = 5000; // 5 segundos

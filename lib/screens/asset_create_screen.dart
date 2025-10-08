@@ -1,13 +1,19 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:invenicum/models/container_node.dart';
-import 'package:invenicum/services/toast_service.dart';
+import 'package:invenicum/widgets/image_preview_section.dart';
 import 'package:provider/provider.dart';
 
 import '../models/asset_type_model.dart';
+import '../models/container_node.dart';
 import '../models/inventory_item.dart';
 import '../providers/container_provider.dart';
 import '../providers/inventory_item_provider.dart';
+import '../services/toast_service.dart';
+// Importamos el nuevo widget separado
 
 class AssetCreateScreen extends StatefulWidget {
   final String containerId;
@@ -32,9 +38,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   // Mapa para los controladores de campos custom
   final Map<int, TextEditingController> _customControllers = {};
 
-  // NUEVO: Estado para gestionar las URLs de las imágenes
-  final List<String> _imageUrls = [];
-  
+  // Estado para gestionar las URLs de previsualización (Base64)
+  List<String> _imagePreviewUrls = [];
+
   AssetType? _assetType;
   int? _containerId;
   int? _assetTypeId;
@@ -75,8 +81,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       _assetType = assetType;
       // Inicializa los controladores para cada campo custom
       for (var field in assetType.fieldDefinitions) {
-        // Usamos field.id como clave; asumimos que no es nulo en un modelo AssetType válido
-        _customControllers[field.id!] = TextEditingController(); 
+        _customControllers[field.id!] = TextEditingController();
       }
     });
   }
@@ -89,51 +94,83 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     super.dispose();
   }
 
-  // --- LÓGICA DE GESTIÓN DE IMÁGENES (Simulación) ---
+  // --- LÓGICA DE GESTIÓN DE IMÁGENES (Subida de Archivo) ---
 
-  /// Muestra un diálogo para simular la subida y captura de la URL de la imagen.
-  void _addImage() {
-    final urlController = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Añadir Imagen (URL de prueba)'),
-          content: TextField(
-            controller: urlController,
-            decoration: const InputDecoration(
-              hintText: 'Introduce la URL o ruta de la imagen',
-              labelText: 'URL de Imagen',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () {
-                final url = urlController.text.trim();
-                if (url.isNotEmpty) {
-                  setState(() {
-                    _imageUrls.add(url);
-                  });
-                }
-                Navigator.of(context).pop();
-              },
-              child: const Text('Añadir'),
-            ),
-          ],
-        );
-      },
+  /// Muestra el selector de archivos y obtiene la URL Base64 para previsualización.
+  Future<void> _addImage() async {
+    // Configuración de File Picker: permite múltiples imágenes y carga los datos.
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: true,
+      withData: true,
     );
+
+    // Verificamos si se seleccionaron archivos.
+    if (result != null && result.files.isNotEmpty) {
+      // Lista temporal para almacenar las URLs Base64 de las nuevas imágenes.
+      final List<String> newImageUrls = [];
+      int successfulSelections = 0;
+
+      // 1. ITERAR sobre CADA archivo seleccionado
+      for (final file in result.files) {
+        // Verificamos si los bytes del archivo se cargaron correctamente.
+        if (file.bytes != null) {
+          // Obtenemos la extensión o usamos 'jpeg' como fallback
+          final extension = file.extension ?? 'jpeg';
+
+          // Generamos la URL Base64 para previsualización instantánea.
+          final String base64Image =
+              'data:image/$extension;base64,${base64Encode(file.bytes!)}';
+
+          newImageUrls.add(base64Image);
+          successfulSelections++;
+        }
+      }
+
+      // 2. Actualizar el estado (una sola vez para todas las nuevas imágenes)
+      if (newImageUrls.isNotEmpty) {
+        setState(() {
+          _imagePreviewUrls.addAll(newImageUrls);
+        });
+
+        ToastService.info('Se seleccionaron $successfulSelections imágenes.');
+      } else {
+        // Si se seleccionaron archivos pero todos fallaron al cargar los bytes
+        ToastService.error(
+          'Error: No se pudo obtener la data de las imágenes seleccionadas.',
+        );
+      }
+    } else {
+      // El usuario canceló la selección.
+      ToastService.info('Selección de archivos cancelada.');
+    }
   }
 
   void _removeImage(String url) {
     setState(() {
-      _imageUrls.remove(url);
+      _imagePreviewUrls.remove(url);
     });
+  }
+
+  /// Convierte una Data URL (Base64) a Uint8List y extrae el nombre/tipo de archivo.
+  Map<String, dynamic> _dataUrlToFileData(String dataUrl, int index) {
+    // Ej: "data:image/png;base64,iVBORw0KGgo..."
+
+    // 1. Extraer el tipo MIME (ej: image/png)
+    final mimeTypeMatch = RegExp(r'data:([^;]+);base64,').firstMatch(dataUrl);
+    final mimeType = mimeTypeMatch?.group(1);
+
+    // 2. Extraer los bytes Base64 puros
+    final base64String = dataUrl.split(',').last;
+    final Uint8List bytes = base64Decode(base64String);
+
+    // 3. Determinar la extensión y nombre simulado
+    // Nota: FilePicker ya nos da un nombre, pero si usamos la URL Base64
+    // para simulación, generamos un nombre basado en el tipo MIME y el índice.
+    final extension = mimeType?.split('/').last ?? 'jpg';
+    final fileName = 'asset_image_$index.$extension';
+
+    return {'bytes': bytes, 'name': fileName};
   }
 
   // --- LÓGICA DE GUARDADO ---
@@ -150,16 +187,28 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     for (var fieldDef in _assetType!.fieldDefinitions) {
       final controller = _customControllers[fieldDef.id];
       if (controller != null && controller.text.isNotEmpty) {
-        // En un entorno real, aquí se haría la validación de tipo (int, double, bool)
         customFieldValues[fieldDef.id.toString()] = controller.text;
       }
     }
 
-    // 2. Crear el nuevo objeto InventoryItem
-    // NOTA: El modelo InventoryItem actual de Flutter no incluye una lista de URLs de imágenes
-    // directamente. En un entorno real, pasarías la lista de URLs al método del Provider/Service,
-    // y este se encargaría de crear los modelos InventoryItemImage en el backend.
-    
+    // 2. Preparar los datos de los archivos para el Provider/Service
+    final List<Map<String, dynamic>> filesData = [];
+
+    // Convertimos cada Base64 Data URL de previsualización en el formato {bytes, name}
+    // para enviarlo al Provider/Service.
+    for (int i = 0; i < _imagePreviewUrls.length; i++) {
+      final dataUrl = _imagePreviewUrls[i];
+
+      // Solo procesamos las Data URLs (que es lo que generamos en _addImage con file_picker)
+      if (dataUrl.startsWith('data:')) {
+        filesData.add(_dataUrlToFileData(dataUrl, i));
+      }
+      // Si tienes URLs reales (ej: 'http://...'), deberías manejar la subida
+      // de forma diferente, o no incluirlas aquí si solo quieres enviar archivos nuevos.
+      // En este contexto de 'Creación', asumimos que todas las URLs son Data URLs de archivos nuevos.
+    }
+
+    // 3. Crear el nuevo objeto InventoryItem
     final newItem = InventoryItem(
       id: 0,
       containerId: _containerId!,
@@ -167,23 +216,18 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: customFieldValues,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-      // Aquí el InventoryItem debería incluir un campo para las imágenes,
-      // pero como tu modelo Flutter no lo tiene, lo pasamos aparte:
+      // No incluimos images, createdAt, updatedAt; el backend las devolverá.
     );
 
-    // 3. Llamar al proveedor para guardar (se debe extender el provider para aceptar las URLs)
+    // 4. Llamar al proveedor para guardar con los archivos
     try {
-      // 🛑 NOTA IMPORTANTE: Si `createInventoryItem` solo acepta `InventoryItem`,
-      // tendrás que modificar `InventoryItemProvider` para aceptar las URLs.
-      // Por ahora, asumimos una nueva función para simular esto:
       await itemProvider.createInventoryItem(
         newItem,
-        imageUrls: _imageUrls, // Pasamos las URLs para que el servicio las maneje
-      ); 
+        filesData:
+            filesData, // <-- ¡CAMBIO CLAVE! Pasamos los datos del archivo
+      );
 
-      // 4. Navegar de vuelta al listado
+      // 5. Navegar de vuelta al listado
       if (mounted) {
         ToastService.success('Activo creado con éxito!');
         context.go(
@@ -197,96 +241,66 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     }
   }
 
-  // --- WIDGET DE IMÁGENES ---
+  // --- WIDGETS DE VISTA ---
 
-  Widget _buildImageSection() {
+  Widget _buildCustomFields() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Imágenes del Activo',
+          'Campos Personalizados',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const Divider(),
-        
-        // Botón para añadir imagen
-        ElevatedButton.icon(
-          onPressed: _addImage,
-          icon: const Icon(Icons.image),
-          label: const Text('Añadir Imagen'),
-        ),
-        const SizedBox(height: 10),
+        if (_assetType!.fieldDefinitions.isEmpty)
+          const Text('Este tipo de activo no tiene campos personalizados.'),
 
-        // Previsualización de imágenes (Grid)
-        if (_imageUrls.isNotEmpty)
-          Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: _imageUrls.map((url) {
-              return Stack(
-                children: [
-                  Container(
-                    width: 150,
-                    height: 150,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: Image.network(
-                      url,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Muestra un placeholder si la URL no es una imagen válida
-                        return Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(Icons.broken_image, size: 40, color: Colors.red),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  url.substring(0, 10) + '...',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 10),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-                      onPressed: () => _removeImage(url),
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.white70,
-                        padding: EdgeInsets.zero,
-                        minimumSize: const Size(30, 30),
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
-          )
-        else
-          const Padding(
-            padding: EdgeInsets.only(top: 8.0),
-            child: Text('No hay imágenes añadidas.'),
-          ),
+        ..._assetType!.fieldDefinitions.map((fieldDef) {
+          final controller = _customControllers[fieldDef.id];
+          if (controller == null) return const SizedBox.shrink();
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: TextFormField(
+              controller: controller,
+              keyboardType: _getKeyboardType(fieldDef.type.toString()),
+              decoration: InputDecoration(
+                labelText: fieldDef.name,
+                hintText: 'Tipo: ${fieldDef.type.toString().toLowerCase()}',
+                border: const OutlineInputBorder(),
+                helperText: fieldDef.isRequired ? 'Obligatorio' : null,
+              ),
+              validator: fieldDef.isRequired
+                  ? (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Este campo es obligatorio.';
+                      }
+                      return null;
+                    }
+                  : null,
+            ),
+          );
+        }).toList(),
       ],
     );
   }
 
-  // --- WIDGET PRINCIPAL (BUILD) ---
+  // Método auxiliar para el tipo de teclado (simulado)
+  TextInputType _getKeyboardType(String fieldType) {
+    switch (fieldType.toLowerCase()) {
+      case 'integer':
+      case 'decimal':
+        return TextInputType.number;
+      case 'date':
+        return TextInputType.datetime;
+      default:
+        return TextInputType.text;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // ... (Inicialización y estado de carga) ...
     if (_assetType == null) {
       context.watch<ContainerProvider>();
       if (_containerId == null || _assetTypeId == null) {
@@ -306,7 +320,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
             // --- TÍTULO ---
             Text(
               'Crear Activo: ${_assetType!.name}',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
@@ -319,7 +335,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                     // --- CAMPOS COMUNES ---
                     const Text(
                       'Datos Comunes',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const Divider(),
                     TextFormField(
@@ -346,45 +365,16 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                     ),
                     const SizedBox(height: 30),
 
-                    // --- SECCIÓN DE IMÁGENES ---
-                    _buildImageSection(),
+                    // --- SECCIÓN DE IMÁGENES (Widget Separado) ---
+                    ImagePreviewSection(
+                      imageUrls: _imagePreviewUrls,
+                      onAddImage: _addImage,
+                      onRemoveImage: _removeImage,
+                    ),
                     const SizedBox(height: 30),
 
-                    // --- CAMPOS CUSTOM (DINÁMICOS) ---
-                    const Text(
-                      'Campos Personalizados',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    const Divider(),
-                    if (_assetType!.fieldDefinitions.isEmpty)
-                      const Text('Este tipo de activo no tiene campos personalizados.'),
-
-                    ..._assetType!.fieldDefinitions.map((fieldDef) {
-                      final controller = _customControllers[fieldDef.id];
-                      if (controller == null) return const SizedBox.shrink();
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: TextFormField(
-                          controller: controller,
-                          keyboardType: _getKeyboardType(fieldDef.type.toString()),
-                          decoration: InputDecoration(
-                            labelText: fieldDef.name,
-                            hintText: 'Tipo: ${fieldDef.type.toString().toLowerCase()}',
-                            border: const OutlineInputBorder(),
-                            helperText: fieldDef.isRequired ? 'Obligatorio' : null,
-                          ),
-                          validator: fieldDef.isRequired
-                              ? (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Este campo es obligatorio.';
-                                  }
-                                  return null;
-                                }
-                              : null,
-                        ),
-                      );
-                    }).toList(),
+                    // --- CAMPOS CUSTOM (Dinámicos) ---
+                    _buildCustomFields(),
                   ],
                 ),
               ),
@@ -401,7 +391,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                   style: TextStyle(fontSize: 16),
                 ),
                 style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 15),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 25,
+                    vertical: 15,
+                  ),
                 ),
               ),
             ),
@@ -409,18 +402,5 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         ),
       ),
     );
-  }
-
-  // Método auxiliar para el tipo de teclado (simulado)
-  TextInputType _getKeyboardType(String fieldType) {
-    switch (fieldType.toLowerCase()) {
-      case 'integer':
-      case 'decimal':
-        return TextInputType.number;
-      case 'date':
-        return TextInputType.datetime;
-      default:
-        return TextInputType.text;
-    }
   }
 }

@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
 
+// Definimos el tipo de datos esperado para los archivos que vienen del frontend
+// Esto mejora la legibilidad.
+typedef FileData = List<Map<String, dynamic>>;
+
 class InventoryItemProvider with ChangeNotifier {
   final InventoryItemService _itemService;
 
@@ -83,7 +87,7 @@ class InventoryItemProvider with ChangeNotifier {
     return processedItems;
   }
 
-  // --- GETTER PRINCIPAL (MODIFICADO) ---
+  // --- GETTER PRINCIPAL ---
 
   /// Obtiene los ítems del inventario, aplicando filtros, ordenamiento y PAGINACIÓN.
   List<InventoryItem> getInventoryItems(int containerId, int assetTypeId) {
@@ -131,7 +135,7 @@ class InventoryItemProvider with ChangeNotifier {
     );
   }
 
-  /// NUEVO GETTER: Devuelve el total de ítems filtrados (antes de la paginación)
+  /// Devuelve el total de ítems filtrados (antes de la paginación)
   int getTotalFilteredItems(int containerId, int assetTypeId) {
     final key = _getCacheKey(containerId, assetTypeId);
     final items = _itemsCache[key] ?? [];
@@ -177,7 +181,7 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
-  // --- LÓGICA DE CRUD (Sin cambios mayores) ---
+  // --- LÓGICA DE CRUD ---
 
   Future<void> loadInventoryItems({
     required int containerId,
@@ -212,20 +216,22 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
+  // --------------------------------------------------------------------------
+  // --- CREATE (MODIFICADO) - ACEPTA AHORA LOS DATOS DEL ARCHIVO (BYTES) ---
+  // --------------------------------------------------------------------------
   Future<void> createInventoryItem(
     InventoryItem newItem, {
-    // Argumento opcional para las URLs de las imágenes
-    List<String> imageUrls = const [],
+    // CAMBIO CLAVE: Recibimos los datos del archivo, no las URLs finales.
+    FileData filesData = const [],
   }) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // Asumimos que tu InventoryItemService (en el backend)
-      // ahora acepta las URLs para crear los registros InventoryItemImage.
+      // 🛑 DELEGAMOS la subida del archivo y la creación del ítem al Servicio
       final createdItem = await _itemService.createInventoryItem(
         newItem,
-        imageUrls: imageUrls, // <--- PASAMOS LAS URLS AL SERVICIO
+        filesData: filesData, // <--- PASAMOS LOS DATOS DEL ARCHIVO
       );
 
       final key = _getCacheKey(
@@ -234,12 +240,11 @@ class InventoryItemProvider with ChangeNotifier {
       );
 
       _itemsCache.putIfAbsent(key, () => []);
-      // Si el servicio devuelve el ítem con las imágenes ya cargadas, mejor.
-      // Si no, la próxima carga de la lista lo actualizará.
+      
+      // Añadimos el nuevo ítem devuelto por el backend a la caché
       _itemsCache[key]!.add(createdItem);
 
-      // **IMPORTANTE**: Al crear un nuevo activo, normalmente queremos que el usuario
-      // regrese a la página 1 de la lista para ver el nuevo registro inmediatamente.
+      // Reiniciamos a la primera página si es necesario
       goToPage(1);
     } catch (e) {
       if (kDebugMode) {
@@ -252,9 +257,15 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
+  // --------------------------------------------------------------------------------
+  // --- UPDATE (MODIFICADO) - ASUMIMOS QUE LOS UPDATES DE IMAGEN SE HACEN APARTE ---
+  // --------------------------------------------------------------------------------
   Future<void> updateInventoryItem(
     InventoryItem updatedItem,
     int assetTypeId,
+    // NOTA: Para la edición, si también se permiten subir archivos nuevos, 
+    // esta función debería modificarse para usar FormData, similar al CREATE.
+    // Por ahora, solo maneja la actualización de datos y URLs existentes.
   ) async {
     _isLoading = true;
     notifyListeners();

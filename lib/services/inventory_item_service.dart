@@ -2,17 +2,21 @@
 
 import 'package:dio/dio.dart';
 import 'package:invenicum/models/inventory_item.dart';
-import 'api_service.dart'; // Tu servicio base de Dio
+import 'api_service.dart';
+import 'dart:typed_data'; 
+import 'dart:convert'; // 💡 Necesario para jsonEncode
+
+// Definimos un TypeDef para hacer la firma más legible
+typedef FileData = List<Map<String, dynamic>>; 
 
 class InventoryItemService {
   final ApiService _apiService;
-  // Usamos un getter para acceder a la instancia de Dio
   Dio get _dio => _apiService.dio;
 
   InventoryItemService(this._apiService);
 
   // --- 1. READ (Lectura) ---
-  /// Obtiene la lista de ítems de inventario para un tipo de activo específico.
+  // ... (Esta función se mantiene igual, asumiendo que el backend devuelve la lista)
   Future<List<InventoryItem>> fetchInventoryItems({
     required int containerId,
     required int assetTypeId,
@@ -23,106 +27,98 @@ class InventoryItemService {
         queryParameters: {'assetTypeId': assetTypeId},
       );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> itemsListJson = response.data as List<dynamic>;
-
-        return itemsListJson
-            .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
-            .toList();
-      } else {
-        throw Exception(
-          'Error al obtener ítems: Código ${response.statusCode}',
-        );
-      }
-    } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
+      // 💡 El backend ahora devuelve { success: true, data: [...] }
+      final List<dynamic> itemsListJson = response.data['data'] as List<dynamic>; 
+      
+      return itemsListJson
+          .map((json) => InventoryItem.fromJson(json as Map<String, dynamic>))
+          .toList();
+      
+    } on DioException {
       rethrow;
     } catch (e) {
       throw Exception('Error inesperado al obtener ítems: $e');
     }
   }
 
-  // ------------------------------------
-  // --- 2. CREATE (Creación) (CORREGIDO) ---
-  // ------------------------------------
-  /// Crea un nuevo ítem de inventario, incluyendo opcionalmente URLs de imágenes.
-  ///
-  /// Ruta esperada en el backend: POST /items
+
+  // ----------------------------------------------------------------------
+  // --- 2. CREATE (Creación) - CORRECCIÓN CLAVE EN EL NOMBRE DEL CAMPO ---
+  // ----------------------------------------------------------------------
   Future<InventoryItem> createInventoryItem(
     InventoryItem item, {
-    // ACEPTA LAS NUEVAS URLS DE IMAGEN
-    List<String> imageUrls = const [], 
+    FileData filesData = const [], 
   }) async {
     try {
-      // Usamos toMap() para serializar el objeto InventoryItem sin el ID (que es nuevo)
-      final data = {
+      // 1. Convertir los datos del activo a Map y codificar el JSON
+      final itemMap = {
         'name': item.name,
         'description': item.description,
-        'containerId': item.containerId,
-        'assetTypeId': item.assetTypeId,
-        'customFieldValues': item.customFieldValues,
-        // AÑADIMOS LAS URLS DE IMAGEN PARA QUE EL BACKEND LAS PROCESE
-        'imageUrls': imageUrls, 
+        'containerId': item.containerId.toString(), // 💡 ENVIAR COMO STRING
+        'assetTypeId': item.assetTypeId.toString(), // 💡 ENVIAR COMO STRING
+        // 💡 CONVERTIMOS EL OBJETO CUSTOM FIELDS A JSON STRING
+        'customFieldValues': jsonEncode(item.customFieldValues), 
       };
 
-      final response = await _dio.post('/items', data: data);
-
-      if (response.statusCode == 201) {
-        // 201 Created
-        // El backend debe devolver el objeto completo, incluyendo el nuevo ID y las imágenes.
-        return InventoryItem.fromJson(response.data);
-      } else {
-        // Mejor manejo de errores para incluir detalles del backend si están disponibles
-        throw Exception(
-          'Error al crear activo: Código ${response.statusCode} - ${response.statusMessage}',
+      // 2. Construir FormData
+      final formData = FormData.fromMap(itemMap);
+      
+      // 3. Añadir los archivos a FormData
+      for (var file in filesData) {
+        final bytes = file['bytes'] as Uint8List;
+        final name = file['name'] as String;
+        
+        final multipartFile = MultipartFile.fromBytes(
+          bytes,
+          filename: name,
+        );
+        
+        // 🛑 CORRECCIÓN CLAVE: El backend (Multer) espera 'images', no 'images[]'.
+        // Multer.array('images') ya maneja el array implícitamente.
+        formData.files.add(
+          MapEntry('images', multipartFile), 
         );
       }
-    } on DioException catch (e) {
+
+      // 4. Enviar la petición POST con FormData
+      final response = await _dio.post('/items', data: formData);
+
+      if (response.statusCode == 201) {
+        // 💡 El backend devuelve un objeto con la clave 'data'
+        return InventoryItem.fromJson(response.data['data']);
+      } else {
+        throw Exception(
+          'Error al crear activo: Código ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
+        );
+      }
+    } on DioException {
       rethrow;
     } catch (e) {
       throw Exception('Error inesperado al crear activo: $e');
     }
   }
 
-  // -------------------------------------
-  // --- 3. UPDATE (Actualización) (MODIFICADO) ---
-  // -------------------------------------
-  /// Actualiza un ítem de inventario existente, incluyendo la gestión de imágenes.
-  ///
-  /// Ruta esperada en el backend: PUT/PATCH /items/:id
+  // ----------------------------------------------------------------------------------
+  // --- 3. UPDATE (Actualización) - MANTENEMOS LA GESTIÓN DE URLs EXISTENTES ---
+  // ----------------------------------------------------------------------------------
   Future<InventoryItem> updateInventoryItem(InventoryItem item) async {
     try {
-      // Preparamos las URLs existentes para enviarlas de vuelta
-      final currentImageUrls = item.images.map((img) => img.url).toList();
+      // Usamos los URLs existentes y convertimos los campos JSON a string
+      final data = item.toJson();
+      data['imageUrls'] = item.images.map((img) => img.url).toList(); 
+      data['customFieldValues'] = jsonEncode(item.customFieldValues);
       
-      // Usamos PUT/PATCH para enviar el objeto completo para la actualización.
-      final data = {
-        'id': item.id,
-        'name': item.name,
-        'description': item.description,
-        'containerId': item.containerId,
-        'assetTypeId': item.assetTypeId,
-        'customFieldValues': item.customFieldValues,
-        
-        // Asumimos que el backend recibirá la lista COMPLETA de URLs y 
-        // gestionará las adiciones/eliminaciones.
-        'imageUrls': currentImageUrls, 
-      };
-
       final response = await _dio.put('/items/${item.id}', data: data);
 
       if (response.statusCode == 200) {
-        // 200 OK
-        // El backend debe devolver el objeto actualizado.
-        return InventoryItem.fromJson(response.data);
+        // 💡 El backend devuelve un objeto con la clave 'data'
+        return InventoryItem.fromJson(response.data['data']);
       } else {
         throw Exception(
           'Error al actualizar activo: Código ${response.statusCode}',
         );
       }
-    } on DioException catch (e) {
+    } on DioException {
       rethrow;
     } catch (e) {
       throw Exception('Error inesperado al actualizar activo: $e');
@@ -130,21 +126,17 @@ class InventoryItemService {
   }
 
   // --- 4. DELETE (Borrado) ---
-  /// Borra un ítem de inventario por ID.
-  ///
-  /// Ruta esperada en el backend: DELETE /items/:id
   Future<void> deleteInventoryItem(int itemId) async {
+    // ... (Se mantiene igual)
     try {
       final response = await _dio.delete('/items/$itemId');
 
       if (response.statusCode != 204 && response.statusCode != 200) {
-        // 204 No Content (típico para DELETE) o 200 OK
         throw Exception(
           'Error al eliminar activo: Código ${response.statusCode}',
         );
       }
-      // Si la respuesta es exitosa (204/200), simplemente retornamos.
-    } on DioException catch (e) {
+    } on DioException {
       rethrow;
     } catch (e) {
       throw Exception('Error inesperado al eliminar activo: $e');

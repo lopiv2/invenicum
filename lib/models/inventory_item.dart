@@ -100,6 +100,23 @@ class InventoryItem {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      // Campos requeridos para la creación/actualización
+      'id': id,
+      'containerId': containerId,
+      'assetTypeId': assetTypeId,
+      'name': name,
+      'description': description,
+      // Nota: customFieldValues es Map, que Dio/jsonEncode maneja bien.
+      'customFieldValues': customFieldValues,
+
+      // No incluimos 'images' en el body si las estamos enviando como FormData (CREATE).
+      // Pero sí es útil para el UPDATE donde se envían las URLs existentes.
+      // Para el UPDATE, el servicio extrae las URLs y las mapea a 'imageUrls'.
+    };
+  }
+
   // Opcional: Para debugging
   @override
   String toString() {

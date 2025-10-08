@@ -3,6 +3,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/config/environment.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/inventory_item.dart';
@@ -14,15 +15,14 @@ class AssetDataTable extends StatefulWidget {
   final AssetType assetType;
   final int containerId;
   final int assetTypeId;
-  // Recibe la lista ya paginada desde AssetListScreen
-  final List<InventoryItem> inventoryItems; 
+  final List<InventoryItem> inventoryItems;
 
   const AssetDataTable({
     super.key,
     required this.assetType,
     required this.containerId,
     required this.assetTypeId,
-    required this.inventoryItems, 
+    required this.inventoryItems,
   });
 
   @override
@@ -30,33 +30,27 @@ class AssetDataTable extends StatefulWidget {
 }
 
 class _AssetDataTableState extends State<AssetDataTable> {
-  
-  // ESTADO DE ORDENAMIENTO (para la UI de DataTabe2)
-  int? _sortColumnIndex = 0; // Por defecto: Nombre (Index 0)
+  int? _sortColumnIndex = 1;
   bool _sortAscending = true;
 
-  // Sincroniza el estado local con el Provider al inicializar
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final itemProvider = context.read<InventoryItemProvider>();
-      // Asume que 'name' es la clave inicial de ordenamiento si no hay otra definida
-      final currentSortKey = itemProvider.sortKey; 
-      
-      // Determina el índice de la columna de ordenamiento
+      final currentSortKey = itemProvider.sortKey;
+
       int index = -1;
       if (currentSortKey == 'name') {
-        index = 0;
-      } else if (currentSortKey == 'description') {
         index = 1;
+      } else if (currentSortKey == 'description') {
+        index = 2;
       } else {
-        // Busca el índice de la columna dinámica
         final customIndex = widget.assetType.fieldDefinitions.indexWhere(
           (def) => def.id.toString() == currentSortKey,
         );
         if (customIndex != -1) {
-          index = customIndex + 2; // +2 por Nombre y Descripción
+          index = customIndex + 3;
         }
       }
 
@@ -69,32 +63,22 @@ class _AssetDataTableState extends State<AssetDataTable> {
     });
   }
 
-
-  // --- LÓGICA DE ORDENAMIENTO (Sorting) ---
-
   void _sortItems(
     BuildContext context,
     int columnIndex,
     String dataKey,
     bool ascending,
   ) {
-    // 1. Actualizar el estado de la UI (para que DataTabe2 muestre la flecha)
     setState(() {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
     });
 
-    // 2. Notificar al Provider para que reordene la lista interna y vuelva a la página 1
     final itemProvider = context.read<InventoryItemProvider>();
-    itemProvider.sortInventoryItems(
-      dataKey: dataKey,
-      ascending: ascending,
-    );
+    itemProvider.sortInventoryItems(dataKey: dataKey, ascending: ascending);
     itemProvider.goToPage(1);
   }
-  
-  // --- FUNCIONES DE ACCIÓN ---
-  
+
   void _editAsset(BuildContext context, InventoryItem item) {
     context.go(
       '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}/edit',
@@ -118,11 +102,14 @@ class _AssetDataTableState extends State<AssetDataTable> {
               onPressed: () => Navigator.of(dialogContext).pop(),
             ),
             TextButton(
-              child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+              child: const Text(
+                'Eliminar',
+                style: TextStyle(color: Colors.red),
+              ),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
                 final itemProvider = context.read<InventoryItemProvider>();
-                
+
                 itemProvider.deleteInventoryItem(
                   item.id,
                   widget.containerId,
@@ -137,8 +124,6 @@ class _AssetDataTableState extends State<AssetDataTable> {
     );
   }
 
-  // --- LÓGICA DE FILTROS POR COLUMNA ---
-
   void _showFilterDialog(
     BuildContext context,
     String headerText,
@@ -151,8 +136,8 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
     void applyFilter(String value) {
       itemProvider.setFilter(filterKey, value);
-      itemProvider.goToPage(1); // Volver a la página 1 al aplicar filtro
-      Navigator.of(context).pop();
+      itemProvider.goToPage(1);
+      context.pop();
       localFilterController.dispose();
     }
 
@@ -174,11 +159,14 @@ class _AssetDataTableState extends State<AssetDataTable> {
               TextButton(
                 onPressed: () {
                   itemProvider.setFilter(filterKey, null);
-                  itemProvider.goToPage(1); // Volver a la página 1 al borrar
+                  itemProvider.goToPage(1);
                   Navigator.of(dialogContext).pop();
                   localFilterController.dispose();
                 },
-                child: const Text('Borrar Filtro', style: TextStyle(color: Colors.red)),
+                child: const Text(
+                  'Borrar Filtro',
+                  style: TextStyle(color: Colors.red),
+                ),
               ),
             TextButton(
               onPressed: () => applyFilter(localFilterController.text),
@@ -197,7 +185,6 @@ class _AssetDataTableState extends State<AssetDataTable> {
     );
   }
 
-  // WIDGET DE CABECERA DE FILTRO
   Widget _buildFilterHeader(
     BuildContext context,
     String headerText,
@@ -236,74 +223,130 @@ class _AssetDataTableState extends State<AssetDataTable> {
     );
   }
 
+  // 💡 NUEVO MÉTODO: Muestra un diálogo con la imagen en grande
+  void _showImageDialog(BuildContext context, String fullImageUrl) {
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return Dialog(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.8,
+              maxHeight: MediaQuery.of(context).size.height * 0.8,
+            ),
+            child: InteractiveViewer(
+              // Permite hacer zoom y pan en la imagen
+              clipBehavior: Clip
+                  .none, // Importante para que no recorte el contenido al hacer pan
+              minScale: 0.1,
+              maxScale: 4.0,
+              child: Image.network(
+                fullImageUrl,
+                fit: BoxFit
+                    .contain, // La imagen se ajustará al espacio disponible
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+                errorBuilder: (context, error, stackTrace) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.broken_image,
+                      size: 60,
+                      color: Colors.grey,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'No se pudo cargar la imagen.',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const Text(
+                      'Asegúrate de que la URL es correcta y el servidor está activo.',
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final itemProvider = context.watch<InventoryItemProvider>();
-    // Usamos la lista paginada que nos pasa el widget padre
-    final inventoryItems = widget.inventoryItems; 
+    final inventoryItems = widget.inventoryItems;
 
     return DataTable2(
-      minWidth: 800,
+      minWidth: 900,
       columnSpacing: 12,
       horizontalMargin: 12,
-      dataRowHeight: 50,
-      
-      // PROPIEDADES DE ORDENAMIENTO
+      dataRowHeight: 60,
+
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
 
       empty: Center(
         child: Text(
-          (itemProvider.filters.isEmpty && itemProvider.globalSearchTerm == null)
+          (itemProvider.filters.isEmpty &&
+                  itemProvider.globalSearchTerm == null)
               ? 'No hay activos creados aún.'
               : 'Ningún activo coincide con los criterios de búsqueda/filtro.',
         ),
       ),
       columns: [
-        // Columna 0: Nombre
+        const DataColumn2(
+          label: Center(child: Icon(Icons.photo_library_outlined, size: 20)),
+          size: ColumnSize.S,
+          numeric: true,
+        ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Nombre', 'name'),
           size: ColumnSize.L,
           onSort: (columnIndex, ascending) {
-            _sortItems(context, 0, 'name', ascending);
+            _sortItems(
+              context,
+              1,
+              'name',
+              ascending,
+            ); // Índice de columna correcto
           },
         ),
-        // Columna 1: Descripción
         DataColumn2(
-          label: _buildFilterHeader(
-            context,
-            'Descripción',
-            'description',
-          ),
+          label: _buildFilterHeader(context, 'Descripción', 'description'),
           size: ColumnSize.L,
           onSort: (columnIndex, ascending) {
-            _sortItems(context, 1, 'description', ascending);
+            _sortItems(
+              context,
+              2,
+              'description',
+              ascending,
+            ); // Índice de columna correcto
           },
         ),
-        // Columnas Dinámicas de Campos Personalizados
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {
-          final columnIndex = entry.key + 2; // +2 por Nombre y Descripción
+          final columnIndex = entry.key + 3;
           final fieldDef = entry.value;
           final filterKey = fieldDef.id.toString();
 
           return DataColumn2(
-            label: _buildFilterHeader(
-              context,
-              fieldDef.name,
-              filterKey,
-            ),
+            label: _buildFilterHeader(context, fieldDef.name, filterKey),
             size: ColumnSize.M,
             onSort: (columnIndex, ascending) {
-              _sortItems(
-                context,
-                columnIndex,
-                filterKey,
-                ascending,
-              );
+              _sortItems(context, columnIndex, filterKey, ascending);
             },
           );
         }).toList(),
-        // Columna Acciones (Sin ordenamiento)
         const DataColumn2(
           label: Center(
             child: Text(
@@ -315,9 +358,70 @@ class _AssetDataTableState extends State<AssetDataTable> {
         ),
       ],
 
-      // CREACIÓN DINÁMICA DE FILAS
       rows: inventoryItems.map((item) {
+        final String? imageUrl = item.images.isNotEmpty
+            ? item.images.first.url
+            : null;
+
+        // 💡 CONSTRUCCIÓN CORRECTA DE LA URL
+        final String fullImageUrl = imageUrl != null
+            ? '${Environment.apiUrl}$imageUrl'
+            : ''; // Si no hay imagen, string vacío
+
+        print('Cargando imagen para item ID ${item.id}: $fullImageUrl');
+
         final List<DataCell> cells = [
+          DataCell(
+            Center(
+              child: Container(
+                width: 50,
+                height: 50,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.grey.shade300),
+                ),
+                // 💡 ENVOLVEMOS LA IMAGEN CON MÁS LÓGICA
+                child: imageUrl != null
+                    ? Tooltip(
+                        message: 'Ver imagen',
+                        child: MouseRegion(
+                          // Para cambiar el cursor al pasar el ratón
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            // Para detectar el tap
+                            onTap: () =>
+                                _showImageDialog(context, fullImageUrl),
+                            child: Image.network(
+                              fullImageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) =>
+                                  const Icon(
+                                    Icons.broken_image,
+                                    size: 25,
+                                    color: Colors.grey,
+                                  ),
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return const Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                      ),
+                                    );
+                                  },
+                            ),
+                          ),
+                        ),
+                      )
+                    : const Icon(
+                        Icons.image_not_supported,
+                        size: 25,
+                        color: Colors.grey,
+                      ),
+              ),
+            ),
+          ),
           DataCell(Text(item.name)),
           DataCell(
             Text(
@@ -328,20 +432,20 @@ class _AssetDataTableState extends State<AssetDataTable> {
           ),
         ];
 
-        // Añadir celdas de campos personalizados
         for (final fieldDef in widget.assetType.fieldDefinitions) {
           final fieldValue =
               item.customFieldValues[fieldDef.id.toString()] ?? '—';
-          cells.add(DataCell(
-            Text(
-              fieldValue.toString(),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
+          cells.add(
+            DataCell(
+              Text(
+                fieldValue.toString(),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
-          ));
+          );
         }
 
-        // Añadir celda de acciones
         cells.add(
           DataCell(
             Row(
