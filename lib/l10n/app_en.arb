@@ -1,0 +1,6 @@
+{
+  "@@locale": "en",
+  "appTitle": "Invenicum Inventory",
+  "greeting": "Hello, welcome!",
+  "rowsPerPageTitle": "Assets per page:"
+}

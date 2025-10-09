@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/services/toast_service.dart';
 import '../services/api_service.dart';
 
@@ -73,6 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  Text(AppLocalizations.of(context)!.appTitle),
                   const Text(
                     'Iniciar Sesión',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),

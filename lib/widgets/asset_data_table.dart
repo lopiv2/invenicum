@@ -2,14 +2,15 @@
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:invenicum/config/environment.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/inventory_item.dart';
 import '../../models/asset_type_model.dart';
 import '../../providers/inventory_item_provider.dart';
 import '../../services/toast_service.dart';
+import '../../models/data_source_table.dart'; // Asegúrate de que esta ruta sea correcta
 
 class AssetDataTable extends StatefulWidget {
   final AssetType assetType;
@@ -32,12 +33,37 @@ class AssetDataTable extends StatefulWidget {
 class _AssetDataTableState extends State<AssetDataTable> {
   int? _sortColumnIndex = 1;
   bool _sortAscending = true;
+  late InventoryDataSource _dataSource;
+  late VoidCallback _providerListener;
 
   @override
   void initState() {
     super.initState();
+
+    final itemProvider = context.read<InventoryItemProvider>();
+
+    // 1. Inicializar el DataSource y el Listener
+    // ------------------------------------------------------------------
+    _dataSource = InventoryDataSource(
+      itemProvider: itemProvider,
+      assetType: widget.assetType,
+      items: widget.inventoryItems,
+      context: context,
+      deleteCallback: (item) => _deleteAsset(context, item),
+      editCallback: (item) => _editAsset(context, item),
+    );
+
+    _providerListener = () {
+      // Usar el getter público 'inventoryItems' del provider
+      _dataSource.updateItems(itemProvider.inventoryItems);
+    };
+
+    itemProvider.addListener(_providerListener);
+    // ------------------------------------------------------------------
+
+    // 2. Restaurar el estado de ordenamiento
+    // ------------------------------------------------------------------
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final itemProvider = context.read<InventoryItemProvider>();
       final currentSortKey = itemProvider.sortKey;
 
       int index = -1;
@@ -61,6 +87,13 @@ class _AssetDataTableState extends State<AssetDataTable> {
         });
       }
     });
+    // ------------------------------------------------------------------
+  }
+
+  @override
+  void dispose() {
+    context.read<InventoryItemProvider>().removeListener(_providerListener);
+    super.dispose();
   }
 
   void _sortItems(
@@ -134,16 +167,20 @@ class _AssetDataTableState extends State<AssetDataTable> {
       text: itemProvider.filters[filterKey] ?? '',
     );
 
-    void applyFilter(String value) {
-      itemProvider.setFilter(filterKey, value);
-      itemProvider.goToPage(1);
-      context.pop();
-      localFilterController.dispose();
-    }
-
+    // 🚨 Usamos showDialog().then(...) para asegurar la disposición del controller
     showDialog(
       context: context,
       builder: (dialogContext) {
+        // 👈 Usamos dialogContext para cerrar el diálogo
+
+        // Función para aplicar filtro, navegando a página 1, y cerrando el diálogo
+        void applyFilterAndClose(String value) {
+          itemProvider.setFilter(filterKey, value);
+          itemProvider.goToPage(1);
+          // Usamos el contexto del diálogo para cerrarlo
+          Navigator.of(dialogContext).pop();
+        }
+
         return AlertDialog(
           title: Text('Filtrar por $headerText'),
           content: TextField(
@@ -152,37 +189,43 @@ class _AssetDataTableState extends State<AssetDataTable> {
               labelText: 'Escribe el valor a buscar',
             ),
             autofocus: true,
-            onSubmitted: applyFilter,
+            onSubmitted: applyFilterAndClose,
           ),
           actions: [
+            // Botón Borrar Filtro
             if (itemProvider.filters.containsKey(filterKey))
               TextButton(
                 onPressed: () {
                   itemProvider.setFilter(filterKey, null);
                   itemProvider.goToPage(1);
-                  Navigator.of(dialogContext).pop();
-                  localFilterController.dispose();
+                  Navigator.of(
+                    dialogContext,
+                  ).pop(); // 👈 Uso explícito de dialogContext
                 },
                 child: const Text(
                   'Borrar Filtro',
                   style: TextStyle(color: Colors.red),
                 ),
               ),
+            // Botón Aplicar
             TextButton(
-              onPressed: () => applyFilter(localFilterController.text),
+              onPressed: () => applyFilterAndClose(localFilterController.text),
               child: const Text('Aplicar'),
             ),
+            // Botón Cancelar
             TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                localFilterController.dispose();
-              },
+              onPressed: () => Navigator.of(
+                dialogContext,
+              ).pop(), // 👈 Uso explícito de dialogContext
               child: const Text('Cancelar'),
             ),
           ],
         );
       },
-    );
+    ).then((_) {
+      // La disposición del controller sigue siendo correcta aquí
+      localFilterController.dispose();
+    });
   }
 
   Widget _buildFilterHeader(
@@ -223,79 +266,22 @@ class _AssetDataTableState extends State<AssetDataTable> {
     );
   }
 
-  // 💡 NUEVO MÉTODO: Muestra un diálogo con la imagen en grande
-  void _showImageDialog(BuildContext context, String fullImageUrl) {
-    showDialog(
-      context: context,
-      builder: (BuildContext dialogContext) {
-        return Dialog(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: MediaQuery.of(context).size.width * 0.8,
-              maxHeight: MediaQuery.of(context).size.height * 0.8,
-            ),
-            child: InteractiveViewer(
-              // Permite hacer zoom y pan en la imagen
-              clipBehavior: Clip
-                  .none, // Importante para que no recorte el contenido al hacer pan
-              minScale: 0.1,
-              maxScale: 4.0,
-              child: Image.network(
-                fullImageUrl,
-                fit: BoxFit
-                    .contain, // La imagen se ajustará al espacio disponible
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  );
-                },
-                errorBuilder: (context, error, stackTrace) => Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.broken_image,
-                      size: 60,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'No se pudo cargar la imagen.',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const Text(
-                      'Asegúrate de que la URL es correcta y el servidor está activo.',
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final itemProvider = context.watch<InventoryItemProvider>();
-    final inventoryItems = widget.inventoryItems;
 
-    return DataTable2(
+    final dataSource = _dataSource;
+
+    // 1. Definición del DataTable2
+    final dataTable = PaginatedDataTable2(
       minWidth: 900,
       columnSpacing: 12,
       horizontalMargin: 12,
       dataRowHeight: 60,
-
+    
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
-
+    
       empty: Center(
         child: Text(
           (itemProvider.filters.isEmpty &&
@@ -314,31 +300,20 @@ class _AssetDataTableState extends State<AssetDataTable> {
           label: _buildFilterHeader(context, 'Nombre', 'name'),
           size: ColumnSize.L,
           onSort: (columnIndex, ascending) {
-            _sortItems(
-              context,
-              1,
-              'name',
-              ascending,
-            ); // Índice de columna correcto
+            _sortItems(context, 1, 'name', ascending);
           },
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Descripción', 'description'),
           size: ColumnSize.L,
           onSort: (columnIndex, ascending) {
-            _sortItems(
-              context,
-              2,
-              'description',
-              ascending,
-            ); // Índice de columna correcto
+            _sortItems(context, 2, 'description', ascending);
           },
         ),
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {
-          final columnIndex = entry.key + 3;
           final fieldDef = entry.value;
           final filterKey = fieldDef.id.toString();
-
+    
           return DataColumn2(
             label: _buildFilterHeader(context, fieldDef.name, filterKey),
             size: ColumnSize.M,
@@ -348,126 +323,36 @@ class _AssetDataTableState extends State<AssetDataTable> {
           );
         }).toList(),
         const DataColumn2(
-          label: Center(
-            child: Text(
-              'Acciones',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
+          label: Text(
+            'Acciones',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
           size: ColumnSize.S,
         ),
       ],
-
-      rows: inventoryItems.map((item) {
-        final String? imageUrl = item.images.isNotEmpty
-            ? item.images.first.url
-            : null;
-
-        // 💡 CONSTRUCCIÓN CORRECTA DE LA URL
-        final String fullImageUrl = imageUrl != null
-            ? '${Environment.apiUrl}$imageUrl'
-            : ''; // Si no hay imagen, string vacío
-
-        final List<DataCell> cells = [
-          DataCell(
-            Center(
-              child: Container(
-                width: 50,
-                height: 50,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Colors.grey.shade300),
-                ),
-                // 💡 ENVOLVEMOS LA IMAGEN CON MÁS LÓGICA
-                child: imageUrl != null
-                    ? Tooltip(
-                        message: 'Ver imagen',
-                        child: MouseRegion(
-                          // Para cambiar el cursor al pasar el ratón
-                          cursor: SystemMouseCursors.click,
-                          child: GestureDetector(
-                            // Para detectar el tap
-                            onTap: () =>
-                                _showImageDialog(context, fullImageUrl),
-                            child: Image.network(
-                              fullImageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.broken_image,
-                                    size: 25,
-                                    color: Colors.grey,
-                                  ),
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return const Center(
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                      ),
-                                    );
-                                  },
-                            ),
-                          ),
-                        ),
-                      )
-                    : const Icon(
-                        Icons.image_not_supported,
-                        size: 25,
-                        color: Colors.grey,
-                      ),
-              ),
-            ),
-          ),
-          DataCell(Text(item.name)),
-          DataCell(
-            Text(
-              item.description ?? '—',
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          ),
-        ];
-
-        for (final fieldDef in widget.assetType.fieldDefinitions) {
-          final fieldValue =
-              item.customFieldValues[fieldDef.id.toString()] ?? '—';
-          cells.add(
-            DataCell(
-              Text(
-                fieldValue.toString(),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-            ),
-          );
+    
+      // Configuración de paginación que interactúa con el Provider
+      rowsPerPage: itemProvider.itemsPerPage,
+      onRowsPerPageChanged: (int? newValue) {
+        if (newValue != null) {
+          itemProvider.setItemsPerPage(newValue);
         }
-
-        cells.add(
-          DataCell(
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit, size: 20),
-                  color: Theme.of(context).colorScheme.primary,
-                  tooltip: 'Editar',
-                  onPressed: () => _editAsset(context, item),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete, size: 20),
-                  color: Colors.red[600],
-                  tooltip: 'Eliminar',
-                  onPressed: () => _deleteAsset(context, item),
-                ),
-              ],
-            ),
-          ),
-        );
-
-        return DataRow(cells: cells);
-      }).toList(),
+      },
+      // El total de filas se obtiene del provider
+      //rowCount: totalItems,
+    
+      // Control de página basado en el provider
+      //pageToDisplay: itemProvider.currentPage - 1,
+      onPageChanged: (int pageIndex) {
+        // DataTable2 usa un índice base 0, tu provider usa base 1.
+        itemProvider.goToPage(pageIndex + 1);
+      },
+    
+      source: dataSource,
     );
+
+    // 3. Devolvemos la tabla
+    // Se elimina el Column envolvente, ya que la tabla debe ocupar el Expanded del padre.
+    return dataTable;
   }
 }

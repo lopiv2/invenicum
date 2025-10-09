@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:invenicum/widgets/asset_data_table.dart';
-import 'package:invenicum/widgets/asset_grid_view.dart';
 import 'package:provider/provider.dart';
 
 import '../models/container_node.dart';
 import '../models/asset_type_model.dart';
 import '../providers/container_provider.dart';
 import '../providers/inventory_item_provider.dart';
+import '../widgets/asset_data_table.dart';
+import '../widgets/asset_grid_view.dart';
 
 class AssetListScreen extends StatefulWidget {
   final String containerId;
@@ -41,21 +41,31 @@ class _AssetListScreenState extends State<AssetListScreen> {
       final itemProvider = context.read<InventoryItemProvider>();
 
       if (cIdInt != null && atIdInt != null) {
-        // Inicializa la carga de datos
+        // Inicializa la carga de datos.
+        // El Provider ahora almacena cIdInt y atIdInt y notifica la actualización.
+        // Se asume que el Provider ya tiene un ordenamiento y paginación por defecto.
         itemProvider.loadInventoryItems(
           containerId: cIdInt,
           assetTypeId: atIdInt,
+          forceReload: true, // Forzar la carga inicial si es necesario
         );
-        
-        // Inicializa el ordenamiento y la paginación
-        itemProvider.sortInventoryItems(dataKey: 'name', ascending: true);
-        itemProvider.goToPage(1);
       }
+      
+      // Suscribirse a los cambios del controlador para actualizar el Provider
+      _searchController.addListener(_onSearchChanged);
     });
+  }
+
+  // Nuevo método para manejar la búsqueda de forma síncrona con el Provider
+  void _onSearchChanged() {
+    final itemProvider = context.read<InventoryItemProvider>();
+    itemProvider.setGlobalSearchTerm(_searchController.text);
+    itemProvider.goToPage(1); // Siempre volver a la página 1 al buscar o filtrar
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -68,47 +78,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     );
   }
 
-  // --- WIDGET DE PAGINACIÓN ---
   
-  Widget _buildPaginationControls(
-    BuildContext context,
-    int totalItems,
-    int currentPage,
-    int itemsPerPage,
-  ) {
-    if (totalItems == 0) return const SizedBox.shrink();
-
-    final totalPages = (totalItems / itemsPerPage).ceil();
-    final itemProvider = context.read<InventoryItemProvider>();
-
-    // No mostrar controles si solo hay una página de resultados
-    if (totalPages <= 1) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.only(top: 10.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text('Página $currentPage de $totalPages ($totalItems activos)'),
-          const SizedBox(width: 16),
-          // Botón Anterior
-          IconButton(
-            icon: const Icon(Icons.chevron_left),
-            onPressed: currentPage > 1
-                ? () => itemProvider.goToPage(currentPage - 1)
-                : null,
-          ),
-          // Botón Siguiente
-          IconButton(
-            icon: const Icon(Icons.chevron_right),
-            onPressed: currentPage < totalPages
-                ? () => itemProvider.goToPage(currentPage + 1)
-                : null,
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,11 +108,11 @@ class _AssetListScreenState extends State<AssetListScreen> {
       );
     }
     
-    // Obtenemos solo los ítems de la página actual (ya ordenados y filtrados)
-    final inventoryItems = itemProvider.getInventoryItems(cIdInt, atIdInt);
+    // 🚨 CORRECCIÓN 1: Usamos el getter inventoryItems. Ya no se pasan IDs.
+    final inventoryItems = itemProvider.inventoryItems; 
     
-    // Obtenemos el total de ítems filtrados (para los controles de paginación)
-    final totalFilteredItems = itemProvider.getTotalFilteredItems(cIdInt, atIdInt);
+    // 🚨 CORRECCIÓN 2: Usamos el getter totalItems. Ya no se pasan IDs.
+    final totalFilteredItems = itemProvider.totalItems;
 
 
     return Padding(
@@ -186,18 +156,15 @@ class _AssetListScreenState extends State<AssetListScreen> {
                               icon: const Icon(Icons.clear),
                               onPressed: () {
                                 _searchController.clear();
-                                itemProvider.setGlobalSearchTerm(null);
-                                itemProvider.goToPage(1); // Volver a la página 1
+                                // La lógica del Provider se maneja en el Listener
+                                // Aquí solo forzamos la limpieza del campo
                               },
                             )
                           : null,
                       border: const OutlineInputBorder(),
                       contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                     ),
-                    onChanged: (value) {
-                      itemProvider.setGlobalSearchTerm(value);
-                      itemProvider.goToPage(1); // Volver a la página 1 al buscar
-                    },
+                    // Se elimina onChanged, ya que usamos el listener del controller
                   ),
                 ),
               ),
@@ -232,27 +199,19 @@ class _AssetListScreenState extends State<AssetListScreen> {
                 elevation: 1,
                 child: _isListView
                     ? AssetDataTable(
-                        assetType: assetType,
-                        containerId: cIdInt,
-                        assetTypeId: atIdInt,
-                        inventoryItems: inventoryItems, // Lista paginada
-                      )
+                          assetType: assetType,
+                          containerId: cIdInt,
+                          assetTypeId: atIdInt,
+                          inventoryItems: inventoryItems, // Lista paginada
+                        )
                     : AssetGridView(
-                        assetType: assetType,
-                        items: inventoryItems, // Lista paginada
-                        containerId: cIdInt,
-                        assetTypeId: atIdInt,
-                      ),
+                          assetType: assetType,
+                          items: inventoryItems, // Lista paginada
+                          containerId: cIdInt,
+                          assetTypeId: atIdInt,
+                        ),
               ),
             ),
-          
-          // --- Controles de Paginación ---
-          _buildPaginationControls(
-            context,
-            totalFilteredItems,
-            itemProvider.currentPage,
-            itemProvider.itemsPerPage,
-          ),
         ],
       ),
     );

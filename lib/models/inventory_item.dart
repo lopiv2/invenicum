@@ -1,4 +1,4 @@
-// lib/models/inventory_item.dart
+import 'package:flutter/material.dart'; // Solo si usas widgets de Flutter
 
 // --- NUEVA CLASE PARA LAS IMÁGENES ---
 class InventoryItemImage {
@@ -32,14 +32,11 @@ class InventoryItem {
   final int containerId;
   final int assetTypeId;
 
-  // NUEVO CAMPO: Lista de imágenes asociadas al activo
   final List<InventoryItemImage> images;
 
-  // Campos de gestión
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  // Mapa dinámico para almacenar los valores de los campos personalizados.
   final Map<String, dynamic> customFieldValues;
 
   InventoryItem({
@@ -50,21 +47,21 @@ class InventoryItem {
     required this.assetTypeId,
     this.createdAt,
     this.updatedAt,
+    // Aseguramos que el constructor siempre tenga un valor por defecto
     required this.customFieldValues,
-    // Inicialización del nuevo campo
     this.images = const [],
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
-    // 1. Extraer campos fijos (asumiendo que los datos base están en el nivel superior o en 'itemData')
     final itemData = json['itemData'] ?? json;
 
-    // 2. Extraer los valores de los campos personalizados.
-    final Map<String, dynamic> fieldValues = Map<String, dynamic>.from(
-      itemData['customFieldValues'] ?? {},
-    );
+    // 🚀 SOLUCIÓN AL ERROR: Conversión segura de customFieldValues
+    // 1. Intentamos obtener el valor y tratarlo como Map<String, dynamic> (con el ?)
+    // 2. Si es null, o si la conversión implícita falla (porque es null), usamos {}
+    final Map<String, dynamic> fieldValues =
+        (itemData['customFieldValues'] as Map<String, dynamic>?) ?? {};
 
-    // 3. Procesar las imágenes (NUEVO)
+    // 3. Procesar las imágenes
     final List<dynamic> imageListJson =
         itemData['images'] as List<dynamic>? ?? [];
     final List<InventoryItemImage> images = imageListJson
@@ -95,29 +92,23 @@ class InventoryItem {
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
 
+      // Pasamos el mapa ya verificado
       customFieldValues: fieldValues,
-      images: images, // Añadido el nuevo campo de imágenes
+      images: images,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      // Campos requeridos para la creación/actualización
       'id': id,
       'containerId': containerId,
       'assetTypeId': assetTypeId,
       'name': name,
       'description': description,
-      // Nota: customFieldValues es Map, que Dio/jsonEncode maneja bien.
       'customFieldValues': customFieldValues,
-
-      // No incluimos 'images' en el body si las estamos enviando como FormData (CREATE).
-      // Pero sí es útil para el UPDATE donde se envían las URLs existentes.
-      // Para el UPDATE, el servicio extrae las URLs y las mapea a 'imageUrls'.
     };
   }
 
-  // Opcional: Para debugging
   @override
   String toString() {
     return 'Item(id: $id, name: $name, images: ${images.length})';

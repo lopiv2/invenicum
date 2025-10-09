@@ -3,7 +3,6 @@ import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
 
 // Definimos el tipo de datos esperado para los archivos que vienen del frontend
-// Esto mejora la legibilidad.
 typedef FileData = List<Map<String, dynamic>>;
 
 class InventoryItemProvider with ChangeNotifier {
@@ -20,20 +19,100 @@ class InventoryItemProvider with ChangeNotifier {
 
   // Estado de Paginación
   int _currentPage = 1;
-  static const int _itemsPerPage = 10;
+  int _itemsPerPage = 10;
 
   int get currentPage => _currentPage;
   int get itemsPerPage => _itemsPerPage;
 
+  // IDs de la vista actual (necesarios para el caché y el getter)
+  int _currentContainerId = 0;
+  int _currentAssetTypeId = 0;
+
+  // Estado Interno (Cache/Loading)
   final Map<String, List<InventoryItem>> _itemsCache = {};
   bool _isLoading = false;
 
   bool get isLoading => _isLoading;
 
+  int _totalFilteredItems = 0;
+
+  // 🚨 CLAVE 1: Getter 'totalItems' que usa el total filtrado
+  int get totalItems => _totalFilteredItems;
+
   InventoryItemProvider(this._itemService);
 
   String _getCacheKey(int containerId, int assetTypeId) {
     return '$containerId-$assetTypeId';
+  }
+
+  int getItemCountForAssetType(int containerId, int assetTypeId) {
+    final key = _getCacheKey(containerId, assetTypeId);
+    // Retorna el tamaño de la lista, o 0 si no existe en caché.
+    return _itemsCache[key]?.length ?? 0;
+  }
+
+  // ----------------------------------------------------------------------
+  // 🚨 CLAVE 2: GETTER PÚBLICO para la tabla de datos
+  // Llama a la función de procesamiento con los IDs de la vista actual.
+  // ----------------------------------------------------------------------
+  List<InventoryItem> get inventoryItems {
+    return _processAndPaginateItems(_currentContainerId, _currentAssetTypeId);
+  }
+
+  // ----------------------------------------------------------------------
+  // FUNCIÓN PRINCIPAL DE PROCESAMIENTO (Filtra, Ordena y Pagina)
+  // ----------------------------------------------------------------------
+
+  /// Obtiene los ítems del inventario, aplicando filtros, ordenamiento y PAGINACIÓN.
+  List<InventoryItem> _processAndPaginateItems(
+    int containerId,
+    int assetTypeId,
+  ) {
+    final key = _getCacheKey(containerId, assetTypeId);
+    final items = _itemsCache[key] ?? [];
+
+    // 1. Aplicar Filtros
+    Iterable<InventoryItem> processedItems = _applyFilters(items);
+
+    // 2. Ordenamiento
+    final sortedList = processedItems.toList();
+
+    sortedList.sort((a, b) {
+      Comparable aValue;
+      Comparable bValue;
+
+      if (sortKey == 'name') {
+        aValue = a.name;
+        bValue = b.name;
+      } else if (sortKey == 'description') {
+        aValue = a.description ?? '';
+        bValue = b.description ?? '';
+      } else {
+        aValue = a.customFieldValues[sortKey]?.toString() ?? '';
+        bValue = b.customFieldValues[sortKey]?.toString() ?? '';
+      }
+
+      final comparison = aValue.compareTo(bValue);
+
+      return sortAscending ? comparison : -comparison;
+    });
+
+    // 🚨 CLAVE 3: Actualizar el total de ítems filtrados ANTES de paginar
+    _totalFilteredItems = sortedList.length;
+
+    // 3. Paginación
+    final totalItems = _totalFilteredItems;
+    final startIndex = (_currentPage - 1) * _itemsPerPage;
+    final endIndex = startIndex + _itemsPerPage;
+
+    if (startIndex >= totalItems) {
+      return [];
+    }
+
+    return sortedList.sublist(
+      startIndex,
+      endIndex < totalItems ? endIndex : totalItems,
+    );
   }
 
   // --- FUNCIÓN AUXILIAR DE FILTRADO (Deduplicación) ---
@@ -42,7 +121,7 @@ class InventoryItemProvider with ChangeNotifier {
   Iterable<InventoryItem> _applyFilters(List<InventoryItem> items) {
     Iterable<InventoryItem> processedItems = items;
 
-    // 1. FILTRO GLOBAL (Busca en todas las propiedades)
+    // 1. FILTRO GLOBAL
     if (_globalSearchTerm != null) {
       final searchTerm = _globalSearchTerm!;
       processedItems = processedItems.where((item) {
@@ -58,7 +137,7 @@ class InventoryItemProvider with ChangeNotifier {
       });
     }
 
-    // 2. FILTRADO POR COLUMNA (Aplicado después del global)
+    // 2. FILTRADO POR COLUMNA
     if (_filters.isNotEmpty) {
       processedItems = processedItems.where((item) {
         // El ítem debe cumplir con TODOS los criterios de filtro por columna
@@ -87,66 +166,16 @@ class InventoryItemProvider with ChangeNotifier {
     return processedItems;
   }
 
-  // --- GETTER PRINCIPAL ---
-
-  /// Obtiene los ítems del inventario, aplicando filtros, ordenamiento y PAGINACIÓN.
-  List<InventoryItem> getInventoryItems(int containerId, int assetTypeId) {
-    final key = _getCacheKey(containerId, assetTypeId);
-    final items = _itemsCache[key] ?? [];
-
-    // Aplicar todos los filtros
-    Iterable<InventoryItem> processedItems = _applyFilters(items);
-
-    // 3. ORDENAMIENTO
-    final sortedList = processedItems.toList();
-
-    sortedList.sort((a, b) {
-      Comparable aValue;
-      Comparable bValue;
-
-      if (sortKey == 'name') {
-        aValue = a.name;
-        bValue = b.name;
-      } else if (sortKey == 'description') {
-        aValue = a.description ?? '';
-        bValue = b.description ?? '';
-      } else {
-        aValue = a.customFieldValues[sortKey]?.toString() ?? '';
-        bValue = b.customFieldValues[sortKey]?.toString() ?? '';
-      }
-
-      final comparison = aValue.compareTo(bValue);
-
-      return sortAscending ? comparison : -comparison;
-    });
-
-    // 4. PAGINACIÓN
-    final totalItems = sortedList.length;
-    final startIndex = (_currentPage - 1) * _itemsPerPage;
-    final endIndex = startIndex + _itemsPerPage;
-
-    if (startIndex >= totalItems) {
-      return [];
-    }
-
-    return sortedList.sublist(
-      startIndex,
-      endIndex < totalItems ? endIndex : totalItems,
-    );
+  // ----------------------------------------------------------------------
+  // FUNCIÓN AUXILIAR PARA NOTIFICAR Y RECALCULAR TOTALES
+  // ----------------------------------------------------------------------
+  void _recalculateTotalsAndNotify() {
+    // Forzar el cálculo para actualizar _totalFilteredItems
+    _processAndPaginateItems(_currentContainerId, _currentAssetTypeId);
+    notifyListeners();
   }
 
-  /// Devuelve el total de ítems filtrados (antes de la paginación)
-  int getTotalFilteredItems(int containerId, int assetTypeId) {
-    final key = _getCacheKey(containerId, assetTypeId);
-    final items = _itemsCache[key] ?? [];
-
-    // Reutilizamos la función de filtrado
-    final processedItems = _applyFilters(items);
-
-    return processedItems.length;
-  }
-
-  // --- LÓGICA DE FILTROS Y ORDENAMIENTO ---
+  // --- LÓGICA DE FILTROS Y ORDENAMIENTO (Ahora llama a la nueva función) ---
 
   void setFilter(String key, String? value) {
     if (value == null || value.isEmpty) {
@@ -154,7 +183,8 @@ class InventoryItemProvider with ChangeNotifier {
     } else {
       _filters[key] = value;
     }
-    notifyListeners();
+    // Llama al nuevo notificador
+    _recalculateTotalsAndNotify();
   }
 
   void setGlobalSearchTerm(String? term) {
@@ -163,35 +193,46 @@ class InventoryItemProvider with ChangeNotifier {
     } else {
       _globalSearchTerm = term.trim().toLowerCase();
     }
-    notifyListeners();
+    _recalculateTotalsAndNotify();
   }
 
   void sortInventoryItems({required String dataKey, required bool ascending}) {
     sortKey = dataKey;
     sortAscending = ascending;
-    notifyListeners();
+    _recalculateTotalsAndNotify();
   }
 
-  // --- LÓGICA DE PAGINACIÓN ---
+  // --- LÓGICA DE PAGINACIÓN (Ahora llama a la nueva función) ---
 
   void goToPage(int page) {
     if (_currentPage != page && page >= 1) {
       _currentPage = page;
-      notifyListeners();
+      _recalculateTotalsAndNotify();
     }
   }
 
-  // --- LÓGICA DE CRUD ---
+  void setItemsPerPage(int count) {
+    if (_itemsPerPage != count) {
+      _itemsPerPage = count;
+      _currentPage = 1;
+      _recalculateTotalsAndNotify();
+    }
+  }
+
+  // --- LÓGICA DE CRUD (Actualizada) ---
 
   Future<void> loadInventoryItems({
     required int containerId,
     required int assetTypeId,
     bool forceReload = false,
   }) async {
+    _currentContainerId = containerId;
+    _currentAssetTypeId = assetTypeId;
+
     final key = _getCacheKey(containerId, assetTypeId);
 
     if (_itemsCache.containsKey(key) && !forceReload) {
-      notifyListeners();
+      _recalculateTotalsAndNotify();
       return;
     }
 
@@ -212,26 +253,21 @@ class InventoryItemProvider with ChangeNotifier {
       rethrow;
     } finally {
       _isLoading = false;
-      notifyListeners();
+      _recalculateTotalsAndNotify();
     }
   }
 
-  // --------------------------------------------------------------------------
-  // --- CREATE (MODIFICADO) - ACEPTA AHORA LOS DATOS DEL ARCHIVO (BYTES) ---
-  // --------------------------------------------------------------------------
   Future<void> createInventoryItem(
     InventoryItem newItem, {
-    // CAMBIO CLAVE: Recibimos los datos del archivo, no las URLs finales.
     FileData filesData = const [],
   }) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      // 🛑 DELEGAMOS la subida del archivo y la creación del ítem al Servicio
       final createdItem = await _itemService.createInventoryItem(
         newItem,
-        filesData: filesData, // <--- PASAMOS LOS DATOS DEL ARCHIVO
+        filesData: filesData,
       );
 
       final key = _getCacheKey(
@@ -240,53 +276,51 @@ class InventoryItemProvider with ChangeNotifier {
       );
 
       _itemsCache.putIfAbsent(key, () => []);
-      
-      // Añadimos el nuevo ítem devuelto por el backend a la caché
       _itemsCache[key]!.add(createdItem);
 
-      // Reiniciamos a la primera página si es necesario
       goToPage(1);
     } catch (e) {
-      if (kDebugMode) {
-        print("Error creating inventory item: $e");
-      }
       rethrow;
     } finally {
       _isLoading = false;
-      notifyListeners();
+      _recalculateTotalsAndNotify();
     }
   }
 
-  // --------------------------------------------------------------------------------
-  // --- UPDATE (MODIFICADO) - ASUMIMOS QUE LOS UPDATES DE IMAGEN SE HACEN APARTE ---
-  // --------------------------------------------------------------------------------
-  Future<void> updateInventoryItem(
-    InventoryItem updatedItem,
-    int assetTypeId,
-    // NOTA: Para la edición, si también se permiten subir archivos nuevos, 
-    // esta función debería modificarse para usar FormData, similar al CREATE.
-    // Por ahora, solo maneja la actualización de datos y URLs existentes.
-  ) async {
+  // 🚀 NUEVA LÓGICA: Método unificado para actualizar datos y gestionar imágenes.
+  Future<void> updateAssetWithFiles(
+    InventoryItem updatedItem, {
+    FileData filesToUpload = const [],
+    List<int> imageIdsToDelete = const [],
+  }) async {
     _isLoading = true;
     notifyListeners();
 
-    final key = _getCacheKey(updatedItem.containerId, assetTypeId);
+    final key = _getCacheKey(updatedItem.containerId, updatedItem.assetTypeId);
     final itemsList = _itemsCache[key];
 
     try {
-      final resultItem = await _itemService.updateInventoryItem(updatedItem);
+      // 1. Llamar al servicio que gestionará el PATCH de los datos, 
+      // la subida de nuevos archivos y la eliminación de IDs de imágenes.
+      final resultItem = await _itemService.updateInventoryItem(
+        updatedItem,
+        filesToUpload: filesToUpload,
+        imageIdsToDelete: imageIdsToDelete,
+      );
 
+      // 2. Actualizar el caché con el ítem recién devuelto por el servicio
       if (itemsList != null) {
         final index = itemsList.indexWhere((item) => item.id == resultItem.id);
         if (index != -1) {
-          itemsList[index] = resultItem;
+          // Reemplazar el ítem con el resultado (que incluye las nuevas imágenes y sin las eliminadas)
+          itemsList[index] = resultItem; 
         }
       }
     } catch (e) {
       rethrow;
     } finally {
       _isLoading = false;
-      notifyListeners();
+      _recalculateTotalsAndNotify();
     }
   }
 
@@ -308,13 +342,10 @@ class InventoryItemProvider with ChangeNotifier {
         itemsList.removeWhere((item) => item.id == itemId);
       }
     } catch (e) {
-      if (kDebugMode) {
-        print("Error deleting inventory item: $e");
-      }
       rethrow;
     } finally {
       _isLoading = false;
-      notifyListeners();
+      _recalculateTotalsAndNotify();
     }
   }
 }

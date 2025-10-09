@@ -1,7 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/services/asset_type_service.dart';
@@ -10,6 +12,7 @@ import 'package:invenicum/services/inventory_item_service.dart';
 import 'routing/app_router.dart';
 import 'package:provider/provider.dart';
 import 'services/api_service.dart';
+import 'l10n/app_localizations.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -60,6 +63,18 @@ class MyApp extends StatelessWidget {
     return Provider(
       create: (_) => ApiService(),
       child: MaterialApp.router(
+        localizationsDelegates: [
+          // El delegado generado a partir de tus archivos .arb
+          AppLocalizations.delegate,
+
+          // Delegados de Flutter estándar (para textos de Material, como botones 'OK')
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+
+        // 2. Idiomas Soportados
+        supportedLocales: AppLocalizations.supportedLocales,
         builder: FToastBuilder(),
         debugShowCheckedModeBanner: false,
         title: 'Invenicum',

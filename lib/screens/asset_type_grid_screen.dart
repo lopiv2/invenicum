@@ -44,19 +44,18 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
     // Es posible que necesitemos esperar a que la lista de contenedores se llene.
     // Si la lista está vacía Y el proveedor NO está ya cargando...
     if (containerProvider.containers.isEmpty && !containerProvider.isLoading) {
-       try {
-         // 🛑 Esperamos la carga de los contenedores
-         await containerProvider.loadContainers();
-         // En este punto, loadContainers DEBE haber llamado a notifyListeners()
-         // lo que causaría una reconstrucción. Pero como estamos usando .read(),
-         // la reconstrucción no se detiene aquí.
-         
-       } catch (e) {
-         // Manejar error de carga
-         return;
-       }
+      try {
+        // 🛑 Esperamos la carga de los contenedores
+        await containerProvider.loadContainers();
+        // En este punto, loadContainers DEBE haber llamado a notifyListeners()
+        // lo que causaría una reconstrucción. Pero como estamos usando .read(),
+        // la reconstrucción no se detiene aquí.
+      } catch (e) {
+        // Manejar error de carga
+        return;
+      }
     }
-    
+
     // 2. BUSCAR el contenedor después de la carga
     // Volvemos a leer el provider para obtener el estado MÁS RECIENTE.
     // Como el build() se ejecuta de nuevo después de la carga, la búsqueda es segura.
@@ -67,7 +66,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
     // 3. Iniciar la carga de ítems para cada AssetType
     if (container != null) {
       for (var assetType in container.assetTypes) {
-        // Llama a la carga de ítems, que llamará a notifyListeners() 
+        // Llama a la carga de ítems, que llamará a notifyListeners()
         // en el InventoryItemProvider cuando termine.
         itemProvider.loadInventoryItems(
           containerId: cIdInt,
@@ -85,14 +84,16 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
   }
 
   void _goToAssetList(BuildContext context, AssetType assetType) {
-    context.go('/container/${widget.containerId}/asset-types/${assetType.id}/assets');
+    context.go(
+      '/container/${widget.containerId}/asset-types/${assetType.id}/assets',
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final containerProvider = context.watch<ContainerProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
-    
+
     final containerIdInt = int.tryParse(widget.containerId);
 
     if (containerIdInt == null) {
@@ -160,12 +161,12 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 itemCount: assetTypes.length,
                 itemBuilder: (context, index) {
                   final assetType = assetTypes[index];
-                  
-                  final assetCount = itemProvider.getInventoryItems(
-                    containerIdInt, 
-                    assetType.id, 
-                  ).length;
-                  
+
+                  final assetCount = itemProvider.getItemCountForAssetType(
+                    containerIdInt, // O widget.containerId
+                    assetType.id,
+                  );
+
                   return AssetTypeCard(
                     containerId: widget.containerId,
                     assetType: assetType,

@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // Importación clave
 
 class ImagePreviewSection extends StatelessWidget {
   final List<String> imageUrls;
@@ -12,6 +15,100 @@ class ImagePreviewSection extends StatelessWidget {
     required this.onRemoveImage,
   });
 
+  // --- WIDGET AUXILIAR QUE CARGA LA IMAGEN SEGÚN EL TIPO DE URL ---
+  Widget _buildImageLoader(String url) {
+    // 1. Verificar si es una Data URL (Base64)
+    if (url.startsWith('data:')) {
+      final String base64String = url.split(',').last;
+
+      try {
+        final Uint8List bytes = base64Decode(base64String);
+        return Image.memory(
+          bytes,
+          fit: BoxFit.cover,
+        );
+      } catch (e) {
+        // Fallback robusto para Base64 fallido (el error original)
+        return Container(
+          color: Colors.red[100],
+          child: const Center(
+            child: Icon(Icons.broken_image, size: 40, color: Colors.red),
+          ),
+        );
+      }
+    } 
+    // 2. Es una URL de Red (http/https) - ¡Usamos CachedNetworkImage!
+    else {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+        // Muestra un indicador de progreso mientras carga
+        placeholder: (context, url) => const Center(
+          child: SizedBox(
+            width: 30, // Reducimos el tamaño del indicador
+            height: 30,
+            child: CircularProgressIndicator(strokeWidth: 3),
+          ),
+        ),
+        // Muestra un ícono de error si la carga falla (mejor que el crash)
+        errorWidget: (context, url, error) {
+          // Si el error es una URL no válida o la imagen está corrupta
+          return Container(
+            color: Colors.grey[200],
+            child: const Center(
+              child: Icon(Icons.error_outline, size: 40, color: Colors.grey),
+            ),
+          );
+        },
+      );
+    }
+  }
+
+  /// Widget auxiliar para construir una previsualización de imagen con botón de eliminar.
+  Widget _buildImagePreview(
+    BuildContext context,
+    String url, {
+    required double size,
+    bool isPrincipal = false,
+  }) {
+    return Stack(
+      children: [
+        Container(
+          width: size,
+          height: size,
+          margin: isPrincipal ? null : const EdgeInsets.only(bottom: 5),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isPrincipal ? Theme.of(context).colorScheme.primary : Colors.grey.shade300,
+              width: isPrincipal ? 3 : 1,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          clipBehavior: Clip.antiAlias,
+          
+          // Usamos el nuevo widget condicional aquí
+          child: _buildImageLoader(url),
+        ),
+        
+        // Botón de eliminar
+        Positioned(
+          top: 5,
+          right: 5,
+          child: IconButton(
+            icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
+            onPressed: () => onRemoveImage(url),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white70,
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(30, 30),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+  
+  // --- BUILD PRINCIPAL ---
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -84,73 +181,6 @@ class ImagePreviewSection extends StatelessWidget {
               ],
             ],
           ),
-      ],
-    );
-  }
-
-  /// Widget auxiliar para construir una previsualización de imagen con botón de eliminar.
-  Widget _buildImagePreview(
-    BuildContext context,
-    String url, {
-    required double size,
-    bool isPrincipal = false,
-  }) {
-    return Stack(
-      children: [
-        Container(
-          width: size,
-          height: size,
-          margin: isPrincipal ? null : const EdgeInsets.only(bottom: 5),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isPrincipal ? Theme.of(context).colorScheme.primary : Colors.grey.shade300,
-              width: isPrincipal ? 3 : 1,
-            ),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Image.network(
-            url,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              // Muestra un placeholder si la URL no es una imagen válida
-              return Container(
-                color: Colors.grey.shade200,
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.broken_image, size: 40, color: Colors.red),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          // Muestra una parte de la URL base64 o el error
-                          url.startsWith('data:') ? 'Imagen Local' : 'Error URL',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 10, overflow: TextOverflow.ellipsis),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        // Botón de eliminar
-        Positioned(
-          top: 5,
-          right: 5,
-          child: IconButton(
-            icon: const Icon(Icons.cancel, color: Colors.red, size: 28),
-            onPressed: () => onRemoveImage(url),
-            style: IconButton.styleFrom(
-              backgroundColor: Colors.white70,
-              padding: EdgeInsets.zero,
-              minimumSize: const Size(30, 30),
-            ),
-          ),
-        ),
       ],
     );
   }
