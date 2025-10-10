@@ -211,9 +211,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     }
     // 2. Es una imagen existente (URL de red)
     else {
-      // Buscamos la InventoryItemImage correspondiente a esta URL
+      final String apiUrl = Environment.apiUrl;
+      final String relativeUrl = url.replaceAll(apiUrl, '');
+
+      // Buscamos la InventoryItemImage correspondiente usando la URL relativa
       final existingImage = _currentImages.firstWhere(
-        (img) => img.url == url,
+        (img) => img.url == relativeUrl,
         orElse: () => InventoryItemImage(id: -1, url: '', order: 0),
       );
 
