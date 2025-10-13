@@ -105,10 +105,14 @@ class AssetTypeService {
   }
 
   // ------------------------------------------------------------------
-  // --- D (DELETE): Eliminar un AssetType ---
+  // --- D (DELETE): Eliminar un AssetType y sus elementos asociados ---
   // ------------------------------------------------------------------
   Future<void> deleteAssetType(int assetTypeId) async {
     try {
+      // Primero, eliminar todos los elementos asociados
+      await _dio.delete('/asset-types/$assetTypeId/assets');
+      
+      // Luego, eliminar el tipo de activo
       final response = await _dio.delete('/asset-types/$assetTypeId');
       
       // La eliminación exitosa puede ser 200 o 204 (No Content)
@@ -116,8 +120,15 @@ class AssetTypeService {
         throw Exception('Fallo al eliminar AssetType: ${response.statusCode}');
       }
     } on DioException catch (e) {
-       // Manejo de errores simplificado
-      throw Exception('Error de conexión: ${e.message}');
+      if (e.response?.statusCode == 401) {
+        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+      } else if (e.response?.statusCode == 404) {
+        throw Exception('El tipo de activo no existe o ya fue eliminado.');
+      }
+      final message = e.response?.data['message'] ?? e.message;
+      throw Exception('Error al eliminar el tipo de activo: $message');
+    } catch (e) {
+      throw Exception('Error inesperado al eliminar el tipo de activo: $e');
     }
   }
 }

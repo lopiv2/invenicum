@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart'; // Solo si usas widgets de Flutter
-
 // --- NUEVA CLASE PARA LAS IMÁGENES ---
 class InventoryItemImage {
   final int id;

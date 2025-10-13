@@ -22,8 +22,7 @@ class InventoryItemService {
   }) async {
     try {
       final response = await _dio.get(
-        '/containers/$containerId/items',
-        queryParameters: {'assetTypeId': assetTypeId},
+        '/containers/$containerId/asset-types/$assetTypeId/items',
       );
 
       final List<dynamic> itemsListJson = response.data['data'] as List<dynamic>; 

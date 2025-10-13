@@ -3,8 +3,11 @@ import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/models/custom_field_definition.dart';
+import 'package:invenicum/utils/asset_form_utils.dart';
 import 'package:provider/provider.dart';
 
 // Asegúrate de que estas importaciones son correctas y los modelos existen
@@ -246,7 +249,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   // --- LÓGICA DE GUARDADO ---
   Future<void> _saveAsset() async {
-    if (!_formKey.currentState!.validate() ||
+    if (!AssetFormUtils.validateForm(_formKey) ||
         widget.initialItem == null ||
         _assetType == null) {
       return;
@@ -333,39 +336,25 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             padding: const EdgeInsets.only(bottom: 20.0),
             child: TextFormField(
               controller: controller,
-              keyboardType: _getKeyboardType(fieldDef.type.toString()),
+              keyboardType: fieldDef.type.keyboardType,
+              inputFormatters: AssetFormUtils.getInputFormatters(fieldDef.type),
               decoration: InputDecoration(
                 labelText: fieldDef.name,
-                hintText: 'Tipo: ${fieldDef.type.toString().toLowerCase()}',
                 border: const OutlineInputBorder(),
-                helperText: fieldDef.isRequired ? 'Obligatorio' : null,
+                helperText: fieldDef.isRequired ? 'Obligatorio' : 'Opcional',
+                hintText: AssetFormUtils.getHintText(fieldDef.type),
               ),
-              validator: fieldDef.isRequired
-                  ? (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Este campo es obligatorio.';
-                      }
-                      return null;
-                    }
-                  : null,
+              validator: (value) {
+                if (fieldDef.isRequired && (value == null || value.isEmpty)) {
+                  return 'Este campo es obligatorio.';
+                }
+                return fieldDef.type.validateValue(value);
+              },
             ),
           );
         }).toList(),
       ],
     );
-  }
-
-  // Método auxiliar para el tipo de teclado (simulado)
-  TextInputType _getKeyboardType(String fieldType) {
-    switch (fieldType.toLowerCase()) {
-      case 'integer':
-      case 'decimal':
-        return TextInputType.number;
-      case 'date':
-        return TextInputType.datetime;
-      default:
-        return TextInputType.text;
-    }
   }
 
   // ----------------------------------------------------

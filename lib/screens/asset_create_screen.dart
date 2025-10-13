@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'dart:typed_data';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/models/custom_field_definition.dart';
+import 'package:invenicum/utils/asset_form_utils.dart';
 import 'package:invenicum/widgets/image_preview_section.dart';
 import 'package:provider/provider.dart';
 
@@ -152,31 +153,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     });
   }
 
-  /// Convierte una Data URL (Base64) a Uint8List y extrae el nombre/tipo de archivo.
-  Map<String, dynamic> _dataUrlToFileData(String dataUrl, int index) {
-    // Ej: "data:image/png;base64,iVBORw0KGgo..."
-
-    // 1. Extraer el tipo MIME (ej: image/png)
-    final mimeTypeMatch = RegExp(r'data:([^;]+);base64,').firstMatch(dataUrl);
-    final mimeType = mimeTypeMatch?.group(1);
-
-    // 2. Extraer los bytes Base64 puros
-    final base64String = dataUrl.split(',').last;
-    final Uint8List bytes = base64Decode(base64String);
-
-    // 3. Determinar la extensión y nombre simulado
-    // Nota: FilePicker ya nos da un nombre, pero si usamos la URL Base64
-    // para simulación, generamos un nombre basado en el tipo MIME y el índice.
-    final extension = mimeType?.split('/').last ?? 'jpg';
-    final fileName = 'asset_image_$index.$extension';
-
-    return {'bytes': bytes, 'name': fileName};
-  }
-
-  // --- LÓGICA DE GUARDADO ---
-
   Future<void> _saveAsset() async {
-    if (!_formKey.currentState!.validate() || _assetType == null) {
+    if (!AssetFormUtils.validateForm(_formKey) || _assetType == null) {
       return;
     }
 
@@ -191,22 +169,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       }
     }
 
-    // 2. Preparar los datos de los archivos para el Provider/Service
-    final List<Map<String, dynamic>> filesData = [];
-
-    // Convertimos cada Base64 Data URL de previsualización en el formato {bytes, name}
-    // para enviarlo al Provider/Service.
-    for (int i = 0; i < _imagePreviewUrls.length; i++) {
-      final dataUrl = _imagePreviewUrls[i];
-
-      // Solo procesamos las Data URLs (que es lo que generamos en _addImage con file_picker)
-      if (dataUrl.startsWith('data:')) {
-        filesData.add(_dataUrlToFileData(dataUrl, i));
-      }
-      // Si tienes URLs reales (ej: 'http://...'), deberías manejar la subida
-      // de forma diferente, o no incluirlas aquí si solo quieres enviar archivos nuevos.
-      // En este contexto de 'Creación', asumimos que todas las URLs son Data URLs de archivos nuevos.
-    }
+    // 2. Preparar los datos de los archivos
+    final filesData = AssetFormUtils.processImages(_imagePreviewUrls);
 
     // 3. Crear el nuevo objeto InventoryItem
     final newItem = InventoryItem(
@@ -216,16 +180,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: customFieldValues,
-      // No incluimos images, createdAt, updatedAt; el backend las devolverá.
     );
 
     // 4. Llamar al proveedor para guardar con los archivos
     try {
-      await itemProvider.createInventoryItem(
-        newItem,
-        filesData:
-            filesData, // <-- ¡CAMBIO CLAVE! Pasamos los datos del archivo
-      );
+      await itemProvider.createInventoryItem(newItem, filesData: filesData);
 
       // 5. Navegar de vuelta al listado
       if (mounted) {
@@ -242,6 +201,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   }
 
   // --- WIDGETS DE VISTA ---
+
+
 
   Widget _buildCustomFields() {
     return Column(
@@ -263,21 +224,20 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
             padding: const EdgeInsets.only(bottom: 16),
             child: TextFormField(
               controller: controller,
-              keyboardType: _getKeyboardType(fieldDef.type.toString()),
+              keyboardType: fieldDef.type.keyboardType,
+              inputFormatters: AssetFormUtils.getInputFormatters(fieldDef.type),
               decoration: InputDecoration(
                 labelText: fieldDef.name,
-                hintText: 'Tipo: ${fieldDef.type.toString().toLowerCase()}',
+                hintText: AssetFormUtils.getHintText(fieldDef.type),
                 border: const OutlineInputBorder(),
                 helperText: fieldDef.isRequired ? 'Obligatorio' : null,
               ),
-              validator: fieldDef.isRequired
-                  ? (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Este campo es obligatorio.';
-                      }
-                      return null;
-                    }
-                  : null,
+              validator: (value) {
+                if (fieldDef.isRequired && (value == null || value.isEmpty)) {
+                  return 'Este campo es obligatorio.';
+                }
+                return fieldDef.type.validateValue(value);
+              },
             ),
           );
         }).toList(),
@@ -285,18 +245,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     );
   }
 
-  // Método auxiliar para el tipo de teclado (simulado)
-  TextInputType _getKeyboardType(String fieldType) {
-    switch (fieldType.toLowerCase()) {
-      case 'integer':
-      case 'decimal':
-        return TextInputType.number;
-      case 'date':
-        return TextInputType.datetime;
-      default:
-        return TextInputType.text;
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {

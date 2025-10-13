@@ -1,12 +1,16 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/inventory_item.dart';
+import 'package:invenicum/models/list_data.dart';
 import 'package:invenicum/screens/asset_create_screen.dart';
 import 'package:invenicum/screens/asset_edit_screen.dart';
 import 'package:invenicum/screens/asset_list_screen.dart';
 import 'package:invenicum/screens/asset_type_create_screen.dart';
 import 'package:invenicum/screens/asset_type_grid_screen.dart';
 import 'package:invenicum/screens/dashboard_screen.dart';
+import 'package:invenicum/screens/datalist_create_screen.dart';
+import 'package:invenicum/screens/datalist_edit_screen.dart';
+import 'package:invenicum/screens/datalist_grid_screen.dart';
 import 'package:invenicum/screens/login_screen.dart';
 import 'package:invenicum/widgets/main_layout.dart';
 
@@ -100,15 +104,37 @@ final router = GoRouter(
           ],
         ),
 
-        // 3. Vista de Listas Personalizadas (Mantenidas)
+        // 3. Vista de Listas Personalizadas
         GoRoute(
           path: '/container/:containerId/datalists',
           builder: (context, state) {
             final containerId = state.pathParameters['containerId']!;
-            return Center(
-              child: Text('Gestión de Listas para Contenedor ID: $containerId'),
-            );
+            return DataListGridScreen(containerId: containerId);
           },
+          routes: [
+            // Ruta para crear nueva lista personalizada
+            GoRoute(
+              path: 'new',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                return DataListCreateScreen(containerId: containerId);
+              },
+            ),
+            // Ruta para editar lista personalizada
+            GoRoute(
+              path: ':dataListId/edit',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                final dataListId = state.pathParameters['dataListId']!;
+                final initialData = state.extra as ListData;
+                return DataListEditScreen(
+                  containerId: containerId,
+                  dataListId: dataListId,
+                  initialData: initialData,
+                );
+              },
+            ),
+          ],
         ),
 
         // 4. Vista de Categorías (Mantenidas)

@@ -240,22 +240,6 @@ class ContainerTreeView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
       child: Row(
         children: [
-          // 1. Icono de expansión: El TreeView se encarga de este espacio,
-          // ¡pero necesitamos el icono si no usamos el widget por defecto!
-          // Dejaré el icono de expansión COMENTADO, ya que el Indentation
-          // de animated_tree_view generalmente proporciona el espacio.
-          // Si necesitas un icono customizado, mira el siguiente bloque.
-
-          /* if (node.children.isNotEmpty)
-          Icon(
-            node.isExpanded ? Icons.expand_more : Icons.chevron_right,
-            size: 20,
-            color: Colors.grey,
-          )
-        else
-          const SizedBox(width: 24), */
-
-          // 2. Icono del nodo
           Icon(
             isContainer
                 ? Icons.folder_open
@@ -351,14 +335,20 @@ class ContainerTreeView extends StatelessWidget {
         );
 
         // Lógica de Navegación del Negocio
-        if (isSection && keyParts.last == 'assettypes') {
-          context.go('/container/$containerIdStr/asset-types');
-          return;
+        if (isSection) {
+          switch (keyParts.last) {
+            case 'assettypes':
+              context.go('/container/$containerIdStr/asset-types');
+              return;
+            case 'datalists':
+              context.go('/container/$containerIdStr/datalists');
+              return;
+          }
         }
 
-        // Lógica de Negocio General: Tap en el contenedor o sección general
-        if (isContainer || isSection) {
-          onContainerTap(container, isSection ? keyParts.last : null);
+        // Lógica de Negocio General: Tap en el contenedor
+        if (isContainer) {
+          onContainerTap(container, null);
         }
       },
 

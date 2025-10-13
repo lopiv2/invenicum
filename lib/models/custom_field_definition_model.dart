@@ -61,7 +61,7 @@ class CustomFieldDefinition {
       id: parsedId,
       name: json['name'] as String,
       type: CustomFieldType.values.firstWhere(
-        (e) => e.toString() == 'CustomFieldType.${json['type']}',
+        (e) => e.name.toLowerCase() == (json['type'] as String).toLowerCase(),
         orElse: () => CustomFieldType.text, // Valor por defecto si no coincide
       ),
       // Asegúrate de manejar la posibilidad de que el backend envíe '0' o '1' como string si es necesario
@@ -82,9 +82,9 @@ class CustomFieldDefinition {
     // 2. Otros campos
     map['name'] = name;
 
-    // *** CORRECCIÓN CLAVE AQUÍ ***
-    // Convertir el enum 'type' a su representación en String.
-    map['type'] = type.name;
+    // Convertir el enum 'type' a su representación en String
+    // Usamos name.toLowerCase() para mantener consistencia con el backend
+    map['type'] = type.name.toLowerCase();
 
     map['isRequired'] = isRequired;
 
