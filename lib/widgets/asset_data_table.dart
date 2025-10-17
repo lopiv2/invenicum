@@ -92,7 +92,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
   @override
   void dispose() {
-    context.read<InventoryItemProvider>().removeListener(_providerListener);
+    //context.read<InventoryItemProvider>().removeListener(_providerListener);
     super.dispose();
   }
 

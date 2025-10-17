@@ -41,9 +41,15 @@ class _AssetListScreenState extends State<AssetListScreen> {
     _itemProvider = context.read<InventoryItemProvider>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _applyFiltersAndLoad(
+      // 🔑 CARGA INICIAL: Ya NO enviamos filtros de agregación al backend.
+      // El backend solo aplica filtros base (containerId, assetTypeId, userId).
+      _itemProvider.loadInventoryItems(
+        containerId: int.tryParse(widget.containerId) ?? 0,
+        assetTypeId: int.tryParse(widget.assetTypeId) ?? 0,
+        aggregationFilters: {}, // ¡Vacío! El filtrado es local.
         forceReload: true,
-      ); // 🔑 Llama a la nueva lógica de carga inicial
+        goToPageOne: true,
+      );
 
       _searchController.addListener(_onSearchChanged);
     });
@@ -60,27 +66,22 @@ class _AssetListScreenState extends State<AssetListScreen> {
 
     if (cIdInt == null || atIdInt == null) return;
 
-    // Construir el mapa de filtros de agregación para el backend
-    final Map<String, String> aggFilters = {};
-    if (_selectedCountFieldId != null &&
-        _selectedCountValue != null &&
-        _selectedCountValue!.isNotEmpty) {
-      aggFilters[_selectedCountFieldId!] = _selectedCountValue!;
-    }
-
+    // Aquí simplemente notificamos al Provider que recargue la lista
+    // si el filtro de búsqueda global lo requiere.
+    // Los filtros de agregación se manejan LOCALMENTE en 'build'.
     _itemProvider.loadInventoryItems(
       containerId: cIdInt,
       assetTypeId: atIdInt,
-      aggregationFilters: aggFilters, // Pasar el filtro dinámico
+      aggregationFilters: {}, // Mantenemos vacío
       forceReload: forceReload,
       goToPageOne: goToPageOne,
     );
+
+    // Forzamos la reconstrucción para que el widget tome los nuevos filtros locales.
+    setState(() {});
   }
 
   void _goBack(BuildContext context) {
-    // 🔑 CAMBIO CLAVE: Usamos context.go() para NAVEGAR
-    // directamente a la ruta padre, forzando su reconstrucción
-    // y reseteando el widget tree asociado.
     context.go('/container/${widget.containerId}/asset-types');
   }
 
@@ -176,7 +177,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
                       _selectedCountValue = null;
                     });
                     _applyFiltersAndLoad(); // Recargar sin filtro de conteo
-                    Navigator.of(context).pop();
+                    context.pop();
                   },
                   child: const Text('Limpiar Contador'),
                 ),
@@ -188,7 +189,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
                       _selectedCountValue = tempValueController.text.trim();
                     });
                     _applyFiltersAndLoad(); // Recargar con el nuevo filtro
-                    Navigator.of(context).pop();
+                    context.pop();
                   },
                   child: const Text('Aplicar'),
                 ),
@@ -198,6 +199,75 @@ class _AssetListScreenState extends State<AssetListScreen> {
         );
       },
     );
+  }
+
+  // --- LÓGICA DE FILTRADO Y AGREGACIÓN LOCAL ---
+
+  /// Aplica el filtro de agregación local (_selectedCountFieldId) sobre la lista de ítems.
+  List<dynamic> _getFilteredItems(List<dynamic> allItems) {
+    if (_selectedCountFieldId == null || _selectedCountValue == null) {
+      return allItems;
+    }
+
+    final fieldId = _selectedCountFieldId!;
+    final filterValue = _selectedCountValue!; // Ya tiene trim() del diálogo
+
+    return allItems.where((item) {
+      // Usamos 'dynamic' aquí, asume que tiene una propiedad customFieldValues.
+      // Si la clase ItemModel no tiene un Map, esto deberá adaptarse.
+      final customValues =
+          item.customFieldValues as Map<String, dynamic>? ?? {};
+      final itemValueRaw = customValues[fieldId];
+
+      String itemValueString = "";
+      // Saneamiento del valor del ítem
+      if (itemValueRaw == null || itemValueRaw.toString().trim().isEmpty) {
+        // Trata valores nulos o que son solo espacios como una cadena vacía para la comparación.
+        itemValueString = "";
+      } else {
+        // SANEAR EL VALOR DEL ÍTEM: convertir a String y aplicar trim()
+        itemValueString = itemValueRaw.toString().trim();
+      }
+
+      // Comparación estricta de cadenas saneadas
+      return itemValueString == filterValue;
+    }).toList();
+  }
+
+  /// Calcula los sumatorios sobre la lista de ítems filtrada localmente.
+  Map<String, num> _calculateLocalAggregations(
+    List<dynamic> filteredItems,
+    List<dynamic>
+    aggregationDefinitions, // Dejamos dynamic aquí para compatibilidad
+  ) {
+    final Map<String, num> localAggregations = {};
+
+    for (var def in aggregationDefinitions) {
+      // 🔑 CORRECCIÓN: Aseguramos la forma de acceder a las propiedades
+      final fieldId = def is Map ? def['id'].toString() : def.id.toString();
+      final isSummable = def is Map
+          ? (def['isSummable'] == true)
+          : (def.isSummable == true);
+
+      if (isSummable) {
+        // ... (El resto de la lógica dentro del bucle es correcta)
+        num totalSum = 0;
+        for (var item in filteredItems) {
+          final customValues =
+              item.customFieldValues as Map<String, dynamic>? ?? {};
+          final value = customValues[fieldId];
+
+          if (value != null) {
+            final numValue = num.tryParse(value.toString().trim());
+            if (numValue != null) {
+              totalSum += numValue;
+            }
+          }
+        }
+        localAggregations['sum_$fieldId'] = totalSum;
+      }
+    }
+    return localAggregations;
   }
 
   @override
@@ -228,8 +298,20 @@ class _AssetListScreenState extends State<AssetListScreen> {
       );
     }
 
-    // 🚨 CORRECCIÓN 1: Usamos el getter inventoryItems. Ya no se pasan IDs.
+    // 1. Obtener los ítems base (ya filtrados por búsqueda global y paginados)
     final inventoryItems = itemProvider.inventoryItems;
+
+    // 2. Aplicar el filtro de agregación LOCALMENTE a los ítems visibles (viewItems)
+    final viewItems = _getFilteredItems(inventoryItems);
+
+    // 3. Calcular las agregaciones LOCALMENTE sobre los ítems filtrados
+    final localAggregations = _calculateLocalAggregations(
+      viewItems,
+      itemProvider.aggregationDefinitions,
+    );
+
+    // 4. Obtener el Conteo Local
+    final totalCountLocal = viewItems.length;
 
     return Scaffold(
       appBar: AppBar(
@@ -265,12 +347,12 @@ class _AssetListScreenState extends State<AssetListScreen> {
                       icon: const Icon(Icons.pin_drop),
                       label: Text(
                         _selectedCountFieldId == null
-                            ? 'Contador Dinámico'
-                            : 'Filtro Activo',
+                            ? 'Filtro de contador Dinámico'
+                            : 'Filtro de contador Activo',
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _selectedCountFieldId != null
-                            ? Theme.of(context).colorScheme.tertiary
+                            ? Theme.of(context).colorScheme.inversePrimary
                             : null,
                       ),
                     ),
@@ -284,9 +366,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
                     // Contador Total de Ítems (siempre visible)
                     Chip(
                       avatar: const Icon(Icons.inventory, size: 18),
-                      label: Text(
-                        'TOTAL ÍTEMS: ${itemProvider.totalItems}',
-                      ),
+                      label: Text('TOTAL ÍTEMS: ${itemProvider.totalItems}'),
                       backgroundColor: Theme.of(
                         context,
                       ).colorScheme.primary.withOpacity(0.1),
@@ -304,7 +384,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
                           size: 18,
                         ),
                         label: Text(
-                          'COUNT "${assetType.fieldDefinitions.firstWhere((def) => def.id.toString() == _selectedCountFieldId).name}": ${itemProvider.aggregationResults['count_${_selectedCountFieldId}']?.toString() ?? '0'}',
+                          'CONTADOR ${assetType.fieldDefinitions.firstWhere((def) => def.id.toString() == _selectedCountFieldId).name} = "$totalCountLocal"',
                         ),
                         backgroundColor: Theme.of(
                           context,
@@ -318,7 +398,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
                     // Sumatorios (basados en las definiciones isSummable del backend)
                     ...itemProvider.aggregationDefinitions.map((def) {
                       return const SizedBox.shrink(); // No mostrar nada si no es sumable
-                    }).toList(),
+                    }),
                   ],
                 ),
 
@@ -340,7 +420,6 @@ class _AssetListScreenState extends State<AssetListScreen> {
                 final fieldId = def['id'].toString();
                 final fieldName = def['name'] as String? ?? 'Campo Desconocido';
 
-                final bool isCountable = def['isCountable'] == true;
                 final bool isSummable = def['isSummable'] == true;
 
                 final List<Widget> aggregationWidgets = [];
@@ -361,30 +440,6 @@ class _AssetListScreenState extends State<AssetListScreen> {
                       backgroundColor: Theme.of(
                         context,
                       ).colorScheme.secondary.withOpacity(0.1),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 5,
-                      ),
-                    ),
-                  );
-                }
-
-                // 2. Mostrar Contador (isCountable)
-                if (isCountable) {
-                  final countKey = 'count_$fieldId';
-                  // Obtener el valor del conteo. Usamos 0 por defecto.
-                  final countValue =
-                      itemProvider.aggregationResults[countKey]?.toString() ??
-                      '0';
-
-                  aggregationWidgets.add(
-                    Chip(
-                      avatar: const Icon(Icons.pin, size: 18),
-                      // Etiqueta para el Conteo
-                      label: Text('COUNT ${fieldName}: ${countValue}'),
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.primary.withOpacity(0.1),
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
                         vertical: 5,

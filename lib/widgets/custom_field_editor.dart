@@ -260,20 +260,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 contentPadding: EdgeInsets.zero,
               ),
 
-            // 🔑 5. Es Contable (Visible para todos)
-            SwitchListTile(
-              title: const Text('Es Contador (Se cuenta en el total del tipo)'),
-              value: _isCountable,
-              onChanged: (bool newValue) {
-                setState(() {
-                  _isCountable = newValue;
-                });
-                _notifyUpdate();
-              },
-              dense: true,
-              contentPadding: EdgeInsets.zero,
-            ),
-
             // 6. Selección de Lista de Datos (Condicional para tipo 'Desplegable')
             if (_selectedType == CustomFieldType.dropdown) ...[
               const SizedBox(height: 16),
