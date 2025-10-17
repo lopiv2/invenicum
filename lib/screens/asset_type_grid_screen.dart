@@ -54,6 +54,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
         // Manejar error de carga
         return;
       }
+      if (!mounted) return;
     }
 
     // 2. BUSCAR el contenedor después de la carga
@@ -64,6 +65,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
         .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
 
     // 3. Iniciar la carga de ítems para cada AssetType
+    if (!mounted) return;
     if (container != null) {
       for (var assetType in container.assetTypes) {
         // Llama a la carga de ítems, que llamará a notifyListeners()
@@ -153,10 +155,10 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             Expanded(
               child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 300,
+                  maxCrossAxisExtent: 400,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
-                  childAspectRatio: 3 / 2,
+                  mainAxisExtent: 160, // Altura fija para las tarjetas
                 ),
                 itemCount: assetTypes.length,
                 itemBuilder: (context, index) {

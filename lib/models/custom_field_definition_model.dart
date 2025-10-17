@@ -1,11 +1,16 @@
 import 'package:invenicum/models/custom_field_definition.dart';
+// (Asumo que CustomFieldType se define en otro archivo que se importa correctamente)
 
 class CustomFieldDefinition {
-  final int? id; // Nullable: será null para nuevos campos
+  final int? id;
   final String name;
   final CustomFieldType type;
   final bool isRequired;
-  final int? dataListId; // Usar el nombre que espera la API/Prisma
+  final int? dataListId;
+
+  // 🔑 NUEVOS CAMPOS PARA SUMATORIOS Y CONTADORES
+  final bool isSummable;
+  final bool isCountable;
 
   const CustomFieldDefinition({
     this.id,
@@ -13,18 +18,25 @@ class CustomFieldDefinition {
     required this.type,
     this.isRequired = false,
     this.dataListId,
+    // Valores por defecto para los nuevos campos
+    this.isSummable = false,
+    this.isCountable = false,
   });
+
+  // ----------------------------------------------------------------
+  // Método copyWith actualizado
+  // ----------------------------------------------------------------
 
   CustomFieldDefinition copyWith({
     int? id,
     String? name,
     CustomFieldType? type,
     bool? isRequired,
-    // Nota: dataListId debe ser de tipo int? para permitir pasar 'null' explícitamente.
     Object? dataListId = const _Sentinel(),
+    // 🔑 Nuevos parámetros en copyWith
+    bool? isSummable,
+    bool? isCountable,
   }) {
-    // Usamos el patrón _Sentinel para distinguir entre no pasar un valor (mantener el original)
-    // y pasar null (establecer el valor en null).
     final isDataListIdSentinel = dataListId is _Sentinel;
 
     return CustomFieldDefinition(
@@ -32,22 +44,25 @@ class CustomFieldDefinition {
       name: name ?? this.name,
       type: type ?? this.type,
       isRequired: isRequired ?? this.isRequired,
-      // Lógica para dataListId: si no se pasó (Sentinel), usa el original.
-      // Si se pasó null o un valor, úsalo.
       dataListId: isDataListIdSentinel ? this.dataListId : dataListId as int?,
+      // 🔑 Asignación de los nuevos campos
+      isSummable: isSummable ?? this.isSummable,
+      isCountable: isCountable ?? this.isCountable,
     );
   }
 
+  // ----------------------------------------------------------------
+  // Constructor fromJson actualizado
+  // ----------------------------------------------------------------
+
   factory CustomFieldDefinition.fromJson(Map<String, dynamic> json) {
-    // 1. Manejo del ID: Debe ser seguro contra String o null
-    // Esto es crucial para evitar el error 'String is not a subtype of int'
+    // ... (Lógica de manejo de id y dataListId es la misma)
     final id = json['id'];
     int? parsedId;
     if (id != null) {
       parsedId = id is int ? id : int.tryParse(id.toString());
     }
 
-    // 2. Manejo de dataListId
     final dataListId = json['dataListId'] ?? json['data_list_id'];
     int? parsedDataListId;
     if (dataListId != null) {
@@ -56,45 +71,49 @@ class CustomFieldDefinition {
           : int.tryParse(dataListId.toString());
     }
 
-    // 3. Devolver la instancia del modelo
     return CustomFieldDefinition(
       id: parsedId,
       name: json['name'] as String,
       type: CustomFieldType.values.firstWhere(
         (e) => e.name.toLowerCase() == (json['type'] as String).toLowerCase(),
-        orElse: () => CustomFieldType.text, // Valor por defecto si no coincide
+        orElse: () => CustomFieldType.text,
       ),
-      // Asegúrate de manejar la posibilidad de que el backend envíe '0' o '1' como string si es necesario
       isRequired: json['isRequired'] as bool,
       dataListId: parsedDataListId,
+      // 🔑 DESERIALIZACIÓN DE LOS NUEVOS CAMPOS (usando '?? false' como fallback seguro)
+      isSummable: json['isSummable'] as bool? ?? false,
+      isCountable: json['isCountable'] as bool? ?? false,
     );
   }
 
-  // Método para serializar a JSON
+  // ----------------------------------------------------------------
+  // Método toJson actualizado
+  // ----------------------------------------------------------------
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> map = {};
 
-    // 1. Lógica Condicional para el 'id'
     if (id != null && id! > 0) {
       map['id'] = id;
     }
 
-    // 2. Otros campos
     map['name'] = name;
-
-    // Convertir el enum 'type' a su representación en String
-    // Usamos name.toLowerCase() para mantener consistencia con el backend
     map['type'] = type.name.toLowerCase();
-
     map['isRequired'] = isRequired;
 
-    // 3. Incluir dataListId si tiene valor
+    // 🔑 SERIALIZACIÓN DE LOS NUEVOS CAMPOS
+    // Solo incluimos si es true, o si tu API lo requiere siempre.
+    // Generalmente, solo enviamos true, el backend asume false si no está.
+    if (isSummable) {
+      map['isSummable'] = true;
+    }
+    if (isCountable) {
+      map['isCountable'] = true;
+    }
+
     if (dataListId != null) {
       map['dataListId'] = dataListId;
     }
-
-    // Opcional: Si tu backend espera snake_case, puedes renombrar los campos aquí
-    // Ejemplo: map['is_required'] = isRequired;
 
     return map;
   }

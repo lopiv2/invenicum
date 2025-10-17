@@ -1,7 +1,11 @@
 // lib/services/asset_type_service.dart
 
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import '../models/asset_type_model.dart';
+import '../models/uploadable_file.dart';
 import 'api_service.dart'; // Importamos el servicio base
 
 class AssetTypeService {
@@ -22,19 +26,28 @@ class AssetTypeService {
   Future<AssetType> createAssetType({
     required int containerId,
     required String name,
-    required String? imageUrl,
-    required List<dynamic> fieldDefinitionsJson, 
+    required List<dynamic> fieldDefinitionsJson,
+    Uint8List? imageBytes,
+    String? imageName,
   }) async {
     try {
       final url = '/containers/$containerId/asset-types';
       
+      // Crear FormData para enviar la imagen
+      final formData = FormData.fromMap({
+        'name': name,
+        'fieldDefinitions': jsonEncode(fieldDefinitionsJson),
+        if (imageBytes != null && imageName != null)
+          'files': MultipartFile.fromBytes(
+            imageBytes,
+            filename: imageName,
+            contentType: MediaType.parse('image/jpeg'), // Ajustar según el tipo
+          ),
+      });
+
       final response = await _dio.post(
         url,
-        data: {
-          'name': name,
-          'imageUrl': imageUrl,
-          'fieldDefinitions': fieldDefinitionsJson,
-        },
+        data: formData,
       );
 
       if (response.statusCode == 201) {

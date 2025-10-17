@@ -38,6 +38,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
   // Mapa para los controladores de campos custom
   final Map<int, TextEditingController> _customControllers = {};
+  final Map<int, List<String>> _listFieldValues =
+      {}; // Valores de las listas desplegables
+  final Map<int, String?> _selectedListValues = {}; // Valores seleccionados
 
   // Estado para gestionar las URLs de previsualización (Base64)
   List<String> _imagePreviewUrls = [];
@@ -83,8 +86,30 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       // Inicializa los controladores para cada campo custom
       for (var field in assetType.fieldDefinitions) {
         _customControllers[field.id!] = TextEditingController();
+        if (field.type == CustomFieldType.dropdown &&
+            field.dataListId != null) {
+          _loadListValues(field.dataListId!, field.id!);
+        }
       }
     });
+  }
+
+  Future<void> _loadListValues(int dataListId, int fieldId) async {
+    try {
+      final containerProvider = context.read<ContainerProvider>();
+      final listData = await containerProvider.getDataList(dataListId);
+
+      if (mounted) {
+        setState(() {
+          _listFieldValues[fieldId] = listData.items;
+          _selectedListValues[fieldId] = null;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ToastService.error('Error al cargar los valores de la lista: $e');
+      }
+    }
   }
 
   @override
@@ -163,9 +188,16 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     // 1. Recoger los valores custom
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
-      final controller = _customControllers[fieldDef.id];
-      if (controller != null && controller.text.isNotEmpty) {
-        customFieldValues[fieldDef.id.toString()] = controller.text;
+      if (fieldDef.type == CustomFieldType.dropdown) {
+        final selectedValue = _selectedListValues[fieldDef.id];
+        if (selectedValue != null) {
+          customFieldValues[fieldDef.id.toString()] = selectedValue;
+        }
+      } else {
+        final controller = _customControllers[fieldDef.id];
+        if (controller != null && controller.text.isNotEmpty) {
+          customFieldValues[fieldDef.id.toString()] = controller.text;
+        }
       }
     }
 
@@ -202,8 +234,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
   // --- WIDGETS DE VISTA ---
 
-
-
   Widget _buildCustomFields() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,6 +247,40 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
           const Text('Este tipo de activo no tiene campos personalizados.'),
 
         ..._assetType!.fieldDefinitions.map((fieldDef) {
+          if (fieldDef.type == CustomFieldType.dropdown) {
+            final values = _listFieldValues[fieldDef.id] ?? [];
+            final selectedValue = _selectedListValues[fieldDef.id];
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: DropdownButtonFormField<String>(
+                value: selectedValue,
+                decoration: InputDecoration(
+                  labelText: fieldDef.name,
+                  border: const OutlineInputBorder(),
+                  helperText: fieldDef.isRequired ? 'Obligatorio' : null,
+                ),
+                items: values.map((value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedListValues[fieldDef.id!] = newValue;
+                  });
+                },
+                validator: (value) {
+                  if (fieldDef.isRequired && value == null) {
+                    return 'Este campo es obligatorio.';
+                  }
+                  return null;
+                },
+              ),
+            );
+          }
+
           final controller = _customControllers[fieldDef.id];
           if (controller == null) return const SizedBox.shrink();
 
@@ -244,8 +308,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       ],
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {

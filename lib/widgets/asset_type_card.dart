@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/models/asset_type_model.dart';
+import 'package:invenicum/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
+import 'package:invenicum/config/environment.dart';
 
 class AssetTypeCard extends StatelessWidget {
   final String containerId;
@@ -52,21 +54,13 @@ class AssetTypeCard extends StatelessWidget {
           assetType.id,
         );
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${assetType.name} ha sido eliminado con éxito'),
-              backgroundColor: Colors.green,
-            ),
+          ToastService.success(
+            'Tipo de Activo "${assetType.name}" eliminado con éxito.',
           );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al eliminar ${assetType.name}: $e'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          ToastService.error('Error al eliminar ${assetType.name}: $e');
         }
       }
     }
@@ -74,67 +68,106 @@ class AssetTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String? imageUrl = assetType.images.isNotEmpty
+        ? assetType.images.first.url
+        : null;
+    final fullImageUrl = imageUrl != null
+        ? '${Environment.apiUrl}$imageUrl'
+        : '';
+    final hasImage = fullImageUrl.isNotEmpty;
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
-        child: Stack(
+        child: Row(
           children: [
+            // Contenedor de imagen
             Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  // Columna izquierda: Título y contador
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          assetType.name,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '$assetCount Activos',
-                          style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.07,
+                height: MediaQuery.of(context).size.height * 0.15,
+                clipBehavior: Clip.antiAlias,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(12),
+                    bottomLeft: Radius.circular(12),
                   ),
-                  // Columna derecha: Iconos y botones
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.inventory_2_outlined,
-                            color: Colors.indigo,
-                          ),
-                          const SizedBox(width: 8),
-                          IconButton(
-                            icon: const Icon(
-                              Icons.delete_outline,
-                              color: Colors.red,
+                  color: Colors.grey.shade100,
+                ),
+                child: hasImage
+                    ? Image.network(
+                        fullImageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Center(
+                              child: Icon(
+                                Icons.broken_image,
+                                size: 30,
+                                color: Colors.grey,
+                              ),
                             ),
-                            onPressed: () => _handleDelete(context),
-                            tooltip: 'Eliminar tipo de activo',
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        },
+                      )
+                    : const Center(
+                        child: Icon(
+                          Icons.inventory_2_outlined,
+                          size: 30,
+                          color: Colors.grey,
+                        ),
+                      ),
+              ),
+            ),
+            // Contenido
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Columna izquierda: Título y contador
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            assetType.name,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            '$assetCount Activos',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ],
+                    ),
+                    // Columna derecha: Iconos y botones
+                    IconButton(
+                      icon: const Icon(Icons.delete_outline, color: Colors.red),
+                      onPressed: () => _handleDelete(context),
+                      tooltip: 'Eliminar tipo de activo',
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

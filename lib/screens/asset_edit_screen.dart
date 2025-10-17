@@ -48,6 +48,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // 2. Mapa de controllers para campos dinámicos
   late Map<int, TextEditingController> _dynamicControllers;
 
+  final Map<int, List<String>> _listFieldValues = {};
+  final Map<int, String?> _selectedListValues = {};
+
   // Estado del modelo
   AssetType? _assetType;
 
@@ -60,6 +63,27 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   // IDs de las imágenes existentes que deben ser eliminadas en el backend
   List<int> _imageIdsToDelete = [];
+
+  Future<void> _loadListValues(int dataListId, int fieldId) async {
+    try {
+      final containerProvider = context.read<ContainerProvider>();
+      // Asegúrate de que getDataList es un método válido en tu ContainerProvider
+      final listData = await containerProvider.getDataList(dataListId);
+
+      // 🔑 Protección después de la llamada asíncrona
+      if (mounted) {
+        setState(() {
+          _listFieldValues[fieldId] = listData.items;
+          // No inicializamos _selectedListValues aquí, se hace en _initializeDynamicFields
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ToastService.error('Error al cargar los valores de la lista: $e');
+      }
+    }
+  }
+
   // ------------------------------------
 
   // 🚀 GETTER UNIFICADO PARA EL WIDGET ImagePreviewSection
@@ -67,8 +91,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     // 1. Mapeamos las imágenes existentes, AÑADIENDO el prefijo de la API
     final existingUrls = _currentImages.map((img) {
       // APLICAMOS LA FUNCIÓN DE URL COMPLETA
-      final String apiUrl =
-          Environment.apiUrl; // O usa Environment.apiUrl
+      final String apiUrl = Environment.apiUrl; // O usa Environment.apiUrl
       return '$apiUrl${img.url}';
     }).toList();
 
@@ -126,12 +149,25 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         _assetType = assetType;
 
         for (var fieldDef in assetType.fieldDefinitions) {
+          final fieldId = fieldDef.id ?? 0;
           final initialValue =
-              widget.initialItem?.customFieldValues[fieldDef.id.toString()] ??
-              '';
-          _dynamicControllers[fieldDef.id ?? 0] = TextEditingController(
-            text: initialValue.toString(),
-          );
+              widget.initialItem?.customFieldValues?[fieldId.toString()];
+
+          if (fieldDef.type == CustomFieldType.dropdown) {
+            // 🔑 Lógica para DROPDOWN
+            _selectedListValues[fieldId] =
+                initialValue; // Pre-seleccionar valor
+
+            // Iniciar carga asíncrona de los ítems de la lista
+            if (fieldDef.dataListId != null) {
+              _loadListValues(fieldDef.dataListId!, fieldId);
+            }
+          } else {
+            // Lógica existente para campos de texto/número
+            _dynamicControllers[fieldId] = TextEditingController(
+              text: initialValue?.toString() ?? '',
+            );
+          }
         }
       });
     }
@@ -249,6 +285,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   // --- LÓGICA DE GUARDADO ---
   Future<void> _saveAsset() async {
+    // 0. Validaciones iniciales
     if (!AssetFormUtils.validateForm(_formKey) ||
         widget.initialItem == null ||
         _assetType == null) {
@@ -260,17 +297,44 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     final atIdInt = int.tryParse(widget.assetTypeId);
     final assetItemIdInt = int.tryParse(widget.assetItemId);
 
-    if (cIdInt == null || atIdInt == null || assetItemIdInt == null) return;
+    if (cIdInt == null || atIdInt == null || assetItemIdInt == null) {
+      if (mounted) {
+        ToastService.error('Error: IDs de navegación no válidos.');
+      }
+      return;
+    }
 
-    // 1. Recoger los valores custom
+    // 1. Recoger los valores custom ACTUALIZADOS
     final Map<String, dynamic> updatedCustomValues = {};
-    _dynamicControllers.forEach((fieldId, controller) {
-      updatedCustomValues[fieldId.toString()] = controller.text;
-    });
+    for (var fieldDef in _assetType!.fieldDefinitions) {
+      final fieldId = fieldDef.id!;
+
+      if (fieldDef.type == CustomFieldType.dropdown) {
+        // 🔑 RECOGEMOS EL VALOR DEL DROPDOWN
+        final selectedValue = _selectedListValues[fieldId];
+        if (selectedValue != null) {
+          updatedCustomValues[fieldId.toString()] = selectedValue;
+        } else if (fieldDef.isRequired) {
+          // Validación de emergencia si el validador del formulario falla
+          if (mounted) {
+            ToastService.error('El campo "${fieldDef.name}" es obligatorio.');
+          }
+          return;
+        }
+      } else {
+        // RECOGEMOS EL VALOR DEL CONTROLADOR DE TEXTO/NÚMERO
+        final controller = _dynamicControllers[fieldId];
+        if (controller != null && controller.text.isNotEmpty) {
+          updatedCustomValues[fieldId.toString()] = controller.text;
+        }
+        // Nota: Los campos vacíos no obligatorios se omiten.
+      }
+    }
 
     // 2. Preparar los datos de los archivos NUEVOS
     final List<Map<String, dynamic>> filesData = [];
     for (int i = 0; i < _newImagePreviewUrls.length; i++) {
+      // Asumo que _dataUrlToFileData devuelve {'bytes': Uint8List, 'name': String}
       filesData.add(_dataUrlToFileData(_newImagePreviewUrls[i], i));
     }
 
@@ -289,22 +353,24 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     // 4. Llamar al proveedor para actualizar el activo con archivos/eliminaciones
     try {
       await itemProvider.updateAssetWithFiles(
-        // Asumo que tienes un método updateAssetWithFiles o similar
         updatedItem,
         filesToUpload: filesData, // Archivos nuevos a subir
         imageIdsToDelete: _imageIdsToDelete, // IDs de imágenes a eliminar
       );
 
-      // 5. Navegar de vuelta
+      // 5. Navegar de vuelta (al listado)
       if (mounted) {
         ToastService.success(
           'Activo "${updatedItem.name}" actualizado correctamente.',
         );
+
+        // 🔑 SOLUCIÓN DE RECARGA: Usar context.go para forzar la reconstrucción del AssetListScreen
         context.go(
           '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
         );
       }
     } catch (e) {
+      // 6. Manejo de errores (protegido con mounted)
       if (mounted) {
         ToastService.error('Error al actualizar activo: ${e.toString()}');
       }
@@ -329,6 +395,55 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
         // ... (Tu código de TextFormField para campos dinámicos)
         ..._assetType!.fieldDefinitions.map((fieldDef) {
+          if (fieldDef.type == CustomFieldType.dropdown) {
+            // 🔑 LÓGICA DE DROPDOWN (Copiada y adaptada)
+            final fieldId = fieldDef.id!;
+            final values = _listFieldValues[fieldId];
+            final selectedValue = _selectedListValues[fieldId];
+
+            // Mostrar indicador de carga si los valores aún no están disponibles
+            if (values == null) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(width: 10),
+                    Text('Cargando ${fieldDef.name}...'),
+                  ],
+                ),
+              );
+            }
+
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: DropdownButtonFormField<String>(
+                value: selectedValue,
+                decoration: InputDecoration(
+                  labelText: fieldDef.name,
+                  border: const OutlineInputBorder(),
+                  helperText: fieldDef.isRequired ? 'Obligatorio' : 'Opcional',
+                ),
+                items: values.map((value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedListValues[fieldId] = newValue;
+                  });
+                },
+                validator: (value) {
+                  if (fieldDef.isRequired && value == null) {
+                    return 'Este campo es obligatorio.';
+                  }
+                  return null;
+                },
+              ),
+            );
+          }
           final controller = _dynamicControllers[fieldDef.id];
           if (controller == null) return const SizedBox.shrink();
 

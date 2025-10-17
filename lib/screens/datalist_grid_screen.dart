@@ -144,7 +144,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                     elevation: 2,
                     child: InkWell(
                       onTap: () {
-                        context.go('/container/${widget.containerId}/datalists/${dataList.id}/edit', extra: dataList);
+                        context.push('/container/${widget.containerId}/datalists/${dataList.id}/edit', extra: dataList);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),

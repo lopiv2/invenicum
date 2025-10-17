@@ -211,7 +211,7 @@ class _AssetGridViewState extends State<AssetGridView> {
                       // Mostrar los dos primeros campos personalizados clave
                       ...widget.assetType.fieldDefinitions.take(2).map((def) {
                         final value =
-                            item.customFieldValues[def.id.toString()] ?? '—';
+                            item.customFieldValues?[def.id.toString()] ?? '—';
                         return Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
                           child: Row(

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:invenicum/services/toast_service.dart';
 import '../models/container_node.dart';
+import '../providers/container_provider.dart';
 
 enum ContainerAction { rename, delete }
 
-class ContainerTreeView extends StatelessWidget {
+class ContainerTreeView extends StatefulWidget {
   final List<ContainerNode> containers;
   final Function(ContainerNode, String? subSection) onContainerTap;
   final Future<void> Function(int containerId) onDeleteContainer;
@@ -21,11 +23,33 @@ class ContainerTreeView extends StatelessWidget {
     required this.onRenameContainer,
   });
 
+  @override
+  State<ContainerTreeView> createState() => _ContainerTreeViewState();
+}
+
+class _ContainerTreeViewState extends State<ContainerTreeView> {
+  Future<void> _loadDataForContainer(int containerId) async {
+    try {
+      await context.read<ContainerProvider>().loadDataLists(containerId);
+    } catch (e) {
+      print('Error cargando listas para contenedor $containerId: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Cargar las listas para todos los contenedores al inicio
+    for (var container in widget.containers) {
+      _loadDataForContainer(container.id);
+    }
+  }
+
   // --- Construcción del Árbol (Sin cambios) ---
   TreeNode<dynamic> _buildTreeRoot() {
     final root = TreeNode.root();
 
-    for (var container in containers) {
+    for (var container in widget.containers) {
       final containerNode = TreeNode(
         key: container.id.toString(),
         data: container.name,
@@ -131,7 +155,7 @@ class ContainerTreeView extends StatelessWidget {
 
       try {
         // Llama al callback proporcionado por el padre
-        await onRenameContainer(container.id, newName);
+        await widget.onRenameContainer(container.id, newName);
 
         if (!context.mounted) return;
         ToastService.success('Contenedor renombrado a "$newName".');
@@ -208,7 +232,7 @@ class ContainerTreeView extends StatelessWidget {
 
     if (confirmed == true) {
       try {
-        await onDeleteContainer(container.id);
+        await widget.onDeleteContainer(container.id);
         if (!context.mounted) return;
         ToastService.success('Contenedor "${container.name}" eliminado.');
       } catch (e) {
@@ -230,7 +254,7 @@ class ContainerTreeView extends StatelessWidget {
       final containerIdInt = int.tryParse(node.key.toString());
       if (containerIdInt != null) {
         try {
-          container = containers.firstWhere((c) => c.id == containerIdInt);
+          container = widget.containers.firstWhere((c) => c.id == containerIdInt);
         } catch (_) {}
       }
     }
@@ -309,11 +333,11 @@ class ContainerTreeView extends StatelessWidget {
     return finalWidget;
   }
 
-  // --- Manejo del Tap (onItemTap - Se mantiene la lógica de navegación) ---
   @override
   Widget build(BuildContext context) {
+    final root = _buildTreeRoot();
     return TreeView.simple(
-      tree: _buildTreeRoot(),
+      tree: root,
       showRootNode: false,
 
       // onItemTap ahora manejará tanto la expansión (si es posible) como la navegación
@@ -328,7 +352,7 @@ class ContainerTreeView extends StatelessWidget {
 
         if (containerIdInt == null) return;
 
-        final container = containers.firstWhere(
+        final container = widget.containers.firstWhere(
           (c) => c.id == containerIdInt,
           orElse: () =>
               throw Exception("Container not found with ID: $containerIdStr"),
@@ -348,7 +372,7 @@ class ContainerTreeView extends StatelessWidget {
 
         // Lógica de Negocio General: Tap en el contenedor
         if (isContainer) {
-          onContainerTap(container, null);
+          widget.onContainerTap(container, null);
         }
       },
 

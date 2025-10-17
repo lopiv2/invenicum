@@ -1,18 +1,17 @@
 // lib/widgets/custom_field_editor.dart
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
 import '../models/list_data.dart'; // Modelo ListData
 
-// Asumo que el modelo CustomFieldDefinition contiene CustomFieldType
-// ej: import 'package:invenicum/models/custom_field_definition_model.dart';
-
 class CustomFieldEditor extends StatefulWidget {
   final CustomFieldDefinition field;
   final List<ListData> availableDataLists; // Listas disponibles del contenedor
   final VoidCallback onDelete;
-  final Function(CustomFieldDefinition) onUpdate; // Callback para notificar cambios
+  final Function(CustomFieldDefinition)
+  onUpdate; // Callback para notificar cambios
 
   const CustomFieldEditor({
     super.key,
@@ -28,10 +27,20 @@ class CustomFieldEditor extends StatefulWidget {
 
 class _CustomFieldEditorState extends State<CustomFieldEditor> {
   late TextEditingController _nameController;
-  // Usamos el tipo String para el estado local si la enumeración se inicializa de una cadena
-  late CustomFieldType _selectedType; 
+  late CustomFieldType _selectedType;
   late bool _isRequired;
   late int? _selectedListDataId;
+
+  // 🔑 NUEVOS ESTADOS
+  late bool _isSummable;
+  late bool _isCountable;
+
+  Timer? _debounceTimer;
+
+  void _debounce(VoidCallback callback) {
+    if (_debounceTimer?.isActive ?? false) _debounceTimer!.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 500), callback);
+  }
 
   @override
   void initState() {
@@ -40,8 +49,10 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     _selectedType = widget.field.type;
     _isRequired = widget.field.isRequired;
     _selectedListDataId = widget.field.dataListId;
+    // 🔑 Inicialización de los nuevos estados
+    _isSummable = widget.field.isSummable;
+    _isCountable = widget.field.isCountable;
 
-    // Escuchar cambios en tiempo real en el campo de texto
     _nameController.addListener(_onNameChanged);
   }
 
@@ -49,62 +60,75 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
   void didUpdateWidget(covariant CustomFieldEditor oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.field != oldWidget.field) {
-      // Remover listener temporalmente para evitar que se dispare al cambiar el texto
       _nameController.removeListener(_onNameChanged);
-      
+
+      // Sincronización de todos los estados locales
       _nameController.text = widget.field.name;
       _selectedType = widget.field.type;
       _isRequired = widget.field.isRequired;
       _selectedListDataId = widget.field.dataListId;
-      
-      // Volver a añadir listener
+      // 🔑 Sincronización de los nuevos estados
+      _isSummable = widget.field.isSummable;
+      _isCountable = widget.field.isCountable;
+
       _nameController.addListener(_onNameChanged);
     }
-  } 
-  
-  // Nuevo método para manejar la actualización del nombre más seguido
+  }
+
   void _onNameChanged() {
-    // Retrasar la notificación ligeramente o usar onEditingComplete
-    // Aquí usamos onChanged del TextFormField en su lugar para más control.
-    // Solo actualizamos el UI de la cabecera del campo aquí
-    setState(() {});
+    setState(() {}); // Solo actualiza la cabecera del campo
   }
 
   // Notificar al padre de los cambios
   void _notifyUpdate() {
     // Limpiar dataListId si el tipo no es dropdown (protección extra)
-    final int? finalDataListId = 
-        _selectedType == CustomFieldType.dropdown ? _selectedListDataId : null;
-        
+    final int? finalDataListId = _selectedType == CustomFieldType.dropdown
+        ? _selectedListDataId
+        : null;
+
+    // 🔑 Lógica para limpiar isSummable si el tipo no es numérico
+    final bool finalIsSummable;
+    if (_selectedType == CustomFieldType.number) {
+      finalIsSummable = _isSummable;
+    } else {
+      finalIsSummable = false;
+    }
+
     widget.onUpdate(
       widget.field.copyWith(
         name: _nameController.text.trim(), // Limpiar espacios en blanco
         type: _selectedType,
         isRequired: _isRequired,
         dataListId: finalDataListId,
+        // 🔑 Envío de los nuevos campos
+        isSummable: finalIsSummable,
+        isCountable: _isCountable,
       ),
     );
   }
 
+  // 🔑 Función de ayuda para determinar si el campo es de tipo numérico
+  bool get _isNumericType => _selectedType == CustomFieldType.number;
+
   @override
   void dispose() {
-    _nameController.removeListener(_onNameChanged); // Importante
+    _debounceTimer?.cancel();
+    _nameController.removeListener(_onNameChanged);
     _nameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Si no hay listas disponibles, forzamos la selección a null (Mejora UX/seguridad)
     final List<ListData> availableLists = widget.availableDataLists;
+
+    // Si no hay listas y es dropdown, forzamos a null y notificamos
     if (availableLists.isEmpty && _selectedType == CustomFieldType.dropdown) {
-      // No llamamos a setState, solo actualizamos el valor local si es necesario
       if (_selectedListDataId != null) {
         _selectedListDataId = null;
         WidgetsBinding.instance.addPostFrameCallback((_) => _notifyUpdate());
       }
     }
-
 
     return Card(
       elevation: 2,
@@ -114,13 +138,16 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- Cabecera y Botón de Eliminar ---
             Row(
               children: [
                 Expanded(
-                  // Usamos _nameController.text para reflejar el texto actual
                   child: Text(
                     'Campo: "${_nameController.text.isEmpty ? 'Sin nombre' : _nameController.text}"',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
                 IconButton(
@@ -140,12 +167,18 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 border: OutlineInputBorder(),
                 isDense: true,
               ),
-              // Usar onChanged para que el título se actualice en tiempo real
               onChanged: (value) {
-                // El listener ya llama a setState, solo necesitamos notificar el valor final
+                setState(() {});
+                _debounce(() {
+                  if (mounted) {
+                    _notifyUpdate();
+                  }
+                });
               },
-              // Usar onFieldSubmitted para notificar al padre solo al terminar de editar (enter, etc.)
-              onFieldSubmitted: (value) => _notifyUpdate(), 
+              onFieldSubmitted: (value) {
+                _debounceTimer?.cancel();
+                _notifyUpdate();
+              },
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
                   return 'El nombre del campo es obligatorio';
@@ -166,55 +199,96 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               items: CustomFieldType.values.map((type) {
                 return DropdownMenuItem(
                   value: type,
-                  child: Text(type.name.toUpperCase()), // Muestra el enum en mayúsculas
+                  child: Text(type.name.toUpperCase()),
                 );
               }).toList(),
               onChanged: (CustomFieldType? newValue) {
                 if (newValue != null) {
                   setState(() {
                     _selectedType = newValue;
-                    // Limpiar listDataId si el tipo no es dropdown
+                    // Limpiar dataListId si el tipo no es dropdown
                     if (_selectedType != CustomFieldType.dropdown) {
                       _selectedListDataId = null;
                     } else if (availableLists.isEmpty) {
-                      // Si cambia a dropdown pero no hay listas, forzamos a null
-                      _selectedListDataId = null; 
+                      _selectedListDataId = null;
+                    }
+
+                    // 🔑 Si el nuevo tipo no es numérico, desactivar el sumatorio
+                    if (!_isNumericType) {
+                      _isSummable = false;
                     }
                   });
                   _notifyUpdate(); // Notificar cambio de tipo
                 }
               },
             ),
-            const SizedBox(height: 16),
 
-            // 3. Campo Requerido (Checkbox)
-            Row(
-              children: [
-                Checkbox(
-                  value: _isRequired,
-                  onChanged: (bool? newValue) {
-                    setState(() {
-                      _isRequired = newValue ?? false;
-                    });
-                    _notifyUpdate();
-                  },
-                ),
-                const Text('Es Requerido'),
-              ],
+            const SizedBox(height: 16),
+            const Divider(),
+
+            // --- Opciones de Comportamiento del Campo ---
+            Text('Opciones:', style: Theme.of(context).textTheme.titleSmall),
+
+            // 3. Campo Requerido (Switch)
+            SwitchListTile(
+              title: const Text('Es Requerido'),
+              value: _isRequired,
+              onChanged: (bool newValue) {
+                setState(() {
+                  _isRequired = newValue;
+                });
+                _notifyUpdate();
+              },
+              dense: true,
+              contentPadding: EdgeInsets.zero,
             ),
 
-            // 4. Selección de Lista de Datos (Condicional para tipo 'Desplegable')
+            // 🔑 4. Es Sumable (Visible solo para tipos numéricos)
+            if (_isNumericType)
+              SwitchListTile(
+                title: const Text(
+                  'Es Sumatorio (Se suma en el total del tipo)',
+                ),
+                value: _isSummable,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    _isSummable = newValue;
+                  });
+                  _notifyUpdate();
+                },
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+
+            // 🔑 5. Es Contable (Visible para todos)
+            SwitchListTile(
+              title: const Text('Es Contador (Se cuenta en el total del tipo)'),
+              value: _isCountable,
+              onChanged: (bool newValue) {
+                setState(() {
+                  _isCountable = newValue;
+                });
+                _notifyUpdate();
+              },
+              dense: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+
+            // 6. Selección de Lista de Datos (Condicional para tipo 'Desplegable')
             if (_selectedType == CustomFieldType.dropdown) ...[
               const SizedBox(height: 16),
-              // Mostrar mensaje si no hay listas disponibles
+              const Divider(),
               if (availableLists.isEmpty)
                 const Text(
                   '⚠️ No hay listas de datos disponibles en este contenedor.',
-                  style: TextStyle(color: Colors.orange, fontStyle: FontStyle.italic),
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontStyle: FontStyle.italic,
+                  ),
                 )
               else
                 DropdownButtonFormField<int>(
-                  value: _selectedListDataId, // Puede ser null
+                  value: _selectedListDataId,
                   decoration: const InputDecoration(
                     labelText: 'Seleccionar Lista de Datos',
                     border: OutlineInputBorder(),

@@ -170,7 +170,7 @@ class InventoryDataSource extends DataTableSource {
 
     // 4. Campos Personalizados
     for (final fieldDef in assetType.fieldDefinitions) {
-      final fieldValue = item.customFieldValues[fieldDef.id.toString()] ?? '—';
+      final fieldValue = item.customFieldValues?[fieldDef.id.toString()] ?? '—';
       cells.add(
         DataCell(Text(fieldValue.toString(), overflow: TextOverflow.ellipsis)),
       );

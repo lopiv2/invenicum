@@ -70,6 +70,11 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
     });
   }
 
+  void _goBack(BuildContext context) {
+    context.pop();
+    //context.go('/container/${widget.containerId}/datalists');
+  }
+
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -112,15 +117,25 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
               children: [
                 Text(
                   'Editar Lista: ${widget.initialData.name}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium
-                      ?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                FilledButton.icon(
-                  onPressed: _saveChanges,
-                  icon: const Icon(Icons.save),
-                  label: const Text('Guardar Cambios'),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: _saveChanges,
+                      icon: const Icon(Icons.save),
+                      label: const Text('Guardar Cambios'),
+                    ),
+                    SizedBox(width: 16),
+                    FilledButton.icon(
+                      onPressed: () => _goBack(context),
+                      icon: const Icon(Icons.cancel),
+                      label: const Text('Cancelar'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -162,7 +177,10 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                     // Sección de elementos
                     const Text(
                       'Elementos de la Lista',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
 

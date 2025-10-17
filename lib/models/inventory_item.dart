@@ -20,6 +20,17 @@ class InventoryItemImage {
       order: json['order'] as int? ?? 0,
     );
   }
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'url': url,
+      'altText': altText,
+      'order': order,
+      // Nota: No incluimos 'inventoryItemId' ni 'assetTypeId' aquí,
+      // ya que típicamente se gestionan en el nivel superior (InventoryItem o AssetType)
+      // al hacer una inserción o actualización. Si el backend lo espera, añádelo.
+    };
+  }
 }
 
 // --- CLASE PRINCIPAL (MODIFICADA) ---
@@ -35,7 +46,7 @@ class InventoryItem {
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  final Map<String, dynamic> customFieldValues;
+  final Map<String, dynamic>? customFieldValues;
 
   InventoryItem({
     required this.id,
@@ -46,20 +57,24 @@ class InventoryItem {
     this.createdAt,
     this.updatedAt,
     // Aseguramos que el constructor siempre tenga un valor por defecto
-    required this.customFieldValues,
+    this.customFieldValues,
     this.images = const [],
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
     final itemData = json['itemData'] ?? json;
 
-    // 🚀 SOLUCIÓN AL ERROR: Conversión segura de customFieldValues
-    // 1. Intentamos obtener el valor y tratarlo como Map<String, dynamic> (con el ?)
-    // 2. Si es null, o si la conversión implícita falla (porque es null), usamos {}
-    final Map<String, dynamic> fieldValues =
-        (itemData['customFieldValues'] as Map<String, dynamic>?) ?? {};
+    // 1. Obtener el valor JSON (puede ser null)
+    final dynamic rawCustomFieldValues = itemData['customFieldValues'];
 
-    // 3. Procesar las imágenes
+    // 2. 🎯 CORRECCIÓN CLAVE: Conversión segura a Map<String, dynamic>?
+    // Si no es null y es un Map, lo convertimos. Si es null, o si la conversión falla, es null.
+    final Map<String, dynamic>? customFieldValues =
+        rawCustomFieldValues != null && rawCustomFieldValues is Map
+        ? Map<String, dynamic>.from(rawCustomFieldValues)
+        : null;
+
+    // 3. Procesar las imágenes (tu código está bien aquí, pero lo incluimos por contexto)
     final List<dynamic> imageListJson =
         itemData['images'] as List<dynamic>? ?? [];
     final List<InventoryItemImage> images = imageListJson
@@ -69,8 +84,9 @@ class InventoryItem {
         )
         .toList();
 
-    // Función auxiliar para convertir String a DateTime
+    // Función auxiliar (queda igual)
     DateTime? parseDate(dynamic value) {
+      // ... (código igual)
       if (value is String) {
         try {
           return DateTime.parse(value);
@@ -90,8 +106,8 @@ class InventoryItem {
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
 
-      // Pasamos el mapa ya verificado
-      customFieldValues: fieldValues,
+      // Pasamos el mapa ya verificado (que ahora es nullable)
+      customFieldValues: customFieldValues, // 🎯 PASAR LA VARIABLE CORRECTA
       images: images,
     );
   }

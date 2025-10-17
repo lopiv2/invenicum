@@ -13,10 +13,10 @@ class ToastService {
   // Función principal para mostrar el toast
   static void show(
     String message,
-    ToastType type, {
-    ToastGravity gravity = ToastGravity.BOTTOM, // Opcional
-    int durationSeconds = 3, // Opcional
-  }) {
+    ToastType type,
+    [int durationSeconds = 3, // Opcional
+    ToastGravity gravity = ToastGravity.BOTTOM] // Opcional
+  ) {
     Color backgroundColor;
     IconData icon;
     Color textColor = Colors.white;
@@ -60,14 +60,14 @@ class ToastService {
 
   // --- Opcional: Métodos de Acceso Directo ---
   static void success(String message, [int durationSeconds = 3]) {
-    show(message, ToastType.success, durationSeconds: durationSeconds);
+    show(message, ToastType.success, durationSeconds);
   }
 
   static void info(String message, [int durationSeconds = 3]) {
-    show(message, ToastType.info, durationSeconds: durationSeconds);
+    show(message, ToastType.info, durationSeconds);
   }
 
   static void error(String message, [int durationSeconds = 3]) {
-    show(message, ToastType.error, durationSeconds: durationSeconds);
+    show(message, ToastType.error, durationSeconds);
   }
 }

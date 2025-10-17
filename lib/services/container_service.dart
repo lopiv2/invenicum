@@ -68,15 +68,25 @@ class ContainerService {
 
   Future<List<ContainerNode>> getContainers() async {
     try {
-      final response = await _dio.get('/containers');
+      final response = await _dio.get('/containers?include=datalists,assettypes');
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = response.data;
         final List<dynamic> containersList = responseData['data'];
+        
+        // Convertir cada contenedor y asegurarnos de que tenga sus listas
+        final containers = containersList.map((json) {
+          // Asegurarnos de que las listas estén incluidas en el JSON
+          if (!json.containsKey('dataLists') && !json.containsKey('data_lists')) {
+            json['dataLists'] = [];
+          }
+          if (!json.containsKey('assetTypes') && !json.containsKey('asset_types')) {
+            json['assetTypes'] = [];
+          }
+          return ContainerNode.fromJson(json);
+        }).toList();
 
-        return containersList
-            .map((json) => ContainerNode.fromJson(json))
-            .toList();
+        return containers;
       } else {
         throw Exception(
           'Error al obtener los contenedores: ${response.statusCode}',
@@ -88,6 +98,7 @@ class ContainerService {
       }
       throw Exception('Error de conexión: ${e.message}');
     } catch (e) {
+      print('Error al obtener contenedores: $e');
       throw Exception('Error inesperado: $e');
     }
   }
@@ -220,6 +231,38 @@ class ContainerService {
       if (response.statusCode != 204 && response.statusCode != 200) {
         throw Exception(
           'Error al eliminar la lista personalizada: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+      }
+      if (e.response?.statusCode == 404) {
+        throw Exception('Lista personalizada no encontrada.');
+      }
+      throw Exception('Error de conexión: ${e.message}');
+    } catch (e) {
+      throw Exception('Error inesperado: $e');
+    }
+  }
+
+  // Método para obtener una lista específica por su ID
+  Future<ListData> getDataList(int dataListId) async {
+    try {
+      final response = await _dio.get('/datalists/$dataListId');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = response.data;
+        if (responseData.containsKey('data') && responseData['data'] != null) {
+          return ListData.fromJson(responseData['data']);
+        } else {
+          throw Exception(
+            'Respuesta de API exitosa, pero el objeto lista ("data") está ausente o es nulo.',
+          );
+        }
+      } else {
+        throw Exception(
+          'Error al obtener la lista personalizada: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {

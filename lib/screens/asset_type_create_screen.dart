@@ -1,5 +1,7 @@
 // lib/screens/asset_type_create_screen.dart
 
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
@@ -7,8 +9,9 @@ import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/widgets/custom_field_editor.dart';
 import 'package:provider/provider.dart';
-import '../models/list_data.dart'; // Necesitas el modelo de Lista de Datos
-import '../providers/container_provider.dart'; // Para obtener Listas de Datos disponibles
+import 'package:file_picker/file_picker.dart';
+import '../models/list_data.dart';
+import '../providers/container_provider.dart';
 
 class AssetTypeCreateScreen extends StatefulWidget {
   final String containerId;
@@ -22,35 +25,54 @@ class AssetTypeCreateScreen extends StatefulWidget {
 class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _imageUrlController =
-      TextEditingController(); // Nuevo controlador para la URL de la imagen
 
   List<CustomFieldDefinition> _fieldDefinitions = [];
   List<ListData> _availableDataLists = [];
   bool _isLoadingLists = true;
 
-  // Estado para la URL de la imagen que se muestra en la vista previa
-  String? _currentImageUrl;
+  // Estado para la imagen
+  String? _imagePreviewUrl;
 
   @override
   void initState() {
     super.initState();
     _loadDataLists();
-    // Escuchar cambios en el controlador de la URL para actualizar la vista previa
-    _imageUrlController.addListener(_updateImagePreview);
   }
 
-  // Actualiza el estado de _currentImageUrl para la vista previa
-  void _updateImagePreview() {
-    setState(() {
-      final url = _imageUrlController.text;
-      // Una validación simple para asegurarse de que es una URL "razonable"
-      if (Uri.tryParse(url)?.hasAbsolutePath == true) {
-        _currentImageUrl = url;
+  /// Muestra el selector de archivos y obtiene la URL Base64 para previsualización
+  Future<void> _addImage() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+      withData: true,
+    );
+
+    if (result != null && result.files.isNotEmpty) {
+      final file = result.files.first;
+      if (file.bytes != null) {
+        final extension = file.extension ?? 'jpeg';
+        final String base64Image =
+            'data:image/$extension;base64,${base64Encode(file.bytes!)}';
+
+        setState(() {
+          _imagePreviewUrl = base64Image;
+        });
+        ToastService.info('Imagen seleccionada');
       } else {
-        _currentImageUrl = null; // Limpiar si no es una URL válida
+        ToastService.error(
+          'Error: No se pudo obtener la data de la imagen seleccionada.',
+        );
       }
+    } else {
+      ToastService.info('Selección de archivo cancelada.');
+    }
+  }
+
+  void _removeImage() {
+    setState(() {
+      _imagePreviewUrl = null;
     });
+    ToastService.info('Imagen removida');
   }
 
   // Carga las listas de datos disponibles del contenedor
@@ -79,9 +101,12 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       _fieldDefinitions.add(
         CustomFieldDefinition(
           id: 0,
-          name: 'Nuevo Campo ${_fieldDefinitions.length + 1}',
+          name: '', // Iniciamos con nombre vacío
           type: CustomFieldType.text,
           isRequired: false,
+          // 🔑 Inicialización de los nuevos campos
+          isSummable: false,
+          isCountable: false,
         ),
       );
     });
@@ -100,25 +125,44 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       if (containerIdInt == null) return;
 
       final newTypeName = _nameController.text;
-      final newImageUrl =
-          _currentImageUrl; // Usamos la URL validada para el AssetType
+
+      // Procesar la imagen si existe
+      Uint8List? imageBytes;
+      String? imageName;
+
+      if (_imagePreviewUrl != null) {
+        final parts = _imagePreviewUrl!.split(',');
+        if (parts.length > 1) {
+          imageBytes = base64Decode(parts[1]);
+          // Obtener la extensión del tipo MIME
+          final mimeType =
+              RegExp(r'data:image/([^;]+);').firstMatch(parts[0])?.group(1) ??
+              'jpeg';
+          imageName = 'asset_type_image.$mimeType';
+        }
+      }
 
       try {
         await containerProvider.addNewAssetTypeToContainer(
           containerId: containerIdInt,
           name: newTypeName,
-          imageUrl: newImageUrl,
-          fieldDefinitions:
-              _fieldDefinitions, // Pasamos la lista de definiciones
+          fieldDefinitions: _fieldDefinitions,
+          imageBytes: imageBytes,
+          imageName: imageName,
         );
 
         if (context.mounted) {
-          ToastService.success('Tipo de Activo "${newTypeName}" creado exitosamente en el servidor.');
+          ToastService.success(
+            'Tipo de Activo "${newTypeName}" creado exitosamente en el servidor.',
+          );
           context.go('/container/${widget.containerId}/asset-types');
         }
       } catch (e) {
         if (context.mounted) {
-          ToastService.error('Error al crear el Tipo de Activo: ${e.toString()}', 5);
+          ToastService.error(
+            'Error al crear el Tipo de Activo: ${e.toString()}',
+            5,
+          );
         }
       }
     }
@@ -127,8 +171,6 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _imageUrlController.removeListener(_updateImagePreview); // Quitar listener
-    _imageUrlController.dispose();
     super.dispose();
   }
 
@@ -166,77 +208,62 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
             ),
             const SizedBox(height: 30),
 
-            // --- Sección de Imagen (URL y Previsualización) ---
+            // --- Sección de Imagen ---
             Text(
-              'Imagen del Tipo de Activo (URL)',
+              'Imagen del Tipo de Activo',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const Divider(),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _imageUrlController,
-                    decoration: const InputDecoration(
-                      labelText: 'URL de la Imagen',
-                      hintText: 'Ej: https://ejemplo.com/mi_imagen.png',
-                      border: OutlineInputBorder(),
-                    ),
-                    // No es estrictamente necesario validar aquí si la URL existe,
-                    // ya que Image.network manejará los errores visualmente.
-                    // Podrías añadir un validador de formato de URL si lo deseas.
-                  ),
-                ),
-                const SizedBox(width: 20),
-                // --- Vista Previa de la Imagen ---
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey),
-                  ),
-                  child:
-                      _currentImageUrl != null && _currentImageUrl!.isNotEmpty
-                      ? ClipRRect(
-                          borderRadius: BorderRadius.circular(7),
-                          child: Image.network(
-                            _currentImageUrl!,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return Center(
-                                child: CircularProgressIndicator(
-                                  value:
-                                      loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  color: Colors.red,
-                                  size: 40,
-                                ),
-                              );
-                            },
-                          ),
-                        )
-                      : const Center(
-                          child: Text(
-                            'Previsualización',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey),
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: _imagePreviewUrl != null
+                  ? Stack(
+                      children: [
+                        Center(
+                          child: Image.memory(
+                            base64Decode(_imagePreviewUrl!.split(',')[1]),
+                            fit: BoxFit.contain,
+                            height: 180,
                           ),
                         ),
-                ),
-              ],
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: const Icon(Icons.close),
+                            onPressed: _removeImage,
+                            color: Colors.red,
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
+                  : Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.image_outlined,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: _addImage,
+                            icon: const Icon(Icons.add_photo_alternate),
+                            label: const Text('Seleccionar Imagen'),
+                          ),
+                        ],
+                      ),
+                    ),
             ),
             const SizedBox(height: 30),
 

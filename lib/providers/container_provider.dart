@@ -30,12 +30,32 @@ class ContainerProvider with ChangeNotifier {
 
     try {
       final loadedContainers = await _containerService.getContainers();
+      
+      // Si ya teníamos contenedores, preservamos el estado expandido/colapsado
+      if (_containers.isNotEmpty) {
+        for (var newContainer in loadedContainers) {
+          final existingContainer = _containers.firstWhere(
+            (c) => c.id == newContainer.id,
+            orElse: () => newContainer,
+          );
+          
+          // Preservar las listas y tipos de activos si el contenedor ya existía
+          if (existingContainer != newContainer) {
+            final index = loadedContainers.indexOf(newContainer);
+            loadedContainers[index] = existingContainer.copyWith(
+              dataLists: newContainer.dataLists,
+              assetTypes: newContainer.assetTypes,
+            );
+          }
+        }
+      }
+      
       _containers = loadedContainers;
     } catch (e) {
       print('Error al cargar contenedores: $e');
     } finally {
       _isLoading = false;
-      notifyListeners(); // 2. Oculta la carga y muestra la lista (ya sea nueva o la antigua si falló).
+      notifyListeners(); // 2. Oculta la carga y muestra la lista
     }
   }
 
@@ -130,8 +150,9 @@ class ContainerProvider with ChangeNotifier {
   Future<void> addNewAssetTypeToContainer({
     required int containerId,
     required String name,
-    required String? imageUrl,
     required List<CustomFieldDefinition> fieldDefinitions,
+    Uint8List? imageBytes,
+    String? imageName,
   }) async {
     try {
       // 1. Convertir la lista de modelos de Dart a la lista de JSON que espera la API
@@ -144,8 +165,9 @@ class ContainerProvider with ChangeNotifier {
           .createAssetType(
             containerId: containerId,
             name: name,
-            imageUrl: imageUrl,
-            fieldDefinitionsJson: fieldDefinitionsJson, // JSON para la API
+            fieldDefinitionsJson: fieldDefinitionsJson,
+            imageBytes: imageBytes,
+            imageName: imageName,
           );
 
       // 3. Actualizar el estado local (igual que antes, pero con el objeto real de la API)
@@ -282,6 +304,16 @@ class ContainerProvider with ChangeNotifier {
       }
     } catch (e) {
       print('Error al cargar listas personalizadas: $e');
+      rethrow;
+    }
+  }
+
+  // Método para obtener una lista específica por su ID
+  Future<ListData> getDataList(int dataListId) async {
+    try {
+      return await _containerService.getDataList(dataListId);
+    } catch (e) {
+      print('Error al obtener la lista personalizada: $e');
       rethrow;
     }
   }
