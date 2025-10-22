@@ -123,6 +123,35 @@ class InventoryItem {
     };
   }
 
+  InventoryItem copyWith({
+    int? id,
+    String? name,
+    String? description,
+    int? containerId,
+    int? assetTypeId,
+    List<InventoryItemImage>? images,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    Map<String, dynamic>? customFieldValues,
+  }) {
+    return InventoryItem(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      containerId: containerId ?? this.containerId,
+      assetTypeId: assetTypeId ?? this.assetTypeId,
+      images: images ?? this.images,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      // Nota: Para customFieldValues, clonamos el mapa actual si no se proporciona uno nuevo
+      customFieldValues:
+          customFieldValues ??
+          (this.customFieldValues != null
+              ? Map.from(this.customFieldValues!)
+              : null),
+    );
+  }
+
   @override
   String toString() {
     return 'Item(id: $id, name: $name, images: ${images.length})';

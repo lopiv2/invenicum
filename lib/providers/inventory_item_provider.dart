@@ -134,14 +134,30 @@ class InventoryItemProvider with ChangeNotifier {
       final bCustom = b.customFieldValues ?? {};
 
       if (sortKey == 'name') {
-        aValue = a.name;
-        bValue = b.name;
+        aValue = a.name.trim().toLowerCase();
+        bValue = b.name.trim().toLowerCase();
       } else if (sortKey == 'description') {
-        aValue = a.description ?? '';
-        bValue = b.description ?? '';
+        aValue = (a.description ?? '').trim().toLowerCase();
+        bValue = (b.description ?? '').trim().toLowerCase();
       } else {
-        aValue = aCustom[sortKey]?.toString() ?? '';
-        bValue = bCustom[sortKey]?.toString() ?? '';
+        // Lógica de campos personalizados
+        // 1. Obtener valores crudos, limpiarlos y convertirlos a minúsculas
+        final aRaw = (aCustom[sortKey]?.toString() ?? '').trim();
+        final bRaw = (bCustom[sortKey]?.toString() ?? '').trim();
+
+        // 2. Intentar parsear como Double para ordenamiento numérico
+        final aNumber = double.tryParse(aRaw);
+        final bNumber = double.tryParse(bRaw);
+
+        if (aNumber != null && bNumber != null) {
+          // Si ambos son números, ordenar numéricamente
+          aValue = aNumber;
+          bValue = bNumber;
+        } else {
+          // Si uno o ambos no son números, ordenar alfabéticamente (case-insensitive)
+          aValue = aRaw.toLowerCase();
+          bValue = bRaw.toLowerCase();
+        }
       }
 
       final comparison = aValue.compareTo(bValue);
@@ -340,6 +356,40 @@ class InventoryItemProvider with ChangeNotifier {
       _isLoading = false;
 
       _recalculateTotalsAndNotify();
+    }
+  }
+
+  Future<void> createBatchFromCSV({
+    required int containerId,
+    required int assetTypeId,
+    required List<Map<String, dynamic>> itemsToUpload,
+  }) async {
+    if (itemsToUpload.isEmpty) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // 🎯 CORRECCIÓN: Llamar al método del servicio (que está en _itemService)
+      await _itemService.createBatchInventoryItems(
+        containerId: containerId,
+        assetTypeId: assetTypeId,
+        itemsData: itemsToUpload,
+      );
+
+      if (_isDisposed) return;
+
+      // Recarga forzada para refrescar la lista y los totales
+      await loadInventoryItems(
+        containerId: containerId,
+        assetTypeId: assetTypeId,
+        forceReload: true,
+        goToPageOne: true,
+      );
+    } catch (e) {
+      rethrow;
+    } finally {
+      if (_isDisposed) return;
     }
   }
 

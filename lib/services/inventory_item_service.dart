@@ -190,4 +190,52 @@ class InventoryItemService {
       throw Exception('Error inesperado al eliminar activo: $e');
     }
   }
+
+  // ----------------------------------------------------------------------
+  // 📦 --- 5. CREATE BATCH (Importación Masiva) ---
+  // ----------------------------------------------------------------------
+
+  /// Envía una lista de datos de activos mapeados a un endpoint de procesamiento por lotes.
+  ///
+  /// Utiliza una petición POST simple (JSON body) ya que no hay archivos adjuntos.
+  Future<void> createBatchInventoryItems({
+    required int containerId,
+    required int assetTypeId,
+    // La lista de Map<String, dynamic> representa los ítems listos para subir.
+    required List<Map<String, dynamic>> itemsData,
+  }) async {
+    // 1. Endpoint específico para la importación masiva.
+    // Es común usar un sub-recurso como '/batch' o '/import'
+    final url = '/containers/$containerId/asset-types/$assetTypeId/items/batch';
+
+    // 2. Preparar el cuerpo de la petición
+    // El backend espera un objeto que contenga el array de ítems.
+    final Map<String, dynamic> requestBody = {
+      // 🔑 Aquí enviamos el array de activos
+      'items': itemsData,
+    };
+
+    try {
+      // 3. Enviar la petición POST. El método post de Dio
+      // automáticamente serializa 'requestBody' a JSON.
+      final response = await _dio.post(url, data: requestBody);
+
+      // 4. Verificar el código de respuesta
+      // Un POST exitoso que crea recursos a menudo devuelve 201 Created o 200 OK.
+      if (response.statusCode != 201 && response.statusCode != 200) {
+        // Si la API devuelve un error de validación o un 4xx/5xx, lanzamos.
+        throw Exception(
+          'Error al importar activos por lotes: Código ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
+        );
+      }
+
+      // Si la respuesta es exitosa (200/201), retornamos implícitamente void.
+    } on DioException {
+      // Captura errores específicos de red/API manejados por Dio.
+      rethrow;
+    } catch (e) {
+      // Captura cualquier otro error (ej: JSON parsing).
+      throw Exception('Error inesperado durante la importación por lotes: $e');
+    }
+  }
 }

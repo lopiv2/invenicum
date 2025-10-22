@@ -1,29 +1,101 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/services/dashboard_service.dart';
+import 'package:invenicum/widgets/stat_card.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({super.key, required this.dashboardService});
+
+  final DashboardService dashboardService; // 🔑 Inyección del servicio
+
+  // Simulación de una función que obtiene datos asíncronos (como si fuera una API)
+  Future<DashboardStats> _fetchStats() {
+    return dashboardService.getGlobalStats();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SingleChildScrollView(
+      // Usamos SingleChildScrollView por si la pantalla es pequeña
       padding: const EdgeInsets.all(16),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Dashboard',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: EdgeInsets.all(16),
-              child: Text('Bienvenido al Dashboard'),
-            ),
+          const SizedBox(height: 24),
+
+          // FutureBuilder para manejar el estado de carga de los datos
+          FutureBuilder<DashboardStats>(
+            future: _fetchStats(), // Llama a la función que simula la API
+            builder: (context, snapshot) {
+              // 1. Mostrar Error
+              if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error al cargar datos: ${snapshot.error}'),
+                );
+              }
+
+              // 2. Mostrar Carga (Loading)
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              // 3. Mostrar Datos (Done)
+              if (snapshot.hasData) {
+                final stats = snapshot.data!;
+                // 🔑 Accedemos directamente a las propiedades del objeto Stats
+                final totalContainers = stats.totalContainers;
+                final totalItems = stats.totalItems;
+                final totalAssets = stats.totalAssets;
+
+                return GridView.count(
+                  crossAxisCount: MediaQuery.of(context).size.width > 600
+                      ? 4
+                      : 2, // 2 o 3 columnas según el tamaño de la pantalla
+                  crossAxisSpacing: 120,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 1.8,
+                  shrinkWrap:
+                      true, // Importante para que GridView funcione dentro de Column/SingleChildScrollView
+                  physics:
+                      const NeverScrollableScrollPhysics(), // Deshabilita el scroll del GridView
+                  children: [
+                    // Widget para Contenedores Totales
+                    StatCard(
+                      title: 'Contenedores',
+                      count: totalContainers,
+                      icon: Icons.inventory_2_outlined,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    StatCard(
+                      title: 'Tipos de Activos',
+                      count: totalAssets,
+                      icon: Icons.type_specimen,
+                      color: Colors.orange.shade600,
+                    ),
+                    // Widget para Items/Activos Totales
+                    StatCard(
+                      title: 'Activos',
+                      count: totalItems,
+                      icon: Icons.devices_other_outlined,
+                      color: Colors.green.shade600,
+                    ),
+
+                    // Puedes añadir más contadores aquí si es necesario
+                  ],
+                );
+              }
+
+              // 4. Caso por defecto (o cuando no hay datos)
+              return const Center(
+                child: Text('No se encontraron estadísticas.'),
+              );
+            },
           ),
+
+          const SizedBox(height: 24),
         ],
       ),
     );

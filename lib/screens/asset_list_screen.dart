@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/models/inventory_item.dart';
+import 'package:invenicum/screens/asset_search_bar.dart';
+import 'package:invenicum/widgets/assets_counters_row.dart';
 import 'package:provider/provider.dart';
 
 import '../models/container_node.dart';
 import '../models/asset_type_model.dart';
 import '../providers/container_provider.dart';
 import '../providers/inventory_item_provider.dart';
+
+// Importar los nuevos widgets
 import '../widgets/asset_data_table.dart';
 import '../widgets/asset_grid_view.dart';
+import '../widgets/asset_list_header.dart'; // 🔑 Nuevo
 
 class AssetListScreen extends StatefulWidget {
   final String containerId;
@@ -24,15 +30,11 @@ class AssetListScreen extends StatefulWidget {
 }
 
 class _AssetListScreenState extends State<AssetListScreen> {
-  // Estado para la barra de búsqueda global
+  // --- ESTADO Y CONTROLADORES ---
   final TextEditingController _searchController = TextEditingController();
-
-  // Estado para el control de la vista (true = Lista/DataTable, false = Grid/Cards)
   bool _isListView = true;
-
   late InventoryItemProvider _itemProvider;
-
-  String? _selectedCountFieldId; // ID del campo custom seleccionado (ej: '10')
+  String? _selectedCountFieldId;
   String? _selectedCountValue;
 
   @override
@@ -41,12 +43,10 @@ class _AssetListScreenState extends State<AssetListScreen> {
     _itemProvider = context.read<InventoryItemProvider>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // 🔑 CARGA INICIAL: Ya NO enviamos filtros de agregación al backend.
-      // El backend solo aplica filtros base (containerId, assetTypeId, userId).
       _itemProvider.loadInventoryItems(
         containerId: int.tryParse(widget.containerId) ?? 0,
         assetTypeId: int.tryParse(widget.assetTypeId) ?? 0,
-        aggregationFilters: {}, // ¡Vacío! El filtrado es local.
+        aggregationFilters: {},
         forceReload: true,
         goToPageOne: true,
       );
@@ -54,6 +54,16 @@ class _AssetListScreenState extends State<AssetListScreen> {
       _searchController.addListener(_onSearchChanged);
     });
   }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    _itemProvider.clearViewItems();
+    super.dispose();
+  }
+
+  // --- MÉTODOS DE LÓGICA Y NAVEGACIÓN ---
 
   void _applyFiltersAndLoad({
     bool forceReload = false,
@@ -66,13 +76,12 @@ class _AssetListScreenState extends State<AssetListScreen> {
 
     if (cIdInt == null || atIdInt == null) return;
 
-    // Aquí simplemente notificamos al Provider que recargue la lista
-    // si el filtro de búsqueda global lo requiere.
-    // Los filtros de agregación se manejan LOCALMENTE en 'build'.
+    // Solo recargamos si se pasa un nuevo término de búsqueda global
+    // o si se fuerza la recarga. La agregación local se maneja en 'build'.
     _itemProvider.loadInventoryItems(
       containerId: cIdInt,
       assetTypeId: atIdInt,
-      aggregationFilters: {}, // Mantenemos vacío
+      aggregationFilters: {},
       forceReload: forceReload,
       goToPageOne: goToPageOne,
     );
@@ -85,24 +94,11 @@ class _AssetListScreenState extends State<AssetListScreen> {
     context.go('/container/${widget.containerId}/asset-types');
   }
 
-  // Nuevo método para manejar la búsqueda de forma síncrona con el Provider
   void _onSearchChanged() {
-    // 🔑 CORRECCIÓN: Verificar si el widget está montado antes de usar context.
     if (!mounted) return;
-
     _itemProvider.setGlobalSearchTerm(_searchController.text);
     _itemProvider.goToPage(1);
   }
-
-  @override
-  void dispose() {
-    _searchController.removeListener(_onSearchChanged);
-    _searchController.dispose();
-    _itemProvider.clearViewItems();
-    super.dispose();
-  }
-
-  // --- NAVEGACIÓN ---
 
   void _goToCreateAsset(BuildContext context) {
     context.go(
@@ -110,8 +106,40 @@ class _AssetListScreenState extends State<AssetListScreen> {
     );
   }
 
+  void _onImportCSV(BuildContext context) {
+    context.go(
+      '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/import-csv',
+    );
+  }
+
+  // --- LÓGICA DE FILTRADO Y AGREGACIÓN LOCAL (Sin cambios) ---
+
+  List<dynamic> _getFilteredItems(List<dynamic> allItems) {
+    if (_selectedCountFieldId == null || _selectedCountValue == null) {
+      return allItems;
+    }
+
+    final fieldId = _selectedCountFieldId!;
+    final filterValue = _selectedCountValue!;
+
+    return allItems.where((item) {
+      final customValues =
+          item.customFieldValues as Map<String, dynamic>? ?? {};
+      final itemValueRaw = customValues[fieldId];
+
+      String itemValueString = "";
+      if (itemValueRaw == null || itemValueRaw.toString().trim().isEmpty) {
+        itemValueString = "";
+      } else {
+        itemValueString = itemValueRaw.toString().trim();
+      }
+      return itemValueString == filterValue;
+    }).toList();
+  }
+
+  // --- DIÁLOGO DE FILTRO DE CONTEO (Se mantiene aquí por necesidad de setState) ---
+
   void _showCountFilterDialog(BuildContext context, AssetType assetType) {
-    // Usamos las definiciones del AssetType local para el Dropdown
     final List<Map<String, dynamic>> availableDefs = assetType.fieldDefinitions
         .map(
           (def) => {
@@ -122,7 +150,6 @@ class _AssetListScreenState extends State<AssetListScreen> {
         )
         .toList();
 
-    // Estados temporales para el diálogo
     String? tempSelectedFieldId = _selectedCountFieldId;
     TextEditingController tempValueController = TextEditingController(
       text: _selectedCountValue,
@@ -146,9 +173,8 @@ class _AssetListScreenState extends State<AssetListScreen> {
                     items: availableDefs.map((def) {
                       final id = def['id'];
                       final name = def['name'] as String;
-                      // 🔑 CORRECCIÓN CLAVE: Castear o convertir el ID a String
                       return DropdownMenuItem<String>(
-                        value: id.toString(), // Asegurar que el valor es String
+                        value: id.toString(),
                         child: Text(name),
                       );
                     }).toList(),
@@ -176,7 +202,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
                       _selectedCountFieldId = null;
                       _selectedCountValue = null;
                     });
-                    _applyFiltersAndLoad(); // Recargar sin filtro de conteo
+                    _applyFiltersAndLoad();
                     context.pop();
                   },
                   child: const Text('Limpiar Contador'),
@@ -188,7 +214,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
                       _selectedCountFieldId = tempSelectedFieldId;
                       _selectedCountValue = tempValueController.text.trim();
                     });
-                    _applyFiltersAndLoad(); // Recargar con el nuevo filtro
+                    _applyFiltersAndLoad();
                     context.pop();
                   },
                   child: const Text('Aplicar'),
@@ -201,74 +227,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     );
   }
 
-  // --- LÓGICA DE FILTRADO Y AGREGACIÓN LOCAL ---
-
-  /// Aplica el filtro de agregación local (_selectedCountFieldId) sobre la lista de ítems.
-  List<dynamic> _getFilteredItems(List<dynamic> allItems) {
-    if (_selectedCountFieldId == null || _selectedCountValue == null) {
-      return allItems;
-    }
-
-    final fieldId = _selectedCountFieldId!;
-    final filterValue = _selectedCountValue!; // Ya tiene trim() del diálogo
-
-    return allItems.where((item) {
-      // Usamos 'dynamic' aquí, asume que tiene una propiedad customFieldValues.
-      // Si la clase ItemModel no tiene un Map, esto deberá adaptarse.
-      final customValues =
-          item.customFieldValues as Map<String, dynamic>? ?? {};
-      final itemValueRaw = customValues[fieldId];
-
-      String itemValueString = "";
-      // Saneamiento del valor del ítem
-      if (itemValueRaw == null || itemValueRaw.toString().trim().isEmpty) {
-        // Trata valores nulos o que son solo espacios como una cadena vacía para la comparación.
-        itemValueString = "";
-      } else {
-        // SANEAR EL VALOR DEL ÍTEM: convertir a String y aplicar trim()
-        itemValueString = itemValueRaw.toString().trim();
-      }
-
-      // Comparación estricta de cadenas saneadas
-      return itemValueString == filterValue;
-    }).toList();
-  }
-
-  /// Calcula los sumatorios sobre la lista de ítems filtrada localmente.
-  Map<String, num> _calculateLocalAggregations(
-    List<dynamic> filteredItems,
-    List<dynamic>
-    aggregationDefinitions, // Dejamos dynamic aquí para compatibilidad
-  ) {
-    final Map<String, num> localAggregations = {};
-
-    for (var def in aggregationDefinitions) {
-      // 🔑 CORRECCIÓN: Aseguramos la forma de acceder a las propiedades
-      final fieldId = def is Map ? def['id'].toString() : def.id.toString();
-      final isSummable = def is Map
-          ? (def['isSummable'] == true)
-          : (def.isSummable == true);
-
-      if (isSummable) {
-        // ... (El resto de la lógica dentro del bucle es correcta)
-        num totalSum = 0;
-        for (var item in filteredItems) {
-          final customValues =
-              item.customFieldValues as Map<String, dynamic>? ?? {};
-          final value = customValues[fieldId];
-
-          if (value != null) {
-            final numValue = num.tryParse(value.toString().trim());
-            if (numValue != null) {
-              totalSum += numValue;
-            }
-          }
-        }
-        localAggregations['sum_$fieldId'] = totalSum;
-      }
-    }
-    return localAggregations;
-  }
+  // --- WIDGET BUILD REFACTORIZADO ---
 
   @override
   Widget build(BuildContext context) {
@@ -304,13 +263,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     // 2. Aplicar el filtro de agregación LOCALMENTE a los ítems visibles (viewItems)
     final viewItems = _getFilteredItems(inventoryItems);
 
-    // 3. Calcular las agregaciones LOCALMENTE sobre los ítems filtrados
-    final localAggregations = _calculateLocalAggregations(
-      viewItems,
-      itemProvider.aggregationDefinitions,
-    );
-
-    // 4. Obtener el Conteo Local
+    // 3. Obtener el Conteo Local
     final totalCountLocal = viewItems.length;
 
     return Scaffold(
@@ -322,193 +275,45 @@ class _AssetListScreenState extends State<AssetListScreen> {
           tooltip: 'Volver a Tipos de Activo',
         ),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Título y Botón de Añadir
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Listado de Activos: "${assetType.name}"',
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Row(
-                  children: [
-                    // 🎯 BOTÓN PARA ABRIR EL FILTRO DE CONTEO
-                    ElevatedButton.icon(
-                      onPressed: () =>
-                          _showCountFilterDialog(context, assetType),
-                      icon: const Icon(Icons.pin_drop),
-                      label: Text(
-                        _selectedCountFieldId == null
-                            ? 'Filtro de contador Dinámico'
-                            : 'Filtro de contador Activo',
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _selectedCountFieldId != null
-                            ? Theme.of(context).colorScheme.inversePrimary
-                            : null,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Wrap(
-                  spacing: 10.0,
-                  runSpacing: 10.0,
-                  children: [
-                    // Contador Total de Ítems (siempre visible)
-                    Chip(
-                      avatar: const Icon(Icons.inventory, size: 18),
-                      label: Text('TOTAL ÍTEMS: ${itemProvider.totalItems}'),
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.primary.withOpacity(0.1),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 5,
-                      ),
-                    ),
-
-                    // 🎯 Contador Dinámico (solo si está activo)
-                    if (_selectedCountFieldId != null)
-                      Chip(
-                        avatar: const Icon(
-                          Icons.check_circle_outline,
-                          size: 18,
-                        ),
-                        label: Text(
-                          'CONTADOR ${assetType.fieldDefinitions.firstWhere((def) => def.id.toString() == _selectedCountFieldId).name} = "$totalCountLocal"',
-                        ),
-                        backgroundColor: Theme.of(
-                          context,
-                        ).colorScheme.tertiary.withOpacity(0.3),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 5,
-                        ),
-                      ),
-
-                    // Sumatorios (basados en las definiciones isSummable del backend)
-                    ...itemProvider.aggregationDefinitions.map((def) {
-                      return const SizedBox.shrink(); // No mostrar nada si no es sumable
-                    }),
-                  ],
-                ),
-
-                const SizedBox(height: 20),
-                ElevatedButton.icon(
-                  onPressed: () => _goToCreateAsset(context),
-                  icon: const Icon(Icons.add),
-                  label: const Text('Añadir Activo'),
-                ),
-              ],
+            // --- HEADER: Título, Botones de Añadir y Filtro ---
+            AssetListHeader(
+              assetType: assetType,
+              onGoToCreateAsset: () => _goToCreateAsset(context),
+              // 🔑 NUEVO: Pasamos la función de importación
+              onImportCSV: () => _onImportCSV(context),
+              onShowCountFilterDialog: () =>
+                  _showCountFilterDialog(context, assetType),
+              selectedCountFieldId: _selectedCountFieldId,
             ),
             const SizedBox(height: 20),
 
-            ///Contadores de agregaciones
-            Wrap(
-              spacing: 10.0,
-              runSpacing: 10.0,
-              children: itemProvider.aggregationDefinitions.map((def) {
-                final fieldId = def['id'].toString();
-                final fieldName = def['name'] as String? ?? 'Campo Desconocido';
-
-                final bool isSummable = def['isSummable'] == true;
-
-                final List<Widget> aggregationWidgets = [];
-
-                // 1. Mostrar Sumatorio (isSummable)
-                if (isSummable) {
-                  final sumKey = 'sum_$fieldId';
-                  // Obtener el valor de la suma. Usamos 0.0 por defecto para evitar errores si no hay valor.
-                  final sumValue =
-                      itemProvider.aggregationResults[sumKey]?.toString() ??
-                      '0.0';
-
-                  aggregationWidgets.add(
-                    Chip(
-                      avatar: const Icon(Icons.calculate, size: 18),
-                      // Etiqueta para la Suma Total
-                      label: Text('SUMA ${fieldName}: ${sumValue}'),
-                      backgroundColor: Theme.of(
-                        context,
-                      ).colorScheme.secondary.withOpacity(0.1),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 5,
-                      ),
-                    ),
-                  );
-                }
-
-                // Devuelve todos los chips generados para este campo custom
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: aggregationWidgets,
-                );
-              }).toList(),
+            // --- CONTADORES DINÁMICOS Y SUMATORIOS ---
+            AssetCountersRow(
+              assetType: assetType,
+              totalCountLocal: totalCountLocal,
+              selectedCountFieldId: _selectedCountFieldId,
+              // Si la Suma local se implementa, iría aquí: localAggregations: localAggregations,
             ),
             const SizedBox(height: 20),
 
-            // BARRA DE BÚSQUEDA Y CONTROL DE VISTA
-            Row(
-              children: [
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.only(right: 15.0),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        labelText: 'Búsqueda Global',
-                        hintText: 'Buscar en todas las columnas...',
-                        prefixIcon: const Icon(Icons.search),
-                        suffixIcon: _searchController.text.isNotEmpty
-                            ? IconButton(
-                                icon: const Icon(Icons.clear),
-                                onPressed: () {
-                                  _searchController.clear();
-                                  // La lógica del Provider se maneja en el Listener
-                                  // Aquí solo forzamos la limpieza del campo
-                                },
-                              )
-                            : null,
-                        border: const OutlineInputBorder(),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 10,
-                          horizontal: 15,
-                        ),
-                      ),
-                      // Se elimina onChanged, ya que usamos el listener del controller
-                    ),
-                  ),
-                ),
-                // Botón de alternar vista
-                IconButton(
-                  icon: Icon(
-                    _isListView ? Icons.grid_view : Icons.list,
-                    size: 30,
-                  ),
-                  tooltip: _isListView
-                      ? 'Mostrar como Grid'
-                      : 'Mostrar como Lista',
-                  onPressed: () {
-                    setState(() {
-                      _isListView = !_isListView;
-                    });
-                  },
-                ),
-              ],
+            // --- BARRA DE BÚSQUEDA Y CONTROL DE VISTA ---
+            AssetSearchBar(
+              searchController: _searchController,
+              isListView: _isListView,
+              onToggleView: () {
+                setState(() {
+                  _isListView = !_isListView;
+                });
+              },
             ),
             const SizedBox(height: 10),
 
-            // --- CONTENIDO PRINCIPAL: Carga o Tabla/Grid ---
+            // --- CONTENIDO PRINCIPAL ---
             if (itemProvider.isLoading)
               const Center(
                 child: Padding(
@@ -525,11 +330,15 @@ class _AssetListScreenState extends State<AssetListScreen> {
                           assetType: assetType,
                           containerId: cIdInt,
                           assetTypeId: atIdInt,
-                          inventoryItems: inventoryItems, // Lista paginada
+                          inventoryItems:
+                              viewItems
+                                  as List<
+                                    InventoryItem
+                                  >, // 🔑 Usar viewItems (la lista filtrada localmente)
                         )
                       : AssetGridView(
                           assetType: assetType,
-                          items: inventoryItems, // Lista paginada
+                          items: viewItems as List<InventoryItem>,
                           containerId: cIdInt,
                           assetTypeId: atIdInt,
                         ),

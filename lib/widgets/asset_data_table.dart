@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/inventory_item.dart';
 import '../../models/asset_type_model.dart';
@@ -51,6 +52,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
       context: context,
       deleteCallback: (item) => _deleteAsset(context, item),
       editCallback: (item) => _editAsset(context, item),
+      copyCallback: (item) => _copyAsset(context, item),
     );
 
     _providerListener = () {
@@ -110,6 +112,43 @@ class _AssetDataTableState extends State<AssetDataTable> {
     final itemProvider = context.read<InventoryItemProvider>();
     itemProvider.sortInventoryItems(dataKey: dataKey, ascending: ascending);
     itemProvider.goToPage(1);
+  }
+
+  void _copyAsset(BuildContext context, InventoryItem item) async {
+    // 1. Crear una copia del InventoryItem existente con ID de creación.
+    // Es crucial establecer el 'id' a 0 (o null) y cambiar el nombre para distinguirlo.
+    final InventoryItem itemCopy = item.copyWith(
+      id: 0, // 0 o null indica al backend que es un nuevo registro
+      name: item.name,
+    );
+
+    final itemProvider = context.read<InventoryItemProvider>();
+
+    // 2. Mostrar un indicador de carga (opcional, pero recomendado)
+    setState(() {
+      // Si tienes un indicador de carga en el widget que contiene la tabla, actívalo.
+      // Esto es un placeholder, asumiendo que tienes un control de loading a nivel de pantalla.
+    });
+
+    // 3. Llamar al servicio para crear la copia
+    try {
+      // Usamos el método existente para crear un ítem (el provider lo llama POST)
+      await itemProvider.createInventoryItem(itemCopy);
+
+      // 4. El Provider (createInventoryItem) se encargará automáticamente de:
+      //    a) Llamar al servicio de backend.
+      //    b) Forzar la recarga (loadInventoryItems con forceReload: true).
+      //    c) Notificar a la UI.
+
+      ToastService.success('✅ Activo "${item.name}" copiado exitosamente.');
+    } catch (e) {
+      ToastService.error('❌ Error al copiar el activo: $e');
+    } finally {
+      // 5. Desactivar indicador de carga si se usó
+      if (mounted && itemProvider.isLoading) {
+        // Si el provider no ha terminado de cargar, no forzar. Si sí, asegurar que se refresque.
+      }
+    }
   }
 
   void _editAsset(BuildContext context, InventoryItem item) {
@@ -278,10 +317,10 @@ class _AssetDataTableState extends State<AssetDataTable> {
       columnSpacing: 12,
       horizontalMargin: 12,
       dataRowHeight: 60,
-    
+
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
-    
+
       empty: Center(
         child: Text(
           (itemProvider.filters.isEmpty &&
@@ -313,7 +352,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {
           final fieldDef = entry.value;
           final filterKey = fieldDef.id.toString();
-    
+
           return DataColumn2(
             label: _buildFilterHeader(context, fieldDef.name, filterKey),
             size: ColumnSize.M,
@@ -330,7 +369,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
           size: ColumnSize.S,
         ),
       ],
-    
+
       // Configuración de paginación que interactúa con el Provider
       rowsPerPage: itemProvider.itemsPerPage,
       onRowsPerPageChanged: (int? newValue) {
@@ -340,14 +379,14 @@ class _AssetDataTableState extends State<AssetDataTable> {
       },
       // El total de filas se obtiene del provider
       //rowCount: totalItems,
-    
+
       // Control de página basado en el provider
       //pageToDisplay: itemProvider.currentPage - 1,
       onPageChanged: (int pageIndex) {
         // DataTable2 usa un índice base 0, tu provider usa base 1.
         itemProvider.goToPage(pageIndex + 1);
       },
-    
+
       source: dataSource,
     );
 

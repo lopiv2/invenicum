@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/models/asset_type_model.dart';
+import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InventoryDataSource extends DataTableSource {
   final InventoryItemProvider itemProvider;
@@ -13,6 +15,7 @@ class InventoryDataSource extends DataTableSource {
   final BuildContext context;
   final Function(InventoryItem) deleteCallback;
   final Function(InventoryItem) editCallback;
+  final Function(InventoryItem) copyCallback;
 
   InventoryDataSource({
     required this.itemProvider,
@@ -21,12 +24,29 @@ class InventoryDataSource extends DataTableSource {
     required this.context,
     required this.deleteCallback,
     required this.editCallback,
+    required this.copyCallback,
   }) : _items = items; // Asignación inicial
 
   void updateItems(List<InventoryItem> newItems) {
     _items = newItems;
     // Notifica a PaginatedDataTable2 que la fuente de datos ha cambiado.
     notifyListeners();
+  }
+
+  // --- Lógica para Abrir URL ---
+  Future<void> _launchUrl(String url) async {
+    // Aseguramos que el URL tenga un esquema si es necesario
+    String fullUrl = url.startsWith('http') ? url : 'https://$url';
+    final Uri uri = Uri.parse(fullUrl);
+
+    try {
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        // En caso de fallo, mostramos un mensaje (usando un ScaffoldMessenger si estuviera disponible)
+        debugPrint('Could not launch $uri');
+      }
+    } catch (e) {
+      debugPrint('Error launching URL $uri: $e');
+    }
   }
 
   // Método copiado de _AssetDataTableState (Necesario para las celdas)
@@ -171,9 +191,35 @@ class InventoryDataSource extends DataTableSource {
     // 4. Campos Personalizados
     for (final fieldDef in assetType.fieldDefinitions) {
       final fieldValue = item.customFieldValues?[fieldDef.id.toString()] ?? '—';
-      cells.add(
-        DataCell(Text(fieldValue.toString(), overflow: TextOverflow.ellipsis)),
-      );
+      // 🔑 MODIFICACIÓN: Detectar tipo 'url' y hacerlo clicable
+      if (fieldDef.type == CustomFieldType.url &&
+          fieldValue != '—' &&
+          fieldValue.isNotEmpty) {
+        cells.add(
+          DataCell(
+            MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => _launchUrl(fieldValue),
+                child: Tooltip(
+                  message: 'Abrir enlace: $fieldValue',
+                  child: Text(
+                    fieldValue,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      decoration: TextDecoration.underline,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      } else {
+        // Para todos los demás tipos de campos
+        cells.add(DataCell(Text(fieldValue, overflow: TextOverflow.ellipsis)));
+      }
     }
 
     // 5. Acciones
@@ -187,6 +233,12 @@ class InventoryDataSource extends DataTableSource {
               color: Theme.of(context).colorScheme.primary,
               tooltip: 'Editar',
               onPressed: () => editCallback(item),
+            ),
+            IconButton(
+              icon: const Icon(Icons.copy, size: 20),
+              color: Theme.of(context).colorScheme.primary,
+              tooltip: 'Copiar',
+              onPressed: () => copyCallback(item),
             ),
             IconButton(
               icon: const Icon(Icons.delete, size: 20),

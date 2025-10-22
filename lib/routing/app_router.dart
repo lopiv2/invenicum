@@ -4,6 +4,7 @@ import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/list_data.dart';
 import 'package:invenicum/screens/asset_create_screen.dart';
 import 'package:invenicum/screens/asset_edit_screen.dart';
+import 'package:invenicum/screens/asset_import_screen.dart';
 import 'package:invenicum/screens/asset_list_screen.dart';
 import 'package:invenicum/screens/asset_type_create_screen.dart';
 import 'package:invenicum/screens/asset_type_grid_screen.dart';
@@ -12,7 +13,13 @@ import 'package:invenicum/screens/datalist_create_screen.dart';
 import 'package:invenicum/screens/datalist_edit_screen.dart';
 import 'package:invenicum/screens/datalist_grid_screen.dart';
 import 'package:invenicum/screens/login_screen.dart';
+import 'package:invenicum/services/api_service.dart';
+import 'package:invenicum/services/dashboard_service.dart';
 import 'package:invenicum/widgets/main_layout.dart';
+
+final _apiService =
+    ApiService(); // Asumiendo que ApiService es una clase existente
+final _dashboardService = DashboardService(_apiService);
 
 final router = GoRouter(
   initialLocation: '/login',
@@ -25,7 +32,8 @@ final router = GoRouter(
       routes: [
         GoRoute(
           path: '/dashboard',
-          builder: (context, state) => const DashboardScreen(),
+          builder: (context, state) =>
+              DashboardScreen(dashboardService: _dashboardService),
         ),
 
         // --- RUTAS DE GESTIÓN DE INVENTARIO ---
@@ -74,6 +82,20 @@ final router = GoRouter(
                 final assetTypeId = state.pathParameters['assetTypeId']!;
 
                 return AssetCreateScreen(
+                  containerId: containerId,
+                  assetTypeId: assetTypeId,
+                );
+              },
+            ),
+            // 🔑 2b. RUTA para IMPORTAR CSV (ANIDADA)
+            // Path final: .../assets/import-csv
+            GoRoute(
+              path: 'import-csv',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                final assetTypeId = state.pathParameters['assetTypeId']!;
+
+                return AssetImportScreen(
                   containerId: containerId,
                   assetTypeId: assetTypeId,
                 );
