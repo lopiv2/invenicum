@@ -70,6 +70,25 @@ class InventoryItemService {
     }
   }
 
+  // NUEVO MÉTODO DE CLONACIÓN
+  Future<InventoryItem> cloneInventoryItem(InventoryItem item) async {
+    // Asegúrate de que tu cliente HTTP (ej. Dio, http) usa la ruta correcta
+    final containerId = item.containerId;
+    final assetTypeId = item.assetTypeId;
+
+    // 🎯 RUTA CLAVE: Llama al nuevo endpoint sin Multer
+    final url = '/containers/$containerId/asset-types/$assetTypeId/items/clone';
+
+    // Realiza la petición POST con el body JSON
+    final response = await _dio.post(
+      url,
+      data: item
+          .toJson(), // Envía el objeto InventoryItem (con images: [{id: 0, url: '...'}])
+    );
+
+    return InventoryItem.fromJson(response.data);
+  }
+
   // ----------------------------------------------------------------------
   // --- 2. CREATE (Creación) ---
   // ----------------------------------------------------------------------

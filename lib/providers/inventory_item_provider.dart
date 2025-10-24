@@ -238,16 +238,20 @@ class InventoryItemProvider with ChangeNotifier {
     if (response != null) {
       _aggregationDefinitions = response.aggregationDefinitions;
       _aggregationResults = response.aggregationResults;
+
+      // LÍNEAS ELIMINADAS: La lista _inventoryItems no existe ni es necesaria
+      // en esta arquitectura. La lista se lee directamente del caché en el getter.
     } else {
+      // LÍNEAS ELIMINADAS: La lista _inventoryItems no existe ni es necesaria
       _aggregationDefinitions = [];
       _aggregationResults = {};
     }
 
-    // 2. Forzar el cálculo de filtros/paginación (la llamada a este método solo es para el efecto secundario de calcular la sublista)
-    // El valor de retorno se ignora, solo se actualiza _totalFilteredItems
+    // 2. Forzar el cálculo de filtros/paginación
+    // Esto asegura que _totalFilteredItems se recalcule usando los datos ACTUALIZADOS del caché.
     _processAndPaginateItems(_currentContainerId, _currentAssetTypeId);
 
-    // 3. Notificar a los oyentes (Esto debe estar al final)
+    // 3. Notificar a los oyentes
     notifyListeners();
   }
 
@@ -390,6 +394,37 @@ class InventoryItemProvider with ChangeNotifier {
       rethrow;
     } finally {
       if (_isDisposed) return;
+    }
+  }
+
+  // NUEVO MÉTODO DE GESTIÓN DE ESTADO PARA CLONACIÓN
+  Future<void> cloneInventoryItem(InventoryItem item) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // 1. Llamada al servicio de clonación (backend)
+      await _itemService.cloneInventoryItem(item);
+
+      if (_isDisposed) return;
+
+      // 2. Forzar la recarga (loadInventoryItems)
+      await loadInventoryItems(
+        containerId: item.containerId,
+        assetTypeId: item.assetTypeId,
+        forceReload: true,
+        goToPageOne: true,
+      );
+      notifyListeners();
+    } catch (e) {
+      // 🔑 CORRECCIÓN CLAVE: Restablecer el estado de carga si hay un error
+      // Esto evita que la UI se quede "colgada" cargando.
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    } finally {
+      // Este 'finally' permanece vacío porque el estado de carga ahora se
+      // maneja en el 'catch' o al final de 'loadInventoryItems'.
     }
   }
 

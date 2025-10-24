@@ -31,6 +31,22 @@ class InventoryItemImage {
       // al hacer una inserción o actualización. Si el backend lo espera, añádelo.
     };
   }
+
+  InventoryItemImage copyWith({
+    int? id,
+    String? url,
+    String? altText,
+    int? order,
+  }) {
+    return InventoryItemImage(
+      id: id ?? this.id,
+      // Al copiar un activo, la URL de la imagen existente (que apunta a un archivo ya subido)
+      // es lo que necesitamos para que el backend la clone.
+      url: url ?? this.url,
+      altText: altText ?? this.altText,
+      order: order ?? this.order,
+    );
+  }
 }
 
 // --- CLASE PRINCIPAL (MODIFICADA) ---
@@ -78,6 +94,7 @@ class InventoryItem {
     final List<dynamic> imageListJson =
         itemData['images'] as List<dynamic>? ?? [];
     final List<InventoryItemImage> images = imageListJson
+        .where((e) => e != null) // 👈 Añadir este filtro
         .map(
           (imgJson) =>
               InventoryItemImage.fromJson(imgJson as Map<String, dynamic>),
@@ -120,6 +137,9 @@ class InventoryItem {
       'name': name,
       'description': description,
       'customFieldValues': customFieldValues,
+      'images': images.map((img) => img.toJson()).toList(),
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
     };
   }
 
@@ -133,17 +153,36 @@ class InventoryItem {
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? customFieldValues,
+    // 🔑 NUEVO: Flag para forzar el reseteo de IDs de imagen (para la operación de copia)
+    bool resetImageIds = false,
   }) {
+    // 1. Lógica de Imágenes
+    List<InventoryItemImage> finalImages;
+
+    if (images != null) {
+      // Si se proporciona una lista, la usamos
+      finalImages = images;
+    } else if (resetImageIds) {
+      // Si queremos resetear IDs (operación de copia):
+      // Clonamos la lista existente, mapeando cada imagen y forzando id: 0
+      finalImages = this.images
+          .map((img) => img.copyWith(id: 0)) // 🔑 Reseteamos el ID
+          .toList();
+    } else {
+      // Uso normal (actualización): usamos la lista existente
+      finalImages = this.images;
+    }
+
     return InventoryItem(
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,
-      images: images ?? this.images,
+      // Usamos la lista de imágenes procesada
+      images: finalImages,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
-      // Nota: Para customFieldValues, clonamos el mapa actual si no se proporciona uno nuevo
       customFieldValues:
           customFieldValues ??
           (this.customFieldValues != null

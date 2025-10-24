@@ -116,37 +116,35 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
   void _copyAsset(BuildContext context, InventoryItem item) async {
     // 1. Crear una copia del InventoryItem existente con ID de creación.
-    // Es crucial establecer el 'id' a 0 (o null) y cambiar el nombre para distinguirlo.
     final InventoryItem itemCopy = item.copyWith(
-      id: 0, // 0 o null indica al backend que es un nuevo registro
+      id: 0, // 0 indica al backend que es un nuevo registro
+      // 🔑 CORRECCIÓN: Agregar "(Copia)" al nombre para asegurar unicidad.
       name: item.name,
+
+      resetImageIds: true, // Esto es correcto para la clonación
     );
 
     final itemProvider = context.read<InventoryItemProvider>();
 
-    // 2. Mostrar un indicador de carga (opcional, pero recomendado)
+    // 2. Mostrar un indicador de carga (Si manejas la carga a nivel de widget, aquí es donde lo harías)
     setState(() {
-      // Si tienes un indicador de carga en el widget que contiene la tabla, actívalo.
-      // Esto es un placeholder, asumiendo que tienes un control de loading a nivel de pantalla.
+      // ... (lógica de carga local)
     });
 
-    // 3. Llamar al servicio para crear la copia
+    // 3. Llamar al servicio para CLONAR la copia
     try {
-      // Usamos el método existente para crear un ítem (el provider lo llama POST)
-      await itemProvider.createInventoryItem(itemCopy);
+      await itemProvider.cloneInventoryItem(itemCopy);
 
-      // 4. El Provider (createInventoryItem) se encargará automáticamente de:
-      //    a) Llamar al servicio de backend.
-      //    b) Forzar la recarga (loadInventoryItems con forceReload: true).
-      //    c) Notificar a la UI.
-
-      ToastService.success('✅ Activo "${item.name}" copiado exitosamente.');
+      // Usamos el nombre COPIADO para la notificación
+      ToastService.success('✅ Activo "${itemCopy.name}" copiado exitosamente.');
     } catch (e) {
       ToastService.error('❌ Error al copiar el activo: $e');
     } finally {
-      // 5. Desactivar indicador de carga si se usó
+      // Si la lógica de carga local (setState) es redundante con el Provider
+      // y no hay otras variables de estado que necesiten limpieza, este bloque
+      // puede dejarse vacío (o limpiar solo el estado local).
       if (mounted && itemProvider.isLoading) {
-        // Si el provider no ha terminado de cargar, no forzar. Si sí, asegurar que se refresque.
+        // Lógica para desactivar el indicador de carga local si aplica.
       }
     }
   }
