@@ -48,6 +48,7 @@ dependencies:
   cached_network_image: ^3.4.1
   url_launcher: ^6.3.2
   csv: ^6.0.0
+  graphview: ^1.5.1
 
 dev_dependencies:
   flutter_test:

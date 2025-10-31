@@ -91,6 +91,12 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
     );
   }
 
+  void _goToEditAssetType(BuildContext context, AssetType assetType) {
+    context.go(
+      '/container/${widget.containerId}/asset-types/${assetType.id}/edit',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final containerProvider = context.watch<ContainerProvider>();
@@ -174,6 +180,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                     assetType: assetType,
                     assetCount: assetCount,
                     onTap: () => _goToAssetList(context, assetType),
+                    onEdit: () => _goToEditAssetType(context, assetType),
                   );
                 },
               ),

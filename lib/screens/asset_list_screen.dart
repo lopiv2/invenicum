@@ -7,13 +7,14 @@ import 'package:provider/provider.dart';
 
 import '../models/container_node.dart';
 import '../models/asset_type_model.dart';
+import '../models/location.dart'; // 🔑 Importado
 import '../providers/container_provider.dart';
 import '../providers/inventory_item_provider.dart';
 
 // Importar los nuevos widgets
 import '../widgets/asset_data_table.dart';
 import '../widgets/asset_grid_view.dart';
-import '../widgets/asset_list_header.dart'; // 🔑 Nuevo
+import '../widgets/asset_list_header.dart';
 
 class AssetListScreen extends StatefulWidget {
   final String containerId;
@@ -34,8 +35,14 @@ class _AssetListScreenState extends State<AssetListScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool _isListView = true;
   late InventoryItemProvider _itemProvider;
+
+  // Filtros de agregación (Campos custom)
   String? _selectedCountFieldId;
   String? _selectedCountValue;
+
+  // 🔑 NUEVO ESTADO: Filtro por Ubicación
+  int? _selectedLocationId;
+
 
   @override
   void initState() {
@@ -43,6 +50,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     _itemProvider = context.read<InventoryItemProvider>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+
       _itemProvider.loadInventoryItems(
         containerId: int.tryParse(widget.containerId) ?? 0,
         assetTypeId: int.tryParse(widget.assetTypeId) ?? 0,
@@ -63,7 +71,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     super.dispose();
   }
 
-  // --- MÉTODOS DE LÓGICA Y NAVEGACIÓN ---
+  // --- MÉTODOS DE LÓGICA Y NAVEGACIÓN (applyFiltersAndLoad se mantiene igual) ---
 
   void _applyFiltersAndLoad({
     bool forceReload = false,
@@ -112,32 +120,51 @@ class _AssetListScreenState extends State<AssetListScreen> {
     );
   }
 
-  // --- LÓGICA DE FILTRADO Y AGREGACIÓN LOCAL (Sin cambios) ---
-
+  // 🔑 MODIFICADO: Lógica de Filtrado Local (Incluye Ubicación)
   List<dynamic> _getFilteredItems(List<dynamic> allItems) {
+    // 1. Filtrar por Ubicación (Campo Común)
+    Iterable<dynamic> filteredByLocation = allItems.where((item) {
+      if (_selectedLocationId == null) {
+        return true; // No hay filtro de ubicación aplicado
+      }
+      // Coincide si el locationId del ítem es igual al seleccionado
+      return (item as InventoryItem).locationId == _selectedLocationId;
+    });
+
+    // 2. Aplicar el Filtro de Conteo/Agregación (Campos Custom)
     if (_selectedCountFieldId == null || _selectedCountValue == null) {
-      return allItems;
+      return filteredByLocation.toList(); // Solo filtro de ubicación aplicado
     }
 
     final fieldId = _selectedCountFieldId!;
-    final filterValue = _selectedCountValue!;
+    final filterValue = _selectedCountValue!.toLowerCase().trim();
 
-    return allItems.where((item) {
+    return filteredByLocation.where((item) {
       final customValues =
-          item.customFieldValues as Map<String, dynamic>? ?? {};
+          (item as InventoryItem).customFieldValues ??
+          {};
       final itemValueRaw = customValues[fieldId];
 
-      String itemValueString = "";
-      if (itemValueRaw == null || itemValueRaw.toString().trim().isEmpty) {
-        itemValueString = "";
-      } else {
-        itemValueString = itemValueRaw.toString().trim();
+      if (itemValueRaw == null) {
+        return filterValue.isEmpty;
       }
+
+      // MANEJO EXPLICITO DE BOOLEANOS
+      if (itemValueRaw is bool) {
+        final bool filterBool = (filterValue == 'true');
+        if (filterValue == 'true' || filterValue == 'false') {
+          return itemValueRaw == filterBool;
+        }
+        return false;
+      }
+
+      // Para String, int, double: convertir a string para comparación normalizada
+      final itemValueString = itemValueRaw.toString().toLowerCase().trim();
       return itemValueString == filterValue;
     }).toList();
   }
 
-  // --- DIÁLOGO DE FILTRO DE CONTEO (Se mantiene aquí por necesidad de setState) ---
+  // --- DIÁLOGO DE FILTRO DE CONTEO (Se mantiene sin cambios) ---
 
   void _showCountFilterDialog(BuildContext context, AssetType assetType) {
     final List<Map<String, dynamic>> availableDefs = assetType.fieldDefinitions
@@ -227,7 +254,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     );
   }
 
-  // --- WIDGET BUILD REFACTORIZADO ---
+  // --- WIDGET BUILD REFACTORIZADO (Añadiendo el selector de Ubicación) ---
 
   @override
   Widget build(BuildContext context) {
@@ -256,11 +283,12 @@ class _AssetListScreenState extends State<AssetListScreen> {
         child: Text('Contenedor o Tipo de Activo no encontrado.'),
       );
     }
+    final List<Location> availableLocations = container.locations;
 
     // 1. Obtener los ítems base (ya filtrados por búsqueda global y paginados)
     final inventoryItems = itemProvider.inventoryItems;
 
-    // 2. Aplicar el filtro de agregación LOCALMENTE a los ítems visibles (viewItems)
+    // 2. Aplicar el filtro de agregación y ubicación LOCALMENTE a los ítems visibles
     final viewItems = _getFilteredItems(inventoryItems);
 
     // 3. Obtener el Conteo Local
@@ -284,13 +312,14 @@ class _AssetListScreenState extends State<AssetListScreen> {
             AssetListHeader(
               assetType: assetType,
               onGoToCreateAsset: () => _goToCreateAsset(context),
-              // 🔑 NUEVO: Pasamos la función de importación
               onImportCSV: () => _onImportCSV(context),
               onShowCountFilterDialog: () =>
                   _showCountFilterDialog(context, assetType),
               selectedCountFieldId: _selectedCountFieldId,
             ),
             const SizedBox(height: 20),
+
+  
 
             // --- CONTADORES DINÁMICOS Y SUMATORIOS ---
             AssetCountersRow(
@@ -330,17 +359,15 @@ class _AssetListScreenState extends State<AssetListScreen> {
                           assetType: assetType,
                           containerId: cIdInt,
                           assetTypeId: atIdInt,
-                          inventoryItems:
-                              viewItems
-                                  as List<
-                                    InventoryItem
-                                  >, // 🔑 Usar viewItems (la lista filtrada localmente)
+                          inventoryItems: viewItems as List<InventoryItem>,
+                          availableLocations: availableLocations,
                         )
                       : AssetGridView(
                           assetType: assetType,
                           items: viewItems as List<InventoryItem>,
                           containerId: cIdInt,
                           assetTypeId: atIdInt,
+                          //availableLocations: availableLocations,
                         ),
                 ),
               ),

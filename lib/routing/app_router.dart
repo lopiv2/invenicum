@@ -1,21 +1,30 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/list_data.dart';
+import 'package:invenicum/models/location.dart';
+import 'package:invenicum/providers/location_provider.dart';
 import 'package:invenicum/screens/asset_create_screen.dart';
 import 'package:invenicum/screens/asset_edit_screen.dart';
 import 'package:invenicum/screens/asset_import_screen.dart';
 import 'package:invenicum/screens/asset_list_screen.dart';
 import 'package:invenicum/screens/asset_type_create_screen.dart';
+import 'package:invenicum/screens/asset_type_edit_screen.dart';
 import 'package:invenicum/screens/asset_type_grid_screen.dart';
 import 'package:invenicum/screens/dashboard_screen.dart';
 import 'package:invenicum/screens/datalist_create_screen.dart';
 import 'package:invenicum/screens/datalist_edit_screen.dart';
 import 'package:invenicum/screens/datalist_grid_screen.dart';
+import 'package:invenicum/screens/loans_screen.dart';
+import 'package:invenicum/screens/location_create_screen.dart';
+import 'package:invenicum/screens/location_edit_screen.dart';
+import 'package:invenicum/screens/locations_screen.dart';
 import 'package:invenicum/screens/login_screen.dart';
 import 'package:invenicum/services/api_service.dart';
 import 'package:invenicum/services/dashboard_service.dart';
 import 'package:invenicum/widgets/main_layout.dart';
+import 'package:provider/provider.dart';
 
 final _apiService =
     ApiService(); // Asumiendo que ApiService es una clase existente
@@ -53,6 +62,21 @@ final router = GoRouter(
               builder: (context, state) {
                 final containerId = state.pathParameters['containerId']!;
                 return AssetTypeCreateScreen(containerId: containerId);
+              },
+            ),
+            // 🔑 1b. NUEVA RUTA DE EDICIÓN DE TIPO DE ACTIVO (ANIDADA)
+            // Path final: /container/:containerId/asset-types/:assetTypeId/edit
+            GoRoute(
+              path: ':assetTypeId/edit', // Captura el ID del AssetType
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                final assetTypeId = state.pathParameters['assetTypeId']!;
+
+                // Asegúrate de haber importado AssetTypeEditScreen
+                return AssetTypeEditScreen(
+                  containerId: containerId,
+                  assetTypeId: assetTypeId,
+                );
               },
             ),
           ],
@@ -170,6 +194,75 @@ final router = GoRouter(
               ),
             );
           },
+        ),
+
+        // --- RUTAS DE GESTIÓN DE INVENTARIO ---
+
+        // 🔑 5. NUEVA RUTA DE GESTIÓN DE UBICACIONES (LOCATIONS) 📍
+        GoRoute(
+          path: '/container/:containerId/locations',
+          builder: (context, state) {
+            final containerId = state.pathParameters['containerId']!;
+            // ASUME que tienes un widget llamado LocationsScreen que acepta containerId
+            return LocationsScreen(containerId: containerId);
+            
+          },
+          routes: [
+            GoRoute(
+              // Ruta para crear una nueva ubicación
+              path: 'new',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                return LocationCreateScreen(containerId: containerId);
+              },
+            ),
+            GoRoute(
+              // La ruta completa será: /container/:containerId/locations/:locationId/edit
+              path: ':locationId/edit',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                final locationId = int.parse(
+                  state.pathParameters['locationId']!,
+                );
+
+                // 1. Obtener el LocationProvider
+                final locationProvider = context.read<LocationProvider>();
+
+                // 2. Buscar la ubicación específica por ID en el Provider
+                // Esto asume que el LocationsScreen ya cargó la lista 'locations'.
+                final Location
+                locationToEdit = locationProvider.locations.firstWhere(
+                  (loc) => loc.id == locationId,
+                  // Manejo de error si el ID no existe (puedes redirigir a una pantalla de error)
+                  orElse: () {
+                    // Mostrar un error y redirigir
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Ubicación no encontrada.')),
+                    );
+                    throw Exception(
+                      'Location ID $locationId not found in the Provider list.',
+                    );
+                  },
+                );
+
+                return LocationEditScreen(
+                  containerId: containerId,
+                  location: locationToEdit,
+                );
+              },
+            ),
+          ],
+        ),
+
+        // 🔑 6. NUEVA RUTA DE GESTIÓN DE PRÉSTAMOS (LOANS) 📑
+        GoRoute(
+          path: '/container/:containerId/loans',
+          builder: (context, state) {
+            final containerId = state.pathParameters['containerId']!;
+            // ASUME que tienes un widget llamado LoansScreen que acepta containerId
+            return LoansScreen(containerId: containerId);
+          },
+          // Puedes añadir rutas anidadas para Préstamos aquí (ej. /loans/new, /loans/:loanId)
         ),
       ],
     ),

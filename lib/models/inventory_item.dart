@@ -1,4 +1,6 @@
-// --- NUEVA CLASE PARA LAS IMÁGENES ---
+// lib/models/inventory_item.dart (Actualizado)
+
+// --- NUEVA CLASE PARA LAS IMÁGENES (Sin cambios) ---
 class InventoryItemImage {
   final int id;
   final String url;
@@ -26,9 +28,6 @@ class InventoryItemImage {
       'url': url,
       'altText': altText,
       'order': order,
-      // Nota: No incluimos 'inventoryItemId' ni 'assetTypeId' aquí,
-      // ya que típicamente se gestionan en el nivel superior (InventoryItem o AssetType)
-      // al hacer una inserción o actualización. Si el backend lo espera, añádelo.
     };
   }
 
@@ -40,8 +39,6 @@ class InventoryItemImage {
   }) {
     return InventoryItemImage(
       id: id ?? this.id,
-      // Al copiar un activo, la URL de la imagen existente (que apunta a un archivo ya subido)
-      // es lo que necesitamos para que el backend la clone.
       url: url ?? this.url,
       altText: altText ?? this.altText,
       order: order ?? this.order,
@@ -56,6 +53,7 @@ class InventoryItem {
   final String? description;
   final int containerId;
   final int assetTypeId;
+  final int locationId; // 🔑 AÑADIDO: ID de la ubicación
 
   final List<InventoryItemImage> images;
 
@@ -70,9 +68,9 @@ class InventoryItem {
     this.description,
     required this.containerId,
     required this.assetTypeId,
+    required this.locationId, // 🔑 AÑADIDO AL CONSTRUCTOR
     this.createdAt,
     this.updatedAt,
-    // Aseguramos que el constructor siempre tenga un valor por defecto
     this.customFieldValues,
     this.images = const [],
   });
@@ -80,21 +78,20 @@ class InventoryItem {
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
     final itemData = json['itemData'] ?? json;
 
-    // 1. Obtener el valor JSON (puede ser null)
+    // 1. Obtener el valor JSON de los campos custom
     final dynamic rawCustomFieldValues = itemData['customFieldValues'];
 
-    // 2. 🎯 CORRECCIÓN CLAVE: Conversión segura a Map<String, dynamic>?
-    // Si no es null y es un Map, lo convertimos. Si es null, o si la conversión falla, es null.
+    // 2. Conversión segura a Map<String, dynamic>?
     final Map<String, dynamic>? customFieldValues =
         rawCustomFieldValues != null && rawCustomFieldValues is Map
-        ? Map<String, dynamic>.from(rawCustomFieldValues)
-        : null;
+            ? Map<String, dynamic>.from(rawCustomFieldValues)
+            : null;
 
-    // 3. Procesar las imágenes (tu código está bien aquí, pero lo incluimos por contexto)
+    // 3. Procesar las imágenes
     final List<dynamic> imageListJson =
         itemData['images'] as List<dynamic>? ?? [];
     final List<InventoryItemImage> images = imageListJson
-        .where((e) => e != null) // 👈 Añadir este filtro
+        .where((e) => e != null)
         .map(
           (imgJson) =>
               InventoryItemImage.fromJson(imgJson as Map<String, dynamic>),
@@ -103,7 +100,6 @@ class InventoryItem {
 
     // Función auxiliar (queda igual)
     DateTime? parseDate(dynamic value) {
-      // ... (código igual)
       if (value is String) {
         try {
           return DateTime.parse(value);
@@ -120,11 +116,10 @@ class InventoryItem {
       description: itemData['description'] as String?,
       containerId: itemData['containerId'] as int,
       assetTypeId: itemData['assetTypeId'] as int,
+      locationId: itemData['locationId'] as int? ?? 0, // 🔑 AÑADIDO: Lo obtenemos del JSON
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
-
-      // Pasamos el mapa ya verificado (que ahora es nullable)
-      customFieldValues: customFieldValues, // 🎯 PASAR LA VARIABLE CORRECTA
+      customFieldValues: customFieldValues,
       images: images,
     );
   }
@@ -134,6 +129,7 @@ class InventoryItem {
       'id': id,
       'containerId': containerId,
       'assetTypeId': assetTypeId,
+      'locationId': locationId, // 🔑 AÑADIDO: Incluido en el JSON de salida
       'name': name,
       'description': description,
       'customFieldValues': customFieldValues,
@@ -149,27 +145,24 @@ class InventoryItem {
     String? description,
     int? containerId,
     int? assetTypeId,
+    int? locationId, // 🔑 AÑADIDO: Incluido en copyWith
     List<InventoryItemImage>? images,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? customFieldValues,
-    // 🔑 NUEVO: Flag para forzar el reseteo de IDs de imagen (para la operación de copia)
+    // Flag para forzar el reseteo de IDs de imagen (para la operación de copia)
     bool resetImageIds = false,
   }) {
-    // 1. Lógica de Imágenes
+    // 1. Lógica de Imágenes (sin cambios)
     List<InventoryItemImage> finalImages;
 
     if (images != null) {
-      // Si se proporciona una lista, la usamos
       finalImages = images;
     } else if (resetImageIds) {
-      // Si queremos resetear IDs (operación de copia):
-      // Clonamos la lista existente, mapeando cada imagen y forzando id: 0
       finalImages = this.images
-          .map((img) => img.copyWith(id: 0)) // 🔑 Reseteamos el ID
+          .map((img) => img.copyWith(id: 0))
           .toList();
     } else {
-      // Uso normal (actualización): usamos la lista existente
       finalImages = this.images;
     }
 
@@ -179,7 +172,7 @@ class InventoryItem {
       description: description ?? this.description,
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,
-      // Usamos la lista de imágenes procesada
+      locationId: locationId ?? this.locationId, // 🔑 AÑADIDO: Usamos el nuevo o el existente
       images: finalImages,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -193,6 +186,6 @@ class InventoryItem {
 
   @override
   String toString() {
-    return 'Item(id: $id, name: $name, images: ${images.length})';
+    return 'Item(id: $id, name: $name, locationId: $locationId, images: ${images.length})';
   }
 }

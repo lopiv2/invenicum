@@ -10,6 +10,7 @@ class AssetTypeCard extends StatelessWidget {
   final AssetType assetType;
   final int assetCount;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
 
   const AssetTypeCard({
     super.key,
@@ -17,6 +18,7 @@ class AssetTypeCard extends StatelessWidget {
     required this.assetType,
     required this.assetCount,
     this.onTap,
+    this.onEdit,
   });
 
   Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
@@ -161,10 +163,29 @@ class AssetTypeCard extends StatelessWidget {
                       ),
                     ),
                     // Columna derecha: Iconos y botones
-                    IconButton(
-                      icon: const Icon(Icons.delete_outline, color: Colors.red),
-                      onPressed: () => _handleDelete(context),
-                      tooltip: 'Eliminar tipo de activo',
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // 🔑 BOTÓN DE EDITAR
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit_outlined,
+                            color: Colors.blueGrey,
+                          ),
+                          onPressed: onEdit, // Usar el nuevo callback
+                          tooltip: 'Editar tipo de activo',
+                        ),
+
+                        // BOTÓN DE ELIMINAR
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
+                          onPressed: () => _handleDelete(context),
+                          tooltip: 'Eliminar tipo de activo',
+                        ),
+                      ],
                     ),
                   ],
                 ),

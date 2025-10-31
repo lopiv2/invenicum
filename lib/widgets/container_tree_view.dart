@@ -9,7 +9,7 @@ import '../providers/container_provider.dart';
 enum ContainerAction { rename, delete }
 
 class ContainerTreeView extends StatefulWidget {
-  final List<ContainerNode> containers;
+  // Definición de callbacks
   final Function(ContainerNode, String? subSection) onContainerTap;
   final Future<void> Function(int containerId) onDeleteContainer;
   final Future<void> Function(int containerId, String newName)
@@ -17,7 +17,6 @@ class ContainerTreeView extends StatefulWidget {
 
   const ContainerTreeView({
     super.key,
-    required this.containers,
     required this.onContainerTap,
     required this.onDeleteContainer,
     required this.onRenameContainer,
@@ -28,8 +27,10 @@ class ContainerTreeView extends StatefulWidget {
 }
 
 class _ContainerTreeViewState extends State<ContainerTreeView> {
+  // --- Lógica Asíncrona para Cargar Sub-datos ---
   Future<void> _loadDataForContainer(int containerId) async {
     try {
+      // Usa context.read() porque NO debe provocar un rebuild. El rebuild lo hace el Consumer.
       await context.read<ContainerProvider>().loadDataLists(containerId);
     } catch (e) {
       print('Error cargando listas para contenedor $containerId: $e');
@@ -39,17 +40,20 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
   @override
   void initState() {
     super.initState();
-    // Cargar las listas para todos los contenedores al inicio
-    for (var container in widget.containers) {
-      _loadDataForContainer(container.id);
-    }
+    // Disparamos la carga de conteos (asíncrona) para todos los contenedores al inicio.
+    Future.microtask(() {
+      final initialContainers = context.read<ContainerProvider>().containers;
+      for (var container in initialContainers) {
+        _loadDataForContainer(container.id);
+      }
+    });
   }
 
-  // --- Construcción del Árbol (Sin cambios) ---
-  TreeNode<dynamic> _buildTreeRoot() {
+  // Genera la estructura de nodos usando la lista actualizada.
+  TreeNode<dynamic> _buildTreeRoot(List<ContainerNode> containers) {
     final root = TreeNode.root();
 
-    for (var container in widget.containers) {
+    for (var container in containers) {
       final containerNode = TreeNode(
         key: container.id.toString(),
         data: container.name,
@@ -60,6 +64,20 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
         data: "Tipos de activos (${container.assetTypes.length})",
       );
       containerNode.add(assetTypesNode);
+
+      // ✅ El valor de locationsCount se actualiza automáticamente
+      // cuando el Provider llama a notifyListeners().
+      final locationsNode = TreeNode(
+        key: "${container.id}_locations",
+        data: "Ubicaciones (${container.locations.length})",
+      );
+      containerNode.add(locationsNode);
+
+      final loansNode = TreeNode(
+        key: "${container.id}_loans",
+        data: "Préstamos / Historial",
+      );
+      containerNode.add(loansNode);
 
       final datalistsNode = TreeNode(
         key: "${container.id}_datalists",
@@ -73,7 +91,164 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     return root;
   }
 
-  // --- Lógica de Manejo de Acciones (NUEVO) ---
+  // Renderiza el contenido de cada nodo y maneja el menú contextual.
+  Widget _itemBuilder(
+    BuildContext context,
+    TreeNode node,
+    List<ContainerNode> containers,
+  ) {
+    final isContainer = node.level == 1;
+    final isSection = node.level == 2;
+    final isClickable = isContainer || isSection;
+
+    ContainerNode? container;
+    if (isContainer) {
+      final containerIdInt = int.tryParse(node.key.toString());
+      if (containerIdInt != null) {
+        try {
+          // Usa la lista inyectada para obtener el objeto ContainerNode correcto.
+          container = containers.firstWhere((c) => c.id == containerIdInt);
+        } catch (_) {}
+      }
+    }
+
+    // Contenido visual del nodo (Icono y Texto)
+    final nodeContent = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+      child: Row(
+        children: [
+          Icon(
+            _getIconForNode(node),
+            size: isContainer ? 20 : 16,
+            color: isContainer
+                ? Theme.of(context).primaryColor
+                : isSection
+                ? Colors.blueGrey
+                : Colors.grey,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              node.data.toString(),
+              style: TextStyle(
+                fontSize: isContainer ? 14 : 12,
+                fontWeight: isSection ? FontWeight.bold : FontWeight.normal,
+                color: isContainer
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey[900],
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (!isClickable) {
+      return nodeContent;
+    }
+
+    Widget finalWidget = nodeContent;
+
+    // Manejo de Menú Contextual para Contenedores (clic derecho)
+    if (isContainer && container != null) {
+      finalWidget = MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          onSecondaryTapDown: (details) =>
+              _showContextMenu(context, details.globalPosition, container!),
+          child: nodeContent,
+        ),
+      );
+    } else {
+      // Cursor de mouse para secciones clicables
+      finalWidget = MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: nodeContent,
+      );
+    }
+
+    return finalWidget;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // 🔑 CONSUMER: Este widget escucha cualquier cambio en ContainerProvider
+    return Consumer<ContainerProvider>(
+      builder: (context, provider, child) {
+        final containers =
+            provider.containers; // La lista siempre estará actualizada.
+
+        // 1. Construir el árbol con la lista actualizada
+        final root = _buildTreeRoot(containers);
+
+        // Muestra un indicador de carga si es necesario
+        if (containers.isEmpty && provider.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        return TreeView.simple(
+          tree: root,
+          showRootNode: false,
+
+          // 2. Lógica de Tap
+          onItemTap: (node) {
+            final isContainer = node.level == 1;
+            final isSection = node.level == 2;
+            final keyParts = node.key.toString().split('_');
+            final containerIdStr = isContainer
+                ? node.key.toString()
+                : keyParts.first;
+            final containerIdInt = int.tryParse(containerIdStr);
+
+            if (containerIdInt == null) return;
+
+            // Usamos la lista 'containers' del Consumer para encontrar el objeto
+            final container = containers.firstWhere(
+              (c) => c.id == containerIdInt,
+              orElse: () => throw Exception(
+                "Container not found with ID: $containerIdStr",
+              ),
+            );
+
+            // Lógica de Navegación del Negocio (GoRouter)
+            if (isSection) {
+              switch (keyParts.last) {
+                case 'assettypes':
+                  context.go('/container/$containerIdStr/asset-types');
+                  return;
+                case 'datalists':
+                  context.go('/container/$containerIdStr/datalists');
+                  return;
+                case 'locations':
+                  context.go('/container/$containerIdStr/locations');
+                  return;
+                case 'loans':
+                  context.go('/container/$containerIdStr/loans');
+                  return;
+              }
+            }
+
+            // Lógica de Negocio General: Tap en el contenedor
+            if (isContainer) {
+              widget.onContainerTap(container, null);
+            }
+          },
+
+          // 3. Builder del Ítem: Pasamos la lista 'containers'
+          builder: (context, node) => _itemBuilder(context, node, containers),
+
+          expansionBehavior: ExpansionBehavior.snapToTop,
+          indentation: const Indentation(
+            style: IndentStyle.roundJoint,
+            width: 24,
+            color: Color(0xFFE0E0E0),
+          ),
+        );
+      },
+    );
+  }
+
   void _handleMenuAction(
     BuildContext context,
     ContainerAction action,
@@ -89,7 +264,6 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     }
   }
 
-  // --- NUEVA FUNCIÓN: Diálogo para Renombrar ---
   Future<void> _showRenameDialog(
     BuildContext context,
     ContainerNode container,
@@ -123,7 +297,6 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
                 return null;
               },
               onFieldSubmitted: (value) {
-                // Permite enviar al presionar Enter si es válido
                 if (formKey.currentState!.validate()) {
                   Navigator.of(context).pop(true);
                 }
@@ -148,13 +321,11 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       },
     );
 
-    // 3. Manejo de la Lógica de Renombrar
     if (confirmed == true) {
       final newName = controller.text.trim();
       if (newName.isEmpty || newName == container.name) return;
 
       try {
-        // Llama al callback proporcionado por el padre
         await widget.onRenameContainer(container.id, newName);
 
         if (!context.mounted) return;
@@ -166,7 +337,6 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     }
   }
 
-  // --- Lógica para mostrar el menú contextual (NUEVO) ---
   void _showContextMenu(
     BuildContext context,
     Offset position,
@@ -198,12 +368,10 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     });
   }
 
-  // --- Diálogo de Confirmación (SIN CAMBIOS ESTRUCTURALES) ---
   Future<void> _showDeleteConfirmationDialog(
     BuildContext context,
     ContainerNode container,
   ) async {
-    // ... (El cuerpo de esta función se mantiene como está)
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -242,148 +410,31 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     }
   }
 
-  // --- Renderizado del Ítem (itemBuilder MODIFICADO) ---
-  // --- Renderizado del Ítem (itemBuilder CORREGIDO) ---
-  Widget _itemBuilder(BuildContext context, TreeNode node) {
+  IconData _getIconForNode(TreeNode node) {
     final isContainer = node.level == 1;
     final isSection = node.level == 2;
-    final isClickable = isContainer || isSection;
 
-    ContainerNode? container;
     if (isContainer) {
-      final containerIdInt = int.tryParse(node.key.toString());
-      if (containerIdInt != null) {
-        try {
-          container = widget.containers.firstWhere((c) => c.id == containerIdInt);
-        } catch (_) {}
+      return Icons.inventory_2_outlined;
+    }
+
+    if (isSection) {
+      final keyParts = node.key.toString().split('_');
+
+      switch (keyParts.last) {
+        case 'assettypes':
+          return Icons.category_outlined;
+        case 'locations':
+          return Icons.place_outlined;
+        case 'loans':
+          return Icons.handshake_outlined;
+        case 'datalists':
+          return Icons.list_alt;
+        default:
+          return Icons.folder_open;
       }
     }
 
-    // 1. Contenido visual del nodo (La estructura de iconos y texto)
-    final nodeContent = Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-      child: Row(
-        children: [
-          Icon(
-            isContainer
-                ? Icons.folder_open
-                : isSection
-                ? Icons.list_alt
-                : Icons.fiber_manual_record,
-            size: isContainer
-                ? 20
-                : isSection
-                ? 16
-                : 8,
-            color: isContainer
-                ? Theme.of(context).primaryColor
-                : isSection
-                ? Colors.grey[700]
-                : Colors.grey,
-          ),
-          const SizedBox(width: 8),
-
-          // 3. Texto del nodo
-          Expanded(
-            child: Text(
-              node.data.toString(),
-              style: TextStyle(
-                fontSize: isContainer ? 14 : 12,
-                fontWeight: isSection ? FontWeight.bold : FontWeight.normal,
-                color: isContainer
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey[900],
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
-      ),
-    );
-
-    if (!isClickable) {
-      return nodeContent;
-    }
-
-    // 2. Manejo de Menú Contextual para Contenedores (Clic Derecho)
-    Widget finalWidget = nodeContent;
-
-    if (isContainer && container != null) {
-      // Si es un contenedor, lo envolvemos para detectar el clic derecho
-      finalWidget = MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          // onSecondaryTapDown para el menú contextual
-          onSecondaryTapDown: (details) =>
-              _showContextMenu(context, details.globalPosition, container!),
-          // No definimos onTap aquí, permitiendo que el TreeView.simple.onItemTap
-          // gestione la expansión y la navegación del clic primario.
-          child: nodeContent,
-        ),
-      );
-    } else {
-      // Si es una sección (Activos/Listas) o un nodo simple
-      // No necesita GestureDetector, solo el cursor de mouse.
-      finalWidget = MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: nodeContent,
-      );
-    }
-
-    return finalWidget;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final root = _buildTreeRoot();
-    return TreeView.simple(
-      tree: root,
-      showRootNode: false,
-
-      // onItemTap ahora manejará tanto la expansión (si es posible) como la navegación
-      onItemTap: (node) {
-        final isContainer = node.level == 1;
-        final isSection = node.level == 2;
-        final keyParts = node.key.toString().split('_');
-        final containerIdStr = isContainer
-            ? node.key.toString()
-            : keyParts.first;
-        final containerIdInt = int.tryParse(containerIdStr);
-
-        if (containerIdInt == null) return;
-
-        final container = widget.containers.firstWhere(
-          (c) => c.id == containerIdInt,
-          orElse: () =>
-              throw Exception("Container not found with ID: $containerIdStr"),
-        );
-
-        // Lógica de Navegación del Negocio
-        if (isSection) {
-          switch (keyParts.last) {
-            case 'assettypes':
-              context.go('/container/$containerIdStr/asset-types');
-              return;
-            case 'datalists':
-              context.go('/container/$containerIdStr/datalists');
-              return;
-          }
-        }
-
-        // Lógica de Negocio General: Tap en el contenedor
-        if (isContainer) {
-          widget.onContainerTap(container, null);
-        }
-      },
-
-      builder: (context, node) => _itemBuilder(context, node),
-
-      expansionBehavior: ExpansionBehavior.snapToTop,
-      indentation: const Indentation(
-        style: IndentStyle.roundJoint,
-        width: 24,
-        color: Color(0xFFE0E0E0),
-      ),
-    );
+    return Icons.fiber_manual_record;
   }
 }

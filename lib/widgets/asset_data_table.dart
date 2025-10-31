@@ -4,8 +4,8 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/models/location.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../models/inventory_item.dart';
 import '../../models/asset_type_model.dart';
@@ -18,6 +18,7 @@ class AssetDataTable extends StatefulWidget {
   final int containerId;
   final int assetTypeId;
   final List<InventoryItem> inventoryItems;
+  final List<Location> availableLocations;
 
   const AssetDataTable({
     super.key,
@@ -25,6 +26,7 @@ class AssetDataTable extends StatefulWidget {
     required this.containerId,
     required this.assetTypeId,
     required this.inventoryItems,
+    required this.availableLocations,
   });
 
   @override
@@ -53,6 +55,8 @@ class _AssetDataTableState extends State<AssetDataTable> {
       deleteCallback: (item) => _deleteAsset(context, item),
       editCallback: (item) => _editAsset(context, item),
       copyCallback: (item) => _copyAsset(context, item),
+      availableLocations: widget.availableLocations,
+      containerId: widget.containerId,
     );
 
     _providerListener = () {
@@ -73,12 +77,14 @@ class _AssetDataTableState extends State<AssetDataTable> {
         index = 1;
       } else if (currentSortKey == 'description') {
         index = 2;
+      } else if (currentSortKey == 'locationId') {
+        index = 3;
       } else {
         final customIndex = widget.assetType.fieldDefinitions.indexWhere(
           (def) => def.id.toString() == currentSortKey,
         );
         if (customIndex != -1) {
-          index = customIndex + 3;
+          index = customIndex + 4;
         }
       }
 
@@ -341,10 +347,17 @@ class _AssetDataTableState extends State<AssetDataTable> {
           },
         ),
         DataColumn2(
+          label: _buildFilterHeader(context, 'Ubicación', 'locationId'),
+          size: ColumnSize.M,
+          onSort: (columnIndex, ascending) {
+            _sortItems(context, 2, 'locationId', ascending);
+          },
+        ),
+        DataColumn2(
           label: _buildFilterHeader(context, 'Descripción', 'description'),
           size: ColumnSize.L,
           onSort: (columnIndex, ascending) {
-            _sortItems(context, 2, 'description', ascending);
+            _sortItems(context, 3, 'description', ascending);
           },
         ),
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {

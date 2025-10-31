@@ -1,0 +1,79 @@
+import 'package:flutter/material.dart';
+import 'package:invenicum/models/location.dart';
+
+class LocationCardContent extends StatelessWidget {
+  final Location location;
+  final VoidCallback onTap;
+  final bool isSelected; // Indica si este nodo está seleccionado actualmente
+
+  const LocationCardContent({
+    super.key,
+    required this.location,
+    required this.onTap,
+    this.isSelected = false, // Valor por defecto
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isRoot = location.parentId == null;
+
+    // Define el color del borde y el fondo basado en si es la raíz o si está seleccionado
+    final borderColor = isSelected
+        ? Colors
+              .orange
+              .shade700 // Borde naranja si está seleccionado
+        : isRoot
+        ? Colors.blue.shade300
+        : Colors.transparent;
+
+    final cardColor = isSelected
+        ? Colors
+              .orange
+              .shade100 // Fondo naranja claro si está seleccionado
+        : isRoot
+        ? Colors.blue.shade50
+        : Colors.grey.shade100;
+
+    // 🔑 CLAVE: Usamos Listener para anular los gestos de paneo del GraphView
+    return Card(
+      elevation: 4,
+      color: cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(
+          color: borderColor,
+          width: isSelected
+              ? 2
+              : 1, // Borde más grueso si está seleccionado
+        ),
+      ),
+      child: Container(
+        width: 160,
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              location.name,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isRoot ? Colors.blue.shade900 : Colors.black87,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (location.description != null &&
+                location.description!.isNotEmpty)
+              Text(
+                location.description!,
+                style: const TextStyle(fontSize: 10, color: Colors.black54),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

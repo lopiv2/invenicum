@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
+import 'package:invenicum/models/location.dart';
 import 'package:invenicum/utils/asset_form_utils.dart';
 import 'package:invenicum/widgets/image_preview_section.dart';
+import 'package:invenicum/widgets/location_dropdown_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../models/asset_type_model.dart';
@@ -14,7 +16,6 @@ import '../models/inventory_item.dart';
 import '../providers/container_provider.dart';
 import '../providers/inventory_item_provider.dart';
 import '../services/toast_service.dart';
-// Importamos el nuevo widget separado
 
 class AssetCreateScreen extends StatefulWidget {
   final String containerId;
@@ -36,11 +37,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  // 🔑 ESTADO DE UBICACIÓN
+  List<Location> _availableLocations = []; // Lista de ubicaciones disponibles
+  int? _selectedLocationId; // ID de la ubicación seleccionada
+
   // Mapa para los controladores de campos custom
   final Map<int, TextEditingController> _customControllers = {};
   final Map<int, List<String>> _listFieldValues =
       {}; // Valores de las listas desplegables
   final Map<int, String?> _selectedListValues = {}; // Valores seleccionados
+
+  final Map<int, bool> _booleanFieldValues = {};
 
   // Estado para gestionar las URLs de previsualización (Base64)
   List<String> _imagePreviewUrls = [];
@@ -72,6 +79,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         description: '',
         assetTypes: [],
         dataLists: [],
+        locations: [], // Asegurarse de que el orElse maneje Locations
         status: '',
       ),
     );
@@ -83,12 +91,22 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
     setState(() {
       _assetType = assetType;
+      // 🔑 CARGAR UBICACIONES
+      _availableLocations = container.locations;
+      // 🔑 Inicializar la ubicación seleccionada (opcionalmente a la primera o null)
+      _selectedLocationId = _availableLocations.isNotEmpty
+          ? _availableLocations.first.id
+          : null;
+
       // Inicializa los controladores para cada campo custom
       for (var field in assetType.fieldDefinitions) {
-        _customControllers[field.id!] = TextEditingController();
         if (field.type == CustomFieldType.dropdown &&
             field.dataListId != null) {
           _loadListValues(field.dataListId!, field.id!);
+        } else if (field.type == CustomFieldType.boolean) {
+          _booleanFieldValues[field.id!] = false;
+        } else {
+          _customControllers[field.id!] = TextEditingController();
         }
       }
     });
@@ -120,31 +138,23 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     super.dispose();
   }
 
-  // --- LÓGICA DE GESTIÓN DE IMÁGENES (Subida de Archivo) ---
+  // --- LÓGICA DE GESTIÓN DE IMÁGENES ---
 
-  /// Muestra el selector de archivos y obtiene la URL Base64 para previsualización.
   Future<void> _addImage() async {
-    // Configuración de File Picker: permite múltiples imágenes y carga los datos.
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
       allowMultiple: true,
       withData: true,
     );
 
-    // Verificamos si se seleccionaron archivos.
     if (result != null && result.files.isNotEmpty) {
-      // Lista temporal para almacenar las URLs Base64 de las nuevas imágenes.
       final List<String> newImageUrls = [];
       int successfulSelections = 0;
 
-      // 1. ITERAR sobre CADA archivo seleccionado
       for (final file in result.files) {
-        // Verificamos si los bytes del archivo se cargaron correctamente.
         if (file.bytes != null) {
-          // Obtenemos la extensión o usamos 'jpeg' como fallback
           final extension = file.extension ?? 'jpeg';
 
-          // Generamos la URL Base64 para previsualización instantánea.
           final String base64Image =
               'data:image/$extension;base64,${base64Encode(file.bytes!)}';
 
@@ -153,7 +163,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         }
       }
 
-      // 2. Actualizar el estado (una sola vez para todas las nuevas imágenes)
       if (newImageUrls.isNotEmpty) {
         setState(() {
           _imagePreviewUrls.addAll(newImageUrls);
@@ -161,13 +170,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
         ToastService.info('Se seleccionaron $successfulSelections imágenes.');
       } else {
-        // Si se seleccionaron archivos pero todos fallaron al cargar los bytes
         ToastService.error(
           'Error: No se pudo obtener la data de las imágenes seleccionadas.',
         );
       }
     } else {
-      // El usuario canceló la selección.
       ToastService.info('Selección de archivos cancelada.');
     }
   }
@@ -179,19 +186,34 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   }
 
   Future<void> _saveAsset() async {
-    if (!AssetFormUtils.validateForm(_formKey) || _assetType == null) {
+    // 🔑 1. VALIDACIÓN ADICIONAL DE UBICACIÓN
+    if (!AssetFormUtils.validateForm(_formKey) ||
+        _assetType == null ||
+        _selectedLocationId ==
+            null // 🔑 Debe haber una ubicación seleccionada
+            ) {
+      if (_selectedLocationId == null) {
+        if (mounted) {
+          ToastService.error('Debe seleccionar una ubicación para el activo.');
+        }
+      }
       return;
     }
 
     final itemProvider = context.read<InventoryItemProvider>();
 
-    // 1. Recoger los valores custom
+    // 2. Recoger los valores custom (sin cambios)
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
         final selectedValue = _selectedListValues[fieldDef.id];
         if (selectedValue != null) {
           customFieldValues[fieldDef.id.toString()] = selectedValue;
+        }
+      } else if (fieldDef.type == CustomFieldType.boolean) {
+        final value = _booleanFieldValues[fieldDef.id];
+        if (value != null) {
+          customFieldValues[fieldDef.id.toString()] = value;
         }
       } else {
         final controller = _customControllers[fieldDef.id];
@@ -201,24 +223,26 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       }
     }
 
-    // 2. Preparar los datos de los archivos
+    // 3. Preparar los datos de los archivos
     final filesData = AssetFormUtils.processImages(_imagePreviewUrls);
 
-    // 3. Crear el nuevo objeto InventoryItem
+    // 4. Crear el nuevo objeto InventoryItem
     final newItem = InventoryItem(
       id: 0,
       containerId: _containerId!,
       assetTypeId: _assetTypeId!,
+      locationId: _selectedLocationId!, // 🔑 AÑADIDO: locationId
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: customFieldValues,
+      // images es null por defecto en creación
     );
 
-    // 4. Llamar al proveedor para guardar con los archivos
+    // 5. Llamar al proveedor para guardar con los archivos
     try {
       await itemProvider.createInventoryItem(newItem, filesData: filesData);
 
-      // 5. Navegar de vuelta al listado
+      // 6. Navegar de vuelta al listado
       if (mounted) {
         ToastService.success('Activo creado con éxito!');
         context.go(
@@ -232,7 +256,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     }
   }
 
-  // --- WIDGETS DE VISTA ---
+  // --- WIDGETS DE VISTA (buildCustomFields sin cambios) ---
 
   Widget _buildCustomFields() {
     return Column(
@@ -247,6 +271,26 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
           const Text('Este tipo de activo no tiene campos personalizados.'),
 
         ..._assetType!.fieldDefinitions.map((fieldDef) {
+          if (fieldDef.type == CustomFieldType.boolean) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: CheckboxListTile(
+                title: Text(fieldDef.name),
+                subtitle: fieldDef.isRequired
+                    ? const Text('Obligatorio')
+                    : null,
+                value: _booleanFieldValues[fieldDef.id] ?? false,
+                onChanged: (bool? newValue) {
+                  setState(() {
+                    if (newValue != null) {
+                      _booleanFieldValues[fieldDef.id!] = newValue;
+                    }
+                  });
+                },
+                controlAffinity: ListTileControlAffinity.leading,
+              ),
+            );
+          }
           if (fieldDef.type == CustomFieldType.dropdown) {
             final values = _listFieldValues[fieldDef.id] ?? [];
             final selectedValue = _selectedListValues[fieldDef.id];
@@ -311,105 +355,125 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ... (Inicialización y estado de carga) ...
-    if (_assetType == null) {
-      context.watch<ContainerProvider>();
-      if (_containerId == null || _assetTypeId == null) {
-        return const Center(child: Text('IDs no válidos.'));
+    // Escuchar al proveedor para reconstrucción en caso de recarga de datos
+    context.watch<ContainerProvider>();
+
+    if (_assetType == null || _containerId == null || _assetTypeId == null) {
+      // Intenta inicializar de nuevo si el assetType es nulo (puede ser la primera carga)
+      if (_assetType == null) {
+        _initializeForm();
       }
-      _initializeForm();
-      return const Center(child: CircularProgressIndicator());
+      return Scaffold(
+        appBar: AppBar(title: Text('Crear Activo')),
+        body: Center(child: CircularProgressIndicator()),
+      );
     }
 
-    return Padding(
-      padding: const EdgeInsets.all(32.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // --- TÍTULO ---
-            Text(
-              'Crear Activo: ${_assetType!.name}',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 30),
-
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.only(bottom: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // --- CAMPOS COMUNES ---
-                    const Text(
-                      'Datos Comunes',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+    // 🔑 Se envuelve la vista en un Scaffold para ser una pantalla completa
+    return Scaffold(
+      appBar: AppBar(title: Text('Crear Activo: ${_assetType!.name}')),
+      body: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.only(bottom: 20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // --- TÍTULO ---
+                      Text(
+                        'Crear Activo: ${_assetType!.name}',
+                        style: Theme.of(context).textTheme.headlineMedium
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
-                    ),
-                    const Divider(),
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre del Activo',
-                        border: OutlineInputBorder(),
+                      const SizedBox(height: 30),
+
+                      // --- CAMPOS COMUNES ---
+                      const Text(
+                        'Datos Comunes',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor introduce un nombre.';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextFormField(
-                      controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descripción (Opcional)',
-                        border: OutlineInputBorder(),
+                      const Divider(),
+
+                      // 🔑 NUEVO: Selector de Ubicación
+                      LocationDropdownField(
+                        availableLocations: _availableLocations,
+                        selectedLocationId: _selectedLocationId,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _selectedLocationId = newValue;
+                          });
+                        },
                       ),
-                      maxLines: 3,
-                    ),
-                    const SizedBox(height: 30),
+                      const SizedBox(height: 16),
 
-                    // --- SECCIÓN DE IMÁGENES (Widget Separado) ---
-                    ImagePreviewSection(
-                      imageUrls: _imagePreviewUrls,
-                      onAddImage: _addImage,
-                      onRemoveImage: _removeImage,
-                    ),
-                    const SizedBox(height: 30),
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Nombre del Activo',
+                          border: OutlineInputBorder(),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor introduce un nombre.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _descriptionController,
+                        decoration: const InputDecoration(
+                          labelText: 'Descripción (Opcional)',
+                          border: OutlineInputBorder(),
+                        ),
+                        maxLines: 3,
+                      ),
+                      const SizedBox(height: 30),
 
-                    // --- CAMPOS CUSTOM (Dinámicos) ---
-                    _buildCustomFields(),
-                  ],
-                ),
-              ),
-            ),
+                      // --- SECCIÓN DE IMÁGENES ---
+                      ImagePreviewSection(
+                        imageUrls: _imagePreviewUrls,
+                        onAddImage: _addImage,
+                        onRemoveImage: _removeImage,
+                      ),
+                      const SizedBox(height: 30),
 
-            // --- BOTÓN DE GUARDAR ---
-            Align(
-              alignment: Alignment.centerRight,
-              child: ElevatedButton.icon(
-                onPressed: _saveAsset,
-                icon: const Icon(Icons.save),
-                label: const Text(
-                  'Guardar Activo',
-                  style: TextStyle(fontSize: 16),
-                ),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 25,
-                    vertical: 15,
+                      // --- CAMPOS CUSTOM (Dinámicos) ---
+                      _buildCustomFields(),
+                    ],
                   ),
                 ),
               ),
-            ),
-          ],
+
+              // --- BOTÓN DE GUARDAR ---
+              Align(
+                alignment: Alignment.centerRight,
+                child: ElevatedButton.icon(
+                  onPressed: _saveAsset,
+                  icon: const Icon(Icons.save),
+                  label: const Text(
+                    'Guardar Activo',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 25,
+                      vertical: 15,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

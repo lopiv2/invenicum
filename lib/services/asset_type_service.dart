@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
 import '../models/asset_type_model.dart';
-import '../models/uploadable_file.dart';
 import 'api_service.dart'; // Importamos el servicio base
 
 class AssetTypeService {
@@ -13,7 +12,7 @@ class AssetTypeService {
   final ApiService _apiService;
 
   // Acceso a la instancia de Dio a través de ApiService
-  Dio get _dio => _apiService.dio; 
+  Dio get _dio => _apiService.dio;
 
   // Constructor que recibe ApiService (Inyección de dependencia)
   AssetTypeService(this._apiService);
@@ -32,7 +31,7 @@ class AssetTypeService {
   }) async {
     try {
       final url = '/containers/$containerId/asset-types';
-      
+
       // Crear FormData para enviar la imagen
       final formData = FormData.fromMap({
         'name': name,
@@ -45,14 +44,11 @@ class AssetTypeService {
           ),
       });
 
-      final response = await _dio.post(
-        url,
-        data: formData,
-      );
+      final response = await _dio.post(url, data: formData);
 
       if (response.statusCode == 201) {
         final Map<String, dynamic> responseData = response.data;
-        
+
         // Asumimos que la respuesta de creación es similar: objeto anidado en 'data'
         if (responseData.containsKey('data') && responseData['data'] != null) {
           return AssetType.fromJson(responseData['data']);
@@ -62,7 +58,9 @@ class AssetTypeService {
           );
         }
       } else {
-        throw Exception('Error al crear el Tipo de Activo: ${response.statusCode}');
+        throw Exception(
+          'Error al crear el Tipo de Activo: ${response.statusCode}',
+        );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
@@ -90,7 +88,7 @@ class AssetTypeService {
         throw Exception('Error al obtener AssetType: ${response.statusCode}');
       }
     } on DioException catch (e) {
-       // Manejo de errores simplificado
+      // Manejo de errores simplificado
       throw Exception('Error de conexión: ${e.message}');
     }
   }
@@ -98,22 +96,54 @@ class AssetTypeService {
   // ------------------------------------------------------------------
   // --- U (UPDATE): Actualizar un AssetType ---
   // ------------------------------------------------------------------
-  Future<AssetType> updateAssetType(AssetType assetType) async {
+  Future<AssetType> updateAssetType({
+    required int assetTypeId,
+    required String name,
+    required List<dynamic> fieldDefinitionsJson,
+    Uint8List? imageBytes,
+    String? imageName,
+    required bool removeExistingImage, // 🔑 Nuevo parámetro para la eliminación
+  }) async {
     try {
-      final response = await _dio.put(
-        '/asset-types/${assetType.id}',
-        data: assetType.toJson(), // Utiliza el toJson() del modelo AssetType
-      );
-      
+      final url = '/asset-types/$assetTypeId';
+
+      // 1. Construir el FormData
+      final formData = FormData.fromMap({
+        'name': name,
+        'fieldDefinitions': jsonEncode(fieldDefinitionsJson),
+
+        // 2. Lógica para subir una nueva imagen
+        if (imageBytes != null && imageName != null)
+          'files': MultipartFile.fromBytes(
+            imageBytes,
+            filename: imageName,
+            contentType: MediaType.parse('image/jpeg'), // Asume JPEG/PNG
+          ),
+
+        // 3. Lógica para eliminar la imagen existente (Si es true, la API debe borrarla)
+        'removeExistingImage': removeExistingImage,
+      });
+
+      // 4. Realizar la solicitud PATCH (más apropiada para actualizaciones parciales)
+      final response = await _dio.patch(url, data: formData);
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = response.data;
+        // Asume que la respuesta exitosa devuelve el objeto AssetType actualizado en 'data'
         return AssetType.fromJson(responseData['data']);
       } else {
-        throw Exception('Error al actualizar AssetType: ${response.statusCode}');
+        throw Exception(
+          'Error al actualizar AssetType: ${response.statusCode}',
+        );
       }
     } on DioException catch (e) {
-       // Manejo de errores simplificado
-      throw Exception('Error de conexión: ${e.message}');
+      if (e.response?.statusCode == 401) {
+        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+      }
+      final message = e.response?.data['message'] ?? e.message;
+      throw Exception('Error de conexión o de servidor: $message');
+    } catch (e) {
+      throw Exception('Error inesperado al actualizar Tipo de Activo: $e');
     }
   }
 
@@ -124,10 +154,10 @@ class AssetTypeService {
     try {
       // Primero, eliminar todos los elementos asociados
       await _dio.delete('/asset-types/$assetTypeId/assets');
-      
+
       // Luego, eliminar el tipo de activo
       final response = await _dio.delete('/asset-types/$assetTypeId');
-      
+
       // La eliminación exitosa puede ser 200 o 204 (No Content)
       if (response.statusCode != 204 && response.statusCode != 200) {
         throw Exception('Fallo al eliminar AssetType: ${response.statusCode}');

@@ -103,6 +103,7 @@ class InventoryItemService {
         'description': item.description,
         'containerId': item.containerId.toString(),
         'assetTypeId': item.assetTypeId.toString(),
+        'locationId': item.locationId.toString(),
         'customFieldValues': jsonEncode(item.customFieldValues),
       };
 
@@ -154,6 +155,7 @@ class InventoryItemService {
         'description': item.description,
         'containerId': item.containerId.toString(),
         'assetTypeId': item.assetTypeId.toString(),
+        'locationId': item.locationId.toString(),
 
         // Campos personalizados como JSON string
         'customFieldValues': jsonEncode(item.customFieldValues),

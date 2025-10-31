@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +7,12 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/utils/asset_form_utils.dart';
+import 'package:invenicum/widgets/location_dropdown_widget.dart';
 import 'package:provider/provider.dart';
-
-// Asegúrate de que estas importaciones son correctas y los modelos existen
 import '../models/asset_type_model.dart';
 import '../models/container_node.dart';
 import '../models/inventory_item.dart';
+import '../models/location.dart'; // 🔑 NUEVO: Importar modelo Location
 import '../providers/container_provider.dart';
 import '../providers/inventory_item_provider.dart';
 import '../services/toast_service.dart';
@@ -45,36 +44,36 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
 
+  // 🔑 ESTADO PARA UBICACIÓN
+  List<Location> _availableLocations = [];
+  int? _selectedLocationId;
+
   // 2. Mapa de controllers para campos dinámicos
   late Map<int, TextEditingController> _dynamicControllers;
 
+  // 🔑 ESTADO PARA CAMPOS DROPDOWN
   final Map<int, List<String>> _listFieldValues = {};
   final Map<int, String?> _selectedListValues = {};
+
+  // 🔑 ESTADO PARA CAMPOS BOOLEANOS (Checkbox)
+  final Map<int, bool?> _booleanValues = {};
 
   // Estado del modelo
   AssetType? _assetType;
 
   // 🚀 ESTADO PARA GESTIÓN DE IMÁGENES
-  // Lista de objetos InventoryItemImage existentes (se eliminan de aquí al marcar para borrar)
   late List<InventoryItemImage> _currentImages;
-
-  // Data URLs Base64 de las imágenes nuevas (para previsualización)
   List<String> _newImagePreviewUrls = [];
-
-  // IDs de las imágenes existentes que deben ser eliminadas en el backend
   List<int> _imageIdsToDelete = [];
 
   Future<void> _loadListValues(int dataListId, int fieldId) async {
     try {
       final containerProvider = context.read<ContainerProvider>();
-      // Asegúrate de que getDataList es un método válido en tu ContainerProvider
       final listData = await containerProvider.getDataList(dataListId);
 
-      // 🔑 Protección después de la llamada asíncrona
       if (mounted) {
         setState(() {
           _listFieldValues[fieldId] = listData.items;
-          // No inicializamos _selectedListValues aquí, se hace en _initializeDynamicFields
         });
       }
     } catch (e) {
@@ -90,9 +89,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   List<String> get _allImageUrls {
     // 1. Mapeamos las imágenes existentes, AÑADIENDO el prefijo de la API
     final existingUrls = _currentImages.map((img) {
-      // APLICAMOS LA FUNCIÓN DE URL COMPLETA
-      final String apiUrl = Environment.apiUrl; // O usa Environment.apiUrl
-      return '$apiUrl${img.url}';
+      final String apiUrl = Environment.apiUrl;
+      // Añadimos el prefijo solo si no es una URL completa
+      return img.url.startsWith('http') ? img.url : '$apiUrl${img.url}';
     }).toList();
 
     // 2. Concatenamos las URLs de red completas con las Data URLs Base64 (que ya están completas)
@@ -111,12 +110,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     );
     _dynamicControllers = {};
 
+    // 🔑 Inicializar estado de ubicación con el valor del item inicial
+    _selectedLocationId = widget.initialItem?.locationId;
+
     // 🚀 Inicializar el estado de imágenes existentes haciendo una copia
     _currentImages = List.from(widget.initialItem?.images ?? []);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // No necesario aquí si usamos didChangeDependencies
-    });
   }
 
   @override
@@ -144,9 +142,13 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       orElse: () => null,
     );
 
-    if (assetType != null) {
+    if (assetType != null && container != null) {
+      // 🔑 Check para 'container'
       setState(() {
         _assetType = assetType;
+
+        // 🔑 Cargar ubicaciones disponibles del contenedor
+        _availableLocations = container.locations;
 
         for (var fieldDef in assetType.fieldDefinitions) {
           final fieldId = fieldDef.id ?? 0;
@@ -154,16 +156,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               widget.initialItem?.customFieldValues?[fieldId.toString()];
 
           if (fieldDef.type == CustomFieldType.dropdown) {
-            // 🔑 Lógica para DROPDOWN
-            _selectedListValues[fieldId] =
-                initialValue; // Pre-seleccionar valor
+            _selectedListValues[fieldId] = initialValue;
 
-            // Iniciar carga asíncrona de los ítems de la lista
             if (fieldDef.dataListId != null) {
               _loadListValues(fieldDef.dataListId!, fieldId);
             }
+          } else if (fieldDef.type == CustomFieldType.boolean) {
+            bool? value = AssetFormUtils.toBoolean(initialValue);
+            _booleanValues[fieldId] = value;
           } else {
-            // Lógica existente para campos de texto/número
             _dynamicControllers[fieldId] = TextEditingController(
               text: initialValue?.toString() ?? '',
             );
@@ -182,10 +183,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   }
 
   // ----------------------------------------------------
-  // LÓGICA DE GESTIÓN DE IMÁGENES
+  // LÓGICA DE GESTIÓN DE IMÁGENES (No se requiere cambiar)
   // ----------------------------------------------------
 
-  /// Muestra el selector de archivos y obtiene la URL Base64 para previsualización.
   Future<void> _addNewImages() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -222,19 +222,14 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     }
   }
 
-  /// Marca una imagen existente para ser eliminada (solo remueve del UI y añade al listado de IDs).
   void _deleteExistingImage(InventoryItemImage image) {
     setState(() {
-      // 1. Quitar de la lista de imágenes actuales (desaparece de la UI)
       _currentImages.removeWhere((img) => img.id == image.id);
-
-      // 2. Añadir a la lista de IDs a eliminar en el backend
       _imageIdsToDelete.add(image.id);
     });
     ToastService.info('Imagen existente marcada para eliminación al guardar.');
   }
 
-  /// Elimina una Data URL de previsualización (un archivo nuevo)
   void _removeNewImage(String url) {
     setState(() {
       _newImagePreviewUrls.remove(url);
@@ -242,18 +237,13 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     ToastService.info('Archivo nuevo removido de la lista de subida.');
   }
 
-  /// 🚀 FUNCIÓN UNIFICADA DE ELIMINACIÓN
   void _handleRemoveImage(String url) {
-    // 1. Es una imagen nueva (Data URL Base64)
     if (url.startsWith('data:')) {
       _removeNewImage(url);
-    }
-    // 2. Es una imagen existente (URL de red)
-    else {
+    } else {
       final String apiUrl = Environment.apiUrl;
       final String relativeUrl = url.replaceAll(apiUrl, '');
 
-      // Buscamos la InventoryItemImage correspondiente usando la URL relativa
       final existingImage = _currentImages.firstWhere(
         (img) => img.url == relativeUrl,
         orElse: () => InventoryItemImage(id: -1, url: '', order: 0),
@@ -269,7 +259,6 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     }
   }
 
-  /// Convierte una Data URL (Base64) a Uint8List y extrae el nombre/tipo de archivo.
   Map<String, dynamic> _dataUrlToFileData(String dataUrl, int index) {
     final mimeTypeMatch = RegExp(r'data:([^;]+);base64,').firstMatch(dataUrl);
     final mimeType = mimeTypeMatch?.group(1);
@@ -288,7 +277,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     // 0. Validaciones iniciales
     if (!AssetFormUtils.validateForm(_formKey) ||
         widget.initialItem == null ||
-        _assetType == null) {
+        _assetType == null ||
+        _selectedLocationId ==
+            null // 🔑 NUEVO: Validar ubicación
+            ) {
+      if (_selectedLocationId == null) {
+        if (mounted) {
+          ToastService.error('Debe seleccionar una ubicación para el activo.');
+        }
+      }
       return;
     }
 
@@ -304,37 +301,50 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       return;
     }
 
-    // 1. Recoger los valores custom ACTUALIZADOS
+    // 1. Recoger los valores custom ACTUALIZADOS (Lógica sin cambios)
     final Map<String, dynamic> updatedCustomValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       final fieldId = fieldDef.id!;
 
       if (fieldDef.type == CustomFieldType.dropdown) {
-        // 🔑 RECOGEMOS EL VALOR DEL DROPDOWN
         final selectedValue = _selectedListValues[fieldId];
         if (selectedValue != null) {
           updatedCustomValues[fieldId.toString()] = selectedValue;
         } else if (fieldDef.isRequired) {
-          // Validación de emergencia si el validador del formulario falla
           if (mounted) {
             ToastService.error('El campo "${fieldDef.name}" es obligatorio.');
           }
           return;
         }
+      } else if (fieldDef.type == CustomFieldType.boolean) {
+        final boolValue = _booleanValues[fieldId];
+
+        if (fieldDef.isRequired && boolValue == null) {
+          if (mounted) {
+            ToastService.error('El campo "${fieldDef.name}" es obligatorio.');
+          }
+          return;
+        }
+
+        if (boolValue != null) {
+          updatedCustomValues[fieldId.toString()] = boolValue;
+        }
       } else {
-        // RECOGEMOS EL VALOR DEL CONTROLADOR DE TEXTO/NÚMERO
         final controller = _dynamicControllers[fieldId];
         if (controller != null && controller.text.isNotEmpty) {
           updatedCustomValues[fieldId.toString()] = controller.text;
+        } else if (fieldDef.isRequired) {
+          if (mounted) {
+            ToastService.error('El campo "${fieldDef.name}" es obligatorio.');
+          }
+          return;
         }
-        // Nota: Los campos vacíos no obligatorios se omiten.
       }
     }
 
     // 2. Preparar los datos de los archivos NUEVOS
     final List<Map<String, dynamic>> filesData = [];
     for (int i = 0; i < _newImagePreviewUrls.length; i++) {
-      // Asumo que _dataUrlToFileData devuelve {'bytes': Uint8List, 'name': String}
       filesData.add(_dataUrlToFileData(_newImagePreviewUrls[i], i));
     }
 
@@ -343,10 +353,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       id: assetItemIdInt,
       containerId: cIdInt,
       assetTypeId: atIdInt,
+      // 🔑 MODIFICADO: Añadir la ubicación seleccionada
+      locationId: _selectedLocationId!,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: updatedCustomValues,
-      // La lista de imágenes aquí solo incluye las que el usuario NO eliminó.
       images: _currentImages,
     );
 
@@ -354,8 +365,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     try {
       await itemProvider.updateAssetWithFiles(
         updatedItem,
-        filesToUpload: filesData, // Archivos nuevos a subir
-        imageIdsToDelete: _imageIdsToDelete, // IDs de imágenes a eliminar
+        filesToUpload: filesData,
+        imageIdsToDelete: _imageIdsToDelete,
       );
 
       // 5. Navegar de vuelta (al listado)
@@ -364,13 +375,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           'Activo "${updatedItem.name}" actualizado correctamente.',
         );
 
-        // 🔑 SOLUCIÓN DE RECARGA: Usar context.go para forzar la reconstrucción del AssetListScreen
         context.go(
           '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
         );
       }
     } catch (e) {
-      // 6. Manejo de errores (protegido con mounted)
+      // 6. Manejo de errores
       if (mounted) {
         ToastService.error('Error al actualizar activo: ${e.toString()}');
       }
@@ -378,10 +388,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   }
 
   // ----------------------------------------------------
-  // WIDGETS AUXILIARES PARA LA UI (Manteniendo los Custom Fields)
+  // WIDGETS AUXILIARES PARA LA UI (Sin cambios en custom fields)
   // ----------------------------------------------------
 
   Widget _buildCustomFields() {
+    if (_assetType == null) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -393,15 +405,14 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         if (_assetType!.fieldDefinitions.isEmpty)
           const Text('Este tipo de activo no tiene campos personalizados.'),
 
-        // ... (Tu código de TextFormField para campos dinámicos)
         ..._assetType!.fieldDefinitions.map((fieldDef) {
+          final fieldId = fieldDef.id!;
+
+          // 🔑 1. Campo DROPDOWN
           if (fieldDef.type == CustomFieldType.dropdown) {
-            // 🔑 LÓGICA DE DROPDOWN (Copiada y adaptada)
-            final fieldId = fieldDef.id!;
             final values = _listFieldValues[fieldId];
             final selectedValue = _selectedListValues[fieldId];
 
-            // Mostrar indicador de carga si los valores aún no están disponibles
             if (values == null) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
@@ -444,6 +455,49 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               ),
             );
           }
+
+          // 🔑 2. Campo BOOLEANO
+          if (fieldDef.type == CustomFieldType.boolean) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: FormField<bool>(
+                initialValue: _booleanValues[fieldId],
+                validator: (value) {
+                  if (fieldDef.isRequired && value == null) {
+                    return 'Este campo es obligatorio.';
+                  }
+                  return null;
+                },
+                builder: (FormFieldState<bool> state) {
+                  return InputDecorator(
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      helperText: fieldDef.isRequired
+                          ? 'Obligatorio'
+                          : 'Opcional',
+                      errorText: state.errorText,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    child: CheckboxListTile(
+                      title: Text(fieldDef.name),
+                      value: state.value ?? false,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _booleanValues[fieldId] = newValue;
+                          state.didChange(newValue);
+                        });
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      contentPadding: EdgeInsets.zero,
+                      dense: true,
+                    ),
+                  );
+                },
+              ),
+            );
+          }
+
+          // 3. Otros campos (Texto, Número, URL, etc.)
           final controller = _dynamicControllers[fieldDef.id];
           if (controller == null) return const SizedBox.shrink();
 
@@ -477,6 +531,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // ----------------------------------------------------
   @override
   Widget build(BuildContext context) {
+    // Si _assetType no está cargado o initialItem es null, muestra un indicador de carga.
+    // Usamos context.watch para asegurarnos de que el widget se reconstruya si el proveedor cambia.
+    context.watch<ContainerProvider>();
     if (widget.initialItem == null || _assetType == null) {
       return Scaffold(
         appBar: AppBar(title: const Text('Editar Activo')),
@@ -501,6 +558,19 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
+              ),
+              const SizedBox(height: 30),
+
+              // 🔑 NUEVO: Selector de Ubicación
+              LocationDropdownField(
+                availableLocations: _availableLocations,
+                selectedLocationId: _selectedLocationId,
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedLocationId = newValue;
+                  });
+                },
+                // El validador por defecto ya se encarga de que no sea nulo si es obligatorio (y lo es)
               ),
               const SizedBox(height: 30),
 

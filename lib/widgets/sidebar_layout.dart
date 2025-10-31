@@ -89,7 +89,6 @@ class _SidebarLayoutState extends State<SidebarLayout> {
                 : ContainerTreeView(
                     onDeleteContainer: _handleDeleteContainer,
                     onRenameContainer: _handleRenameContainer,
-                    containers: containers, // La lista viene del Provider
                     onContainerTap: (container, String? subSection) {
                       if (subSection != null) {
                         print(

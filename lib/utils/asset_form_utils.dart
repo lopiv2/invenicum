@@ -90,6 +90,29 @@ class AssetFormUtils {
     }
   }
 
+  // 🔑 NUEVO MÉTODO PARA CONVERTIR A BOOLEANO
+  /// Convierte varios tipos de valores persistidos (String, bool, null) a bool?.
+  /// Es crucial para inicializar los Checkbox en el formulario.
+  static bool? toBoolean(dynamic value) {
+    if (value == null) {
+      return null;
+    }
+    if (value is bool) {
+      return value;
+    }
+    if (value is String) {
+      final lowerCaseValue = value.toLowerCase();
+      if (lowerCaseValue == 'true' || lowerCaseValue == '1') {
+        return true;
+      }
+      if (lowerCaseValue == 'false' || lowerCaseValue == '0') {
+        return false;
+      }
+    }
+    // Si no se puede determinar, devolvemos null
+    return null;
+  }
+
   /// Convierte una Data URL (Base64) a datos de archivo
   static Map<String, dynamic> dataUrlToFileData(String dataUrl, int index) {
     // 1. Extraer el tipo MIME (ej: image/png)
