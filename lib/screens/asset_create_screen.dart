@@ -231,7 +231,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       id: 0,
       containerId: _containerId!,
       assetTypeId: _assetTypeId!,
-      locationId: _selectedLocationId!, // 🔑 AÑADIDO: locationId
+      locationId: _selectedLocationId, // 🔑 Ahora puede ser null si no hay ubicaciones
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: customFieldValues,
@@ -251,6 +251,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       }
     } catch (e) {
       if (mounted) {
+        print('Error al crear activo: $e');
         ToastService.error('Error al crear activo: ${e.toString()}');
       }
     }
@@ -385,14 +386,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // --- TÍTULO ---
-                      Text(
-                        'Crear Activo: ${_assetType!.name}',
-                        style: Theme.of(context).textTheme.headlineMedium
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 30),
-
                       // --- CAMPOS COMUNES ---
                       const Text(
                         'Datos Comunes',

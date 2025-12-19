@@ -129,52 +129,82 @@ class _SidebarLayoutState extends State<SidebarLayout> {
 
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
+    bool isCollection = false; // Estado local para el checkbox
 
-    final result = await showDialog<Map<String, String?>>(
+    final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Nuevo contenedor'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(
-                labelText: 'Nombre del contenedor',
-                hintText: 'Ingrese el nombre del contenedor',
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Nuevo contenedor'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Nombre del contenedor',
+                  hintText: 'Ingrese el nombre del contenedor',
+                ),
+                autofocus: true,
               ),
-              autofocus: true,
+              const SizedBox(height: 16),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Descripción (opcional)',
+                  hintText: 'Ingrese una descripción',
+                ),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: CheckboxListTile(
+                      title: const Text('¿Es una colección?'),
+                      value: isCollection,
+                      onChanged: (value) {
+                        setState(() {
+                          isCollection = value ?? false;
+                        });
+                      },
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  Tooltip(
+                    message:
+                        'Los contenedores de colección tienen barras de seguimiento de colecciones, valor invertido, valor de mercado y vista de Exposición',
+                    child: Icon(
+                      Icons.help_outline,
+                      size: 18,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
             ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Descripción (opcional)',
-                hintText: 'Ingrese una descripción',
-              ),
-              maxLines: 2,
+            ElevatedButton(
+              onPressed: () {
+                if (nameController.text.isNotEmpty) {
+                  Navigator.pop(context, {
+                    'name': nameController.text,
+                    'description': descriptionController.text.isEmpty
+                        ? null
+                        : descriptionController.text,
+                    'isCollection': isCollection,
+                  });
+                }
+              },
+              child: const Text('Crear'),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (nameController.text.isNotEmpty) {
-                Navigator.pop(context, {
-                  'name': nameController.text,
-                  'description': descriptionController.text.isEmpty
-                      ? null
-                      : descriptionController.text,
-                });
-              }
-            },
-            child: const Text('Crear'),
-          ),
-        ],
       ),
     );
 
@@ -184,6 +214,7 @@ class _SidebarLayoutState extends State<SidebarLayout> {
         await containerProvider.createNewContainer(
           result['name']!,
           result['description'],
+          isCollection: result['isCollection'] ?? false,
         );
 
         // ¡El setState() ya no es necesario! La llamada al Provider lo maneja.

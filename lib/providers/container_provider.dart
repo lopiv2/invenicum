@@ -68,12 +68,14 @@ class ContainerProvider with ChangeNotifier {
   // --- Lógica de Crear Contenedor (Mantenido igual) ---
   Future<ContainerNode?> createNewContainer(
     String name,
-    String? description,
-  ) async {
+    String? description, {
+    bool isCollection = false,
+  }) async {
     try {
       final newContainer = await _containerService.createContainer(
         name,
         description,
+        isCollection: isCollection,
       );
       await loadContainers();
 
@@ -158,6 +160,94 @@ class ContainerProvider with ChangeNotifier {
       }
     } catch (e) {
       print('Error al eliminar el tipo de activo $assetTypeId: $e');
+      rethrow;
+    }
+  }
+
+  /// Actualiza los campos de colección (posesión y deseados) para un tipo de activo
+  Future<void> updateAssetTypeCollectionFields({
+    required int containerId,
+    required int assetTypeId,
+    String? possessionFieldId,
+    String? desiredFieldId,
+  }) async {
+    // Función auxiliar para encontrar y actualizar un AssetType dentro del estado local
+    void _updateLocalAssetType({required AssetType newAssetType}) {
+      final containerIndex = _containers.indexWhere((c) => c.id == containerId);
+
+      if (containerIndex != -1) {
+        final container = _containers[containerIndex];
+        final assetTypeIndex = container.assetTypes.indexWhere(
+          (at) => at.id == assetTypeId,
+        );
+
+        if (assetTypeIndex != -1) {
+          // 1. Crear la nueva lista de AssetTypes
+          final updatedAssetTypes = List<AssetType>.from(container.assetTypes);
+          updatedAssetTypes[assetTypeIndex] =
+              newAssetType; // 🔑 Usar el AssetType nuevo (sea optimista o confirmado por API)
+
+          // 2. Crear la nueva instancia de ContainerNode (Inmutabilidad)
+          final updatedContainer = container.copyWith(
+            assetTypes: updatedAssetTypes,
+          );
+
+          // 3. Crear la nueva lista principal de contenedores y reemplazar
+          final newContainersList = List<ContainerNode>.from(_containers);
+          newContainersList[containerIndex] = updatedContainer;
+          _containers = newContainersList;
+
+          // 4. Notificar a los listeners
+          notifyListeners();
+        }
+      }
+    }
+
+    // --- INICIO DE LA LÓGICA PRINCIPAL ---
+    try {
+      // 1. PASO OPTIMISTA: Actualizar el estado local inmediatamente
+      print(
+        '🔄 Actualizando estado local sin esperar al servidor (Optimista)...',
+      );
+
+      final container = _containers.firstWhere((c) => c.id == containerId);
+      final oldAssetType = container.assetTypes.firstWhere(
+        (at) => at.id == assetTypeId,
+      );
+
+      // 🔑 Usamos copyWith para crear la nueva instancia (¡Adiós a la construcción manual!)
+      final updatedAssetTypeOptimistic = oldAssetType.copyWith(
+        possessionFieldId: possessionFieldId,
+        desiredFieldId: desiredFieldId,
+      );
+
+      _updateLocalAssetType(newAssetType: updatedAssetTypeOptimistic);
+
+      print('✅ Estado local optimista actualizado.');
+
+      // 2. LLAMADA AL SERVIDOR: Intentar persistir en el servidor
+      print('📡 Intentando persistir en el servidor...');
+      final updatedAssetTypeFromApi = await _assetTypeService
+          .updateAssetTypeCollectionFields(
+            assetTypeId: assetTypeId,
+            possessionFieldId: possessionFieldId,
+            desiredFieldId: desiredFieldId,
+          );
+
+      // 3. PASO DE CONFIRMACIÓN: Actualizar con la respuesta del servidor (si es diferente o por seguridad)
+      print('🔄 Actualizando con respuesta del servidor (Confirmación)...');
+      _updateLocalAssetType(newAssetType: updatedAssetTypeFromApi);
+
+      print('✅ Actualización de campos de colección finalizada con éxito.');
+    } catch (e) {
+      print('🚨 Error al actualizar campos de colección: $e');
+
+      // ⚠️ OPCIONAL pero RECOMENDADO: Si falla el servidor, deberías revertir
+      // el estado optimista a los valores ANTERIORES.
+      // Para simplificar, asumiremos que el error será manejado por el ToastService en el widget.
+
+      // Relanzar la excepción para que el widget pueda capturarla
+      // y mostrar un mensaje de error (ej: con ToastService.error).
       rethrow;
     }
   }

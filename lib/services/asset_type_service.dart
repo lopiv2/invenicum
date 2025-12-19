@@ -148,6 +148,51 @@ class AssetTypeService {
   }
 
   // ------------------------------------------------------------------
+  // --- U (UPDATE): Actualizar campos de colección de un AssetType ---
+  // ------------------------------------------------------------------
+  Future<AssetType> updateAssetTypeCollectionFields({
+    required int assetTypeId,
+    String? possessionFieldId,
+    String? desiredFieldId,
+  }) async {
+    try {
+      // Preparar los datos - enviar null como null, no como strings vacíos
+      final Map<String, dynamic> data = {
+        'possessionFieldId': possessionFieldId,
+        'desiredFieldId': desiredFieldId,
+      };
+
+      final response = await _dio.patch(
+        '/asset-types/$assetTypeId/collection-fields',
+        data: data,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = response.data;
+        if (responseData.containsKey('data') && responseData['data'] != null) {
+          return AssetType.fromJson(responseData['data']);
+        } else {
+          throw Exception(
+            'Respuesta de API exitosa, pero el objeto AssetType ("data") está ausente o es nulo.',
+          );
+        }
+      } else {
+        throw Exception(
+          'Error al actualizar campos de colección: ${response.statusCode}',
+        );
+      }
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401) {
+        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+      }
+      final message = e.response?.data['message'] ?? e.message;
+      throw Exception('Error de conexión o de servidor: $message');
+    } catch (e) {
+      throw Exception('Error inesperado: $e');
+    }
+  }
+
+  // ------------------------------------------------------------------
   // --- D (DELETE): Eliminar un AssetType y sus elementos asociados ---
   // ------------------------------------------------------------------
   Future<void> deleteAssetType(int assetTypeId) async {

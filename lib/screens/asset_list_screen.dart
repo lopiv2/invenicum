@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/screens/asset_search_bar.dart';
 import 'package:invenicum/widgets/assets_counters_row.dart';
+import 'package:invenicum/widgets/possession_progress_bar.dart';
 import 'package:provider/provider.dart';
 
 import '../models/container_node.dart';
@@ -43,14 +44,12 @@ class _AssetListScreenState extends State<AssetListScreen> {
   // 🔑 NUEVO ESTADO: Filtro por Ubicación
   int? _selectedLocationId;
 
-
   @override
   void initState() {
     super.initState();
     _itemProvider = context.read<InventoryItemProvider>();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
       _itemProvider.loadInventoryItems(
         containerId: int.tryParse(widget.containerId) ?? 0,
         assetTypeId: int.tryParse(widget.assetTypeId) ?? 0,
@@ -140,9 +139,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     final filterValue = _selectedCountValue!.toLowerCase().trim();
 
     return filteredByLocation.where((item) {
-      final customValues =
-          (item as InventoryItem).customFieldValues ??
-          {};
+      final customValues = (item as InventoryItem).customFieldValues ?? {};
       final itemValueRaw = customValues[fieldId];
 
       if (itemValueRaw == null) {
@@ -294,6 +291,9 @@ class _AssetListScreenState extends State<AssetListScreen> {
     // 3. Obtener el Conteo Local
     final totalCountLocal = viewItems.length;
 
+    // Convertir viewItems a List<InventoryItem> para pasar a widgets
+    final viewItemsList = viewItems.cast<InventoryItem>();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Activos en "${assetType.name}"'),
@@ -319,17 +319,28 @@ class _AssetListScreenState extends State<AssetListScreen> {
             ),
             const SizedBox(height: 20),
 
-  
-
             // --- CONTADORES DINÁMICOS Y SUMATORIOS ---
             AssetCountersRow(
               assetType: assetType,
               totalCountLocal: totalCountLocal,
               selectedCountFieldId: _selectedCountFieldId,
+              inventoryItems: viewItemsList,
               // Si la Suma local se implementa, iría aquí: localAggregations: localAggregations,
             ),
+            const SizedBox(height: 10),
+            if (assetType.possessionFieldId != null &&
+                assetType.possessionFieldId!.isNotEmpty)
+              Column(
+                children: [
+                  const SizedBox(height: 15),
+                  PossessionProgressBar(
+                    assetType: assetType,
+                    // Usamos la lista de ítems filtrada localmente
+                    inventoryItems: viewItemsList,
+                  ),
+                ],
+              ),
             const SizedBox(height: 20),
-
             // --- BARRA DE BÚSQUEDA Y CONTROL DE VISTA ---
             AssetSearchBar(
               searchController: _searchController,
@@ -359,12 +370,12 @@ class _AssetListScreenState extends State<AssetListScreen> {
                           assetType: assetType,
                           containerId: cIdInt,
                           assetTypeId: atIdInt,
-                          inventoryItems: viewItems as List<InventoryItem>,
+                          inventoryItems: viewItemsList,
                           availableLocations: availableLocations,
                         )
                       : AssetGridView(
                           assetType: assetType,
-                          items: viewItems as List<InventoryItem>,
+                          items: viewItemsList,
                           containerId: cIdInt,
                           assetTypeId: atIdInt,
                           //availableLocations: availableLocations,

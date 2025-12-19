@@ -22,38 +22,27 @@ class InventoryItemService {
   Future<InventoryResponse> fetchInventoryItems({
     required int containerId,
     required int assetTypeId,
-    // 🎯 NUEVO: Aceptar filtros de agregación para el contador dinámico
     Map<String, String>? aggregationFilters,
   }) async {
     try {
-      // 1. Construir el Path base de la URL
       String path = '/containers/$containerId/asset-types/$assetTypeId/items';
 
-      // 2. Construir los parámetros de query (query string)
       final Map<String, dynamic> queryParameters = {};
 
-      // 3. Añadir los filtros de agregación si existen
       if (aggregationFilters != null && aggregationFilters.isNotEmpty) {
-        // 🔑 Serializar el mapa de filtros de agregación en un formato legible por el backend
-        // Ejemplo: { '10': 'Dañado' } -> '10:Dañado'
         final aggString = aggregationFilters.entries
             .map((e) => '${e.key}:${e.value}')
             .join(',');
-
-        // Enviamos todos los filtros de agregación bajo una sola clave 'aggFilters'
         queryParameters['aggFilters'] = aggString;
       }
 
       final response = await _dio.get(
-        path, // Usamos la URL base
-        queryParameters: queryParameters.isNotEmpty
-            ? queryParameters
-            : null, // Enviamos los parámetros
+        path,
+        queryParameters: queryParameters.isNotEmpty ? queryParameters : null,
       );
 
-      // 🎯 CORRECCIÓN CLAVE: Verificar si la respuesta es nula o vacía.
+      // 🔑 Verificar y extraer correctamente
       if (response.data == null) {
-        // Si la respuesta es nula, devolvemos una InventoryResponse vacía.
         return InventoryResponse(
           items: [],
           aggregationDefinitions: [],
@@ -61,8 +50,19 @@ class InventoryItemService {
         );
       }
 
-      // Ahora es seguro hacer el cast, ya que hemos verificado que no es null.
-      return InventoryResponse.fromJson(response.data as Map<String, dynamic>);
+      final responseData = response.data as Map<String, dynamic>;
+      final dataField = responseData['data'] as Map<String, dynamic>?;
+
+      if (dataField == null) {
+        return InventoryResponse(
+          items: [],
+          aggregationDefinitions: [],
+          aggregationResults: {},
+        );
+      }
+
+      // Ahora pasamos el contenido correcto a fromJson
+      return InventoryResponse.fromJson(dataField);
     } on DioException {
       rethrow;
     } catch (e) {
@@ -97,20 +97,22 @@ class InventoryItemService {
     FileData filesData = const [],
   }) async {
     try {
-      // 1. Convertir los datos del activo a Map y codificar el JSON
-      final itemMap = {
-        'name': item.name,
-        'description': item.description,
-        'containerId': item.containerId.toString(),
-        'assetTypeId': item.assetTypeId.toString(),
-        'locationId': item.locationId.toString(),
-        'customFieldValues': jsonEncode(item.customFieldValues),
-      };
+      // 1. Construir FormData manualmente para manejar null correctamente
+      final formData = FormData();
+      
+      formData.fields.add(MapEntry('name', item.name));
+      formData.fields.add(MapEntry('description', item.description ?? ''));
+      formData.fields.add(MapEntry('containerId', item.containerId.toString()));
+      formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
+      
+      // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
+      if (item.locationId != null) {
+        formData.fields.add(MapEntry('locationId', item.locationId.toString()));
+      }
+      
+      formData.fields.add(MapEntry('customFieldValues', jsonEncode(item.customFieldValues)));
 
-      // 2. Construir FormData
-      final formData = FormData.fromMap(itemMap);
-
-      // 3. Añadir los archivos a FormData
+      // 2. Añadir los archivos a FormData
       for (var file in filesData) {
         final bytes = file['bytes'] as Uint8List;
         final name = file['name'] as String;
@@ -121,12 +123,23 @@ class InventoryItemService {
         formData.files.add(MapEntry('images', multipartFile));
       }
 
-      // 4. Enviar la petición POST con FormData
+      // 3. Enviar la petición POST con FormData
       final response = await _dio.post('/items', data: formData);
 
       if (response.statusCode == 201) {
-        // Asumimos que el backend devuelve { "data": InventoryItemJson }
-        return InventoryItem.fromJson(response.data['data']);
+        // El backend devuelve una estructura anidada: { data: { data: InventoryItemJson } }
+        final responseData = response.data;
+        
+        // Manejar la posible anidación
+        dynamic itemData = responseData;
+        if (itemData is Map && itemData.containsKey('data')) {
+          itemData = itemData['data'];
+        }
+        if (itemData is Map && itemData.containsKey('data')) {
+          itemData = itemData['data'];
+        }
+        
+        return InventoryItem.fromJson(itemData as Map<String, dynamic>);
       } else {
         throw Exception(
           'Error al crear activo: Código ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
@@ -148,26 +161,23 @@ class InventoryItemService {
     List<int> imageIdsToDelete = const [], // IDs de imágenes a eliminar
   }) async {
     try {
-      // 1. Convertir los datos del activo a Map y codificar el JSON
-      final itemMap = {
-        // Campos fijos
-        'name': item.name,
-        'description': item.description,
-        'containerId': item.containerId.toString(),
-        'assetTypeId': item.assetTypeId.toString(),
-        'locationId': item.locationId.toString(),
+      // 1. Construir FormData manualmente para manejar null correctamente
+      final formData = FormData();
+      
+      formData.fields.add(MapEntry('name', item.name));
+      formData.fields.add(MapEntry('description', item.description ?? ''));
+      formData.fields.add(MapEntry('containerId', item.containerId.toString()));
+      formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
+      
+      // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
+      if (item.locationId != null) {
+        formData.fields.add(MapEntry('locationId', item.locationId.toString()));
+      }
+      
+      formData.fields.add(MapEntry('customFieldValues', jsonEncode(item.customFieldValues)));
+      formData.fields.add(MapEntry('imageIdsToDelete', jsonEncode(imageIdsToDelete)));
 
-        // Campos personalizados como JSON string
-        'customFieldValues': jsonEncode(item.customFieldValues),
-
-        // IDs de imágenes a eliminar (Array de IDs como JSON string)
-        'imageIdsToDelete': jsonEncode(imageIdsToDelete),
-      };
-
-      // 2. Construir FormData
-      final formData = FormData.fromMap(itemMap);
-
-      // 3. Añadir los archivos NUEVOS a FormData
+      // 2. Añadir los archivos NUEVOS a FormData
       for (var file in filesToUpload) {
         final bytes = file['bytes'] as Uint8List;
         final name = file['name'] as String;
@@ -177,12 +187,21 @@ class InventoryItemService {
         formData.files.add(MapEntry('images', multipartFile));
       }
 
-      // 4. Enviar la petición PATCH con FormData
+      // 3. Enviar la petición PATCH con FormData
       // El backend debe devolver el InventoryItem actualizado directamente.
       final response = await _dio.patch('/items/${item.id}', data: formData);
 
       if (response.statusCode == 200) {
-        return InventoryItem.fromJson(response.data);
+        // Manejar la posible estructura anidada
+        dynamic itemData = response.data;
+        if (itemData is Map && itemData.containsKey('data')) {
+          itemData = itemData['data'];
+        }
+        if (itemData is Map && itemData.containsKey('data')) {
+          itemData = itemData['data'];
+        }
+        
+        return InventoryItem.fromJson(itemData as Map<String, dynamic>);
       } else {
         throw Exception(
           'Error al actualizar activo: Código ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',

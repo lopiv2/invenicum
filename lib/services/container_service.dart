@@ -19,12 +19,17 @@ class ContainerService {
 
   Future<ContainerNode> createContainer(
     String name,
-    String? description,
-  ) async {
+    String? description, {
+    bool isCollection = false,
+  }) async {
     try {
       final response = await _dio.post(
         '/containers',
-        data: {'name': name, 'description': description},
+        data: {
+          'name': name,
+          'description': description,
+          'isCollection': isCollection,
+        },
       );
 
       if (response.statusCode == 201) {

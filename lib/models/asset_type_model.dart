@@ -1,28 +1,30 @@
-// lib/models/asset_type.dart (CORREGIDO)
+// lib/models/asset_type.dart
 
 import 'package:invenicum/models/custom_field_definition_model.dart';
-// 💡 Necesitas importar el modelo de imagen, en este caso InventoryItemImage
 import 'package:invenicum/models/inventory_item.dart'; 
 
 class AssetType {
   final int id;
-  final String name; // Ej: "Ordenador", "Reactivo Químico"
+  final String name; 
   final List<CustomFieldDefinition> fieldDefinitions;
-  // 🔑 CAMBIO: Reemplazamos String? imageUrl por List<InventoryItemImage> images
-  final List<InventoryItemImage> images; 
+  final List<InventoryItemImage> images;
+  final String? possessionFieldId;
+  final String? desiredFieldId;
 
   AssetType({
     required this.id,
     required this.name,
     this.fieldDefinitions = const [],
-    this.images = const [], // 🔑 Inicialización de la nueva propiedad
+    this.images = const [], 
+    this.possessionFieldId,
+    this.desiredFieldId,
   });
 
+  // --- CONSTRUCTOR DE FÁBRICA Y JSON ---
+
   factory AssetType.fromJson(Map<String, dynamic> json) {
-    // 1. Procesar la lista de imágenes desde el JSON
     final List<dynamic> imageListJson = json['images'] as List<dynamic>? ?? [];
-    
-    // 2. Mapear la lista de JSON a objetos InventoryItemImage
+
     final List<InventoryItemImage> images = imageListJson
         .map(
           (imgJson) =>
@@ -30,26 +32,62 @@ class AssetType {
         )
         .toList();
 
+    // 🔑 Obtener el valor dinámico del JSON (puede ser int, String o null)
+    final possessionIdDynamic = json['possessionFieldId'] ?? json['possession_field_id'];
+    final desiredIdDynamic = json['desiredFieldId'] ?? json['desired_field_id'];
+
     return AssetType(
       id: json['id'] as int,
       name: json['name'] as String,
-      // 🔑 Mapeamos la lista de imágenes
-      images: images, 
+      images: images,
       fieldDefinitions: (json['fieldDefinitions'] as List<dynamic>?)
           ?.map((item) => CustomFieldDefinition.fromJson(item as Map<String, dynamic>))
           .toList() ?? [],
+      
+      // 🎯 CORRECCIÓN: Conversión segura: si no es nulo, lo convierte a String. 
+      // Si es un int (como el 5 que causó el error), .toString() lo maneja.
+      possessionFieldId: possessionIdDynamic != null ? possessionIdDynamic.toString() : null,
+      desiredFieldId: desiredIdDynamic != null ? desiredIdDynamic.toString() : null,
     );
   }
 
-  // MÉTODO NECESARIO PARA ContainerNode.toJson()
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'name': name,
-      // 🔑 Serializamos la lista de imágenes
       'images': images.map((e) => e.toJson()).toList(), 
-      // Llama a toJson() en cada definición de campo
       'fieldDefinitions': fieldDefinitions.map((e) => e.toJson()).toList(),
+      'possessionFieldId': possessionFieldId,
+      'desiredFieldId': desiredFieldId,
     };
+  }
+
+  // 🌟 MÉTODO copyWith AÑADIDO 🌟
+  /// Crea una copia de esta instancia con los valores proporcionados.
+  /// Los valores nulos en los argumentos (possessionFieldId, desiredFieldId) 
+  /// SOBREESCRIBEN el valor actual, ya que son campos opcionales.
+  AssetType copyWith({
+    int? id,
+    String? name,
+    List<CustomFieldDefinition>? fieldDefinitions,
+    List<InventoryItemImage>? images,
+    // 🔑 Utilizamos String? como tipo de argumento para permitir borrar el campo (asignar null)
+    String? possessionFieldId, 
+    String? desiredFieldId,   
+  }) {
+    return AssetType(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      fieldDefinitions: fieldDefinitions ?? this.fieldDefinitions,
+      images: images ?? this.images,
+      
+      // 💡 IMPORTANTE: Si el argumento es null, asignamos el null. 
+      // Si no fue proporcionado (el argumento es null, pero queremos el valor anterior),
+      // necesitamos una lógica especial, pero aquí asumimos que si se proporciona, es el nuevo valor.
+      // Ya que los campos son String?, pasaremos el argumento directamente para poder "limpiar" el campo.
+      // Si el argumento es omitido, Dart lo pasa como 'null'.
+      possessionFieldId: possessionFieldId ?? this.possessionFieldId,
+      desiredFieldId: desiredFieldId ?? this.desiredFieldId,
+    );
   }
 }

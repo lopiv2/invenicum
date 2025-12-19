@@ -53,7 +53,7 @@ class InventoryItem {
   final String? description;
   final int containerId;
   final int assetTypeId;
-  final int locationId; // 🔑 AÑADIDO: ID de la ubicación
+  final int? locationId; // 🔑 AÑADIDO: ID de la ubicación (nullable)
 
   final List<InventoryItemImage> images;
 
@@ -68,7 +68,7 @@ class InventoryItem {
     this.description,
     required this.containerId,
     required this.assetTypeId,
-    required this.locationId, // 🔑 AÑADIDO AL CONSTRUCTOR
+    this.locationId, // 🔑 AÑADIDO AL CONSTRUCTOR (ahora nullable)
     this.createdAt,
     this.updatedAt,
     this.customFieldValues,
@@ -116,7 +116,7 @@ class InventoryItem {
       description: itemData['description'] as String?,
       containerId: itemData['containerId'] as int,
       assetTypeId: itemData['assetTypeId'] as int,
-      locationId: itemData['locationId'] as int? ?? 0, // 🔑 AÑADIDO: Lo obtenemos del JSON
+      locationId: itemData['locationId'] as int?, // 🔑 AÑADIDO: Ahora permite null
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
       customFieldValues: customFieldValues,

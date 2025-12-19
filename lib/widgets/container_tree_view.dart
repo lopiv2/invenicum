@@ -118,7 +118,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       child: Row(
         children: [
           Icon(
-            _getIconForNode(node),
+            _getIconForNode(node, container),
             size: isContainer ? 20 : 16,
             color: isContainer
                 ? Theme.of(context).primaryColor
@@ -211,22 +211,40 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
               ),
             );
 
+            String? targetPath;
+
             // Lógica de Navegación del Negocio (GoRouter)
             if (isSection) {
-              switch (keyParts.last) {
+              final sectionKey = keyParts.last;
+
+              switch (sectionKey) {
                 case 'assettypes':
-                  context.go('/container/$containerIdStr/asset-types');
-                  return;
+                  targetPath = '/container/$containerIdStr/asset-types';
+                  break;
                 case 'datalists':
-                  context.go('/container/$containerIdStr/datalists');
-                  return;
+                  targetPath = '/container/$containerIdStr/datalists';
+                  break;
                 case 'locations':
-                  context.go('/container/$containerIdStr/locations');
-                  return;
+                  // El print que ya tenías para depuración:
+                  print('Navegando a ubicaciones para ID: $containerIdStr');
+                  targetPath = '/container/$containerIdStr/locations';
+                  break;
                 case 'loans':
-                  context.go('/container/$containerIdStr/loans');
-                  return;
+                  targetPath = '/container/$containerIdStr/loans';
+                  break;
               }
+            }
+
+            if (targetPath != null) {
+              // 🟢 CORRECCIÓN APLICADA: Envolver la navegación en Future.microtask.
+              // Esto permite que el TreeView termine su manipulación de estado
+              // (como animaciones o scrolling) antes de que el Widget sea destruido
+              // por el cambio de ruta.
+              Future.microtask(() {
+                if (!context.mounted) return;
+                context.go(targetPath!);
+              });
+              return;
             }
 
             // Lógica de Negocio General: Tap en el contenedor
@@ -410,11 +428,15 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     }
   }
 
-  IconData _getIconForNode(TreeNode node) {
+  IconData _getIconForNode(TreeNode node, ContainerNode? container) {
     final isContainer = node.level == 1;
     final isSection = node.level == 2;
 
     if (isContainer) {
+      // Si es una colección, usar un icono de colección
+      if (container != null && container.isCollection) {
+        return Icons.collections_outlined;
+      }
       return Icons.inventory_2_outlined;
     }
 

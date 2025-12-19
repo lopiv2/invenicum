@@ -17,6 +17,8 @@ class ContainerNode {
   final List<AssetType> assetTypes;
   // 🎯 Lista de ubicaciones ya disponible en el contenedor
   final List<Location> locations;
+  // 🎯 Indicar si el contenedor es una colección
+  final bool isCollection;
 
   ContainerNode({
     required this.id,
@@ -29,6 +31,8 @@ class ContainerNode {
     this.assetTypes = const [],
     // 🎯 Inicializar locations
     this.locations = const [],
+    // 🎯 Inicializar isCollection
+    this.isCollection = false,
   });
 
   // **********************************************
@@ -45,6 +49,8 @@ class ContainerNode {
     List<AssetType>? assetTypes,
     // 🎯 Añadir locations para copia inmutable
     List<Location>? locations,
+    // 🎯 Añadir isCollection para copia inmutable
+    bool? isCollection,
   }) {
     return ContainerNode(
       id: id ?? this.id,
@@ -57,6 +63,8 @@ class ContainerNode {
       assetTypes: assetTypes ?? this.assetTypes,
       // 🎯 Aplicar locations
       locations: locations ?? this.locations,
+      // 🎯 Aplicar isCollection
+      isCollection: isCollection ?? this.isCollection,
     );
   }
 
@@ -94,6 +102,8 @@ class ContainerNode {
       ),
       // 🎯 Parsear la lista de ubicaciones
       locations: _parseList<Location>(json['locations'], Location.fromJson),
+      // 🎯 Parsear isCollection
+      isCollection: json['isCollection'] ?? json['is_collection'] ?? false,
     );
   }
 
@@ -109,6 +119,8 @@ class ContainerNode {
       'assetTypes': assetTypes.map((e) => e.toJson()).toList(),
       // 🎯 Incluir locations en toJson
       'locations': locations.map((e) => e.toJson()).toList(),
+      // 🎯 Incluir isCollection en toJson
+      'isCollection': isCollection,
     };
   }
 }

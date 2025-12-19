@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/models/asset_type_model.dart';
+import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
@@ -45,6 +46,141 @@ class AssetTypeCard extends StatelessWidget {
           },
         ) ??
         false;
+  }
+
+  void _showConfigureCollectionDialog(BuildContext context) async {
+    String? possessionFieldId = assetType.possessionFieldId;
+    String? desiredFieldId = assetType.desiredFieldId;
+
+    // Obtener solo los campos booleanos del tipo de activo
+    final booleanFields = assetType.fieldDefinitions
+        .where((field) =>
+            field.type == CustomFieldType.boolean)
+        .toList();
+
+    if (!context.mounted) return;
+
+    final result = await showDialog<Map<String, String?>>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text('Configurar Campos de Colección'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Selecciona los campos booleanos para controlar la colección:',
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 16),
+                const Text('Campo de Posesión:'),
+                const SizedBox(height: 8),
+                if (booleanFields.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'No hay campos booleanos definidos.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  )
+                else
+                  DropdownButtonFormField<String?>(
+                    value: possessionFieldId,
+                    hint: const Text('Seleccionar campo...'),
+                    items: [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text('Ninguno'),
+                      ),
+                      ...booleanFields.map((field) {
+                        return DropdownMenuItem(
+                          value: field.id.toString(),
+                          child: Text(field.name),
+                        );
+                      }),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        possessionFieldId = value;
+                      });
+                    },
+                  ),
+                const SizedBox(height: 20),
+                const Text('Campo de Deseados:'),
+                const SizedBox(height: 8),
+                if (booleanFields.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'No hay campos booleanos definidos.',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  )
+                else
+                  DropdownButtonFormField<String?>(
+                    value: desiredFieldId,
+                    hint: const Text('Seleccionar campo...'),
+                    items: [
+                      const DropdownMenuItem(
+                        value: null,
+                        child: Text('Ninguno'),
+                      ),
+                      ...booleanFields.map((field) {
+                        return DropdownMenuItem(
+                          value: field.id.toString(),
+                          child: Text(field.name),
+                        );
+                      }),
+                    ],
+                    onChanged: (value) {
+                      setState(() {
+                        desiredFieldId = value;
+                      });
+                    },
+                  ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, {
+                'possession': possessionFieldId,
+                'desired': desiredFieldId,
+              }),
+              child: const Text('Guardar'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (result != null && context.mounted) {
+      try {
+        final containerIdInt = int.tryParse(containerId);
+        if (containerIdInt == null) return;
+
+        await context.read<ContainerProvider>().updateAssetTypeCollectionFields(
+          containerId: containerIdInt,
+          assetTypeId: assetType.id,
+          possessionFieldId: result['possession'],
+          desiredFieldId: result['desired'],
+        );
+
+        if (context.mounted) {
+          ToastService.success('Campos de colección configurados.');
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ToastService.error('Error: $e');
+        }
+      }
+    }
   }
 
   void _handleDelete(BuildContext context) async {
@@ -166,6 +302,16 @@ class AssetTypeCard extends StatelessWidget {
                     Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        // 🔑 BOTÓN DE CONFIGURAR COLECCIÓN
+                        IconButton(
+                          icon: const Icon(
+                            Icons.tune_outlined,
+                            color: Colors.orange,
+                          ),
+                          onPressed: () =>
+                              _showConfigureCollectionDialog(context),
+                          tooltip: 'Configurar campos de colección',
+                        ),
                         // 🔑 BOTÓN DE EDITAR
                         IconButton(
                           icon: const Icon(

@@ -204,6 +204,7 @@ final router = GoRouter(
           builder: (context, state) {
             final containerId = state.pathParameters['containerId']!;
             // ASUME que tienes un widget llamado LocationsScreen que acepta containerId
+            print('Navegando a LocationsScreen para Container ID: $containerId');
             return LocationsScreen(containerId: containerId);
             
           },
