@@ -252,8 +252,14 @@ class InventoryDataSource extends DataTableSource {
       ),
       // 2. Nombre
       DataCell(Text(item.name, overflow: TextOverflow.ellipsis)),
+
+      // 3. Cantidad
+      DataCell(Text(item.quantity.toString(), overflow: TextOverflow.ellipsis)),
       
-      // 🔑 NUEVO: 3. Ubicación (Insertado antes de Descripción)
+      // 4. Stock minimo
+      DataCell(Text(item.minStock.toString(), overflow: TextOverflow.ellipsis)),
+      
+      // 5. Ubicación (Insertado antes de Descripción)
       DataCell(
         Tooltip(
           message: _getLocationName(item.locationId),
@@ -264,7 +270,7 @@ class InventoryDataSource extends DataTableSource {
         ),
       ),
       
-      // 4. Descripción (Desplazado)
+      // 6. Descripción (Desplazado)
       DataCell(Text(item.description ?? '—', overflow: TextOverflow.ellipsis)),
     ];
 

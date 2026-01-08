@@ -104,6 +104,8 @@ class InventoryItemService {
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
+      formData.fields.add(MapEntry('quantity', item.quantity.toString()));
+      formData.fields.add(MapEntry('minStock', item.minStock.toString())); // 🔑 NUEVA: minStock
       
       // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
       if (item.locationId != null) {
@@ -168,6 +170,8 @@ class InventoryItemService {
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
+      formData.fields.add(MapEntry('quantity', item.quantity.toString()));
+      formData.fields.add(MapEntry('minStock', item.minStock.toString())); // 🔑 NUEVA: minStock
       
       // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
       if (item.locationId != null) {

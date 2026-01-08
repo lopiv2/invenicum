@@ -43,6 +43,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // 1. Controllers para campos fijos
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
+  late TextEditingController _quantityController; // 🔑 NUEVA: Controlador de cantidad
+  late TextEditingController _minStockController; // 🔑 NUEVA: Controlador de minStock
 
   // 🔑 ESTADO PARA UBICACIÓN
   List<Location> _availableLocations = [];
@@ -107,6 +109,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     );
     _descriptionController = TextEditingController(
       text: widget.initialItem?.description ?? '',
+    );
+    _quantityController = TextEditingController(
+      text: (widget.initialItem?.quantity ?? 1).toString(), // 🔑 NUEVA: Inicializar con cantidad
+    );
+    _minStockController = TextEditingController(
+      text: (widget.initialItem?.minStock ?? 1).toString(), // 🔑 NUEVA: Inicializar con minStock
     );
     _dynamicControllers = {};
 
@@ -178,6 +186,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _quantityController.dispose(); // 🔑 NUEVA: Limpiar controlador de cantidad
+    _minStockController.dispose(); // 🔑 NUEVA: Limpiar controlador de minStock
     _dynamicControllers.values.forEach((controller) => controller.dispose());
     super.dispose();
   }
@@ -355,6 +365,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       assetTypeId: atIdInt,
       // 🔑 MODIFICADO: Añadir la ubicación seleccionada
       locationId: _selectedLocationId!,
+      quantity: int.tryParse(_quantityController.text) ?? 1, // 🔑 NUEVA: Obtener cantidad del controlador
+      minStock: int.tryParse(_minStockController.text) ?? 1, // 🔑 NUEVA: Obtener minStock del controlador
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: updatedCustomValues,
@@ -597,6 +609,82 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                 ),
                 maxLines: 3,
               ),
+              const SizedBox(height: 30),
+
+              // 🔑 NUEVA: Campo de Cantidad (solo si no es seriado)
+              if (!_assetType!.isSerialized)
+                TextFormField(
+                  controller: _quantityController,
+                  decoration: const InputDecoration(
+                    labelText: 'Cantidad',
+                    border: OutlineInputBorder(),
+                    helperText: 'Cantidad disponible del artículo',
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor introduce una cantidad.';
+                    }
+                    final quantity = int.tryParse(value);
+                    if (quantity == null || quantity < 1) {
+                      return 'La cantidad debe ser mayor a 0.';
+                    }
+                    return null;
+                  },
+                ),
+              if (_assetType!.isSerialized)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(4),
+                      border: Border.all(color: Colors.blue.shade200),
+                    ),
+                    child: const Row(
+                      children: [
+                        Icon(Icons.info, color: Colors.blue),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Este es un artículo seriado. La cantidad es fija a 1.',
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 30),
+
+              // 🔑 NUEVA: Campo de Stock Mínimo (solo si no es seriado)
+              if (!_assetType!.isSerialized)
+                TextFormField(
+                  controller: _minStockController,
+                  decoration: const InputDecoration(
+                    labelText: 'Stock Mínimo',
+                    border: OutlineInputBorder(),
+                    helperText: 'Cantidad mínima recomendada del artículo',
+                  ),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                  ],
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor introduce un stock mínimo.';
+                    }
+                    final minStock = int.tryParse(value);
+                    if (minStock == null || minStock < 1) {
+                      return 'El stock mínimo debe ser mayor a 0.';
+                    }
+                    return null;
+                  },
+                ),
               const SizedBox(height: 30),
 
               // ------------------------------------

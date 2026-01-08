@@ -56,7 +56,7 @@ class ApiService {
 
       // Si hay un objeto data, usamos esos valores
       if (responseData['data'] is Map) {
-        final data = responseData['data'] as Map<String, dynamic>;
+        responseData = responseData['data'] as Map<String, dynamic>;
       }
 
       final loginResponse = LoginResponse.fromJson(responseData);

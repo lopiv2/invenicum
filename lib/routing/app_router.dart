@@ -16,11 +16,13 @@ import 'package:invenicum/screens/dashboard_screen.dart';
 import 'package:invenicum/screens/datalist_create_screen.dart';
 import 'package:invenicum/screens/datalist_edit_screen.dart';
 import 'package:invenicum/screens/datalist_grid_screen.dart';
+import 'package:invenicum/screens/loan_create_screen.dart';
 import 'package:invenicum/screens/loans_screen.dart';
 import 'package:invenicum/screens/location_create_screen.dart';
 import 'package:invenicum/screens/location_edit_screen.dart';
 import 'package:invenicum/screens/locations_screen.dart';
 import 'package:invenicum/screens/login_screen.dart';
+import 'package:invenicum/screens/preferences_screen.dart';
 import 'package:invenicum/services/api_service.dart';
 import 'package:invenicum/services/dashboard_service.dart';
 import 'package:invenicum/widgets/main_layout.dart';
@@ -43,6 +45,12 @@ final router = GoRouter(
           path: '/dashboard',
           builder: (context, state) =>
               DashboardScreen(dashboardService: _dashboardService),
+        ),
+
+        // Ruta de Preferencias
+        GoRoute(
+          path: '/preferences',
+          builder: (context, state) => const PreferencesScreen(),
         ),
 
         // --- RUTAS DE GESTIÓN DE INVENTARIO ---
@@ -260,10 +268,30 @@ final router = GoRouter(
           path: '/container/:containerId/loans',
           builder: (context, state) {
             final containerId = state.pathParameters['containerId']!;
-            // ASUME que tienes un widget llamado LoansScreen que acepta containerId
             return LoansScreen(containerId: containerId);
           },
-          // Puedes añadir rutas anidadas para Préstamos aquí (ej. /loans/new, /loans/:loanId)
+          routes: [
+            // Crear nuevo préstamo
+            GoRoute(
+              path: 'new',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                return LoanCreateScreen(containerId: containerId);
+              },
+            ),
+            // Editar préstamo existente
+            GoRoute(
+              path: ':loanId/edit',
+              builder: (context, state) {
+                final containerId = state.pathParameters['containerId']!;
+                final loanId = int.tryParse(state.pathParameters['loanId']!);
+                return LoanCreateScreen(
+                  containerId: containerId,
+                  loanId: loanId,
+                );
+              },
+            ),
+          ],
         ),
       ],
     ),

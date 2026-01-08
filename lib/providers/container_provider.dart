@@ -319,6 +319,7 @@ class ContainerProvider with ChangeNotifier {
     required List<CustomFieldDefinition> fieldDefinitions,
     Uint8List? imageBytes,
     String? imageName,
+    bool isSerialized = true,
   }) async {
     try {
       // 1. Lógica de API
@@ -332,6 +333,7 @@ class ContainerProvider with ChangeNotifier {
             fieldDefinitionsJson: fieldDefinitionsJson,
             imageBytes: imageBytes,
             imageName: imageName,
+            isSerialized: isSerialized,
             // 🎯 CORRECCIÓN: Pasar la ID de la ubicación al servicio
           );
 

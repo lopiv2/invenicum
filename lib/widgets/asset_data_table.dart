@@ -75,16 +75,20 @@ class _AssetDataTableState extends State<AssetDataTable> {
       int index = -1;
       if (currentSortKey == 'name') {
         index = 1;
-      } else if (currentSortKey == 'description') {
+      } else if (currentSortKey == 'quantity') {
         index = 2;
-      } else if (currentSortKey == 'locationId') {
+      } else if (currentSortKey == 'minStock') {
         index = 3;
+      } else if (currentSortKey == 'locationId') {
+        index = 4;
+      } else if (currentSortKey == 'description') {
+        index = 5;
       } else {
         final customIndex = widget.assetType.fieldDefinitions.indexWhere(
           (def) => def.id.toString() == currentSortKey,
         );
         if (customIndex != -1) {
-          index = customIndex + 4;
+          index = customIndex + 6;
         }
       }
 
@@ -347,17 +351,31 @@ class _AssetDataTableState extends State<AssetDataTable> {
           },
         ),
         DataColumn2(
+          label: _buildFilterHeader(context, 'Cantidad', 'quantity'),
+          size: ColumnSize.S,
+          onSort: (columnIndex, ascending) {
+            _sortItems(context, 2, 'quantity', ascending);
+          },
+        ),
+        DataColumn2(
+          label: _buildFilterHeader(context, 'Stock minimo', 'minStock'),
+          size: ColumnSize.S,
+          onSort: (columnIndex, ascending) {
+            _sortItems(context, 3, 'minStock', ascending);
+          },
+        ),
+        DataColumn2(
           label: _buildFilterHeader(context, 'Ubicación', 'locationId'),
           size: ColumnSize.M,
           onSort: (columnIndex, ascending) {
-            _sortItems(context, 2, 'locationId', ascending);
+            _sortItems(context, 4, 'locationId', ascending);
           },
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Descripción', 'description'),
           size: ColumnSize.L,
           onSort: (columnIndex, ascending) {
-            _sortItems(context, 3, 'description', ascending);
+            _sortItems(context, 5, 'description', ascending);
           },
         ),
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {

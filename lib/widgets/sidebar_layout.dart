@@ -80,7 +80,7 @@ class _SidebarLayoutState extends State<SidebarLayout> {
             ),
           ),
 
-          // 4. Se muestra el estado de carga o la lista
+          // 4. Se muestra el estado de carga o la lista (área scrollable)
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -99,6 +99,13 @@ class _SidebarLayoutState extends State<SidebarLayout> {
                       }
                     },
                   ),
+          ),
+          // 5. Sección de Preferencias (siempre visible, no scrollable)
+          const Divider(),
+          Sidebar(
+            icon: Icons.settings,
+            title: 'Preferencias',
+            onTap: () => context.go('/preferences'),
           ),
         ],
       ),

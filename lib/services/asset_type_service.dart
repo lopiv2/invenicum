@@ -28,6 +28,7 @@ class AssetTypeService {
     required List<dynamic> fieldDefinitionsJson,
     Uint8List? imageBytes,
     String? imageName,
+    bool isSerialized = true,
   }) async {
     try {
       final url = '/containers/$containerId/asset-types';
@@ -35,6 +36,7 @@ class AssetTypeService {
       // Crear FormData para enviar la imagen
       final formData = FormData.fromMap({
         'name': name,
+        'isSerialized': isSerialized,
         'fieldDefinitions': jsonEncode(fieldDefinitionsJson),
         if (imageBytes != null && imageName != null)
           'files': MultipartFile.fromBytes(

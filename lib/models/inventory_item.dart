@@ -54,6 +54,8 @@ class InventoryItem {
   final int containerId;
   final int assetTypeId;
   final int? locationId; // 🔑 AÑADIDO: ID de la ubicación (nullable)
+  final int quantity; // 🔑 NUEVA: Cantidad del artículo (1 para seriados, variable para no seriados)
+  final int minStock; // 🔑 NUEVA: Stock mínimo recomendado (umbral de alerta)
 
   final List<InventoryItemImage> images;
 
@@ -69,6 +71,8 @@ class InventoryItem {
     required this.containerId,
     required this.assetTypeId,
     this.locationId, // 🔑 AÑADIDO AL CONSTRUCTOR (ahora nullable)
+    this.quantity = 1, // 🔑 NUEVA: Por defecto 1
+    this.minStock = 1, // 🔑 NUEVA: Por defecto 1
     this.createdAt,
     this.updatedAt,
     this.customFieldValues,
@@ -117,6 +121,8 @@ class InventoryItem {
       containerId: itemData['containerId'] as int,
       assetTypeId: itemData['assetTypeId'] as int,
       locationId: itemData['locationId'] as int?, // 🔑 AÑADIDO: Ahora permite null
+      quantity: itemData['quantity'] as int? ?? 1, // 🔑 NUEVA: Por defecto 1
+      minStock: itemData['minStock'] as int? ?? 1, // 🔑 NUEVA: Por defecto 1
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
       customFieldValues: customFieldValues,
@@ -130,6 +136,8 @@ class InventoryItem {
       'containerId': containerId,
       'assetTypeId': assetTypeId,
       'locationId': locationId, // 🔑 AÑADIDO: Incluido en el JSON de salida
+      'quantity': quantity, // 🔑 NUEVA: Incluido en el JSON de salida
+      'minStock': minStock, // 🔑 NUEVA: Incluido en el JSON de salida
       'name': name,
       'description': description,
       'customFieldValues': customFieldValues,
@@ -146,6 +154,8 @@ class InventoryItem {
     int? containerId,
     int? assetTypeId,
     int? locationId, // 🔑 AÑADIDO: Incluido en copyWith
+    int? quantity, // 🔑 NUEVA: Incluido en copyWith
+    int? minStock, // 🔑 NUEVA: Incluido en copyWith
     List<InventoryItemImage>? images,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -173,6 +183,8 @@ class InventoryItem {
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,
       locationId: locationId ?? this.locationId, // 🔑 AÑADIDO: Usamos el nuevo o el existente
+      quantity: quantity ?? this.quantity, // 🔑 NUEVA: Usamos el nuevo o el existente
+      minStock: minStock ?? this.minStock, // 🔑 NUEVA: Usamos el nuevo o el existente
       images: finalImages,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,

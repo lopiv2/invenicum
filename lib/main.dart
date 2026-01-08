@@ -6,10 +6,12 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
+import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
 import 'package:invenicum/services/asset_type_service.dart';
 import 'package:invenicum/services/container_service.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
+import 'package:invenicum/services/loan_service.dart';
 import 'package:invenicum/services/location_service.dart';
 import 'routing/app_router.dart';
 import 'package:provider/provider.dart';
@@ -40,6 +42,9 @@ void main() {
         Provider(
           create: (context) => InventoryItemService(context.read<ApiService>()),
         ),
+        Provider(
+          create: (context) => LoanService(context.read<ApiService>()),
+        ),
 
         // 4. MODIFICADO: Provee el ContainerProvider, inyectando AMBOS servicios
         ChangeNotifierProvider(
@@ -57,6 +62,9 @@ void main() {
         ChangeNotifierProvider(
           create: (context) =>
               InventoryItemProvider(context.read<InventoryItemService>()),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => LoanProvider(context.read<LoanService>()),
         ),
       ],
       child: const MyApp(),

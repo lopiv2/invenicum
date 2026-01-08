@@ -33,6 +33,9 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   // Estado para la imagen
   String? _imagePreviewUrl;
 
+  // Estado para tipo seriado/no seriado
+  bool _isSerialized = true;
+
   @override
   void initState() {
     super.initState();
@@ -149,6 +152,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
           fieldDefinitions: _fieldDefinitions,
           imageBytes: imageBytes,
           imageName: imageName,
+          isSerialized: _isSerialized,
         );
 
         if (context.mounted) {
@@ -205,6 +209,25 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 20),
+
+            // --- Checkbox para Tipo de Activo (Seriado/No Seriado) ---
+            Card(
+              color: Colors.blue.shade50,
+              child: CheckboxListTile(
+                title: const Text('¿Es un artículo seriado?'),
+                subtitle: const Text(
+                  'Los artículos seriados tienen cantidad fija de 1 (ej: número de serie). '
+                  'Los no seriados pueden tener cantidades variables (ej: consumibles).',
+                ),
+                value: _isSerialized,
+                onChanged: (value) {
+                  setState(() {
+                    _isSerialized = value ?? true;
+                  });
+                },
+              ),
             ),
             const SizedBox(height: 30),
 
@@ -305,20 +328,39 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
             ),
             const SizedBox(height: 40),
 
-            // --- Botón de Guardar ---
-            ElevatedButton.icon(
-              onPressed: _saveAssetType,
-              icon: const Icon(Icons.save),
-              label: const Text(
-                'Crear Tipo de Activo',
-                style: TextStyle(fontSize: 16),
-              ),
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
-                  vertical: 15,
+            // --- Botones de Guardar y Cancelar ---
+            Row(
+              children: [
+                ElevatedButton.icon(
+                  onPressed: _saveAssetType,
+                  icon: const Icon(Icons.save),
+                  label: const Text(
+                    'Crear Tipo de Activo',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(width: 16),
+                OutlinedButton.icon(
+                  onPressed: () => context.pop(),
+                  icon: const Icon(Icons.cancel),
+                  label: const Text(
+                    'Cancelar',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ],
         ),

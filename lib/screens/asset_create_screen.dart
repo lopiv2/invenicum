@@ -36,6 +36,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _quantityController = TextEditingController(text: '1'); // 🔑 NUEVA: Controlador de cantidad
+  final _minStockController = TextEditingController(text: '1'); // 🔑 NUEVA: Controlador de stock mínimo
 
   // 🔑 ESTADO DE UBICACIÓN
   List<Location> _availableLocations = []; // Lista de ubicaciones disponibles
@@ -134,6 +136,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
+    _quantityController.dispose(); // 🔑 NUEVA: Limpiar controlador de cantidad
+    _minStockController.dispose(); // 🔑 NUEVA: Limpiar controlador de minStock
     _customControllers.forEach((_, controller) => controller.dispose());
     super.dispose();
   }
@@ -232,6 +236,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       containerId: _containerId!,
       assetTypeId: _assetTypeId!,
       locationId: _selectedLocationId, // 🔑 Ahora puede ser null si no hay ubicaciones
+      quantity: int.tryParse(_quantityController.text) ?? 1, // 🔑 NUEVA: Obtener cantidad del controlador
+      minStock: int.tryParse(_minStockController.text) ?? 1, // 🔑 NUEVA: Obtener minStock del controlador
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: customFieldValues,
@@ -430,6 +436,83 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                         ),
                         maxLines: 3,
                       ),
+                      const SizedBox(height: 16),
+
+                      // 🔑 NUEVA: Campo de Cantidad (solo si no es seriado)
+                      if (!_assetType!.isSerialized)
+                        TextFormField(
+                          controller: _quantityController,
+                          decoration: const InputDecoration(
+                            labelText: 'Cantidad',
+                            border: OutlineInputBorder(),
+                            helperText: 'Cantidad disponible del artículo',
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor introduce una cantidad.';
+                            }
+                            final quantity = int.tryParse(value);
+                            if (quantity == null || quantity < 1) {
+                              return 'La cantidad debe ser mayor a 0.';
+                            }
+                            return null;
+                          },
+                        ),
+                      if (_assetType!.isSerialized)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(4),
+                              border:
+                                  Border.all(color: Colors.blue.shade200),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.info, color: Colors.blue),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Este es un artículo seriado. La cantidad es fija a 1.',
+                                    style: TextStyle(fontSize: 12),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      const SizedBox(height: 16),
+
+                      // 🔑 NUEVA: Campo de Stock Mínimo (solo si no es seriado)
+                      if (!_assetType!.isSerialized)
+                        TextFormField(
+                          controller: _minStockController,
+                          decoration: const InputDecoration(
+                            labelText: 'Stock Mínimo',
+                            border: OutlineInputBorder(),
+                            helperText: 'Cantidad mínima recomendada del artículo',
+                          ),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Por favor introduce un stock mínimo.';
+                            }
+                            final minStock = int.tryParse(value);
+                            if (minStock == null || minStock < 1) {
+                              return 'El stock mínimo debe ser mayor a 0.';
+                            }
+                            return null;
+                          },
+                        ),
                       const SizedBox(height: 30),
 
                       // --- SECCIÓN DE IMÁGENES ---

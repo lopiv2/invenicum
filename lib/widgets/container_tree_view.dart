@@ -3,6 +3,7 @@ import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/services/toast_service.dart';
+import 'package:invenicum/providers/loan_provider.dart';
 import '../models/container_node.dart';
 import '../providers/container_provider.dart';
 
@@ -43,8 +44,11 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     // Disparamos la carga de conteos (asíncrona) para todos los contenedores al inicio.
     Future.microtask(() {
       final initialContainers = context.read<ContainerProvider>().containers;
+      final loanProvider = context.read<LoanProvider>();
       for (var container in initialContainers) {
         _loadDataForContainer(container.id);
+        // Cargar préstamos para cada contenedor
+        loanProvider.fetchLoans(container.id);
       }
     });
   }
@@ -52,6 +56,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
   // Genera la estructura de nodos usando la lista actualizada.
   TreeNode<dynamic> _buildTreeRoot(List<ContainerNode> containers) {
     final root = TreeNode.root();
+    final loanProvider = context.watch<LoanProvider>();
 
     for (var container in containers) {
       final containerNode = TreeNode(
@@ -73,9 +78,11 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       );
       containerNode.add(locationsNode);
 
+      // ✅ Contar préstamos del contenedor actual
+      final loansCount = loanProvider.loans.length;
       final loansNode = TreeNode(
         key: "${container.id}_loans",
-        data: "Préstamos / Historial",
+        data: "Préstamos ($loansCount)",
       );
       containerNode.add(loansNode);
 

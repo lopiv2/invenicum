@@ -18,22 +18,18 @@ class ToastService {
     ToastGravity gravity = ToastGravity.BOTTOM] // Opcional
   ) {
     Color backgroundColor;
-    IconData icon;
-    Color textColor = Colors.white;
+    final textColor = Colors.white;
 
     // 1. Asignar colores e iconos según el tipo de Toast
     switch (type) {
       case ToastType.success:
         backgroundColor = Colors.green.shade600;
-        icon = Icons.check_circle_outline;
         break;
       case ToastType.info:
         backgroundColor = Colors.blue.shade600;
-        icon = Icons.info_outline;
         break;
       case ToastType.error:
         backgroundColor = Colors.red.shade600;
-        icon = Icons.error_outline;
         break;
     }
 

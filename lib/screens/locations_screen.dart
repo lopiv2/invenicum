@@ -319,4 +319,14 @@ class _LocationsScreenState extends State<LocationsScreen>
     super.initState();
     Future.microtask(() => _loadLocations());
   }
+
+  @override
+  void didUpdateWidget(LocationsScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Si el containerId cambió, recargar las ubicaciones del nuevo contenedor
+    if (oldWidget.containerId != widget.containerId) {
+      _selectedLocationId = null; // Limpiar selección anterior
+      _loadLocations();
+    }
+  }
 }

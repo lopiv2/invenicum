@@ -10,6 +10,7 @@ class AssetType {
   final List<InventoryItemImage> images;
   final String? possessionFieldId;
   final String? desiredFieldId;
+  final bool isSerialized; // true = seriado (quantity = 1), false = no seriado (quantity variable)
 
   AssetType({
     required this.id,
@@ -18,6 +19,7 @@ class AssetType {
     this.images = const [], 
     this.possessionFieldId,
     this.desiredFieldId,
+    this.isSerialized = true, // Por defecto, los elementos son seriados
   });
 
   // --- CONSTRUCTOR DE FÁBRICA Y JSON ---
@@ -40,6 +42,7 @@ class AssetType {
       id: json['id'] as int,
       name: json['name'] as String,
       images: images,
+      isSerialized: json['isSerialized'] as bool? ?? true,
       fieldDefinitions: (json['fieldDefinitions'] as List<dynamic>?)
           ?.map((item) => CustomFieldDefinition.fromJson(item as Map<String, dynamic>))
           .toList() ?? [],
@@ -59,6 +62,7 @@ class AssetType {
       'fieldDefinitions': fieldDefinitions.map((e) => e.toJson()).toList(),
       'possessionFieldId': possessionFieldId,
       'desiredFieldId': desiredFieldId,
+      'isSerialized': isSerialized,
     };
   }
 
@@ -73,13 +77,15 @@ class AssetType {
     List<InventoryItemImage>? images,
     // 🔑 Utilizamos String? como tipo de argumento para permitir borrar el campo (asignar null)
     String? possessionFieldId, 
-    String? desiredFieldId,   
+    String? desiredFieldId,
+    bool? isSerialized,   
   }) {
     return AssetType(
       id: id ?? this.id,
       name: name ?? this.name,
       fieldDefinitions: fieldDefinitions ?? this.fieldDefinitions,
       images: images ?? this.images,
+      isSerialized: isSerialized ?? this.isSerialized,
       
       // 💡 IMPORTANTE: Si el argumento es null, asignamos el null. 
       // Si no fue proporcionado (el argumento es null, pero queremos el valor anterior),
