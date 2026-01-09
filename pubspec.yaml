@@ -50,6 +50,8 @@ dependencies:
   csv: ^6.0.0
   graphview: ^1.5.1
   fl_chart: ^1.1.1
+  pdf: ^3.11.3
+  printing: ^5.14.2
 
 dev_dependencies:
   flutter_test:

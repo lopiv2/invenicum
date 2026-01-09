@@ -3,33 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 // Definimos los tipos de Toast disponibles
-enum ToastType {
-  success,
-  info,
-  error,
-}
+enum ToastType { success, info, error }
 
 class ToastService {
   // Función principal para mostrar el toast
   static void show(
     String message,
-    ToastType type,
-    [int durationSeconds = 3, // Opcional
-    ToastGravity gravity = ToastGravity.BOTTOM] // Opcional
-  ) {
-    Color backgroundColor;
+    ToastType type, [
+    int durationSeconds = 3, // Opcional
+    ToastGravity gravity = ToastGravity.BOTTOM, // Opcional
+  ]) {
+    String webColor;
+    Color bgColor;
     final textColor = Colors.white;
 
     // 1. Asignar colores e iconos según el tipo de Toast
     switch (type) {
       case ToastType.success:
-        backgroundColor = Colors.green.shade600;
+        webColor = "#2e7d32"; // Green shade 800
+        bgColor = Colors.green;
         break;
       case ToastType.info:
-        backgroundColor = Colors.blue.shade600;
+        webColor = "#1976d2"; // Blue shade 700
+        bgColor = Colors.blue;
         break;
       case ToastType.error:
-        backgroundColor = Colors.red.shade600;
+        webColor = "#d32f2f"; // Red shade 700 (¡Este es el que quieres!)
+        bgColor = Colors.red;
         break;
     }
 
@@ -39,14 +39,13 @@ class ToastService {
       toastLength: Toast.LENGTH_LONG, // Usamos LONG para que se vea más tiempo
       gravity: gravity,
       timeInSecForIosWeb: durationSeconds,
-      backgroundColor: backgroundColor,
+      backgroundColor: bgColor,
       textColor: textColor,
       fontSize: 16.0,
-      
+
       // 💡 Opcional: Construir un Widget personalizado
       webShowClose: true, // Útil para web
-      // webBgColor: "#${backgroundColor.value.toRadixString(16).substring(2)}", // Configuración opcional para web
-      
+      webBgColor: webColor, // Configuración opcional para web
       // Para un estilo más avanzado (como añadir el icono),
       // tendrías que usar el enfoque de FToast.showToast() y crear un Widget.
       // Sin embargo, la implementación básica de Fluttertoast (mostrada arriba)

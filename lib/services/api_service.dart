@@ -32,12 +32,22 @@ class ApiService {
           return handler.next(options);
         },
       ),
-      LogInterceptor(requestBody: true, responseBody: true, error: true),
+      // MODIFICACIÓN AQUÍ:
+      LogInterceptor(
+        requestBody: true,
+        responseBody:
+            false, // Desactivamos el body global para manejarlo manualmente si quieres
+        error: true,
+        logPrint: (object) {
+          // Solo imprimimos si no parece ser una lista gigante de bytes
+          final log = object.toString();
+          if (log.length < 1000) print(log);
+        },
+      ),
     ]);
   }
 
   Future<LoginResponse> login(String username, String password) async {
-
     // 2. Imprime la URL para verificarla
     try {
       final response = await dio.post(

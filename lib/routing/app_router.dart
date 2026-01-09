@@ -16,6 +16,7 @@ import 'package:invenicum/screens/dashboard_screen.dart';
 import 'package:invenicum/screens/datalist_create_screen.dart';
 import 'package:invenicum/screens/datalist_edit_screen.dart';
 import 'package:invenicum/screens/datalist_grid_screen.dart';
+import 'package:invenicum/screens/delivery_voucher_editor_screen.dart';
 import 'package:invenicum/screens/loan_create_screen.dart';
 import 'package:invenicum/screens/loans_screen.dart';
 import 'package:invenicum/screens/location_create_screen.dart';
@@ -51,6 +52,12 @@ final router = GoRouter(
         GoRoute(
           path: '/preferences',
           builder: (context, state) => const PreferencesScreen(),
+        ),
+
+        // Ruta del Editor de Vales de Entrega
+        GoRoute(
+          path: '/delivery-voucher-editor',
+          builder: (context, state) => const DeliveryVoucherEditorScreen(),
         ),
 
         // --- RUTAS DE GESTIÓN DE INVENTARIO ---

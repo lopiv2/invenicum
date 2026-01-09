@@ -13,6 +13,7 @@ import 'package:invenicum/services/container_service.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
 import 'package:invenicum/services/loan_service.dart';
 import 'package:invenicum/services/location_service.dart';
+import 'package:invenicum/services/voucher_service.dart';
 import 'routing/app_router.dart';
 import 'package:provider/provider.dart';
 import 'services/api_service.dart';
@@ -44,6 +45,9 @@ void main() {
         ),
         Provider(
           create: (context) => LoanService(context.read<ApiService>()),
+        ),
+        Provider(
+          create: (context) => VoucherService(context.read<ApiService>()),
         ),
 
         // 4. MODIFICADO: Provee el ContainerProvider, inyectando AMBOS servicios

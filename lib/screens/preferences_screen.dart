@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class PreferencesScreen extends StatefulWidget {
   const PreferencesScreen({super.key});
@@ -57,6 +58,30 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                             ),
                           ),
                         );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Gestión de Préstamos',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    ListTile(
+                      title: const Text('Editor de Vales de Entrega'),
+                      subtitle: const Text('Personaliza la plantilla PDF para préstamos'),
+                      trailing: const Icon(Icons.arrow_forward),
+                      onTap: () {
+                        context.push('/delivery-voucher-editor');
                       },
                     ),
                   ],

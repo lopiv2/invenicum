@@ -16,11 +16,7 @@ class LoanCreateScreen extends StatefulWidget {
   final String containerId;
   final int? loanId;
 
-  const LoanCreateScreen({
-    super.key,
-    required this.containerId,
-    this.loanId,
-  });
+  const LoanCreateScreen({super.key, required this.containerId, this.loanId});
 
   @override
   State<LoanCreateScreen> createState() => _LoanCreateScreenState();
@@ -32,6 +28,8 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   late TextEditingController _borrowerEmailController;
   late TextEditingController _borrowerPhoneController;
   late TextEditingController _notesController;
+  late TextEditingController _quantityController; // Añadir esto
+  int _currentStock = 0; // Para validar que no presten más de lo que hay
 
   InventoryItem? _selectedItem;
   DateTime? _expectedReturnDate;
@@ -44,6 +42,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
     _borrowerEmailController = TextEditingController();
     _borrowerPhoneController = TextEditingController();
     _notesController = TextEditingController();
+    _quantityController = TextEditingController(text: '1');
 
     if (widget.loanId != null) {
       _loadLoanForEditing();
@@ -68,6 +67,10 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
         containerId: 0,
         inventoryItemId: 0,
         itemName: '',
+        quantity: 1,
+        borrowerName: '',
+        borrowerEmail: '',
+        borrowerPhone: '',
         loanDate: DateTime.now(),
         status: 'active',
       ),
@@ -79,6 +82,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
       _borrowerEmailController.text = loan.borrowerEmail ?? '';
       _borrowerPhoneController.text = loan.borrowerPhone ?? '';
       _notesController.text = loan.notes ?? '';
+      _quantityController.text = loan.quantity.toString();
       // Asegurar que siempre se carga la fecha del préstamo actual desde el provider
       _expectedReturnDate = loan.expectedReturnDate;
 
@@ -98,7 +102,8 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   }
 
   Future<void> _selectReturnDate() async {
-    final initialDate = _expectedReturnDate ?? DateTime.now().add(Duration(days: 7));
+    final initialDate =
+        _expectedReturnDate ?? DateTime.now().add(Duration(days: 7));
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -193,6 +198,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
       try {
         final loan = Loan(
           id: _editingLoan?.id ?? 0,
+          quantity: int.tryParse(_quantityController.text) ?? 1,
           containerId: containerIdInt,
           inventoryItemId: _editingLoan?.inventoryItemId ?? _selectedItem!.id,
           itemName: _editingLoan?.itemName ?? _selectedItem!.name,
@@ -244,6 +250,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
     _borrowerEmailController.dispose();
     _borrowerPhoneController.dispose();
     _notesController.dispose();
+    _quantityController.dispose();
     super.dispose();
   }
 
@@ -257,16 +264,20 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _editingLoan != null ? 'Editar Préstamo' : 'Registrar Nuevo Préstamo',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              _editingLoan != null
+                  ? 'Editar Préstamo'
+                  : 'Registrar Nuevo Préstamo',
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
             // Seleccionar Objeto
-            Text('Objeto a Prestar', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Objeto a Prestar',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -282,13 +293,17 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                       _selectedItem?.name ?? 'Selecciona un objeto',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _selectedItem != null ? Colors.black : Colors.grey,
+                        color: _selectedItem != null
+                            ? Colors.black
+                            : Colors.grey,
                       ),
                     ),
                   ),
                   ElevatedButton(
                     onPressed: _editingLoan == null ? _selectItem : null,
-                    child: Text(_editingLoan != null ? 'No editable' : 'Seleccionar'),
+                    child: Text(
+                      _editingLoan != null ? 'No editable' : 'Seleccionar',
+                    ),
                   ),
                 ],
               ),
@@ -311,7 +326,24 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               },
             ),
             const SizedBox(height: 20),
-
+            TextFormField(
+              controller: _quantityController,
+              decoration: InputDecoration(
+                labelText: 'Cantidad a prestar (Disponible: $_currentStock)',
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.numbers),
+              ),
+              keyboardType: TextInputType.number,
+              validator: (value) {
+                if (value == null || value.isEmpty)
+                  return 'Ingresa una cantidad';
+                final n = int.tryParse(value);
+                if (n == null || n <= 0) return 'Cantidad no válida';
+                if (n > _currentStock) return 'No hay suficiente stock';
+                return null;
+              },
+            ),
+            const SizedBox(height: 20),
             // Email
             TextFormField(
               controller: _borrowerEmailController,
@@ -407,10 +439,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 OutlinedButton.icon(
                   onPressed: () => context.pop(),
                   icon: const Icon(Icons.cancel),
-                  label: const Text(
-                    'Cancelar',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  label: const Text('Cancelar', style: TextStyle(fontSize: 16)),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 30,

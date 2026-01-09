@@ -5,6 +5,7 @@ class Loan {
   final int containerId;
   final int inventoryItemId;
   final String itemName;
+  final int quantity; // 👈 Nuevo campo añadido
   final String? borrowerName;
   final String? borrowerEmail;
   final String? borrowerPhone;
@@ -12,13 +13,16 @@ class Loan {
   final DateTime? expectedReturnDate;
   final DateTime? actualReturnDate;
   final String? notes;
-  final String status; // 'active', 'returned', 'overdue'
+  final String status;
+
+  String get formattedVoucherId => 'V-${id.toString().padLeft(6, '0')}';
 
   Loan({
     required this.id,
     required this.containerId,
     required this.inventoryItemId,
     required this.itemName,
+    required this.quantity, // 👈 Requerido en el constructor
     this.borrowerName,
     this.borrowerEmail,
     this.borrowerPhone,
@@ -35,6 +39,7 @@ class Loan {
       containerId: json['containerId'] as int,
       inventoryItemId: json['inventoryItemId'] as int,
       itemName: json['itemName'] as String? ?? '',
+      quantity: json['quantity'] as int? ?? 1, // 👈 Default a 1 si es null
       borrowerName: json['borrowerName'] as String?,
       borrowerEmail: json['borrowerEmail'] as String?,
       borrowerPhone: json['borrowerPhone'] as String?,
@@ -58,6 +63,7 @@ class Loan {
       'containerId': containerId,
       'inventoryItemId': inventoryItemId,
       'itemName': itemName,
+      'quantity': quantity, // 👈 Incluido en la serialización
       'borrowerName': borrowerName,
       'borrowerEmail': borrowerEmail,
       'borrowerPhone': borrowerPhone,
@@ -73,9 +79,9 @@ class Loan {
     };
   }
 
-  /// Serializa solo los campos que se pueden editar (excluyendo id, inventoryItemId, loanDate)
   Map<String, dynamic> toJsonForUpdate() {
     return {
+      'quantity': quantity, // 👈 Añadido por si se quiere editar la cantidad
       'borrowerName': borrowerName,
       'borrowerEmail': borrowerEmail,
       'borrowerPhone': borrowerPhone,
@@ -92,6 +98,7 @@ class Loan {
     int? containerId,
     int? inventoryItemId,
     String? itemName,
+    int? quantity, // 👈 Añadido al copyWith
     String? borrowerName,
     String? borrowerEmail,
     String? borrowerPhone,
@@ -106,6 +113,7 @@ class Loan {
       containerId: containerId ?? this.containerId,
       inventoryItemId: inventoryItemId ?? this.inventoryItemId,
       itemName: itemName ?? this.itemName,
+      quantity: quantity ?? this.quantity, // 👈
       borrowerName: borrowerName ?? this.borrowerName,
       borrowerEmail: borrowerEmail ?? this.borrowerEmail,
       borrowerPhone: borrowerPhone ?? this.borrowerPhone,

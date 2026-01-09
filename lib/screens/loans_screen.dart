@@ -1,5 +1,7 @@
 // lib/screens/loans_screen.dart
 
+import 'dart:typed_data';
+
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,10 @@ import 'package:intl/intl.dart';
 import 'package:invenicum/models/loan.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/services/toast_service.dart';
+import 'package:invenicum/services/voucher_service.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 class LoansScreen extends StatefulWidget {
@@ -125,6 +131,109 @@ class _LoansScreenState extends State<LoansScreen> {
     }
   }
 
+  Future<void> _generateVoucher(Loan loan) async {
+    try {
+      final voucherService = context.read<VoucherService>();
+      final config = await voucherService.getVoucherConfig();
+
+      if (config == null) {
+        ToastService.error("No hay una plantilla de vale configurada.");
+        return;
+      }
+
+      final String template = config['template'] ?? "";
+      final String? logoPath = config['logoPath'];
+      Uint8List? logoBytes;
+
+      if (logoPath != null) {
+        logoBytes = await voucherService.fetchImageBytes(logoPath);
+      }
+
+      final String voucherIdStr = loan.formattedVoucherId;
+
+      // Mapeo de datos del Loan a las etiquetas
+      final String processedContent = template
+          .replaceAll('{voucherId}', voucherIdStr)
+          .replaceAll('{itemName}', loan.itemName)
+          .replaceAll('{quantity}', loan.quantity.toString())
+          .replaceAll('{borrowerName}', loan.borrowerName ?? 'N/A')
+          .replaceAll('{borrowerEmail}', loan.borrowerEmail ?? 'N/A')
+          .replaceAll('{borrowerPhone}', loan.borrowerPhone ?? 'N/A')
+          .replaceAll(
+            '{loanDate}',
+            DateFormat('dd/MM/yyyy').format(loan.loanDate),
+          )
+          .replaceAll(
+            '{expectedReturnDate}',
+            loan.expectedReturnDate != null
+                ? DateFormat('dd/MM/yyyy').format(loan.expectedReturnDate!)
+                : 'N/A',
+          )
+          .replaceAll('{notes}', loan.notes ?? '');
+
+      // Generar el PDF
+      final doc = pw.Document();
+      doc.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          build: (pw.Context context) {
+            return pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // CABECERA: Logo a la izquierda, Título e ID a la derecha
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    if (logoBytes != null)
+                      pw.Image(pw.MemoryImage(logoBytes), width: 80),
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Text(
+                          'VALE DE ENTREGA',
+                          style: pw.TextStyle(
+                            fontWeight: pw.FontWeight.bold,
+                            fontSize: 18,
+                          ),
+                        ),
+                        pw.Text(
+                          voucherIdStr, // 👈 El ID justo debajo del título
+                          style: const pw.TextStyle(
+                            fontSize: 14,
+                            color: PdfColors.grey700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                pw.SizedBox(height: 10),
+                pw.Divider(thickness: 1),
+                pw.SizedBox(height: 20),
+
+                // CUERPO DEL TEXTO
+                pw.Text(
+                  processedContent,
+                  style: const pw.TextStyle(fontSize: 12, height: 1.5),
+                ),
+
+                pw.Spacer(),
+              ],
+            );
+          },
+        ),
+      );
+
+      await Printing.layoutPdf(
+        onLayout: (format) => doc.save(),
+        name: 'Vale_${voucherIdStr}.pdf',
+      );
+    } catch (e) {
+      ToastService.error("Error al generar PDF: $e");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loanProvider = context.watch<LoanProvider>();
@@ -209,7 +318,10 @@ class _LoansScreenState extends State<LoansScreen> {
                           DataColumn(label: Text('Fecha Préstamo')),
                           DataColumn(label: Text('Fecha Devolución')),
                           DataColumn(label: Text('Estado')),
-                          DataColumn(label: Text('Acciones')),
+                          DataColumn(
+                            label: Text('Acciones'),
+                            headingRowAlignment: MainAxisAlignment.center,
+                          ),
                         ],
                         rows: loans.map((loan) {
                           return DataRow(
@@ -283,6 +395,8 @@ class _LoansScreenState extends State<LoansScreen> {
                               ),
                               DataCell(
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     if (loan.status == 'active')
                                       IconButton(
@@ -295,6 +409,14 @@ class _LoansScreenState extends State<LoansScreen> {
                                       )
                                     else
                                       const SizedBox(width: 48),
+                                    IconButton(
+                                      icon: const Icon(
+                                        Icons.print,
+                                        color: Colors.teal,
+                                      ),
+                                      onPressed: () => _generateVoucher(loan),
+                                      tooltip: 'Generar Vale de Entrega',
+                                    ),
                                     IconButton(
                                       icon: const Icon(
                                         Icons.edit,
