@@ -14,6 +14,7 @@ class Loan {
   final DateTime? actualReturnDate;
   final String? notes;
   final String status;
+  final int userId;
 
   String get formattedVoucherId => 'V-${id.toString().padLeft(6, '0')}';
 
@@ -31,6 +32,7 @@ class Loan {
     this.actualReturnDate,
     this.notes,
     required this.status,
+    this.userId = 0, // Valor por defecto
   });
 
   factory Loan.fromJson(Map<String, dynamic> json) {
@@ -54,6 +56,7 @@ class Loan {
           : null,
       notes: json['notes'] as String?,
       status: json['status'] as String? ?? 'active',
+      userId: json['userId'] as int? ?? 0, // 👈 Default a 0 si es null
     );
   }
 
@@ -76,6 +79,7 @@ class Loan {
           : null,
       'notes': notes,
       'status': status,
+      'userId': userId,
     };
   }
 
@@ -90,6 +94,7 @@ class Loan {
           : null,
       'notes': notes,
       'status': status,
+      'userId': userId,
     };
   }
 
@@ -107,6 +112,7 @@ class Loan {
     DateTime? actualReturnDate,
     String? notes,
     String? status,
+    int? userId,
   }) {
     return Loan(
       id: id ?? this.id,
@@ -122,6 +128,7 @@ class Loan {
       actualReturnDate: actualReturnDate ?? this.actualReturnDate,
       notes: notes ?? this.notes,
       status: status ?? this.status,
+      userId: userId ?? this.userId,
     );
   }
 

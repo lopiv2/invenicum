@@ -2,22 +2,56 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:provider/provider.dart';
 
-class LowStockCard extends StatelessWidget {
+class LowStockCard extends StatefulWidget {
   const LowStockCard({super.key});
+
+  @override
+  State<LowStockCard> createState() => _LowStockCardState();
+}
+
+class _LowStockCardState extends State<LowStockCard> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<InventoryItemProvider>(
+        context,
+        listen: false,
+      );
+      // Llamamos al método que acabamos de arreglar
+      provider.loadAllItemsGlobal();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<InventoryItemProvider>(
       builder: (context, itemProvider, child) {
+        // 2. Si el provider está cargando, mostramos un indicador
+        if (itemProvider.isLoading && itemProvider.inventoryItems.isEmpty) {
+          return const Card(
+            child: Padding(
+              padding: EdgeInsets.all(20),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
         final lowStockItems = itemProvider.inventoryItems
-            .where((item) => item.quantity < item.minStock)
+            .where((item) => item.quantity < (item.minStock))
             .toList();
 
         return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize:
+                  MainAxisSize.min, // Importante para evitar errores de scroll
               children: [
                 Row(
                   children: [
@@ -37,6 +71,7 @@ class LowStockCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
+
                 if (lowStockItems.isEmpty)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 20),
@@ -52,6 +87,7 @@ class LowStockCard extends StatelessWidget {
                     ),
                   )
                 else
+                  // 3. Limitamos el tamaño del ListView para que no rompa el Dashboard
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -60,60 +96,56 @@ class LowStockCard extends StatelessWidget {
                         Divider(height: 1, color: Colors.grey.shade300),
                     itemBuilder: (context, index) {
                       final item = lowStockItems[index];
-                      final stockPercentage =
-                          (item.quantity / item.minStock * 100)
-                              .clamp(0, 100);
+                      final double minStock = item.minStock.toDouble();
+                      final double quantity = item.quantity.toDouble();
+
+                      // Evitar división por cero
+                      final stockPercentage = minStock > 0
+                          ? (quantity / minStock * 100).clamp(0.0, 100.0)
+                          : 0.0;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Row(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Indicador visual con barra de progreso
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          item.name,
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            fontSize: 14,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                      Text(
-                                        '${item.quantity}/${item.minStock}',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.orange.shade600,
-                                          fontSize: 13,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 6),
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: LinearProgressIndicator(
-                                      value: stockPercentage / 100,
-                                      minHeight: 6,
-                                      backgroundColor: Colors.grey.shade300,
-                                      valueColor:
-                                          AlwaysStoppedAnimation<Color>(
-                                        stockPercentage < 33
-                                            ? Colors.red.shade600
-                                            : Colors.orange.shade600,
-                                      ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    item.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 14,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
+                                ),
+                                Text(
+                                  '${item.quantity}/$minStock',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    color: stockPercentage < 50
+                                        ? Colors.red.shade600
+                                        : Colors.orange.shade600,
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: stockPercentage / 100,
+                                minHeight: 6,
+                                backgroundColor: Colors.grey.shade200,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  stockPercentage < 50
+                                      ? Colors.red.shade600
+                                      : Colors.orange.shade600,
+                                ),
                               ),
                             ),
                           ],

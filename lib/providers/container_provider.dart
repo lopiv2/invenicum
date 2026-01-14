@@ -34,29 +34,37 @@ class ContainerProvider with ChangeNotifier {
     try {
       final loadedContainers = await _containerService.getContainers();
 
-      // Si ya teníamos contenedores, preservamos el estado expandido/colapsado
-      if (_containers.isNotEmpty) {
-        for (var i = 0; i < loadedContainers.length; i++) {
-          final newContainer = loadedContainers[i];
-          final existingContainer = _containers.firstWhere(
-            (c) => c.id == newContainer.id,
-            orElse: () => newContainer,
-          );
+      // Prepara una nueva lista para los contenedores actualizados
+      final List<ContainerNode> updatedContainers = [];
 
-          // Preservar las listas, tipos de activos y UBICACIONES si el contenedor ya existía
-          if (existingContainer != newContainer) {
-            loadedContainers[i] = existingContainer.copyWith(
-              // Mantenemos los datos cargados asíncronamente
-              dataLists: existingContainer.dataLists,
-              assetTypes: existingContainer.assetTypes,
-              // 🎯 CORRECCIÓN: Usar la lista de locations completa
-              locations: existingContainer.locations,
-            );
-          }
-        }
+      for (final containerFromApi in loadedContainers) {
+        // Por cada contenedor, carga sus ubicaciones
+        final locations = await _locationService.getLocations(containerFromApi.id);
+
+        // Busca el contenedor existente en el estado actual para preservar datos
+        final existingContainer = _containers.firstWhere(
+          (c) => c.id == containerFromApi.id,
+          orElse: () => containerFromApi, // Si no existe, usa el de la API
+        );
+
+        // Fusiona los datos: usa los datos de la API como base y preserva
+        // las listas internas si ya existen, pero AÑADE las ubicaciones cargadas.
+        updatedContainers.add(
+          containerFromApi.copyWith(
+            // Usa las listas del contenedor existente si no están vacías
+            assetTypes: existingContainer.assetTypes.isNotEmpty
+                ? existingContainer.assetTypes
+                : containerFromApi.assetTypes,
+            dataLists: existingContainer.dataLists.isNotEmpty
+                ? existingContainer.dataLists
+                : containerFromApi.dataLists,
+            // 🎯 Asigna la lista de ubicaciones recién cargada
+            locations: locations,
+          ),
+        );
       }
 
-      _containers = loadedContainers;
+      _containers = updatedContainers;
     } catch (e) {
       print('Error al cargar contenedores: $e');
     } finally {

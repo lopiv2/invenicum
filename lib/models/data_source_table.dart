@@ -46,7 +46,11 @@ class InventoryDataSource extends DataTableSource {
     }
     final location = availableLocations.firstWhere(
       (loc) => loc.id == locationId,
-      orElse: () => Location(id: locationId, name: locationId.toString(), containerId: containerId),
+      orElse: () => Location(
+        id: locationId,
+        name: locationId.toString(),
+        containerId: containerId,
+      ),
     );
     return location.name;
   }
@@ -89,7 +93,7 @@ class InventoryDataSource extends DataTableSource {
                     child: CircularProgressIndicator(
                       value: loadingProgress.expectedTotalBytes != null
                           ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
+                                loadingProgress.expectedTotalBytes!
                           : null,
                     ),
                   );
@@ -175,16 +179,14 @@ class InventoryDataSource extends DataTableSource {
     return DataCell(
       Tooltip(
         message: displayValue,
-        child: Text(
-          displayValue,
-          overflow: TextOverflow.ellipsis,
-        ),
+        child: Text(displayValue, overflow: TextOverflow.ellipsis),
       ),
     );
   }
 
   // --- Métodos de DataTableSource ---
 
+  @override
   @override
   DataRow? getRow(int index) {
     // 1. Calcular el índice de inicio de la página actual (Base 0)
@@ -200,9 +202,31 @@ class InventoryDataSource extends DataTableSource {
 
     final item = _items[localIndex];
 
-    final String? imageUrl = item.images.isNotEmpty ? item.images.first.url : null;
-    final String fullImageUrl =
-        imageUrl != null ? '${Environment.apiUrl}$imageUrl' : '';
+    // --- LÓGICA DE COLORES DE STOCK ---
+    Color? rowColor;
+    final double currentQty = item.quantity.toDouble();
+    final double minStock = item.minStock.toDouble();
+
+    if (minStock > 0 && currentQty < minStock) {
+      // Calculamos cuánto representa la cantidad actual respecto al mínimo
+      // Ejemplo: si tengo 4 y el mínimo es 10, tengo el 40% (Ratio 0.4)
+      final double ratio = currentQty / minStock;
+
+      if (ratio < 0.5) {
+        // MENOS del 50% del stock mínimo -> ROJO
+        rowColor = Colors.red.withOpacity(0.25);
+      } else {
+        // MÁS del 50% (pero por debajo del mínimo) -> NARANJA
+        rowColor = Colors.orange.withOpacity(0.25);
+      }
+    }
+
+    final String? imageUrl = item.images.isNotEmpty
+        ? item.images.first.url
+        : null;
+    final String fullImageUrl = imageUrl != null
+        ? '${Environment.apiUrl}$imageUrl'
+        : '';
 
     final List<DataCell> cells = [
       // 1. Célula de Imagen
@@ -228,10 +252,10 @@ class InventoryDataSource extends DataTableSource {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) =>
                               const Icon(
-                            Icons.broken_image,
-                            size: 25,
-                            color: Colors.grey,
-                          ),
+                                Icons.broken_image,
+                                size: 25,
+                                color: Colors.grey,
+                              ),
                           loadingBuilder: (context, child, loadingProgress) {
                             if (loadingProgress == null) return child;
                             return const Center(
@@ -254,12 +278,19 @@ class InventoryDataSource extends DataTableSource {
       DataCell(Text(item.name, overflow: TextOverflow.ellipsis)),
 
       // 3. Cantidad
-      DataCell(Text(item.quantity.toString(), overflow: TextOverflow.ellipsis)),
-      
+      DataCell(
+        Text(
+          item.quantity.toString(),
+          style: TextStyle(
+            fontWeight: rowColor != null ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+
       // 4. Stock minimo
-      DataCell(Text(item.minStock.toString(), overflow: TextOverflow.ellipsis)),
-      
-      // 5. Ubicación (Insertado antes de Descripción)
+      DataCell(Text(item.minStock.toString())),
+
+      // 5. Ubicación
       DataCell(
         Tooltip(
           message: _getLocationName(item.locationId),
@@ -269,12 +300,12 @@ class InventoryDataSource extends DataTableSource {
           ),
         ),
       ),
-      
-      // 6. Descripción (Desplazado)
+
+      // 6. Descripción
       DataCell(Text(item.description ?? '—', overflow: TextOverflow.ellipsis)),
     ];
 
-    // 5+. Campos Personalizados (¡Usando el nuevo método!)
+    // 5+. Campos Personalizados
     for (final fieldDef in assetType.fieldDefinitions) {
       final fieldValue = item.customFieldValues?[fieldDef.id.toString()];
       cells.add(_buildCustomFieldCell(context, fieldDef, fieldValue));
@@ -312,6 +343,8 @@ class InventoryDataSource extends DataTableSource {
     return DataRow(
       cells: cells,
       key: ValueKey(item.id),
+      // 🔑 Aplicamos el color aquí
+      color: WidgetStateProperty.resolveWith<Color?>((states) => rowColor),
     );
   }
 

@@ -20,12 +20,19 @@ class InventoryItemService {
   // --- 1. READ (Lectura) ---
   // 🔑 CAMBIO CLAVE: Ahora devuelve InventoryResponse (que contiene items y totales)
   Future<InventoryResponse> fetchInventoryItems({
-    required int containerId,
-    required int assetTypeId,
+    int? containerId,
+    int? assetTypeId,
     Map<String, String>? aggregationFilters,
   }) async {
     try {
-      String path = '/containers/$containerId/asset-types/$assetTypeId/items';
+      // 🔑 LÓGICA DE RUTA DINÁMICA
+      // Si faltan los IDs, apuntamos a una ruta global, no a la jerárquica
+      String path;
+      if (containerId != null && assetTypeId != null) {
+        path = '/containers/$containerId/asset-types/$assetTypeId/items';
+      } else {
+        path = '/items'; // <--- Esta ruta debe existir en tu backend
+      }
 
       final Map<String, dynamic> queryParameters = {};
 
@@ -99,20 +106,24 @@ class InventoryItemService {
     try {
       // 1. Construir FormData manualmente para manejar null correctamente
       final formData = FormData();
-      
+
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
-      formData.fields.add(MapEntry('minStock', item.minStock.toString())); // 🔑 NUEVA: minStock
-      
+      formData.fields.add(
+        MapEntry('minStock', item.minStock.toString()),
+      ); // 🔑 NUEVA: minStock
+
       // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
       if (item.locationId != null) {
         formData.fields.add(MapEntry('locationId', item.locationId.toString()));
       }
-      
-      formData.fields.add(MapEntry('customFieldValues', jsonEncode(item.customFieldValues)));
+
+      formData.fields.add(
+        MapEntry('customFieldValues', jsonEncode(item.customFieldValues)),
+      );
 
       // 2. Añadir los archivos a FormData
       for (var file in filesData) {
@@ -131,7 +142,7 @@ class InventoryItemService {
       if (response.statusCode == 201) {
         // El backend devuelve una estructura anidada: { data: { data: InventoryItemJson } }
         final responseData = response.data;
-        
+
         // Manejar la posible anidación
         dynamic itemData = responseData;
         if (itemData is Map && itemData.containsKey('data')) {
@@ -140,7 +151,7 @@ class InventoryItemService {
         if (itemData is Map && itemData.containsKey('data')) {
           itemData = itemData['data'];
         }
-        
+
         return InventoryItem.fromJson(itemData as Map<String, dynamic>);
       } else {
         throw Exception(
@@ -165,21 +176,27 @@ class InventoryItemService {
     try {
       // 1. Construir FormData manualmente para manejar null correctamente
       final formData = FormData();
-      
+
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
-      formData.fields.add(MapEntry('minStock', item.minStock.toString())); // 🔑 NUEVA: minStock
-      
+      formData.fields.add(
+        MapEntry('minStock', item.minStock.toString()),
+      ); // 🔑 NUEVA: minStock
+
       // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
       if (item.locationId != null) {
         formData.fields.add(MapEntry('locationId', item.locationId.toString()));
       }
-      
-      formData.fields.add(MapEntry('customFieldValues', jsonEncode(item.customFieldValues)));
-      formData.fields.add(MapEntry('imageIdsToDelete', jsonEncode(imageIdsToDelete)));
+
+      formData.fields.add(
+        MapEntry('customFieldValues', jsonEncode(item.customFieldValues)),
+      );
+      formData.fields.add(
+        MapEntry('imageIdsToDelete', jsonEncode(imageIdsToDelete)),
+      );
 
       // 2. Añadir los archivos NUEVOS a FormData
       for (var file in filesToUpload) {
@@ -204,7 +221,7 @@ class InventoryItemService {
         if (itemData is Map && itemData.containsKey('data')) {
           itemData = itemData['data'];
         }
-        
+
         return InventoryItem.fromJson(itemData as Map<String, dynamic>);
       } else {
         throw Exception(

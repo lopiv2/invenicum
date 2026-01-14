@@ -13,18 +13,7 @@ class SidebarLayout extends StatefulWidget {
 }
 
 class _SidebarLayoutState extends State<SidebarLayout> {
-  // 1. Eliminamos el estado local `containers` y la instancia de `ContainerService`.
-
-  @override
-  void initState() {
-    super.initState();
-    // 2. Disparamos la carga de contenedores una vez, después de que el widget se haya montado.
-    // Usamos context.read porque no queremos que initState reaccione a los cambios futuros,
-    // solo queremos iniciar la acción.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ContainerProvider>().loadContainers();
-    });
-  }
+  // initState ya no es necesario, el provider se encarga de la carga inicial.
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +88,12 @@ class _SidebarLayoutState extends State<SidebarLayout> {
                       }
                     },
                   ),
+          ),
+          const Divider(),
+          Sidebar(
+            icon: Icons.notifications_active,
+            title: 'Alertas y Notificaciones',
+            onTap: () => context.go('/alerts'),
           ),
           // 5. Sección de Preferencias (siempre visible, no scrollable)
           const Divider(),

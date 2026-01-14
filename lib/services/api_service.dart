@@ -123,5 +123,25 @@ class ApiService {
 
   Future<void> logout() async {
     await _storage.delete(key: Environment.authTokenKey);
+    dio.options.headers.remove('Authorization');
+  }
+
+  Future<UserData?> getMe() async {
+    try {
+      final response = await dio.get('/auth/me'); // Asumiendo que este es el endpoint
+      if (response.data != null) {
+        // La respuesta puede venir con una clave 'user'
+        if (response.data['user'] != null) {
+          return UserData.fromJson(response.data['user']);
+        }
+        return UserData.fromJson(response.data);
+      }
+      return null;
+    } catch (e) {
+      // Si el token es inválido o ha expirado, la petición puede fallar.
+      // En ese caso, simplemente devolvemos null.
+      print('Error fetching user data: $e');
+      return null;
+    }
   }
 }

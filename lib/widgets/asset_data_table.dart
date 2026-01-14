@@ -2,7 +2,6 @@
 
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/location.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +10,7 @@ import '../../models/inventory_item.dart';
 import '../../models/asset_type_model.dart';
 import '../../providers/inventory_item_provider.dart';
 import '../../services/toast_service.dart';
-import '../../models/data_source_table.dart'; // Asegúrate de que esta ruta sea correcta
+import '../../models/data_source_table.dart'; 
 
 class AssetDataTable extends StatefulWidget {
   final AssetType assetType;
@@ -37,7 +36,6 @@ class _AssetDataTableState extends State<AssetDataTable> {
   int? _sortColumnIndex = 1;
   bool _sortAscending = true;
   late InventoryDataSource _dataSource;
-  late VoidCallback _providerListener;
 
   @override
   void initState() {
@@ -45,8 +43,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
     final itemProvider = context.read<InventoryItemProvider>();
 
-    // 1. Inicializar el DataSource y el Listener
-    // ------------------------------------------------------------------
+    // 1. Inicializar el DataSource (sin listener manual, build se encarga)
     _dataSource = InventoryDataSource(
       itemProvider: itemProvider,
       assetType: widget.assetType,
@@ -59,61 +56,33 @@ class _AssetDataTableState extends State<AssetDataTable> {
       containerId: widget.containerId,
     );
 
-    _providerListener = () {
-      // Usar el getter público 'inventoryItems' del provider
-      _dataSource.updateItems(itemProvider.inventoryItems);
-    };
-
-    itemProvider.addListener(_providerListener);
-    // ------------------------------------------------------------------
-
-    // 2. Restaurar el estado de ordenamiento
-    // ------------------------------------------------------------------
+    // 2. Restaurar el estado de ordenamiento visual desde el Provider
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final currentSortKey = itemProvider.sortKey;
-
       int index = -1;
-      if (currentSortKey == 'name') {
-        index = 1;
-      } else if (currentSortKey == 'quantity') {
-        index = 2;
-      } else if (currentSortKey == 'minStock') {
-        index = 3;
-      } else if (currentSortKey == 'locationId') {
-        index = 4;
-      } else if (currentSortKey == 'description') {
-        index = 5;
-      } else {
+
+      if (currentSortKey == 'name') index = 1;
+      else if (currentSortKey == 'quantity') index = 2;
+      else if (currentSortKey == 'minStock') index = 3;
+      else if (currentSortKey == 'location') index = 4;
+      else if (currentSortKey == 'description') index = 5;
+      else {
         final customIndex = widget.assetType.fieldDefinitions.indexWhere(
           (def) => def.id.toString() == currentSortKey,
         );
-        if (customIndex != -1) {
-          index = customIndex + 6;
-        }
+        if (customIndex != -1) index = customIndex + 6;
       }
 
-      if (index != -1) {
+      if (index != -1 && mounted) {
         setState(() {
           _sortColumnIndex = index;
           _sortAscending = itemProvider.sortAscending;
         });
       }
     });
-    // ------------------------------------------------------------------
   }
 
-  @override
-  void dispose() {
-    //context.read<InventoryItemProvider>().removeListener(_providerListener);
-    super.dispose();
-  }
-
-  void _sortItems(
-    BuildContext context,
-    int columnIndex,
-    String dataKey,
-    bool ascending,
-  ) {
+  void _sortItems(BuildContext context, int columnIndex, String dataKey, bool ascending) {
     setState(() {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
@@ -121,41 +90,25 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
     final itemProvider = context.read<InventoryItemProvider>();
     itemProvider.sortInventoryItems(dataKey: dataKey, ascending: ascending);
-    itemProvider.goToPage(1);
+    itemProvider.goToPage(1); // Reset a pág 1 al ordenar
   }
 
-  void _copyAsset(BuildContext context, InventoryItem item) async {
-    // 1. Crear una copia del InventoryItem existente con ID de creación.
-    final InventoryItem itemCopy = item.copyWith(
-      id: 0, // 0 indica al backend que es un nuevo registro
-      // 🔑 CORRECCIÓN: Agregar "(Copia)" al nombre para asegurar unicidad.
-      name: item.name,
+  // ... (Métodos _copyAsset, _editAsset, _deleteAsset y _showFilterDialog se mantienen igual)
+  // Asegúrate de que _copyAsset use item.name + " (Copia)" si quieres evitar duplicados visuales inmediatos
 
-      resetImageIds: true, // Esto es correcto para la clonación
+  void _copyAsset(BuildContext context, InventoryItem item) async {
+    final InventoryItem itemCopy = item.copyWith(
+      id: 0, 
+      name: "${item.name} (Copia)",
+      resetImageIds: true,
     );
 
     final itemProvider = context.read<InventoryItemProvider>();
-
-    // 2. Mostrar un indicador de carga (Si manejas la carga a nivel de widget, aquí es donde lo harías)
-    setState(() {
-      // ... (lógica de carga local)
-    });
-
-    // 3. Llamar al servicio para CLONAR la copia
     try {
       await itemProvider.cloneInventoryItem(itemCopy);
-
-      // Usamos el nombre COPIADO para la notificación
       ToastService.success('✅ Activo "${itemCopy.name}" copiado exitosamente.');
     } catch (e) {
       ToastService.error('❌ Error al copiar el activo: $e');
-    } finally {
-      // Si la lógica de carga local (setState) es redundante con el Provider
-      // y no hay otras variables de estado que necesiten limpieza, este bloque
-      // puede dejarse vacío (o limpiar solo el estado local).
-      if (mounted && itemProvider.isLoading) {
-        // Lógica para desactivar el indicador de carga local si aplica.
-      }
     }
   }
 
@@ -164,127 +117,78 @@ class _AssetDataTableState extends State<AssetDataTable> {
       '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}/edit',
       extra: item,
     );
-    ToastService.info('Editando activo: ${item.name} (ID: ${item.id})');
   }
 
   void _deleteAsset(BuildContext context, InventoryItem item) {
     showDialog(
       context: context,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          title: const Text('Confirmar Eliminación'),
-          content: Text(
-            '¿Estás seguro de que deseas eliminar el activo "${item.name}"?',
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('Confirmar Eliminación'),
+        content: Text('¿Estás seguro de que deseas eliminar "${item.name}"?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              context.read<InventoryItemProvider>().deleteInventoryItem(
+                item.id, widget.containerId, widget.assetTypeId,
+              );
+              ToastService.success('Activo eliminado.');
+            },
+            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
           ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Cancelar'),
-              onPressed: () => Navigator.of(dialogContext).pop(),
-            ),
-            TextButton(
-              child: const Text(
-                'Eliminar',
-                style: TextStyle(color: Colors.red),
-              ),
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                final itemProvider = context.read<InventoryItemProvider>();
-
-                itemProvider.deleteInventoryItem(
-                  item.id,
-                  widget.containerId,
-                  widget.assetTypeId,
-                );
-                ToastService.success('Activo "${item.name}" eliminado.');
-              },
-            ),
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 
-  void _showFilterDialog(
-    BuildContext context,
-    String headerText,
-    String filterKey,
-  ) {
+  void _showFilterDialog(BuildContext context, String headerText, String filterKey) {
     final itemProvider = context.read<InventoryItemProvider>();
-    final localFilterController = TextEditingController(
-      text: itemProvider.filters[filterKey] ?? '',
-    );
+    final controller = TextEditingController(text: itemProvider.filters[filterKey] ?? '');
 
-    // 🚨 Usamos showDialog().then(...) para asegurar la disposición del controller
     showDialog(
       context: context,
-      builder: (dialogContext) {
-        // 👈 Usamos dialogContext para cerrar el diálogo
-
-        // Función para aplicar filtro, navegando a página 1, y cerrando el diálogo
-        void applyFilterAndClose(String value) {
-          itemProvider.setFilter(filterKey, value);
-          itemProvider.goToPage(1);
-          // Usamos el contexto del diálogo para cerrarlo
-          Navigator.of(dialogContext).pop();
-        }
-
-        return AlertDialog(
-          title: Text('Filtrar por $headerText'),
-          content: TextField(
-            controller: localFilterController,
-            decoration: const InputDecoration(
-              labelText: 'Escribe el valor a buscar',
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Filtrar por $headerText'),
+        content: TextField(
+          controller: controller,
+          decoration: const InputDecoration(labelText: 'Valor a buscar'),
+          autofocus: true,
+          onSubmitted: (val) {
+            itemProvider.setFilter(filterKey, val);
+            itemProvider.goToPage(1);
+            Navigator.pop(dialogContext);
+          },
+        ),
+        actions: [
+          if (itemProvider.filters.containsKey(filterKey))
+            TextButton(
+              onPressed: () {
+                itemProvider.setFilter(filterKey, null);
+                itemProvider.goToPage(1);
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Borrar Filtro', style: TextStyle(color: Colors.red)),
             ),
-            autofocus: true,
-            onSubmitted: applyFilterAndClose,
+          TextButton(
+            onPressed: () {
+              itemProvider.setFilter(filterKey, controller.text);
+              itemProvider.goToPage(1);
+              Navigator.pop(dialogContext);
+            },
+            child: const Text('Aplicar'),
           ),
-          actions: [
-            // Botón Borrar Filtro
-            if (itemProvider.filters.containsKey(filterKey))
-              TextButton(
-                onPressed: () {
-                  itemProvider.setFilter(filterKey, null);
-                  itemProvider.goToPage(1);
-                  Navigator.of(
-                    dialogContext,
-                  ).pop(); // 👈 Uso explícito de dialogContext
-                },
-                child: const Text(
-                  'Borrar Filtro',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            // Botón Aplicar
-            TextButton(
-              onPressed: () => applyFilterAndClose(localFilterController.text),
-              child: const Text('Aplicar'),
-            ),
-            // Botón Cancelar
-            TextButton(
-              onPressed: () => Navigator.of(
-                dialogContext,
-              ).pop(), // 👈 Uso explícito de dialogContext
-              child: const Text('Cancelar'),
-            ),
-          ],
-        );
-      },
-    ).then((_) {
-      // La disposición del controller sigue siendo correcta aquí
-      localFilterController.dispose();
-    });
+        ],
+      ),
+    ).then((_) => controller.dispose());
   }
 
-  Widget _buildFilterHeader(
-    BuildContext context,
-    String headerText,
-    String filterKey,
-  ) {
+  Widget _buildFilterHeader(BuildContext context, String headerText, String filterKey) {
     final itemProvider = context.watch<InventoryItemProvider>();
     final isActive = itemProvider.filters.containsKey(filterKey);
 
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
           child: Text(
@@ -299,12 +203,9 @@ class _AssetDataTableState extends State<AssetDataTable> {
         IconButton(
           icon: Icon(
             isActive ? Icons.filter_alt : Icons.filter_alt_outlined,
-            size: 20,
-            color: isActive
-                ? Theme.of(context).colorScheme.primary
-                : Colors.grey.shade600,
+            size: 18,
+            color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey,
           ),
-          tooltip: isActive ? 'Filtro activo' : 'Filtrar columna',
           onPressed: () => _showFilterDialog(context, headerText, filterKey),
           padding: EdgeInsets.zero,
           constraints: const BoxConstraints(),
@@ -315,26 +216,28 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Escuchamos cambios en el provider
     final itemProvider = context.watch<InventoryItemProvider>();
 
-    final dataSource = _dataSource;
+    // 2. 🔑 ACTUALIZACIÓN CRÍTICA: Sincronizar ítems con el DataSource antes de renderizar
+    _dataSource.updateItems(itemProvider.inventoryItems);
 
-    // 1. Definición del DataTable2
-    final dataTable = PaginatedDataTable2(
+    return PaginatedDataTable2(
       minWidth: 900,
       columnSpacing: 12,
       horizontalMargin: 12,
       dataRowHeight: 60,
-
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
+      
+      // 3. 🔑 Sincronizar página visual con el estado del Provider
+      initialFirstRowIndex: (itemProvider.currentPage - 1) * itemProvider.itemsPerPage,
 
       empty: Center(
         child: Text(
-          (itemProvider.filters.isEmpty &&
-                  itemProvider.globalSearchTerm == null)
+          (itemProvider.filters.isEmpty && itemProvider.globalSearchTerm == null)
               ? 'No hay activos creados aún.'
-              : 'Ningún activo coincide con los criterios de búsqueda/filtro.',
+              : 'Ningún activo coincide con los criterios.',
         ),
       ),
       columns: [
@@ -346,81 +249,51 @@ class _AssetDataTableState extends State<AssetDataTable> {
         DataColumn2(
           label: _buildFilterHeader(context, 'Nombre', 'name'),
           size: ColumnSize.L,
-          onSort: (columnIndex, ascending) {
-            _sortItems(context, 1, 'name', ascending);
-          },
+          onSort: (idx, asc) => _sortItems(context, idx, 'name', asc),
         ),
         DataColumn2(
-          label: _buildFilterHeader(context, 'Cantidad', 'quantity'),
+          label: _buildFilterHeader(context, 'Stock actual', 'quantity'),
           size: ColumnSize.S,
-          onSort: (columnIndex, ascending) {
-            _sortItems(context, 2, 'quantity', ascending);
-          },
+          onSort: (idx, asc) => _sortItems(context, idx, 'quantity', asc),
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Stock minimo', 'minStock'),
           size: ColumnSize.S,
-          onSort: (columnIndex, ascending) {
-            _sortItems(context, 3, 'minStock', ascending);
-          },
+          onSort: (idx, asc) => _sortItems(context, idx, 'minStock', asc),
         ),
         DataColumn2(
-          label: _buildFilterHeader(context, 'Ubicación', 'locationId'),
+          label: _buildFilterHeader(context, 'Ubicación', 'location'),
           size: ColumnSize.M,
-          onSort: (columnIndex, ascending) {
-            _sortItems(context, 4, 'locationId', ascending);
-          },
+          onSort: (idx, asc) => _sortItems(context, idx, 'location', asc),
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Descripción', 'description'),
           size: ColumnSize.L,
-          onSort: (columnIndex, ascending) {
-            _sortItems(context, 5, 'description', ascending);
-          },
+          onSort: (idx, asc) => _sortItems(context, idx, 'description', asc),
         ),
+        // Columnas dinámicas
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {
           final fieldDef = entry.value;
           final filterKey = fieldDef.id.toString();
-
           return DataColumn2(
             label: _buildFilterHeader(context, fieldDef.name, filterKey),
             size: ColumnSize.M,
-            onSort: (columnIndex, ascending) {
-              _sortItems(context, columnIndex, filterKey, ascending);
-            },
+            onSort: (idx, asc) => _sortItems(context, idx, filterKey, asc),
           );
         }).toList(),
         const DataColumn2(
-          label: Text(
-            'Acciones',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
+          label: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold)),
           size: ColumnSize.S,
         ),
       ],
-
-      // Configuración de paginación que interactúa con el Provider
       rowsPerPage: itemProvider.itemsPerPage,
-      onRowsPerPageChanged: (int? newValue) {
-        if (newValue != null) {
-          itemProvider.setItemsPerPage(newValue);
-        }
+      onRowsPerPageChanged: (newValue) {
+        if (newValue != null) itemProvider.setItemsPerPage(newValue);
       },
-      // El total de filas se obtiene del provider
-      //rowCount: totalItems,
-
-      // Control de página basado en el provider
-      //pageToDisplay: itemProvider.currentPage - 1,
-      onPageChanged: (int pageIndex) {
-        // DataTable2 usa un índice base 0, tu provider usa base 1.
+      onPageChanged: (pageIndex) {
         itemProvider.goToPage(pageIndex + 1);
       },
-
-      source: dataSource,
+      source: _dataSource,
     );
-
-    // 3. Devolvemos la tabla
-    // Se elimina el Column envolvente, ya que la tabla debe ocupar el Expanded del padre.
-    return dataTable;
   }
 }

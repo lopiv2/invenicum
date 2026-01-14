@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/services/toast_service.dart';
-import '../services/api_service.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,7 +17,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
-  final _apiService = ApiService();
 
   Future<void> _login() async {
     if (!_formKey.currentState!.validate()) return;
@@ -26,7 +26,8 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final result = await _apiService.login(
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      final result = await authProvider.login(
         _usernameController.text,
         _passwordController.text,
       );

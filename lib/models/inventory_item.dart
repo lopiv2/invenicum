@@ -1,6 +1,8 @@
 // lib/models/inventory_item.dart (Actualizado)
 
 // --- NUEVA CLASE PARA LAS IMÁGENES (Sin cambios) ---
+import 'package:invenicum/models/location.dart';
+
 class InventoryItemImage {
   final int id;
   final String url;
@@ -23,12 +25,7 @@ class InventoryItemImage {
     );
   }
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'url': url,
-      'altText': altText,
-      'order': order,
-    };
+    return {'id': id, 'url': url, 'altText': altText, 'order': order};
   }
 
   InventoryItemImage copyWith({
@@ -54,8 +51,10 @@ class InventoryItem {
   final int containerId;
   final int assetTypeId;
   final int? locationId; // 🔑 AÑADIDO: ID de la ubicación (nullable)
-  final int quantity; // 🔑 NUEVA: Cantidad del artículo (1 para seriados, variable para no seriados)
+  final int
+  quantity; // 🔑 NUEVA: Cantidad del artículo (1 para seriados, variable para no seriados)
   final int minStock; // 🔑 NUEVA: Stock mínimo recomendado (umbral de alerta)
+  final Location? location;
 
   final List<InventoryItemImage> images;
 
@@ -77,19 +76,20 @@ class InventoryItem {
     this.updatedAt,
     this.customFieldValues,
     this.images = const [],
+    this.location,
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
     final itemData = json['itemData'] ?? json;
-
+    //print(itemData);
     // 1. Obtener el valor JSON de los campos custom
     final dynamic rawCustomFieldValues = itemData['customFieldValues'];
 
     // 2. Conversión segura a Map<String, dynamic>?
     final Map<String, dynamic>? customFieldValues =
         rawCustomFieldValues != null && rawCustomFieldValues is Map
-            ? Map<String, dynamic>.from(rawCustomFieldValues)
-            : null;
+        ? Map<String, dynamic>.from(rawCustomFieldValues)
+        : null;
 
     // 3. Procesar las imágenes
     final List<dynamic> imageListJson =
@@ -120,13 +120,17 @@ class InventoryItem {
       description: itemData['description'] as String?,
       containerId: itemData['containerId'] as int,
       assetTypeId: itemData['assetTypeId'] as int,
-      locationId: itemData['locationId'] as int?, // 🔑 AÑADIDO: Ahora permite null
+      locationId:
+          itemData['locationId'] as int?, // 🔑 AÑADIDO: Ahora permite null
       quantity: itemData['quantity'] as int? ?? 1, // 🔑 NUEVA: Por defecto 1
       minStock: itemData['minStock'] as int? ?? 1, // 🔑 NUEVA: Por defecto 1
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
       customFieldValues: customFieldValues,
       images: images,
+      location: itemData['location'] != null
+        ? Location.fromJson(itemData['location'] as Map<String, dynamic>)
+        : null,
     );
   }
 
@@ -144,6 +148,7 @@ class InventoryItem {
       'images': images.map((img) => img.toJson()).toList(),
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+      'location': location?.toJson(),
     };
   }
 
@@ -169,9 +174,7 @@ class InventoryItem {
     if (images != null) {
       finalImages = images;
     } else if (resetImageIds) {
-      finalImages = this.images
-          .map((img) => img.copyWith(id: 0))
-          .toList();
+      finalImages = this.images.map((img) => img.copyWith(id: 0)).toList();
     } else {
       finalImages = this.images;
     }
@@ -182,12 +185,17 @@ class InventoryItem {
       description: description ?? this.description,
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,
-      locationId: locationId ?? this.locationId, // 🔑 AÑADIDO: Usamos el nuevo o el existente
-      quantity: quantity ?? this.quantity, // 🔑 NUEVA: Usamos el nuevo o el existente
-      minStock: minStock ?? this.minStock, // 🔑 NUEVA: Usamos el nuevo o el existente
+      locationId:
+          locationId ??
+          this.locationId, // 🔑 AÑADIDO: Usamos el nuevo o el existente
+      quantity:
+          quantity ?? this.quantity, // 🔑 NUEVA: Usamos el nuevo o el existente
+      minStock:
+          minStock ?? this.minStock, // 🔑 NUEVA: Usamos el nuevo o el existente
       images: finalImages,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      location: location,
       customFieldValues:
           customFieldValues ??
           (this.customFieldValues != null

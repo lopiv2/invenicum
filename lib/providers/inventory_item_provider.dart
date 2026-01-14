@@ -89,6 +89,41 @@ class InventoryItemProvider with ChangeNotifier {
     return '$containerId-$assetTypeId$aggString';
   }
 
+  Future<void> loadAllItemsGlobal() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // 1. Llamamos al servicio (asegúrate de que el servicio permita IDs opcionales como vimos antes)
+      final response = await _itemService.fetchInventoryItems(
+        containerId:
+            null, // Enviamos null para que el servicio use la ruta global
+        assetTypeId: null,
+      );
+
+      if (_isDisposed) return;
+
+      // 2. 🔑 SOLUCIÓN AL ERROR:
+      // En lugar de '_inventoryItems = ...', guardamos en el caché.
+      // Usamos IDs 0 y 0 para representar la "Vista Global" del Dashboard.
+      final dashboardKey = _getCacheKey(0, 0);
+      _itemsCache[dashboardKey] = response;
+
+      // 3. Establecemos la vista actual a 0,0 para que el getter 'inventoryItems'
+      // sepa de dónde leer los datos inmediatamente.
+      _currentContainerId = 0;
+      _currentAssetTypeId = 0;
+    } catch (e) {
+      debugPrint('Error cargando items globales: $e');
+    } finally {
+      _isLoading = false;
+      if (!_isDisposed) {
+        // Recalculamos totales para que el Dashboard vea los resultados
+        _recalculateTotalsAndNotify();
+      }
+    }
+  }
+
   int getItemCountForAssetType(int containerId, int assetTypeId) {
     final key = _getCacheKey(containerId, assetTypeId);
     // 🔑 CORRECCIÓN: Acceder a la lista de ítems dentro del objeto caché
@@ -130,39 +165,72 @@ class InventoryItemProvider with ChangeNotifier {
       Comparable aValue;
       Comparable bValue;
 
-      final aCustom = a.customFieldValues ?? {};
-      final bCustom = b.customFieldValues ?? {};
+      switch (sortKey) {
+        case 'name':
+          aValue = a.name.trim().toLowerCase();
+          bValue = b.name.trim().toLowerCase();
+          break;
+        case 'description':
+          aValue = (a.description ?? '').trim().toLowerCase();
+          bValue = (b.description ?? '').trim().toLowerCase();
+          break;
+        case 'quantity':
+          aValue = a.quantity;
+          bValue = b.quantity;
+          break;
+        case 'minStock':
+          aValue = a.minStock;
+          bValue = b.minStock;
+          break;
+        case 'createdAt':
+          // Usar una fecha muy antigua para valores nulos para que aparezcan al principio/final
+          aValue = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          bValue = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          break;
+        case 'updatedAt':
+          aValue = a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          bValue = b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
+          break;
+        case 'location':
+          aValue = (a.location?.name ?? '').trim().toLowerCase();
+          bValue = (b.location?.name ?? '').trim().toLowerCase();
 
-      if (sortKey == 'name') {
-        aValue = a.name.trim().toLowerCase();
-        bValue = b.name.trim().toLowerCase();
-      } else if (sortKey == 'description') {
-        aValue = (a.description ?? '').trim().toLowerCase();
-        bValue = (b.description ?? '').trim().toLowerCase();
-      } else {
-        // Lógica de campos personalizados
-        // 1. Obtener valores crudos, limpiarlos y convertirlos a minúsculas
-        final aRaw = (aCustom[sortKey]?.toString() ?? '').trim();
-        final bRaw = (bCustom[sortKey]?.toString() ?? '').trim();
+          // 🔑 Si las ubicaciones son iguales, usamos el nombre como segundo criterio
+          if (aValue == bValue) {
+            aValue = a.name.trim().toLowerCase();
+            bValue = b.name.trim().toLowerCase();
+          }
+          break;
+        default:
+          // Lógica para campos personalizados
+          final aCustom = a.customFieldValues ?? {};
+          final bCustom = b.customFieldValues ?? {};
+          final aRaw = (aCustom[sortKey]?.toString() ?? '').trim();
+          final bRaw = (bCustom[sortKey]?.toString() ?? '').trim();
 
-        // 2. Intentar parsear como Double para ordenamiento numérico
-        final aNumber = double.tryParse(aRaw);
-        final bNumber = double.tryParse(bRaw);
+          final aNumber = num.tryParse(aRaw);
+          final bNumber = num.tryParse(bRaw);
 
-        if (aNumber != null && bNumber != null) {
-          // Si ambos son números, ordenar numéricamente
-          aValue = aNumber;
-          bValue = bNumber;
-        } else {
-          // Si uno o ambos no son números, ordenar alfabéticamente (case-insensitive)
-          aValue = aRaw.toLowerCase();
-          bValue = bRaw.toLowerCase();
-        }
+          if (aNumber != null && bNumber != null) {
+            aValue = aNumber;
+            bValue = bNumber;
+          } else {
+            aValue = aRaw.toLowerCase();
+            bValue = bRaw.toLowerCase();
+          }
+          break;
       }
 
-      final comparison = aValue.compareTo(bValue);
-
-      return sortAscending ? comparison : -comparison;
+      // 🔑 IMPORTANTE: Comparación segura
+      try {
+        final comparison = aValue.compareTo(bValue);
+        return sortAscending ? comparison : -comparison;
+      } catch (e) {
+        // Fallback en caso de que los tipos no coincidan (ej. comparar String con num)
+        return sortAscending
+            ? aValue.toString().compareTo(bValue.toString())
+            : bValue.toString().compareTo(aValue.toString());
+      }
     });
 
     _totalFilteredItems = sortedList.length;
@@ -182,48 +250,64 @@ class InventoryItemProvider with ChangeNotifier {
     );
   }
 
+  void resetState() {
+    _itemsCache.clear();
+    _filters.clear();
+    _globalSearchTerm = null;
+    _currentPage = 1;
+    _currentContainerId = 0;
+    _currentAssetTypeId = 0;
+    _totalFilteredItems = 0;
+    _isLoading = false;
+    notifyListeners();
+  }
+
   Iterable<InventoryItem> _applyFilters(List<InventoryItem> items) {
-    Iterable<InventoryItem> processedItems = items;
+    return items.where((item) {
+      // 1. FILTRO GLOBAL
+      if (_globalSearchTerm != null) {
+        final term = _globalSearchTerm!;
+        bool matches =
+            item.name.toLowerCase().contains(term) ||
+            (item.description ?? '').toLowerCase().contains(term) ||
+            (item.location?.name ?? '').toLowerCase().contains(
+              term,
+            ); // 📍 Búsqueda global incluye ubicación
 
-    // 1. FILTRO GLOBAL
-    if (_globalSearchTerm != null) {
-      final searchTerm = _globalSearchTerm!;
-      processedItems = processedItems.where((item) {
-        if (item.name.toLowerCase().contains(searchTerm)) return true;
-        if ((item.description ?? '').toLowerCase().contains(searchTerm))
-          return true;
-        return item.customFieldValues?.values.any((value) {
-              return (value?.toString().toLowerCase() ?? '').contains(
-                searchTerm,
-              );
-            }) ??
-            false;
-      });
-    }
+        if (!matches) {
+          matches =
+              item.customFieldValues?.values.any(
+                (value) =>
+                    (value?.toString().toLowerCase() ?? '').contains(term),
+              ) ??
+              false;
+        }
+        if (!matches) return false;
+      }
 
-    // 2. FILTRADO POR COLUMNA
-    if (_filters.isNotEmpty) {
-      processedItems = processedItems.where((item) {
+      // 2. FILTRADO POR COLUMNA
+      if (_filters.isNotEmpty) {
         return _filters.entries.every((filterEntry) {
           final filterKey = filterEntry.key;
           final filterValue = filterEntry.value.toLowerCase();
-          String itemValue;
 
-          if (filterKey == 'name') {
-            itemValue = item.name.toLowerCase();
-          } else if (filterKey == 'description') {
-            itemValue = (item.description ?? '').toLowerCase();
-          } else {
-            final rawValue = item.customFieldValues?[filterKey];
-            itemValue = (rawValue?.toString() ?? '').toLowerCase();
-          }
+          String itemValue = '';
+          if (filterKey == 'name')
+            itemValue = item.name;
+          else if (filterKey == 'description')
+            itemValue = item.description ?? '';
+          else if (filterKey == 'location')
+            itemValue =
+                item.location?.name ?? ''; // 📍 Filtro específico columna
+          else
+            itemValue = item.customFieldValues?[filterKey]?.toString() ?? '';
 
-          return itemValue.contains(filterValue);
+          return itemValue.toLowerCase().contains(filterValue);
         });
-      });
-    }
+      }
 
-    return processedItems;
+      return true;
+    });
   }
 
   // ----------------------------------------------------------------------

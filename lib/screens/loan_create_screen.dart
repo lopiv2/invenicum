@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/loan.dart';
+import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
-import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/services/api_service.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
@@ -14,9 +14,9 @@ import 'package:provider/provider.dart';
 
 class LoanCreateScreen extends StatefulWidget {
   final String containerId;
-  final int? loanId;
 
-  const LoanCreateScreen({super.key, required this.containerId, this.loanId});
+  // Ya no recibimos loanId porque esta pantalla es solo para creación
+  const LoanCreateScreen({super.key, required this.containerId});
 
   @override
   State<LoanCreateScreen> createState() => _LoanCreateScreenState();
@@ -28,12 +28,11 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   late TextEditingController _borrowerEmailController;
   late TextEditingController _borrowerPhoneController;
   late TextEditingController _notesController;
-  late TextEditingController _quantityController; // Añadir esto
-  int _currentStock = 0; // Para validar que no presten más de lo que hay
-
+  late TextEditingController _quantityController;
+  
+  int _currentStock = 0;
   InventoryItem? _selectedItem;
   DateTime? _expectedReturnDate;
-  Loan? _editingLoan;
 
   @override
   void initState() {
@@ -43,72 +42,15 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
     _borrowerPhoneController = TextEditingController();
     _notesController = TextEditingController();
     _quantityController = TextEditingController(text: '1');
-
-    if (widget.loanId != null) {
-      _loadLoanForEditing();
-    }
-  }
-
-  @override
-  void didUpdateWidget(LoanCreateScreen oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Si el loanId cambió, recargar el préstamo
-    if (oldWidget.loanId != widget.loanId && widget.loanId != null) {
-      _loadLoanForEditing();
-    }
-  }
-
-  void _loadLoanForEditing() {
-    final loanProvider = context.read<LoanProvider>();
-    final loan = loanProvider.loans.firstWhere(
-      (l) => l.id == widget.loanId,
-      orElse: () => Loan(
-        id: 0,
-        containerId: 0,
-        inventoryItemId: 0,
-        itemName: '',
-        quantity: 1,
-        borrowerName: '',
-        borrowerEmail: '',
-        borrowerPhone: '',
-        loanDate: DateTime.now(),
-        status: 'active',
-      ),
-    );
-
-    if (loan.id != 0) {
-      _editingLoan = loan;
-      _borrowerNameController.text = loan.borrowerName ?? '';
-      _borrowerEmailController.text = loan.borrowerEmail ?? '';
-      _borrowerPhoneController.text = loan.borrowerPhone ?? '';
-      _notesController.text = loan.notes ?? '';
-      _quantityController.text = loan.quantity.toString();
-      // Asegurar que siempre se carga la fecha del préstamo actual desde el provider
-      _expectedReturnDate = loan.expectedReturnDate;
-
-      // Cargar el item seleccionado
-      final itemProvider = context.read<InventoryItemProvider>();
-      _selectedItem = itemProvider.inventoryItems.firstWhere(
-        (item) => item.id == loan.inventoryItemId,
-        orElse: () => InventoryItem(
-          id: 0,
-          name: loan.itemName,
-          assetTypeId: 0,
-          locationId: 0,
-          containerId: 0,
-        ),
-      );
-    }
   }
 
   Future<void> _selectReturnDate() async {
-    final initialDate =
-        _expectedReturnDate ?? DateTime.now().add(Duration(days: 7));
+    final initialDate = _expectedReturnDate ?? DateTime.now().add(const Duration(days: 7));
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now().add(Duration(days: 365)),
+      firstDate: DateTime.now(), // No tiene sentido prestar hacia el pasado
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {
       setState(() {
@@ -122,13 +64,11 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
     final containerIdInt = int.parse(widget.containerId);
 
     try {
-      // Obtener el contenedor
       final container = containerProvider.containers.firstWhere(
         (c) => c.id == containerIdInt,
-        orElse: () => throw Exception('Container not found'),
+        orElse: () => throw Exception('Contenedor no encontrado'),
       );
 
-      // Obtener todos los items de todos los tipos de activo del contenedor
       final allItems = <InventoryItem>[];
       final apiService = context.read<ApiService>();
       final inventoryItemService = InventoryItemService(apiService);
@@ -141,10 +81,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           );
           allItems.addAll(response.items);
         } catch (e) {
-          // Continuar con el siguiente tipo de activo si hay error
-          if (mounted) {
-            ToastService.error('Error cargando items de ${assetType.name}');
-          }
+          debugPrint('Error cargando items de ${assetType.name}');
         }
       }
 
@@ -163,9 +100,12 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                         final item = allItems[index];
                         return ListTile(
                           title: Text(item.name),
+                          subtitle: Text('Disponible: ${item.quantity}'),
                           onTap: () {
                             setState(() {
                               _selectedItem = item;
+                              _currentStock = item.quantity;
+                              _quantityController.text = _currentStock > 0 ? '1' : '0';
                             });
                             Navigator.of(ctx).pop();
                           },
@@ -185,7 +125,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
   void _saveLoan() async {
     if (_formKey.currentState!.validate()) {
-      if (_selectedItem == null && _editingLoan == null) {
+      if (_selectedItem == null) {
         ToastService.error('Debes seleccionar un objeto');
         return;
       }
@@ -194,51 +134,35 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
       if (containerIdInt == null) return;
 
       final loanProvider = context.read<LoanProvider>();
+      final authProvider = context.read<AuthProvider>();
+      final int userId = authProvider.user?.id ?? 0;
 
       try {
         final loan = Loan(
-          id: _editingLoan?.id ?? 0,
+          id: 0,
           quantity: int.tryParse(_quantityController.text) ?? 1,
           containerId: containerIdInt,
-          inventoryItemId: _editingLoan?.inventoryItemId ?? _selectedItem!.id,
-          itemName: _editingLoan?.itemName ?? _selectedItem!.name,
+          inventoryItemId: _selectedItem!.id,
+          itemName: _selectedItem!.name,
           borrowerName: _borrowerNameController.text,
           borrowerEmail: _borrowerEmailController.text,
           borrowerPhone: _borrowerPhoneController.text,
-          loanDate: _editingLoan?.loanDate ?? DateTime.now(),
+          loanDate: DateTime.now(),
           expectedReturnDate: _expectedReturnDate,
           notes: _notesController.text,
-          status: _editingLoan?.status ?? 'active',
+          status: 'active',
+          userId: userId,
         );
 
-        if (_editingLoan != null) {
-          await loanProvider.updateLoan(containerIdInt, loan);
-          if (mounted) {
-            ToastService.success('Préstamo actualizado exitosamente');
-            // Recargar todos los préstamos para asegurar que tenemos la versión actual del servidor
-            await loanProvider.fetchLoans(containerIdInt);
-            // Después de recargar, actualizar el estado local con los datos frescos
-            if (mounted) {
-              setState(() {
-                _loadLoanForEditing();
-              });
-              // Esperar un poco para que el setState se complete antes de navegar
-              await Future.delayed(const Duration(milliseconds: 500));
-            }
-          }
-        } else {
-          await loanProvider.createLoan(containerIdInt, loan);
-          if (mounted) {
-            ToastService.success('Préstamo creado exitosamente');
-          }
-        }
-
+        await loanProvider.createLoan(containerIdInt, loan);
+        
         if (mounted) {
+          ToastService.success('Préstamo registrado exitosamente');
           context.go('/container/${widget.containerId}/loans');
         }
       } catch (e) {
         if (mounted) {
-          ToastService.error('Error al guardar préstamo: ${e.toString()}');
+          ToastService.error('Error al registrar préstamo: ${e.toString()}');
         }
       }
     }
@@ -264,20 +188,12 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              _editingLoan != null
-                  ? 'Editar Préstamo'
-                  : 'Registrar Nuevo Préstamo',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+              'Registrar Nuevo Préstamo',
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
-            // Seleccionar Objeto
-            Text(
-              'Objeto a Prestar',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+            Text('Objeto a Prestar', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -293,24 +209,19 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                       _selectedItem?.name ?? 'Selecciona un objeto',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _selectedItem != null
-                            ? Colors.black
-                            : Colors.grey,
+                        color: _selectedItem != null ? Colors.black : Colors.grey,
                       ),
                     ),
                   ),
                   ElevatedButton(
-                    onPressed: _editingLoan == null ? _selectItem : null,
-                    child: Text(
-                      _editingLoan != null ? 'No editable' : 'Seleccionar',
-                    ),
+                    onPressed: _selectItem,
+                    child: const Text('Seleccionar'),
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 30),
 
-            // Nombre del Prestatario
             TextFormField(
               controller: _borrowerNameController,
               decoration: const InputDecoration(
@@ -318,14 +229,10 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 hintText: 'Ej: Juan Pérez',
                 border: OutlineInputBorder(),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El nombre es obligatorio';
-                }
-                return null;
-              },
+              validator: (value) => (value == null || value.isEmpty) ? 'El nombre es obligatorio' : null,
             ),
             const SizedBox(height: 20),
+
             TextFormField(
               controller: _quantityController,
               decoration: InputDecoration(
@@ -335,8 +242,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               ),
               keyboardType: TextInputType.number,
               validator: (value) {
-                if (value == null || value.isEmpty)
-                  return 'Ingresa una cantidad';
+                if (value == null || value.isEmpty) return 'Ingresa una cantidad';
                 final n = int.tryParse(value);
                 if (n == null || n <= 0) return 'Cantidad no válida';
                 if (n > _currentStock) return 'No hay suficiente stock';
@@ -344,39 +250,33 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               },
             ),
             const SizedBox(height: 20),
-            // Email
+
             TextFormField(
               controller: _borrowerEmailController,
               decoration: const InputDecoration(
                 labelText: 'Correo Electrónico',
-                hintText: 'juan@example.com',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
-                if (value != null && value.isNotEmpty) {
-                  if (!value.contains('@')) {
-                    return 'Correo inválido';
-                  }
+                if (value != null && value.isNotEmpty && !value.contains('@')) {
+                  return 'Correo inválido';
                 }
                 return null;
               },
             ),
             const SizedBox(height: 20),
 
-            // Teléfono
             TextFormField(
               controller: _borrowerPhoneController,
               decoration: const InputDecoration(
                 labelText: 'Teléfono',
-                hintText: '+34 123 456 789',
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.phone,
             ),
             const SizedBox(height: 20),
 
-            // Fecha de Devolución Esperada
             GestureDetector(
               onTap: _selectReturnDate,
               child: Container(
@@ -394,9 +294,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                           : 'Selecciona fecha de devolución',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _expectedReturnDate != null
-                            ? Colors.black
-                            : Colors.grey,
+                        color: _expectedReturnDate != null ? Colors.black : Colors.grey,
                       ),
                     ),
                     const Icon(Icons.calendar_today),
@@ -406,33 +304,24 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Notas
             TextFormField(
               controller: _notesController,
               decoration: const InputDecoration(
                 labelText: 'Notas Adicionales',
-                hintText: 'Ej: Producto en buen estado',
                 border: OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
             const SizedBox(height: 40),
 
-            // Botones
             Row(
               children: [
                 ElevatedButton.icon(
                   onPressed: _saveLoan,
                   icon: const Icon(Icons.save),
-                  label: Text(
-                    _editingLoan != null ? 'Actualizar' : 'Registrar Préstamo',
-                    style: const TextStyle(fontSize: 16),
-                  ),
+                  label: const Text('Registrar Préstamo', style: TextStyle(fontSize: 16)),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 15,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -441,10 +330,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                   icon: const Icon(Icons.cancel),
                   label: const Text('Cancelar', style: TextStyle(fontSize: 16)),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 30,
-                      vertical: 15,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
                   ),
                 ),
               ],

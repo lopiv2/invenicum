@@ -59,10 +59,6 @@ class _LoansScreenState extends State<LoansScreen> {
     context.go('/container/${widget.containerId}/loans/new');
   }
 
-  void _editLoan(int loanId) {
-    context.go('/container/${widget.containerId}/loans/$loanId/edit');
-  }
-
   Future<void> _returnLoan(Loan loan) async {
     final loanProvider = context.read<LoanProvider>();
     final containerIdInt = int.tryParse(widget.containerId);
@@ -416,14 +412,6 @@ class _LoansScreenState extends State<LoansScreen> {
                                       ),
                                       onPressed: () => _generateVoucher(loan),
                                       tooltip: 'Generar Vale de Entrega',
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.edit,
-                                        color: Colors.blue,
-                                      ),
-                                      onPressed: () => _editLoan(loan.id),
-                                      tooltip: 'Editar',
                                     ),
                                     IconButton(
                                       icon: const Icon(
