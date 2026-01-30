@@ -13,6 +13,7 @@ class MainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🎨 Tu tema personalizado
     return Scaffold(
       body: Column(
         children: [
@@ -22,7 +23,7 @@ class MainLayout extends StatelessWidget {
               children: [
                 SidebarLayout(),
                 Expanded(
-                  child: Container(color: Colors.grey[100], child: child),
+                  child: Container(color: theme.colorScheme.surfaceContainer, child: child),
                 ),
               ],
             ),
@@ -40,7 +41,7 @@ class _Header extends StatelessWidget {
     final authProvider = context.watch<AuthProvider>();
     final user = authProvider.user;
     final String avatarSeed = user?.name ?? "Guest";
-    print ("Avatar seed: $avatarSeed");
+    //print ("Avatar seed: $avatarSeed");
 
     return Container(
       height: 60,

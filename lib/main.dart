@@ -2,9 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
+
+// Localizations & Routing
 import 'package:invenicum/l10n/app_localizations.dart';
-import 'package:invenicum/models/user_theme_config_model.dart';
+import 'routing/app_router.dart';
+
+// Providers
 import 'package:invenicum/providers/alert_provider.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
@@ -12,6 +18,10 @@ import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
 import 'package:invenicum/providers/theme_provider.dart';
+import 'package:invenicum/providers/dashboard_provider.dart';
+
+// Services
+import 'package:invenicum/services/api_service.dart';
 import 'package:invenicum/services/alert_service.dart';
 import 'package:invenicum/services/asset_type_service.dart';
 import 'package:invenicum/services/container_service.dart';
@@ -20,124 +30,115 @@ import 'package:invenicum/services/loan_service.dart';
 import 'package:invenicum/services/location_service.dart';
 import 'package:invenicum/services/theme_service.dart';
 import 'package:invenicum/services/voucher_service.dart';
-import 'routing/app_router.dart';
-import 'package:provider/provider.dart';
-import 'services/api_service.dart';
+import 'package:invenicum/services/dashboard_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   if (kIsWeb) {
     BrowserContextMenu.disableContextMenu();
   }
 
-  // 2. Crea el AuthProvider manualmente antes de lanzar la app
+  // 1. Inicialización previa de Auth
   final authProvider = AuthProvider();
-
-  // 3. ESPERA a que se verifique la sesión persistente
   await authProvider.checkAuthStatus();
 
   runApp(
     MultiProvider(
       providers: [
-        // --- PROVEEDORES DE SERVICIO (SIN ESTADO) ---
+        // --- SERVICIOS (Singletons) ---
         Provider(create: (_) => ApiService()),
-        Provider(create: (context) => ThemeService(context.read<ApiService>())),
-        Provider(
-          create: (context) => ContainerService(context.read<ApiService>()),
-        ),
-        Provider(
-          create: (context) => LocationService(context.read<ApiService>()),
-        ),
-        Provider(
-          create: (context) => AssetTypeService(context.read<ApiService>()),
-        ),
-        Provider(
-          create: (context) => InventoryItemService(context.read<ApiService>()),
-        ),
-        Provider(create: (context) => LoanService(context.read<ApiService>())),
-        Provider(
-          create: (context) => VoucherService(context.read<ApiService>()),
-        ),
-        Provider(create: (context) => AlertService(context.read<ApiService>())),
+        Provider(create: (c) => DashboardService(c.read<ApiService>())),
+        Provider(create: (c) => ThemeService(c.read<ApiService>())),
+        Provider(create: (c) => ContainerService(c.read<ApiService>())),
+        Provider(create: (c) => LocationService(c.read<ApiService>())),
+        Provider(create: (c) => AssetTypeService(c.read<ApiService>())),
+        Provider(create: (c) => InventoryItemService(c.read<ApiService>())),
+        Provider(create: (c) => LoanService(c.read<ApiService>())),
+        Provider(create: (c) => VoucherService(c.read<ApiService>())),
+        Provider(create: (c) => AlertService(c.read<ApiService>())),
 
-        // --- PROVEEDORES DE ESTADO (CON NOTIFIERS) ---
+        // --- PROVEEDORES DE ESTADO ---
 
-        // 1. AuthProvider es el principal y no depende de nadie
+        // Auth es la raíz de la lógica
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
 
-        // 2. Los demás providers dependen de AuthProvider.
-        // Se reconstruirán si AuthProvider notifica cambios.
+        // --- Dashboard ---
+        ChangeNotifierProxyProvider<AuthProvider, DashboardProvider>(
+          create: (context) =>
+              DashboardProvider(context.read<DashboardService>()),
+          update: (context, auth, previous) {
+            if (!auth.isLoading && auth.isAuthenticated) {
+              // 🚩 Solo disparamos si no tenemos estadísticas aún
+              if (previous != null &&
+                  previous.stats == null &&
+                  !previous.isLoading) {
+                Future.microtask(() => previous.fetchStats());
+              }
+            }
+            return previous!;
+          },
+        ),
+
+        // --- Items ---
+        ChangeNotifierProxyProvider<AuthProvider, InventoryItemProvider>(
+          create: (c) => InventoryItemProvider(c.read<InventoryItemService>()),
+          update: (context, auth, prev) {
+            if (!auth.isLoading && auth.isAuthenticated && auth.token != null) {
+              // 🚩 Añadimos la misma lógica: solo si está vacío
+              if (prev != null && !prev.isLoading) {
+                Future.microtask(() => prev.loadAllItemsGlobal());
+              }
+            }
+            return prev!;
+          },
+        ),
+
+        // Theme: Sincronización con perfil de usuario
         ChangeNotifierProxyProvider<AuthProvider, ThemeProvider>(
-          create: (context) => ThemeProvider(context.read<ThemeService>()),
-          update: (context, auth, previousProvider) {
+          create: (c) => ThemeProvider(c.read<ThemeService>()),
+          update: (context, auth, prev) {
             if (auth.isAuthenticated &&
                 auth.user?.themeConfig != null &&
-                !previousProvider!.isInitialized) {
+                !prev!.isInitialized) {
               final config = auth.user!.themeConfig!;
-
-              // 🚩 IMPORTANTE: Marcamos como inicializado ANTES del await
-              // para evitar que el ProxyProvider dispare la llamada varias veces
-              previousProvider.setInitializing();
-
-              previousProvider.initializeThemeFromConfig(
+              prev.setInitializing();
+              prev.initializeThemeFromConfig(
                 config.theme.primaryColor,
                 config.theme.brightness,
               );
             }
-            return previousProvider!;
+            return prev!;
           },
         ),
+
+        // Contenedores: Carga inicial
         ChangeNotifierProxyProvider<AuthProvider, ContainerProvider>(
-          create: (context) => ContainerProvider(
-            context.read<ContainerService>(),
-            context.read<AssetTypeService>(),
-            context.read<LocationService>(),
+          create: (c) => ContainerProvider(
+            c.read<ContainerService>(),
+            c.read<AssetTypeService>(),
+            c.read<LocationService>(),
           ),
-          update: (context, auth, previousProvider) {
-            // Cuando 'auth' cambia, podemos reaccionar aquí.
-            // Por ejemplo, si el usuario inicia sesión, podríamos cargar datos.
-            if (auth.isAuthenticated) {
-              previousProvider?.loadContainers();
+          update: (context, auth, prev) {
+            if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
+              Future.microtask(() => prev?.loadContainers());
             }
-            return previousProvider!;
+            return prev!;
           },
         ),
+
+        // Location, Loan, Alert (Siguiendo el mismo patrón si es necesario)
         ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
-          create: (context) =>
-              LocationProvider(context.read<LocationService>()),
-          update: (context, auth, previousProvider) {
-            if (auth.isAuthenticated) {
-              // Asumiendo que LocationProvider tiene un método similar
-              // previousProvider?.loadLocations();
-            }
-            return previousProvider!;
-          },
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, InventoryItemProvider>(
-          create: (context) =>
-              InventoryItemProvider(context.read<InventoryItemService>()),
-          update: (context, auth, previousProvider) {
-            // Lógica similar si es necesario
-            return previousProvider!;
-          },
+          create: (c) => LocationProvider(c.read<LocationService>()),
+          update: (_, auth, prev) => prev!,
         ),
         ChangeNotifierProxyProvider<AuthProvider, LoanProvider>(
-          create: (context) => LoanProvider(context.read<LoanService>()),
-          update: (context, auth, previousProvider) {
-            if (auth.isAuthenticated) {
-              // previousProvider?.loadLoans();
-            }
-            return previousProvider!;
-          },
+          create: (c) => LoanProvider(c.read<LoanService>()),
+          update: (_, auth, prev) => prev!,
         ),
         ChangeNotifierProxyProvider<AuthProvider, AlertProvider>(
-          create: (context) => AlertProvider(context.read<AlertService>()),
-          update: (context, auth, previousProvider) {
-            if (auth.isAuthenticated) {
-              // previousProvider?.loadAlerts();
-            }
-            return previousProvider!;
-          },
+          create: (c) => AlertProvider(c.read<AlertService>()),
+          update: (_, auth, prev) => prev!,
         ),
       ],
       child: const MyApp(),
@@ -145,29 +146,45 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget { // 🚩 Cambiado a StatefulWidget
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    // El AuthProvider ahora es el mismo que se creó en main()
-    final authProvider = Provider.of<AuthProvider>(context);
-    final themeProvider = Provider.of<ThemeProvider>(context);
+  State<MyApp> createState() => _MyAppState();
+}
 
-    return MaterialApp.router(
-      localizationsDelegates: [
-        AppLocalizations.delegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: AppLocalizations.supportedLocales,
-      builder: FToastBuilder(),
-      debugShowCheckedModeBanner: false,
-      title: 'Invenicum',
-      theme: themeProvider.themeData,
-      // Pasamos la instancia correcta al router
-      routerConfig: createAppRouter(authProvider),
+class _MyAppState extends State<MyApp> {
+  late GoRouter _router; // 🚩 Guardamos la instancia aquí
+
+  @override
+  void initState() {
+    super.initState();
+    // Lo creamos una sola vez al iniciar la App
+    // Necesitamos el AuthProvider inicial
+    final authProvider = context.read<AuthProvider>();
+    _router = createAppRouter(authProvider);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Escuchamos Auth y Theme
+    //final authProvider = Provider.of<AuthProvider>(context);
+    final themeProvider = context.watch<ThemeProvider>();
+
+    return ToastificationWrapper(
+      child: MaterialApp.router(
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocalizations.supportedLocales,
+        debugShowCheckedModeBanner: false,
+        title: 'Invenicum',
+        theme: themeProvider.themeData,
+        routerConfig: _router,
+      ),
     );
   }
 }

@@ -82,16 +82,21 @@ class _LocationsScreenState extends State<LocationsScreen>
     final isLoading = locationProvider.isLoading;
     final errorMessage = locationProvider.errorMessage;
     final locations = locationProvider.locations;
+    final theme = Theme.of(context); // 🎨 Tu tema personalizado
     final Map<int, Location> locationMap = {
       for (var loc in locations) loc.id: loc,
     };
     // 1. Manejar el estado de Carga Inicial
     if (isLoading && locations.isEmpty) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return Scaffold(
+        backgroundColor: Colors.transparent, // 👈 Deja ver el fondo del MainLayout
+        body: Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+      );
     }
     // 2. Manejar el estado de Error
     if (errorMessage != null) {
       return Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(title: const Text('Esquema de Ubicaciones')),
         body: Center(
           child: Text(
@@ -104,9 +109,10 @@ class _LocationsScreenState extends State<LocationsScreen>
     // 3. Manejar el estado Sin Datos
     if (locations.isEmpty) {
       return Scaffold(
+        backgroundColor: Colors.transparent,
         appBar: AppBar(
           title: const Text('Esquema de Ubicaciones'),
-          backgroundColor: Colors.blueGrey,
+          backgroundColor: theme.colorScheme.surfaceContainer,
           actions: [
             IconButton(
               icon: const Icon(Icons.add_location_alt),

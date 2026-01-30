@@ -6,16 +6,37 @@ import 'package:invenicum/models/list_data.dart';
 import 'api_service.dart';
 
 class ContainerService {
-  // Ahora _apiService es final y DEBE ser inyectada.
   final ApiService _apiService;
 
-  // Usamos el Dio del ApiService.
+  // Acceso directo al Dio configurado en ApiService
   Dio get _dio => _apiService.dio;
 
-  // Constructor que recibe ApiService (Inyección de dependencia)
   ContainerService(this._apiService);
 
-  // --- Métodos de la API ---
+  // --- Helpers Privados ---
+
+  /// Extrae la clave 'data' de la respuesta de forma segura
+  dynamic _extractData(Response response) {
+    final Map<String, dynamic> responseData = response.data;
+    if (responseData.containsKey('data') && responseData['data'] != null) {
+      return responseData['data'];
+    }
+    throw Exception('La respuesta del servidor no contiene el campo "data".');
+  }
+
+  /// Centraliza el manejo de excepciones de Dio
+  Exception _handleError(DioException e, String context) {
+    if (e.response?.statusCode == 401) {
+      return Exception('No autorizado: Sesión expirada o token inválido.');
+    }
+    if (e.response?.statusCode == 404) {
+      return Exception('Recurso no encontrado ($context).');
+    }
+    final message = e.response?.data?['message'] ?? e.message;
+    return Exception('Error en $context: $message');
+  }
+
+  // --- Métodos de Contenedores ---
 
   Future<ContainerNode> createContainer(
     String name,
@@ -31,120 +52,50 @@ class ContainerService {
           'isCollection': isCollection,
         },
       );
-
-      if (response.statusCode == 201) {
-        // CORRECCIÓN CLAVE: Accede a la clave 'data' dentro de la respuesta.
-        // Si tu API devuelve el objeto anidado en 'data', debes hacer esto:
-        final Map<String, dynamic> responseData = response.data;
-
-        // Verifica que la clave 'data' exista y no sea nula antes de usarla
-        if (responseData.containsKey('data') && responseData['data'] != null) {
-          // Pasa solo el objeto contenedor al fromJson
-          return ContainerNode.fromJson(responseData['data']);
-        } else {
-          // Manejar caso donde 'data' no está presente o es nulo
-          throw Exception(
-            'Respuesta de API exitosa, pero el objeto contenedor ("data") está ausente o es nulo.',
-          );
-        }
-      } else {
-        throw Exception('Error al crear el contenedor: ${response.statusCode}');
-      }
+      return ContainerNode.fromJson(_extractData(response));
     } on DioException catch (e) {
-      // ... (Manejo de errores)
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      throw Exception('Error de conexión: ${e.message}');
-    } catch (e) {
-      throw Exception('Error inesperado: $e');
-    }
-  }
-
-  Future<void> deleteContainer(int containerId) async {
-    try {
-      // Llama al DELETE /api/v1/containers/:containerId
-      await _dio.delete('/containers/$containerId');
-    } catch (e) {
-      // Manejo de errores específicos (ej. 404, 401)
-      rethrow;
+      throw _handleError(e, 'crear contenedor');
     }
   }
 
   Future<List<ContainerNode>> getContainers() async {
     try {
+      // Cargamos relaciones para evitar N+1 queries en el backend
       final response = await _dio.get('/containers?include=datalists,assettypes');
+      final List<dynamic> list = _extractData(response);
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        final List<dynamic> containersList = responseData['data'];
-        
-        // Convertir cada contenedor y asegurarnos de que tenga sus listas
-        final containers = containersList.map((json) {
-          // Asegurarnos de que las listas estén incluidas en el JSON
-          if (!json.containsKey('dataLists') && !json.containsKey('data_lists')) {
-            json['dataLists'] = [];
-          }
-          if (!json.containsKey('assetTypes') && !json.containsKey('asset_types')) {
-            json['assetTypes'] = [];
-          }
-          return ContainerNode.fromJson(json);
-        }).toList();
-
-        return containers;
-      } else {
-        throw Exception(
-          'Error al obtener los contenedores: ${response.statusCode}',
-        );
-      }
+      return list.map((json) {
+        // Normalización: Aseguramos que existan las listas aunque el backend no las envíe
+        json['dataLists'] ??= json['data_lists'] ?? [];
+        json['assetTypes'] ??= json['asset_types'] ?? [];
+        return ContainerNode.fromJson(json);
+      }).toList();
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      throw Exception('Error de conexión: ${e.message}');
-    } catch (e) {
-      print('Error al obtener contenedores: $e');
-      throw Exception('Error inesperado: $e');
+      throw _handleError(e, 'obtener contenedores');
     }
   }
 
   Future<ContainerNode> updateContainer(int containerId, String name) async {
     try {
       final response = await _dio.patch(
-        '/containers/$containerId', // Usar PATCH para actualizar parcialmente
-        data: {
-          'name': name,
-          // Nota: Si quieres actualizar la descripción, puedes incluirla aquí también.
-        },
+        '/containers/$containerId',
+        data: {'name': name},
       );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        if (responseData.containsKey('data') && responseData['data'] != null) {
-          return ContainerNode.fromJson(responseData['data']);
-        } else {
-          throw Exception(
-            'Respuesta de API exitosa, pero el objeto contenedor actualizado ("data") está ausente o es nulo.',
-          );
-        }
-      } else {
-        throw Exception(
-          'Error al actualizar el contenedor: ${response.statusCode}',
-        );
-      }
+      return ContainerNode.fromJson(_extractData(response));
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      if (e.response?.statusCode == 404) {
-        throw Exception('Contenedor no encontrado.');
-      }
-      // Re-lanza el error para que el ContainerProvider lo maneje.
-      throw Exception('Error de conexión al renombrar: ${e.message}');
-    } catch (e) {
-      throw Exception('Error inesperado al renombrar: $e');
+      throw _handleError(e, 'actualizar contenedor');
     }
   }
+
+  Future<void> deleteContainer(int containerId) async {
+    try {
+      await _dio.delete('/containers/$containerId');
+    } on DioException catch (e) {
+      throw _handleError(e, 'eliminar contenedor');
+    }
+  }
+
+  // --- Métodos de DataLists (Listas Personalizadas) ---
 
   Future<ListData> createDataList({
     required int containerId,
@@ -161,28 +112,9 @@ class ContainerService {
           'items': items,
         },
       );
-
-      if (response.statusCode == 201) {
-        final Map<String, dynamic> responseData = response.data;
-        if (responseData.containsKey('data') && responseData['data'] != null) {
-          return ListData.fromJson(responseData['data']);
-        } else {
-          throw Exception(
-            'Respuesta de API exitosa, pero el objeto lista ("data") está ausente o es nulo.',
-          );
-        }
-      } else {
-        throw Exception(
-          'Error al crear la lista personalizada: ${response.statusCode}',
-        );
-      }
+      return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      throw Exception('Error de conexión: ${e.message}');
-    } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw _handleError(e, 'crear lista personalizada');
     }
   }
 
@@ -201,110 +133,36 @@ class ContainerService {
           'items': items,
         },
       );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        if (responseData.containsKey('data') && responseData['data'] != null) {
-          return ListData.fromJson(responseData['data']);
-        } else {
-          throw Exception(
-            'Respuesta de API exitosa, pero el objeto lista ("data") está ausente o es nulo.',
-          );
-        }
-      } else {
-        throw Exception(
-          'Error al actualizar la lista personalizada: ${response.statusCode}',
-        );
-      }
+      return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      if (e.response?.statusCode == 404) {
-        throw Exception('Lista personalizada no encontrada.');
-      }
-      throw Exception('Error de conexión: ${e.message}');
-    } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw _handleError(e, 'actualizar lista personalizada');
     }
   }
 
   Future<void> deleteDataList(int dataListId) async {
     try {
-      final response = await _dio.delete('/datalists/$dataListId');
-      
-      if (response.statusCode != 204 && response.statusCode != 200) {
-        throw Exception(
-          'Error al eliminar la lista personalizada: ${response.statusCode}',
-        );
-      }
+      await _dio.delete('/datalists/$dataListId');
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      if (e.response?.statusCode == 404) {
-        throw Exception('Lista personalizada no encontrada.');
-      }
-      throw Exception('Error de conexión: ${e.message}');
-    } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw _handleError(e, 'eliminar lista personalizada');
     }
   }
 
-  // Método para obtener una lista específica por su ID
   Future<ListData> getDataList(int dataListId) async {
     try {
       final response = await _dio.get('/datalists/$dataListId');
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        if (responseData.containsKey('data') && responseData['data'] != null) {
-          return ListData.fromJson(responseData['data']);
-        } else {
-          throw Exception(
-            'Respuesta de API exitosa, pero el objeto lista ("data") está ausente o es nulo.',
-          );
-        }
-      } else {
-        throw Exception(
-          'Error al obtener la lista personalizada: ${response.statusCode}',
-        );
-      }
+      return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      if (e.response?.statusCode == 404) {
-        throw Exception('Lista personalizada no encontrada.');
-      }
-      throw Exception('Error de conexión: ${e.message}');
-    } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw _handleError(e, 'obtener lista personalizada');
     }
   }
 
-  // Método para obtener las listas de un contenedor específico
   Future<List<ListData>> getDataLists(int containerId) async {
     try {
       final response = await _dio.get('/containers/$containerId/datalists');
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = response.data;
-        final List<dynamic> dataListsJson = responseData['data'];
-
-        return dataListsJson.map((json) => ListData.fromJson(json)).toList();
-      } else {
-        throw Exception(
-          'Error al obtener las listas personalizadas: ${response.statusCode}',
-        );
-      }
+      final List<dynamic> list = _extractData(response);
+      return list.map((json) => ListData.fromJson(json)).toList();
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
-      }
-      throw Exception('Error de conexión: ${e.message}');
-    } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw _handleError(e, 'obtener listas del contenedor');
     }
   }
 }

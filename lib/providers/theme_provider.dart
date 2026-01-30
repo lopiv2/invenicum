@@ -22,6 +22,46 @@ class ThemeProvider with ChangeNotifier {
   static final List<CustomTheme> predefinedThemes = [
     CustomTheme(id: 'emerald', name: 'Esmeralda', primaryColor: Colors.teal),
     CustomTheme(id: 'sunset', name: 'Atardecer', primaryColor: Colors.orange),
+    CustomTheme(id: 'ocean', name: 'Océano Índico', primaryColor: Colors.blue),
+    CustomTheme(
+      id: 'lavender',
+      name: 'Lavanda Dulce',
+      primaryColor: Colors.purple.shade300,
+    ),
+    CustomTheme(
+      id: 'forest',
+      name: 'Bosque Profundo',
+      primaryColor: Colors.green.shade900,
+    ),
+    CustomTheme(id: 'cherry', name: 'Cereza', primaryColor: Colors.redAccent),
+    CustomTheme(
+      id: 'indigo',
+      name: 'Noche Eléctrica',
+      primaryColor: Colors.indigoAccent,
+    ),
+    CustomTheme(id: 'amber', name: 'Oro Ámbar', primaryColor: Colors.amber),
+    CustomTheme(
+      id: 'sakura',
+      name: 'Flor de Cerezo',
+      primaryColor: Colors.pink.shade200,
+    ),
+    CustomTheme(
+      id: 'slate',
+      name: 'Pizarra Moderna',
+      primaryColor: Colors.blueGrey.shade700,
+    ),
+    CustomTheme(
+      id: 'cyberpunk',
+      name: 'Cyberpunk',
+      primaryColor: Colors.pinkAccent,
+      brightness: Brightness.dark,
+    ),
+    CustomTheme(
+      id: 'nordic',
+      name: 'Ártico Nord',
+      primaryColor: Colors.lightBlue.shade100,
+      brightness: Brightness.light,
+    ),
     CustomTheme(
       id: 'dark_mode',
       name: 'Noche Profunda',
@@ -45,7 +85,9 @@ class ThemeProvider with ChangeNotifier {
     );
   }
 
-  setInitializing() { _isInitialized = true; }
+  setInitializing() {
+    _isInitialized = true;
+  }
 
   Future<void> loadUserThemes() async {
     try {
@@ -135,7 +177,7 @@ class ThemeProvider with ChangeNotifier {
 
       // 2. IMPORTANTE: También lo establecemos como tema actual
       // Esto llamará a setTheme() que actualiza UserThemeConfig y hace el notifyListeners()
-      await setTheme(theme);
+      Future.delayed(Duration.zero).then((_) async => await setTheme(theme));
     } catch (e) {
       debugPrint('Error en saveThemeToLibrary: $e');
       rethrow;

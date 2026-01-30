@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+// Models
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/list_data.dart';
 import 'package:invenicum/models/location.dart';
+
+// Providers
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
+
+// Screens
 import 'package:invenicum/screens/alerts_screen.dart';
 import 'package:invenicum/screens/asset_create_screen.dart';
 import 'package:invenicum/screens/asset_edit_screen.dart';
@@ -25,15 +32,14 @@ import 'package:invenicum/screens/location_edit_screen.dart';
 import 'package:invenicum/screens/locations_screen.dart';
 import 'package:invenicum/screens/login_screen.dart';
 import 'package:invenicum/screens/preferences_screen.dart';
-import 'package:invenicum/services/api_service.dart';
-import 'package:invenicum/services/dashboard_service.dart';
+
+// Layout
 import 'package:invenicum/widgets/main_layout.dart';
-import 'package:provider/provider.dart';
+
+// Services
+import 'package:invenicum/services/dashboard_service.dart';
 
 GoRouter createAppRouter(AuthProvider authProvider) {
-  final _apiService = ApiService();
-  final _dashboardService = DashboardService(_apiService);
-
   return GoRouter(
     refreshListenable: authProvider,
     initialLocation: '/dashboard',
@@ -41,29 +47,37 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       final bool isAuthenticated = authProvider.isAuthenticated;
       final bool isLoggingIn = state.matchedLocation == '/login';
 
-      // Si está cargando el estado inicial (checkAuthStatus), no hacemos nada aún
+      // 1. Mientras se verifica el token en disco, no redirigir
       if (authProvider.isLoading) return null;
 
-      // 1. Si NO está autenticado y NO está en el login -> Mandar a login
-      if (!isAuthenticated && !isLoggingIn) return '/login';
+      // 2. Si NO está autenticado y no va a login, forzar login
+      if (!isAuthenticated) {
+        return isLoggingIn ? null : '/login';
+      }
 
-      // 2. Si ESTÁ autenticado e intenta ir a login o a la raíz -> Mandar a dashboard
-      if (isAuthenticated && (isLoggingIn || state.matchedLocation == '/')) {
+      // 3. Si ESTÁ autenticado e intenta ir a login o raíz, mandar a dashboard
+      if (isLoggingIn || state.matchedLocation == '/') {
         return '/dashboard';
       }
 
-      // En cualquier otro caso (está en dashboard, configuración, etc.), permitir
       return null;
     },
     routes: [
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      // Ruta de Login fuera del Shell
+      GoRoute(
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
+
+      // Rutas Protegidas dentro del MainLayout
       ShellRoute(
         builder: (context, state, child) => MainLayout(child: child),
         routes: [
           GoRoute(
             path: '/dashboard',
-            builder: (context, state) =>
-                DashboardScreen(dashboardService: _dashboardService),
+            builder: (context, state) => DashboardScreen(
+              dashboardService: context.read<DashboardService>(),
+            ),
           ),
           GoRoute(
             path: '/alerts',
@@ -77,6 +91,8 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             path: '/delivery-voucher-editor',
             builder: (context, state) => const DeliveryVoucherEditorScreen(),
           ),
+
+          // --- CONTENEDORES / ASSET TYPES ---
           GoRoute(
             path: '/container/:containerId/asset-types',
             builder: (context, state) {
@@ -86,180 +102,146 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             routes: [
               GoRoute(
                 path: 'new',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  return AssetTypeCreateScreen(containerId: containerId);
-                },
+                builder: (context, state) => AssetTypeCreateScreen(
+                  containerId: state.pathParameters['containerId']!,
+                ),
               ),
               GoRoute(
                 path: ':assetTypeId/edit',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  final assetTypeId = state.pathParameters['assetTypeId']!;
-                  return AssetTypeEditScreen(
-                    containerId: containerId,
-                    assetTypeId: assetTypeId,
-                  );
-                },
+                builder: (context, state) => AssetTypeEditScreen(
+                  containerId: state.pathParameters['containerId']!,
+                  assetTypeId: state.pathParameters['assetTypeId']!,
+                ),
               ),
             ],
           ),
+
+          // --- ASSETS (ITEMS) ---
           GoRoute(
             path: '/container/:containerId/asset-types/:assetTypeId/assets',
-            builder: (context, state) {
-              final containerId = state.pathParameters['containerId']!;
-              final assetTypeId = state.pathParameters['assetTypeId']!;
-              return AssetListScreen(
-                containerId: containerId,
-                assetTypeId: assetTypeId,
-              );
-            },
+            builder: (context, state) => AssetListScreen(
+              containerId: state.pathParameters['containerId']!,
+              assetTypeId: state.pathParameters['assetTypeId']!,
+            ),
             routes: [
               GoRoute(
                 path: 'new',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  final assetTypeId = state.pathParameters['assetTypeId']!;
-                  return AssetCreateScreen(
-                    containerId: containerId,
-                    assetTypeId: assetTypeId,
-                  );
-                },
+                builder: (context, state) => AssetCreateScreen(
+                  containerId: state.pathParameters['containerId']!,
+                  assetTypeId: state.pathParameters['assetTypeId']!,
+                ),
               ),
               GoRoute(
                 path: 'import-csv',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  final assetTypeId = state.pathParameters['assetTypeId']!;
-                  return AssetImportScreen(
-                    containerId: containerId,
-                    assetTypeId: assetTypeId,
-                  );
-                },
+                builder: (context, state) => AssetImportScreen(
+                  containerId: state.pathParameters['containerId']!,
+                  assetTypeId: state.pathParameters['assetTypeId']!,
+                ),
               ),
               GoRoute(
                 path: ':assetItemId/edit',
                 builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  final assetTypeId = state.pathParameters['assetTypeId']!;
-                  final assetItemId = state.pathParameters['assetItemId']!;
-                  final InventoryItem? initialItem =
-                      state.extra as InventoryItem?;
+                  final item = state.extra as InventoryItem?;
                   return AssetEditScreen(
-                    containerId: containerId,
-                    assetTypeId: assetTypeId,
-                    assetItemId: assetItemId,
-                    initialItem: initialItem,
+                    containerId: state.pathParameters['containerId']!,
+                    assetTypeId: state.pathParameters['assetTypeId']!,
+                    assetItemId: state.pathParameters['assetItemId']!,
+                    initialItem: item,
                   );
                 },
               ),
             ],
           ),
+
+          // --- DATALISTS ---
           GoRoute(
             path: '/container/:containerId/datalists',
-            builder: (context, state) {
-              final containerId = state.pathParameters['containerId']!;
-              return DataListGridScreen(containerId: containerId);
-            },
+            builder: (context, state) => DataListGridScreen(
+              containerId: state.pathParameters['containerId']!,
+            ),
             routes: [
               GoRoute(
                 path: 'new',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  return DataListCreateScreen(containerId: containerId);
-                },
+                builder: (context, state) => DataListCreateScreen(
+                  containerId: state.pathParameters['containerId']!,
+                ),
               ),
               GoRoute(
                 path: ':dataListId/edit',
                 builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  final dataListId = state.pathParameters['dataListId']!;
-                  final initialData = state.extra as ListData;
+                  final listData = state.extra as ListData?;
                   return DataListEditScreen(
-                    containerId: containerId,
-                    dataListId: dataListId,
-                    initialData: initialData,
+                    containerId: state.pathParameters['containerId']!,
+                    dataListId: state.pathParameters['dataListId']!,
+                    initialData: listData!, // La pantalla debe manejar si esto es null
                   );
                 },
               ),
             ],
           ),
-          GoRoute(
-            path: '/container/:containerId/categories',
-            builder: (context, state) {
-              final containerId = state.pathParameters['containerId']!;
-              return Center(
-                child: Text(
-                  'Gestión de Categorías para Contenedor ID: $containerId',
-                ),
-              );
-            },
-          ),
+
+          // --- LOCATIONS ---
           GoRoute(
             path: '/container/:containerId/locations',
-            builder: (context, state) {
-              final containerId = state.pathParameters['containerId']!;
-              print(
-                'Navegando a LocationsScreen para Container ID: $containerId',
-              );
-              return LocationsScreen(containerId: containerId);
-            },
+            builder: (context, state) => LocationsScreen(
+              containerId: state.pathParameters['containerId']!,
+            ),
             routes: [
               GoRoute(
                 path: 'new',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  return LocationCreateScreen(containerId: containerId);
-                },
+                builder: (context, state) => LocationCreateScreen(
+                  containerId: state.pathParameters['containerId']!,
+                ),
               ),
               GoRoute(
                 path: ':locationId/edit',
                 builder: (context, state) {
                   final containerId = state.pathParameters['containerId']!;
-                  final locationId = int.parse(
-                    state.pathParameters['locationId']!,
-                  );
-                  final locationProvider = context.read<LocationProvider>();
-                  final Location
-                  locationToEdit = locationProvider.locations.firstWhere(
-                    (loc) => loc.id == locationId,
-                    orElse: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Ubicación no encontrada.'),
-                        ),
-                      );
-                      throw Exception(
-                        'Location ID $locationId not found in the Provider list.',
-                      );
-                    },
-                  );
+                  final locationId = int.tryParse(state.pathParameters['locationId'] ?? '');
+                  
+                  // Intentar obtener del extra
+                  Location? location = state.extra as Location?;
+                  
+                  // Fallback: Si no hay extra (ej. refresh), buscar en el provider
+                  if (location == null && locationId != null) {
+                    final provider = context.read<LocationProvider>();
+                    try {
+                      location = provider.locations.firstWhere((l) => l.id == locationId);
+                    } catch (_) {
+                      // Si no está, la pantalla de edición deberá cargarla por ID o mostrar error
+                    }
+                  }
+
                   return LocationEditScreen(
                     containerId: containerId,
-                    location: locationToEdit,
+                    location: location!, // Puede ser null, la pantalla debe validarlo
                   );
                 },
               ),
             ],
           ),
+
+          // --- LOANS ---
           GoRoute(
             path: '/container/:containerId/loans',
-            builder: (context, state) {
-              final containerId = state.pathParameters['containerId']!;
-              return LoansScreen(containerId: containerId);
-            },
+            builder: (context, state) => LoansScreen(
+              containerId: state.pathParameters['containerId']!,
+            ),
             routes: [
               GoRoute(
                 path: 'new',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  return LoanCreateScreen(containerId: containerId);
-                },
+                builder: (context, state) => LoanCreateScreen(
+                  containerId: state.pathParameters['containerId']!,
+                ),
               ),
             ],
           ),
         ],
       ),
     ],
+    // Manejo de errores de ruta no encontrada
+    errorBuilder: (context, state) => Scaffold(
+      body: Center(child: Text('Página no encontrada: ${state.uri}')),
+    ),
   );
 }

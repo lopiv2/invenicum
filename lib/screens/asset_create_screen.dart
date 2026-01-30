@@ -503,7 +503,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         body: Center(child: CircularProgressIndicator()),
       );
     }
-
+    final theme = Theme.of(context); // 🎨 Tu tema personalizado
     // 🔑 Se envuelve la vista en un Scaffold para ser una pantalla completa
     return Scaffold(
       appBar: AppBar(title: Text('Crear Activo: ${_assetType!.name}')),
@@ -649,7 +649,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: Colors.blue.shade50,
+                              color: theme.secondaryHeaderColor,
                               borderRadius: BorderRadius.circular(4),
                               border: Border.all(color: Colors.blue.shade200),
                             ),

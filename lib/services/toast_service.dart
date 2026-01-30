@@ -1,68 +1,73 @@
-// lib/utils/toast_service.dart
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:toastification/toastification.dart';
 
-// Definimos los tipos de Toast disponibles
 enum ToastType { success, info, error }
 
 class ToastService {
-  // Función principal para mostrar el toast
+  // Función principal adaptada a Toastification
   static void show(
     String message,
     ToastType type, [
-    int durationSeconds = 3, // Opcional
-    ToastGravity gravity = ToastGravity.BOTTOM, // Opcional
+    int durationSeconds = 4, // Toastification luce mejor con un poco más de tiempo
+    Alignment alignment = Alignment.bottomCenter,
   ]) {
-    String webColor;
-    Color bgColor;
-    final textColor = Colors.white;
+    
+    // 1. Mapeamos tus tipos a los estilos de Toastification
+    ToastificationType toastType;
+    IconData icon;
+    Color primaryColor;
 
-    // 1. Asignar colores e iconos según el tipo de Toast
     switch (type) {
       case ToastType.success:
-        webColor = "#2e7d32"; // Green shade 800
-        bgColor = Colors.green;
+        toastType = ToastificationType.success;
+        icon = Icons.check_circle_outline;
+        primaryColor = Colors.green.shade800;
         break;
       case ToastType.info:
-        webColor = "#1976d2"; // Blue shade 700
-        bgColor = Colors.blue;
+        toastType = ToastificationType.info;
+        icon = Icons.info_outline;
+        primaryColor = Colors.blue.shade700;
         break;
       case ToastType.error:
-        webColor = "#d32f2f"; // Red shade 700 (¡Este es el que quieres!)
-        bgColor = Colors.red;
+        toastType = ToastificationType.error;
+        icon = Icons.error_outline;
+        primaryColor = Colors.red.shade800;
         break;
     }
 
-    // 2. Mostrar el Toast usando la función nativa de fluttertoast
-    Fluttertoast.showToast(
-      msg: message,
-      toastLength: Toast.LENGTH_LONG, // Usamos LONG para que se vea más tiempo
-      gravity: gravity,
-      timeInSecForIosWeb: durationSeconds,
-      backgroundColor: bgColor,
-      textColor: textColor,
-      fontSize: 16.0,
-
-      // 💡 Opcional: Construir un Widget personalizado
-      webShowClose: true, // Útil para web
-      webBgColor: webColor, // Configuración opcional para web
-      // Para un estilo más avanzado (como añadir el icono),
-      // tendrías que usar el enfoque de FToast.showToast() y crear un Widget.
-      // Sin embargo, la implementación básica de Fluttertoast (mostrada arriba)
-      // es la más simple y portable.
+    // 2. Ejecutamos la notificación
+    toastification.show(
+      type: toastType,
+      style: ToastificationStyle.flatColored, // Estilo limpio y moderno
+      autoCloseDuration: Duration(seconds: durationSeconds),
+      title: Text(message, style: const TextStyle(fontWeight: FontWeight.w600)),
+      alignment: alignment,
+      direction: TextDirection.ltr,
+      animationDuration: const Duration(milliseconds: 300),
+      icon: Icon(icon, color: primaryColor),
+      primaryColor: primaryColor,
+      backgroundColor: Colors.white,
+      foregroundColor: Colors.black87,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      borderRadius: BorderRadius.circular(12),
+      showProgressBar: true, // Barra de tiempo visual muy útil
+      closeButtonShowType: CloseButtonShowType.onHover,
+      pauseOnHover: true,
+      dragToClose: true,
     );
   }
 
-  // --- Opcional: Métodos de Acceso Directo ---
-  static void success(String message, [int durationSeconds = 3]) {
+  // --- Métodos de Acceso Directo (Exactamente iguales a los que tenías) ---
+  static void success(String message, [int durationSeconds = 4]) {
     show(message, ToastType.success, durationSeconds);
   }
 
-  static void info(String message, [int durationSeconds = 3]) {
+  static void info(String message, [int durationSeconds = 4]) {
     show(message, ToastType.info, durationSeconds);
   }
 
-  static void error(String message, [int durationSeconds = 3]) {
+  static void error(String message, [int durationSeconds = 4]) {
     show(message, ToastType.error, durationSeconds);
   }
 }

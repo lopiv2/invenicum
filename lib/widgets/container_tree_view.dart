@@ -107,6 +107,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     final isContainer = node.level == 1;
     final isSection = node.level == 2;
     final isClickable = isContainer || isSection;
+    final theme = Theme.of(context);
 
     ContainerNode? container;
     if (isContainer) {
@@ -128,10 +129,10 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
             _getIconForNode(node, container),
             size: isContainer ? 20 : 16,
             color: isContainer
-                ? Theme.of(context).primaryColor
+                ? theme.colorScheme.primary
                 : isSection
-                ? Colors.blueGrey
-                : Colors.grey,
+                ? theme.colorScheme.secondary
+                : theme.hintColor,
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -141,8 +142,8 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
                 fontSize: isContainer ? 14 : 12,
                 fontWeight: isSection ? FontWeight.bold : FontWeight.normal,
                 color: isContainer
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey[900],
+                    ? theme.colorScheme.onSurface
+                    : theme.colorScheme.onSurfaceVariant,
               ),
               overflow: TextOverflow.ellipsis,
             ),
@@ -181,6 +182,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
   @override
   Widget build(BuildContext context) {
     // 🔑 CONSUMER: Este widget escucha cualquier cambio en ContainerProvider
+    final theme = Theme.of(context);
     return Consumer<ContainerProvider>(
       builder: (context, provider, child) {
         final containers =
@@ -264,10 +266,10 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
           builder: (context, node) => _itemBuilder(context, node, containers),
 
           expansionBehavior: ExpansionBehavior.snapToTop,
-          indentation: const Indentation(
+          indentation: Indentation(
             style: IndentStyle.roundJoint,
             width: 24,
-            color: Color(0xFFE0E0E0),
+            color: theme.dividerColor,
           ),
         );
       },
@@ -397,6 +399,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     BuildContext context,
     ContainerNode container,
   ) async {
+    final theme = Theme.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -412,10 +415,12 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text(
+              style: FilledButton.styleFrom(
+                backgroundColor: theme.colorScheme.error,
+              ),
+              child: Text(
                 'Eliminar',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: theme.colorScheme.error),
               ),
             ),
           ],

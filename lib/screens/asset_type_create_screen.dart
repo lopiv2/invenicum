@@ -180,6 +180,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🎨 Tu tema personalizado
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32.0),
       child: Form(
@@ -214,7 +215,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
 
             // --- Checkbox para Tipo de Activo (Seriado/No Seriado) ---
             Card(
-              color: Colors.blue.shade50,
+              color: theme.secondaryHeaderColor,
               child: CheckboxListTile(
                 title: const Text('¿Es un artículo seriado?'),
                 subtitle: const Text(

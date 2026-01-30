@@ -76,6 +76,10 @@ class InventoryItemService {
     }
   }
 
+  Future<String?> getToken() async {
+    return await _apiService.getToken();
+  }
+
   // NUEVO MÉTODO DE CLONACIÓN
   Future<InventoryItem> cloneInventoryItem(InventoryItem item) async {
     // Asegúrate de que tu cliente HTTP (ej. Dio, http) usa la ruta correcta

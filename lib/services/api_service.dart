@@ -8,64 +8,53 @@ class ApiService {
   static final ApiService _instance = ApiService._internal();
   final Dio dio = Dio();
   final _storage = const FlutterSecureStorage();
+  
+  // 🚀 MEMORIA SÍNCRONA: El secreto para ganar la carrera de milisegundos.
+  String? _cachedToken;
 
-  factory ApiService() {
-    return _instance;
-  }
+  factory ApiService() => _instance;
 
   ApiService._internal() {
     dio.options.baseUrl = '${Environment.apiUrl}${Environment.apiVersion}';
-    dio.options.connectTimeout = Duration(
-      milliseconds: Environment.connectTimeout,
-    );
-    dio.options.receiveTimeout = Duration(
-      milliseconds: Environment.receiveTimeout,
-    );
+    dio.options.connectTimeout = Duration(milliseconds: Environment.connectTimeout);
+    dio.options.receiveTimeout = Duration(milliseconds: Environment.receiveTimeout);
 
-    // Interceptor para agregar el token a las peticiones
-    dio.interceptors.addAll([
+    dio.interceptors.add(
       InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await _storage.read(key: Environment.authTokenKey);
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
+        onRequest: (options, handler) {
+          // 🚩 CAMBIO CRÍTICO: Eliminamos el 'await' de aquí.
+          // Si el token no está en _cachedToken, no lo buscamos en el disco dentro del interceptor
+          // porque el disco es demasiado lento para peticiones en ráfaga.
+          
+          if (_cachedToken != null) {
+            options.headers['Authorization'] = 'Bearer $_cachedToken';
           }
           return handler.next(options);
         },
-      ),
-      // MODIFICACIÓN AQUÍ:
-      LogInterceptor(
-        requestBody: true,
-        responseBody:
-            false, // Desactivamos el body global para manejarlo manualmente si quieres
-        error: true,
-        logPrint: (object) {
-          // Solo imprimimos si no parece ser una lista gigante de bytes
-          final log = object.toString();
-          if (log.length < 1000) print(log);
+        onError: (e, handler) {
+          if (e.response?.statusCode == 401) {
+            _cachedToken = null;
+            _storage.delete(key: Environment.authTokenKey);
+          }
+          return handler.next(e);
         },
       ),
-    ]);
+    );
   }
 
+  // ----------------------------------------------------
+  // MÉTODOS DE AUTENTICACIÓN
+  // ----------------------------------------------------
+
   Future<LoginResponse> login(String username, String password) async {
-    // 2. Imprime la URL para verificarla
     try {
       final response = await dio.post(
         Environment.loginEndpoint,
         data: {'username': username, 'password': password},
       );
 
-      if (response.data is! Map<String, dynamic>) {
-        return LoginResponse(
-          success: false,
-          message: 'Error en el formato de la respuesta del servidor',
-        );
-      }
-
+      // Normalización de la respuesta (por si viene envuelta en 'data')
       Map<String, dynamic> responseData = response.data;
-
-      // Si hay un objeto data, usamos esos valores
       if (responseData['data'] is Map) {
         responseData = responseData['data'] as Map<String, dynamic>;
       }
@@ -73,76 +62,41 @@ class ApiService {
       final loginResponse = LoginResponse.fromJson(responseData);
 
       if (loginResponse.success && loginResponse.token != null) {
-        await _storage.write(
-          key: Environment.authTokenKey,
-          value: loginResponse.token!,
-        );
-        print('Token guardado: ${loginResponse.token}'); // Para depuración
+        // 🔑 PRIMERO en memoria (instantáneo para las siguientes peticiones)
+        _cachedToken = loginResponse.token;
+        // 🔑 SEGUNDO en disco (asíncrono, no bloquea el flujo)
+        _storage.write(key: Environment.authTokenKey, value: _cachedToken!);
       }
-
       return loginResponse;
     } on DioException catch (e) {
-      String message;
-
-      if (e.response != null) {
-        // Si hay una respuesta del servidor, lee el mensaje de error directamente
-        message =
-            e.response!.data['message'] ?? 'Error en la respuesta del servidor';
-
-        // Y retorna una respuesta de LoginResponse con el error
-        return LoginResponse(success: false, message: message);
-      } else {
-        // Si no hay respuesta del servidor (timeout, conexión perdida, etc.)
-        switch (e.type) {
-          case DioExceptionType.connectionTimeout:
-          case DioExceptionType.sendTimeout:
-          case DioExceptionType.receiveTimeout:
-            message =
-                'Tiempo de espera agotado. Por favor, verifica tu conexión.';
-            break;
-          case DioExceptionType.connectionError:
-            message = 'Error de conexión. Verifica tu conexión a internet.';
-            break;
-          default:
-            message = 'Error desconocido. Por favor, intenta de nuevo.';
-        }
-        return LoginResponse(success: false, message: message);
-      }
-    } catch (e) {
-      // Para cualquier otro tipo de error inesperado
       return LoginResponse(
-        success: false,
-        message: 'Error inesperado: ${e.toString()}',
+        success: false, 
+        message: e.response?.data['message'] ?? 'Error de autenticación'
       );
     }
   }
 
-  Future<bool> isAuthenticated() async {
-    final token = await _storage.read(key: Environment.authTokenKey);
-    return token != null;
+  // 🚩 REEMPLAZO: Este método se llama UNA SOLA VEZ al arrancar la app (en main.dart)
+  Future<void> initializeToken() async {
+    _cachedToken = await _storage.read(key: Environment.authTokenKey);
   }
 
-  Future<void> logout() async {
-    await _storage.delete(key: Environment.authTokenKey);
-    dio.options.headers.remove('Authorization');
-  }
+  // Getter síncrono para los Providers
+  String? get currentToken => _cachedToken;
+
+  Future<String?> getToken() async => _cachedToken ?? await _storage.read(key: Environment.authTokenKey);
 
   Future<UserData?> getMe() async {
     try {
-      final response = await dio.get('/auth/me'); // Asumiendo que este es el endpoint
-      if (response.data != null) {
-        // La respuesta puede venir con una clave 'user'
-        if (response.data['user'] != null) {
-          return UserData.fromJson(response.data['user']);
-        }
-        return UserData.fromJson(response.data);
-      }
-      return null;
-    } catch (e) {
-      // Si el token es inválido o ha expirado, la petición puede fallar.
-      // En ese caso, simplemente devolvemos null.
-      print('Error fetching user data: $e');
-      return null;
-    }
+      final response = await dio.get('/auth/me');
+      return UserData.fromJson(response.data['user'] ?? response.data);
+    } catch (_) { return null; }
+  }
+
+  Future<bool> isAuthenticated() async => _cachedToken != null || (await _storage.read(key: Environment.authTokenKey)) != null;
+
+  Future<void> logout() async {
+    _cachedToken = null;
+    await _storage.delete(key: Environment.authTokenKey);
   }
 }

@@ -235,15 +235,19 @@ class _LoansScreenState extends State<LoansScreen> {
     final loanProvider = context.watch<LoanProvider>();
     final isLoading = loanProvider.isLoading;
     final loans = _getFilteredLoans(loanProvider.loans);
-
+    final theme = Theme.of(context); // 🎨 Tu tema personalizado
     if (isLoading && loanProvider.loans.isEmpty) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
-    }
+    return Scaffold(
+      backgroundColor: Colors.transparent, // 👈 Deja ver el fondo del MainLayout
+      body: Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+    );
+  }
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       appBar: AppBar(
         title: const Text('Gestión de Préstamos'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: theme.colorScheme.surfaceContainer,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

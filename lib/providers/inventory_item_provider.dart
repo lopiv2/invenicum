@@ -90,39 +90,42 @@ class InventoryItemProvider with ChangeNotifier {
   }
 
   Future<void> loadAllItemsGlobal() async {
-    _isLoading = true;
-    notifyListeners();
+  // 🔑 GUARDIA DE SEGURIDAD: Si no hay token en el servicio, no disparamos.
+  // Esto evita el 401 si por alguna razón el ProxyProvider se dispara antes.
+  final token = await _itemService.getToken(); // Necesitarás añadir este método al service o acceder al apiService
+  if (token == null) {
+    debugPrint('[InventoryItemProvider] Abortando carga global: Sin token.');
+    return;
+  }
 
-    try {
-      // 1. Llamamos al servicio (asegúrate de que el servicio permita IDs opcionales como vimos antes)
-      final response = await _itemService.fetchInventoryItems(
-        containerId:
-            null, // Enviamos null para que el servicio use la ruta global
-        assetTypeId: null,
-      );
+  if (_isLoading) return; // Evita llamadas duplicadas
 
-      if (_isDisposed) return;
+  _isLoading = true;
+  notifyListeners();
 
-      // 2. 🔑 SOLUCIÓN AL ERROR:
-      // En lugar de '_inventoryItems = ...', guardamos en el caché.
-      // Usamos IDs 0 y 0 para representar la "Vista Global" del Dashboard.
-      final dashboardKey = _getCacheKey(0, 0);
-      _itemsCache[dashboardKey] = response;
+  try {
+    final response = await _itemService.fetchInventoryItems(
+      containerId: null, 
+      assetTypeId: null,
+    );
 
-      // 3. Establecemos la vista actual a 0,0 para que el getter 'inventoryItems'
-      // sepa de dónde leer los datos inmediatamente.
-      _currentContainerId = 0;
-      _currentAssetTypeId = 0;
-    } catch (e) {
-      debugPrint('Error cargando items globales: $e');
-    } finally {
-      _isLoading = false;
-      if (!_isDisposed) {
-        // Recalculamos totales para que el Dashboard vea los resultados
-        _recalculateTotalsAndNotify();
-      }
+    if (_isDisposed) return;
+
+    final dashboardKey = _getCacheKey(0, 0);
+    _itemsCache[dashboardKey] = response;
+
+    _currentContainerId = 0;
+    _currentAssetTypeId = 0;
+  } catch (e) {
+    debugPrint('Error cargando items globales: $e');
+    // Si es un 401, podrías limpiar la caché aquí
+  } finally {
+    _isLoading = false;
+    if (!_isDisposed) {
+      _recalculateTotalsAndNotify();
     }
   }
+}
 
   int getItemCountForAssetType(int containerId, int assetTypeId) {
     final key = _getCacheKey(containerId, assetTypeId);

@@ -99,6 +99,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // 🎨 Tu tema personalizado
     final containerProvider = context.watch<ContainerProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
 
@@ -116,10 +117,20 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
     if (container == null) {
       // 🎯 Mostrar indicador de carga si los contenedores aún no están listos
       if (containerProvider.isLoading) {
-        return const Center(child: CircularProgressIndicator());
+        return Center(
+          child: CircularProgressIndicator(
+            color:
+                theme.primaryColor, // 👈 Usa tu color (Esmeralda, Cereza, etc.)
+          ),
+        );
       }
       return Center(
-        child: Text('Contenedor con ID ${widget.containerId} no encontrado.'),
+        child: Text(
+          'Contenedor con ID ${widget.containerId} no encontrado.',
+          style: TextStyle(
+            color: theme.colorScheme.error,
+          ), // Texto en color de error del tema
+        ),
       );
     }
 
@@ -135,25 +146,36 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             children: [
               Text(
                 'Tipos de Activo en "${container.name}"',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: theme
+                      .colorScheme
+                      .onSurface, // Se adapta a fondo claro/oscuro
                 ),
               ),
               ElevatedButton.icon(
                 onPressed: () => _goToCreateAssetType(context),
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('Crear Nuevo Tipo'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.colorScheme.surfaceContainer, // 👈 Color del tema
+                  foregroundColor: theme
+                      .colorScheme
+                      .onSurface, // Texto legible sobre el color
+                ),
               ),
             ],
           ),
           const SizedBox(height: 20),
 
           if (assetTypes.isEmpty)
-            const Expanded(
+            Expanded(
               child: Center(
                 child: Text(
                   'Aún no hay Tipos de Activo definidos en este contenedor.',
-                  style: TextStyle(color: Colors.grey),
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                  ),
                 ),
               ),
             )
