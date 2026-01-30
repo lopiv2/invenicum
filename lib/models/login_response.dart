@@ -1,3 +1,5 @@
+import 'package:invenicum/models/user_data_model.dart';
+
 class LoginResponse {
   final bool success;
   final String message;
@@ -26,28 +28,4 @@ class LoginResponse {
   }
 }
 
-class UserData {
-  final int id;
-  final String email;
-  final String name;
 
-  UserData({required this.id, required this.email, required this.name});
-
-  factory UserData.fromJson(Map<String, dynamic> json) {
-    print('Parsing User Data:');
-    print('- Raw User Data: $json');
-
-    final userData = UserData(
-      id: json['id'] is int ? json['id'] : int.parse(json['id'].toString()),
-      email: json['email']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-    );
-
-    print('- Parsed User Data:');
-    print('  * ID: ${userData.id}');
-    print('  * Email: ${userData.email}');
-    print('  * Name: ${userData.name}');
-
-    return userData;
-  }
-}

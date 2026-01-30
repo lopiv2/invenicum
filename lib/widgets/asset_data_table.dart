@@ -3,6 +3,7 @@
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/location.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +11,7 @@ import '../../models/inventory_item.dart';
 import '../../models/asset_type_model.dart';
 import '../../providers/inventory_item_provider.dart';
 import '../../services/toast_service.dart';
-import '../../models/data_source_table.dart'; 
+import '../../models/data_source_table.dart';
 
 class AssetDataTable extends StatefulWidget {
   final AssetType assetType;
@@ -61,11 +62,16 @@ class _AssetDataTableState extends State<AssetDataTable> {
       final currentSortKey = itemProvider.sortKey;
       int index = -1;
 
-      if (currentSortKey == 'name') index = 1;
-      else if (currentSortKey == 'quantity') index = 2;
-      else if (currentSortKey == 'minStock') index = 3;
-      else if (currentSortKey == 'location') index = 4;
-      else if (currentSortKey == 'description') index = 5;
+      if (currentSortKey == 'name')
+        index = 1;
+      else if (currentSortKey == 'quantity')
+        index = 2;
+      else if (currentSortKey == 'minStock')
+        index = 3;
+      else if (currentSortKey == 'location')
+        index = 4;
+      else if (currentSortKey == 'description')
+        index = 5;
       else {
         final customIndex = widget.assetType.fieldDefinitions.indexWhere(
           (def) => def.id.toString() == currentSortKey,
@@ -82,7 +88,12 @@ class _AssetDataTableState extends State<AssetDataTable> {
     });
   }
 
-  void _sortItems(BuildContext context, int columnIndex, String dataKey, bool ascending) {
+  void _sortItems(
+    BuildContext context,
+    int columnIndex,
+    String dataKey,
+    bool ascending,
+  ) {
     setState(() {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
@@ -98,7 +109,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
   void _copyAsset(BuildContext context, InventoryItem item) async {
     final InventoryItem itemCopy = item.copyWith(
-      id: 0, 
+      id: 0,
       name: "${item.name} (Copia)",
       resetImageIds: true,
     );
@@ -126,12 +137,17 @@ class _AssetDataTableState extends State<AssetDataTable> {
         title: const Text('Confirmar Eliminación'),
         content: Text('¿Estás seguro de que deseas eliminar "${item.name}"?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancelar'),
+          ),
           TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
               context.read<InventoryItemProvider>().deleteInventoryItem(
-                item.id, widget.containerId, widget.assetTypeId,
+                item.id,
+                widget.containerId,
+                widget.assetTypeId,
               );
               ToastService.success('Activo eliminado.');
             },
@@ -142,9 +158,15 @@ class _AssetDataTableState extends State<AssetDataTable> {
     );
   }
 
-  void _showFilterDialog(BuildContext context, String headerText, String filterKey) {
+  void _showFilterDialog(
+    BuildContext context,
+    String headerText,
+    String filterKey,
+  ) {
     final itemProvider = context.read<InventoryItemProvider>();
-    final controller = TextEditingController(text: itemProvider.filters[filterKey] ?? '');
+    final controller = TextEditingController(
+      text: itemProvider.filters[filterKey] ?? '',
+    );
 
     showDialog(
       context: context,
@@ -168,7 +190,10 @@ class _AssetDataTableState extends State<AssetDataTable> {
                 itemProvider.goToPage(1);
                 Navigator.pop(dialogContext);
               },
-              child: const Text('Borrar Filtro', style: TextStyle(color: Colors.red)),
+              child: const Text(
+                'Borrar Filtro',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           TextButton(
             onPressed: () {
@@ -183,7 +208,11 @@ class _AssetDataTableState extends State<AssetDataTable> {
     ).then((_) => controller.dispose());
   }
 
-  Widget _buildFilterHeader(BuildContext context, String headerText, String filterKey) {
+  Widget _buildFilterHeader(
+    BuildContext context,
+    String headerText,
+    String filterKey,
+  ) {
     final itemProvider = context.watch<InventoryItemProvider>();
     final isActive = itemProvider.filters.containsKey(filterKey);
 
@@ -200,15 +229,18 @@ class _AssetDataTableState extends State<AssetDataTable> {
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        IconButton(
-          icon: Icon(
-            isActive ? Icons.filter_alt : Icons.filter_alt_outlined,
-            size: 18,
-            color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey,
+        GestureDetector(
+          onTap: () => _showFilterDialog(context, headerText, filterKey),
+          child: Padding(
+            padding: const EdgeInsets.only(left: 4.0),
+            child: Icon(
+              isActive ? Icons.filter_alt : Icons.filter_alt_outlined,
+              size: 16, // Reducido de 18 a 16
+              color: isActive
+                  ? Theme.of(context).colorScheme.primary
+                  : Colors.grey,
+            ),
           ),
-          onPressed: () => _showFilterDialog(context, headerText, filterKey),
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(),
         ),
       ],
     );
@@ -218,24 +250,30 @@ class _AssetDataTableState extends State<AssetDataTable> {
   Widget build(BuildContext context) {
     // 1. Escuchamos cambios en el provider
     final itemProvider = context.watch<InventoryItemProvider>();
+    // 💡 CÁLCULO DINÁMICO DEL ANCHO
+    // Base de 800px para campos fijos + 150px por cada campo personalizado
+    double dynamicMinWidth =
+        800 + (widget.assetType.fieldDefinitions.length * 150);
 
     // 2. 🔑 ACTUALIZACIÓN CRÍTICA: Sincronizar ítems con el DataSource antes de renderizar
     _dataSource.updateItems(itemProvider.inventoryItems);
 
     return PaginatedDataTable2(
-      minWidth: 900,
+      minWidth: dynamicMinWidth,
       columnSpacing: 12,
       horizontalMargin: 12,
       dataRowHeight: 60,
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
-      
+
       // 3. 🔑 Sincronizar página visual con el estado del Provider
-      initialFirstRowIndex: (itemProvider.currentPage - 1) * itemProvider.itemsPerPage,
+      initialFirstRowIndex:
+          (itemProvider.currentPage - 1) * itemProvider.itemsPerPage,
 
       empty: Center(
         child: Text(
-          (itemProvider.filters.isEmpty && itemProvider.globalSearchTerm == null)
+          (itemProvider.filters.isEmpty &&
+                  itemProvider.globalSearchTerm == null)
               ? 'No hay activos creados aún.'
               : 'Ningún activo coincide con los criterios.',
         ),
@@ -243,7 +281,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
       columns: [
         const DataColumn2(
           label: Center(child: Icon(Icons.photo_library_outlined, size: 20)),
-          size: ColumnSize.S,
+          size: ColumnSize.M,
           numeric: true,
         ),
         DataColumn2(
@@ -275,14 +313,24 @@ class _AssetDataTableState extends State<AssetDataTable> {
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {
           final fieldDef = entry.value;
           final filterKey = fieldDef.id.toString();
+          ColumnSize columnSize = ColumnSize.M;
+          if (fieldDef.type == CustomFieldType.boolean ||
+              fieldDef.type == CustomFieldType.number) {
+            columnSize = ColumnSize.S; // Más estrecho para números o checks
+          } else if (fieldDef.type == CustomFieldType.dropdown) {
+            columnSize = ColumnSize.L; // Más ancho para desplegables
+          }
           return DataColumn2(
             label: _buildFilterHeader(context, fieldDef.name, filterKey),
-            size: ColumnSize.M,
+            size: columnSize,
             onSort: (idx, asc) => _sortItems(context, idx, filterKey, asc),
           );
         }).toList(),
         const DataColumn2(
-          label: Text('Acciones', style: TextStyle(fontWeight: FontWeight.bold)),
+          label: Text(
+            'Acciones',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           size: ColumnSize.S,
         ),
       ],

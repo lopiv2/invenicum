@@ -1,5 +1,6 @@
 // lib/providers/auth_provider.dart
 import 'package:flutter/material.dart';
+import 'package:invenicum/models/user_data_model.dart';
 import '../models/login_response.dart';
 import '../services/api_service.dart';
 

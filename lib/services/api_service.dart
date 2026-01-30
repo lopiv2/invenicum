@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:invenicum/models/user_data_model.dart';
 import '../config/environment.dart';
 import '../models/login_response.dart';
 

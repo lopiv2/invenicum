@@ -275,7 +275,12 @@ class InventoryDataSource extends DataTableSource {
         ),
       ),
       // 2. Nombre
-      DataCell(Text(item.name, overflow: TextOverflow.ellipsis)),
+      DataCell(
+        Tooltip(
+          message: item.name,
+          child: Text(item.name, overflow: TextOverflow.ellipsis),
+        ),
+      ),
 
       // 3. Cantidad
       DataCell(
@@ -302,40 +307,62 @@ class InventoryDataSource extends DataTableSource {
       ),
 
       // 6. Descripción
-      DataCell(Text(item.description ?? '—', overflow: TextOverflow.ellipsis)),
+      DataCell(
+        Tooltip(
+          message: item.description ?? '—',
+          child: Text(item.description ?? '—', overflow: TextOverflow.ellipsis),
+        ),
+      ),
     ];
 
     // 5+. Campos Personalizados
     for (final fieldDef in assetType.fieldDefinitions) {
-      final fieldValue = item.customFieldValues?[fieldDef.id.toString()];
+      final Map<String, dynamic> customValues = item.customFieldValues ?? {};
+
+      final fieldValue =
+          customValues[fieldDef.id.toString()] ??
+          customValues[fieldDef.id] ??
+          customValues[fieldDef.name];
+
       cells.add(_buildCustomFieldCell(context, fieldDef, fieldValue));
     }
 
     // Última celda: Acciones
     cells.add(
       DataCell(
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit, size: 20),
-              color: Theme.of(context).colorScheme.primary,
-              tooltip: 'Editar',
-              onPressed: () => editCallback(item),
-            ),
-            IconButton(
-              icon: const Icon(Icons.copy, size: 20),
-              color: Theme.of(context).colorScheme.primary,
-              tooltip: 'Copiar',
-              onPressed: () => copyCallback(item),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, size: 20),
-              color: Colors.red[600],
-              tooltip: 'Eliminar',
-              onPressed: () => deleteCallback(item),
-            ),
-          ],
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.edit, size: 20),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                color: Theme.of(context).colorScheme.primary,
+                tooltip: 'Editar',
+                onPressed: () => editCallback(item),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.copy, size: 20),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                color: Theme.of(context).colorScheme.primary,
+                tooltip: 'Copiar',
+                onPressed: () => copyCallback(item),
+              ),
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.delete, size: 20),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+                color: Colors.red[600],
+                tooltip: 'Eliminar',
+                onPressed: () => deleteCallback(item),
+              ),
+            ],
+          ),
         ),
       ),
     );

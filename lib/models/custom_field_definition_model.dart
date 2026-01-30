@@ -1,5 +1,5 @@
 // lib/models/custom_field_definition.dart
-import 'package:invenicum/models/custom_field_definition.dart'; 
+import 'package:invenicum/models/custom_field_definition.dart';
 // Asumo que tu CustomFieldType y CustomFieldTypeExtension están aquí
 
 class CustomFieldDefinition {
@@ -73,16 +73,17 @@ class CustomFieldDefinition {
     return CustomFieldDefinition(
       id: parsedId,
       name: json['name'] as String,
-      
+
       // 🐛 CORRECCIÓN CRÍTICA: Usar el método fromString de la extensión
       // para manejar el parsing robusto de la cadena de la API.
       type: CustomFieldTypeExtension.fromString(json['type'] as String),
 
       // isRequired puede venir como 'is_required' o 'isRequired'
-      isRequired: json['isRequired'] as bool? ?? json['is_required'] as bool? ?? false,
-      
+      isRequired:
+          json['isRequired'] as bool? ?? json['is_required'] as bool? ?? false,
+
       dataListId: parsedDataListId,
-      
+
       // DESERIALIZACIÓN DE LOS NUEVOS CAMPOS (usando '?? false' como fallback seguro)
       // Se asume que en el JSON serán 'isSummable' y 'isCountable'
       isSummable: json['isSummable'] as bool? ?? false,
@@ -95,30 +96,20 @@ class CustomFieldDefinition {
   // ----------------------------------------------------------------
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = {};
+    return {
+      if (id != null) 'id': id,
+      'name': name,
+      'type': type.dbName,
+      'isRequired': isRequired,
 
-    if (id != null && id! > 0) {
-      map['id'] = id;
-    }
+      // 💡 Solo enviamos a la API si es TRUE.
+      // Si lo cambias a Texto y pasa a ser false, desaparece del JSON
+      // y Prisma ya no se queja del "Unknown argument".
+      if (isSummable) 'isSummable': true,
+      if (isCountable) 'isCountable': true,
 
-    map['name'] = name;
-    // 💡 MEJORA: Usar dbName para enviar el identificador técnico a la API
-    map['type'] = type.dbName; 
-    map['isRequired'] = isRequired;
-
-    // Serialización de los campos de contador/sumatorio
-    if (isSummable) {
-      map['isSummable'] = true;
-    }
-    if (isCountable) {
-      map['isCountable'] = true;
-    }
-
-    if (dataListId != null) {
-      map['dataListId'] = dataListId;
-    }
-
-    return map;
+      if (dataListId != null) 'dataListId': dataListId,
+    };
   }
 }
 

@@ -9,8 +9,8 @@ class Environment {
   static String get baseUrl => '$apiUrl$apiVersion';
   
   // Timeouts
-  static const int connectTimeout = 5000; // 5 segundos
-  static const int receiveTimeout = 3000; // 3 segundos
+  static const int connectTimeout = 15000; // 15 segundos
+  static const int receiveTimeout = 45000; // 45 segundos
 
   // Endpoints
   static const String loginEndpoint = '/auth/login';

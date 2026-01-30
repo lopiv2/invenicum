@@ -83,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: _usernameController,
+                    textInputAction: TextInputAction.next,
                     decoration: const InputDecoration(
                       labelText: 'Usuario',
                       border: OutlineInputBorder(),
@@ -102,6 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: OutlineInputBorder(),
                     ),
                     obscureText: true,
+                    onFieldSubmitted: (_) => _isLoading ? null : _login(),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Por favor ingrese su contraseña';

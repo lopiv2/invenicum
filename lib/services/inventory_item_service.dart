@@ -18,7 +18,6 @@ class InventoryItemService {
   InventoryItemService(this._apiService);
 
   // --- 1. READ (Lectura) ---
-  // 🔑 CAMBIO CLAVE: Ahora devuelve InventoryResponse (que contiene items y totales)
   Future<InventoryResponse> fetchInventoryItems({
     int? containerId,
     int? assetTypeId,

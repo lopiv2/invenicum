@@ -5,9 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/location.dart';
+import 'package:invenicum/services/ai_service.dart';
+import 'package:invenicum/services/api_service.dart';
 import 'package:invenicum/utils/asset_form_utils.dart';
 import 'package:invenicum/widgets/image_preview_section.dart';
 import 'package:invenicum/widgets/location_dropdown_widget.dart';
+import 'package:invenicum/widgets/magic_ai_dialog_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../models/asset_type_model.dart';
@@ -36,8 +39,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _quantityController = TextEditingController(text: '1'); // 🔑 NUEVA: Controlador de cantidad
-  final _minStockController = TextEditingController(text: '1'); // 🔑 NUEVA: Controlador de stock mínimo
+  final _quantityController = TextEditingController(
+    text: '1',
+  ); // 🔑 NUEVA: Controlador de cantidad
+  final _minStockController = TextEditingController(
+    text: '1',
+  ); // 🔑 NUEVA: Controlador de stock mínimo
+  bool _isMagicLoading = false;
+  Set<String> _highlightedFields = {};
 
   // 🔑 ESTADO DE UBICACIÓN
   List<Location> _availableLocations = []; // Lista de ubicaciones disponibles
@@ -50,6 +59,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   final Map<int, String?> _selectedListValues = {}; // Valores seleccionados
 
   final Map<int, bool> _booleanFieldValues = {};
+  final ScrollController _scrollController = ScrollController();
 
   // Estado para gestionar las URLs de previsualización (Base64)
   List<String> _imagePreviewUrls = [];
@@ -57,12 +67,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   AssetType? _assetType;
   int? _containerId;
   int? _assetTypeId;
+  late AIService _aiService;
 
   @override
   void initState() {
     super.initState();
     _containerId = int.tryParse(widget.containerId);
     _assetTypeId = int.tryParse(widget.assetTypeId);
+    _aiService = AIService(context.read<ApiService>());
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeForm();
@@ -114,6 +126,101 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     });
   }
 
+  Future<void> _runMagicAI(String url) async {
+    if (_assetType == null) return;
+
+    setState(() => _isMagicLoading = true);
+
+    try {
+      // 1. Obtener nombres de campos personalizados definidos para este AssetType
+      final List<String> customFields = _assetType!.fieldDefinitions
+          .map((f) => f.name)
+          .toList();
+
+      // 2. Llamada al servicio (AIService)
+      // Se incluye 'name' y 'description' como campos estándar que la IA siempre debe buscar
+      final Map<String, dynamic> result = await _aiService.extractDataFromUrl(
+        url: url,
+        fields: ['name', 'description', ...customFields],
+      );
+
+      setState(() {
+        // 3. Rellenar campos comunes
+        if (result.containsKey('name')) {
+          _nameController.text = result['name'].toString();
+          _highlightedFields.add('name');
+        }
+        if (result.containsKey('description')) {
+          _descriptionController.text = result['description'].toString();
+          _highlightedFields.add('description');
+        }
+
+        // 4. Rellenar campos personalizados dinámicos
+        for (var fieldDef in _assetType!.fieldDefinitions) {
+          final key = fieldDef.name;
+          if (result.containsKey(key)) {
+            _highlightedFields.add(key); // Usamos el nombre del campo como ID
+          }
+          if (!result.containsKey(key)) continue;
+
+          final value = result[key];
+
+          if (fieldDef.type == CustomFieldType.boolean) {
+            _booleanFieldValues[fieldDef.id!] = value is bool
+                ? value
+                : value.toString().toLowerCase() == 'true';
+          } else if (fieldDef.type == CustomFieldType.dropdown) {
+            final List<String> options = _listFieldValues[fieldDef.id] ?? [];
+            final String incomingValue = value.toString();
+
+            // Búsqueda flexible (case-insensitive)
+            final matchedOption = options.firstWhere(
+              (opt) => opt.toLowerCase() == incomingValue.toLowerCase(),
+              orElse: () => '',
+            );
+
+            if (matchedOption.isNotEmpty) {
+              _selectedListValues[fieldDef.id!] = matchedOption;
+            }
+          } else {
+            // Para text, number, price, url, date
+            final controller = _customControllers[fieldDef.id];
+            if (controller != null) {
+              String valStr = value.toString();
+
+              // Si el campo es numérico o de precio, opcionalmente podrías limpiar símbolos
+              if (fieldDef.type == CustomFieldType.number ||
+                  fieldDef.type == CustomFieldType.price) {
+                // Esto quita todo lo que no sea número, coma o punto
+                valStr = valStr.replaceAll(RegExp(r'[^0-9.,]'), '');
+              }
+
+              controller.text = valStr;
+            }
+          }
+        }
+      });
+
+      ToastService.success('¡Campos completados con éxito!');
+      // --- EFECTO TEMPORAL ---
+      // Quitamos el color verde después de 3 segundos
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          setState(() => _highlightedFields.clear());
+        }
+      });
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    } catch (e) {
+      ToastService.error('La IA no pudo extraer los datos: $e');
+    } finally {
+      setState(() => _isMagicLoading = false);
+    }
+  }
+
   Future<void> _loadListValues(int dataListId, int fieldId) async {
     try {
       final containerProvider = context.read<ContainerProvider>();
@@ -135,6 +242,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _scrollController.dispose();
     _descriptionController.dispose();
     _quantityController.dispose(); // 🔑 NUEVA: Limpiar controlador de cantidad
     _minStockController.dispose(); // 🔑 NUEVA: Limpiar controlador de minStock
@@ -180,6 +288,19 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       }
     } else {
       ToastService.info('Selección de archivos cancelada.');
+    }
+  }
+
+  void _showMagicDialog() async {
+    // Mostramos el diálogo y esperamos el resultado (la URL)
+    final String? url = await showDialog<String>(
+      context: context,
+      builder: (context) => const MagicAiDialog(),
+    );
+
+    // Si el usuario no canceló y la URL no es nula, ejecutamos la lógica
+    if (url != null && url.isNotEmpty) {
+      _runMagicAI(url);
     }
   }
 
@@ -235,9 +356,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       id: 0,
       containerId: _containerId!,
       assetTypeId: _assetTypeId!,
-      locationId: _selectedLocationId, // 🔑 Ahora puede ser null si no hay ubicaciones
-      quantity: int.tryParse(_quantityController.text) ?? 1, // 🔑 NUEVA: Obtener cantidad del controlador
-      minStock: int.tryParse(_minStockController.text) ?? 1, // 🔑 NUEVA: Obtener minStock del controlador
+      locationId:
+          _selectedLocationId, // 🔑 Ahora puede ser null si no hay ubicaciones
+      quantity:
+          int.tryParse(_quantityController.text) ??
+          1, // 🔑 NUEVA: Obtener cantidad del controlador
+      minStock:
+          int.tryParse(_minStockController.text) ??
+          1, // 🔑 NUEVA: Obtener minStock del controlador
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: customFieldValues,
@@ -345,6 +471,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                 labelText: fieldDef.name,
                 hintText: AssetFormUtils.getHintText(fieldDef.type),
                 border: const OutlineInputBorder(),
+                filled: _highlightedFields.contains(fieldDef.name),
+                fillColor: Colors.green.withOpacity(0.1),
                 helperText: fieldDef.isRequired ? 'Obligatorio' : null,
               ),
               validator: (value) {
@@ -388,10 +516,59 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
             children: [
               Expanded(
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   padding: const EdgeInsets.only(bottom: 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const SizedBox(height: 10),
+                      // SUSTITÚYELO POR ESTO
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: _isMagicLoading
+                              ? ElevatedButton.icon(
+                                  key: const ValueKey('loading'),
+                                  onPressed:
+                                      null, // Deshabilitado mientras carga
+                                  icon: const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.amber,
+                                    ),
+                                  ),
+                                  label: const Text('Analizando web...'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.amber.shade50,
+                                    disabledBackgroundColor:
+                                        Colors.amber.shade50,
+                                  ),
+                                )
+                              : ElevatedButton.icon(
+                                  key: const ValueKey('idle'),
+                                  onPressed: _showMagicDialog,
+                                  icon: const Icon(
+                                    Icons.auto_awesome,
+                                    color: Colors.amber,
+                                  ),
+                                  label: const Text('Rellenar con IA'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.amber.shade100,
+                                    foregroundColor: Colors.amber.shade900,
+                                    side: BorderSide(
+                                      color: Colors.amber.shade300,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                  ),
+                                ),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
                       // --- CAMPOS COMUNES ---
                       const Text(
                         'Datos Comunes',
@@ -416,9 +593,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
                       TextFormField(
                         controller: _nameController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Nombre del Activo',
                           border: OutlineInputBorder(),
+                          filled: _highlightedFields.contains('name'),
+                          fillColor: Colors.green.withOpacity(0.1),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -430,8 +609,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _descriptionController,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: 'Descripción (Opcional)',
+                          filled: _highlightedFields.contains('description'),
+                          fillColor: Colors.green.withOpacity(0.1),
                           border: OutlineInputBorder(),
                         ),
                         maxLines: 3,
@@ -470,8 +651,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                             decoration: BoxDecoration(
                               color: Colors.blue.shade50,
                               borderRadius: BorderRadius.circular(4),
-                              border:
-                                  Border.all(color: Colors.blue.shade200),
+                              border: Border.all(color: Colors.blue.shade200),
                             ),
                             child: const Row(
                               children: [
@@ -496,7 +676,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                           decoration: const InputDecoration(
                             labelText: 'Stock Mínimo',
                             border: OutlineInputBorder(),
-                            helperText: 'Cantidad mínima recomendada del artículo',
+                            helperText:
+                                'Cantidad mínima recomendada del artículo',
                           ),
                           keyboardType: TextInputType.number,
                           inputFormatters: [

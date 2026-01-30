@@ -8,15 +8,15 @@ import 'package:file_picker/file_picker.dart';
 import '../models/list_data.dart';
 import '../models/asset_type_model.dart';
 import '../models/custom_field_definition.dart';
-import '../models/custom_field_definition_model.dart'; 
+import '../models/custom_field_definition_model.dart';
 import '../providers/container_provider.dart';
 import '../services/toast_service.dart';
 import '../widgets/custom_field_editor.dart';
-import '../config/environment.dart'; 
+import '../config/environment.dart';
 
 class AssetTypeEditScreen extends StatefulWidget {
   final String containerId;
-  final String assetTypeId; 
+  final String assetTypeId;
 
   const AssetTypeEditScreen({
     super.key,
@@ -39,8 +39,10 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
 
   // Estado para la imagen
   String? _imagePreviewUrl;
-  bool _imageWasRemoved = false; // Bandera para indicar que la imagen existente debe eliminarse
-  bool _isNewImageBase64 = false; // Bandera para saber si la URL es Base64 (nueva) o remota (existente)
+  bool _imageWasRemoved =
+      false; // Bandera para indicar que la imagen existente debe eliminarse
+  bool _isNewImageBase64 =
+      false; // Bandera para saber si la URL es Base64 (nueva) o remota (existente)
 
   @override
   void initState() {
@@ -114,11 +116,14 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         setState(() {
           _imagePreviewUrl = base64Image;
           _isNewImageBase64 = true; // Es una imagen nueva
-          _imageWasRemoved = false; // Si se carga una nueva, no eliminamos la anterior
+          _imageWasRemoved =
+              false; // Si se carga una nueva, no eliminamos la anterior
         });
         ToastService.info('Imagen seleccionada');
       } else {
-        ToastService.error('Error: No se pudo obtener la data de la imagen seleccionada.');
+        ToastService.error(
+          'Error: No se pudo obtener la data de la imagen seleccionada.',
+        );
       }
     } else {
       ToastService.info('Selección de archivo cancelada.');
@@ -129,7 +134,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
     setState(() {
       _imagePreviewUrl = null;
       _isNewImageBase64 = false; // Ya no hay imagen Base64
-      
+
       // Si el AssetType ya tenía una imagen, marcamos para eliminación
       if (_currentAssetType?.images.isNotEmpty ?? false) {
         _imageWasRemoved = true;
@@ -143,7 +148,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
       _fieldDefinitions.add(
         CustomFieldDefinition(
           id: 0,
-          name: '', 
+          name: '',
           type: CustomFieldType.text,
           isRequired: false,
           isSummable: false,
@@ -166,7 +171,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
     final containerProvider = context.read<ContainerProvider>();
     final containerIdInt = int.tryParse(widget.containerId);
     final assetTypeIdInt = int.tryParse(widget.assetTypeId);
-    
+
     if (containerIdInt == null || assetTypeIdInt == null) return;
 
     final updatedTypeName = _nameController.text;
@@ -181,7 +186,8 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         newImageBytes = base64Decode(parts[1]);
         // Intentar obtener la extensión, por defecto 'jpeg'
         final mimeType =
-            RegExp(r'data:image/([^;]+);').firstMatch(parts[0])?.group(1) ?? 'jpeg';
+            RegExp(r'data:image/([^;]+);').firstMatch(parts[0])?.group(1) ??
+            'jpeg';
         newImageName = 'asset_type_image.$mimeType';
       }
     }
@@ -192,7 +198,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         assetTypeId: assetTypeIdInt,
         name: updatedTypeName,
         fieldDefinitions: _fieldDefinitions,
-        
+
         // Parámetros de imagen
         imageBytes: newImageBytes,
         imageName: newImageName,
@@ -230,7 +236,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
-    
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32.0),
       child: Form(
@@ -295,7 +301,11 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
                                   fit: BoxFit.contain,
                                   height: 180,
                                   errorBuilder: (c, e, s) => const Center(
-                                    child: Icon(Icons.broken_image, size: 48, color: Colors.grey),
+                                    child: Icon(
+                                      Icons.broken_image,
+                                      size: 48,
+                                      color: Colors.grey,
+                                    ),
                                   ),
                                 ),
                         ),
@@ -355,7 +365,10 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
                     onDelete: () => _removeField(index),
                     onUpdate: (updatedField) {
                       setState(() {
-                        _fieldDefinitions[index] = updatedField;
+                        // Nos aseguramos de PRESERVAR el ID que ya tenía este campo en la lista
+                        _fieldDefinitions[index] = updatedField.copyWith(
+                          id: _fieldDefinitions[index].id,
+                        );
                       });
                     },
                   ),
