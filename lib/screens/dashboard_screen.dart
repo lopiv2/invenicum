@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/providers/auth_provider.dart'; // Necesitamos el Auth
+import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/services/dashboard_service.dart';
 import 'package:invenicum/widgets/stat_card.dart';
@@ -15,8 +16,6 @@ class DashboardScreen extends StatelessWidget {
   Future<DashboardStats?> _fetchStats(BuildContext context) async {
     final auth = context.read<AuthProvider>();
     
-    // 🚩 BLOQUEO DE SEGURIDAD
-    // Si no hay token o estamos en proceso de carga, no disparamos la petición
     if (auth.token == null || auth.isLoading) {
       debugPrint('[DashboardScreen] Esperando token... Petición abortada.');
       return null; 
@@ -32,40 +31,38 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Dashboard',
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          Text(
+            l10n.dashboard,
+            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
 
           FutureBuilder<DashboardStats?>(
-            // Pasamos el contexto para verificar el estado de Auth
             future: _fetchStats(context), 
             builder: (context, snapshot) {
               
-              // 1. Manejo de nulidad (cuando abortamos la petición por falta de token)
               if (snapshot.connectionState == ConnectionState.done && snapshot.data == null) {
-                return const Center(
+                return Center(
                   child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text('Sincronizando sesión...'),
+                    padding: const EdgeInsets.all(20),
+                    child: Text(l10n.syncingSession),
                   ),
                 );
               }
 
-              // 2. Mostrar Error
               if (snapshot.hasError) {
                 return Center(
-                  child: Text('Error al cargar datos: ${snapshot.error}'),
+                  child: Text('${l10n.errorLoadingData}: ${snapshot.error}'),
                 );
               }
 
-              // 3. Mostrar Carga
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
                   child: Padding(
@@ -75,7 +72,6 @@ class DashboardScreen extends StatelessWidget {
                 );
               }
 
-              // 4. Mostrar Datos
               if (snapshot.hasData) {
                 final stats = snapshot.data!;
                 
@@ -83,32 +79,32 @@ class DashboardScreen extends StatelessWidget {
                   builder: (context, loanProvider, child) {
                     return GridView.count(
                       crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-                      crossAxisSpacing: 20, // Ajustado de 120 (que era mucho)
+                      crossAxisSpacing: 20,
                       mainAxisSpacing: 12,
                       childAspectRatio: 1.8,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         StatCard(
-                          title: 'Contenedores',
+                          title: l10n.containers,
                           count: stats.totalContainers,
                           icon: Icons.inventory_2_outlined,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                         StatCard(
-                          title: 'Tipos de Activos',
+                          title: l10n.totalAssets,
                           count: stats.totalAssets,
                           icon: Icons.type_specimen,
                           color: Colors.orange.shade600,
                         ),
                         StatCard(
-                          title: 'Activos',
+                          title: l10n.assets,
                           count: stats.totalItems,
                           icon: Icons.devices_other_outlined,
                           color: Colors.green.shade600,
                         ),
                         StatCard(
-                          title: 'Préstamos vigentes',
+                          title: l10n.activeLoans,
                           count: loanProvider.activeLoans.length,
                           icon: Icons.compare_arrows,
                           color: Colors.red.shade600,

@@ -54,6 +54,7 @@ dependencies:
   random_avatar: ^0.0.8
   flutter_colorpicker: ^1.1.0
   toastification: ^3.0.3
+  flutter_carousel_widget: ^3.1.0
 
 dev_dependencies:
   flutter_test:

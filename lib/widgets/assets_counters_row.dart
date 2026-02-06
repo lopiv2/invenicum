@@ -22,124 +22,118 @@ class AssetCountersRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Escuchamos el provider
     final itemProvider = context.watch<InventoryItemProvider>();
 
-    // Obtener los items a contar (parámetro o del itemProvider)
-    final itemsToCount = inventoryItems ?? itemProvider.inventoryItems;
+    // 🔑 CORRECCIÓN CRÍTICA: Lógica de selección de items
+    // Si la pantalla nos pasa una lista vacía pero el provider ya tiene los items cargados,
+    // usamos los del provider para evitar que los contadores parpadeen en 0 al refrescar.
+    final bool isLocalEmpty = inventoryItems == null || inventoryItems!.isEmpty;
+    final itemsToCount = (isLocalEmpty && itemProvider.inventoryItems.isNotEmpty)
+        ? itemProvider.inventoryItems
+        : (inventoryItems ?? []);
 
-    // Lógica para obtener el nombre del campo dinámico
-    final String dynamicFieldName = selectedCountFieldId != null
-        ? assetType.fieldDefinitions
-            .firstWhere((def) => def.id.toString() == selectedCountFieldId)
-            .name
-        : '';
+    final bool isLoading = itemProvider.isLoading;
 
-    // 🎯 Contar items con possessionFieldId en true/1
-    int possessionCount = 0;
-    if (assetType.possessionFieldId != null && assetType.possessionFieldId!.isNotEmpty) {
-      possessionCount = itemsToCount.where((item) {
-        final customValues = item.customFieldValues ?? {};
-        final fieldValue = customValues[assetType.possessionFieldId!];
-        // Contar si el valor es true o 1
-        if (fieldValue is bool) {
-          return fieldValue == true;
-        }
-        if (fieldValue is int) {
-          return fieldValue == 1;
-        }
-        if (fieldValue is String) {
-          return fieldValue.toLowerCase() == 'true' || fieldValue == '1';
-        }
-        return false;
-      }).length;
-    }
-
-    // 🎯 Contar items con desiredFieldId en true/1
-    int desiredCount = 0;
-    if (assetType.desiredFieldId != null && assetType.desiredFieldId!.isNotEmpty) {
-      desiredCount = itemsToCount.where((item) {
-        final customValues = item.customFieldValues ?? {};
-        final fieldValue = customValues[assetType.desiredFieldId!];
-        // Contar si el valor es true o 1
-        if (fieldValue is bool) {
-          return fieldValue == true;
-        }
-        if (fieldValue is int) {
-          return fieldValue == 1;
-        }
-        if (fieldValue is String) {
-          return fieldValue.toLowerCase() == 'true' || fieldValue == '1';
-        }
-        return false;
-      }).length;
-    }
+    // --- LÓGICA DE CONTEO ---
+    int possessionCount = _countField(itemsToCount, assetType.possessionFieldId);
+    int desiredCount = _countField(itemsToCount, assetType.desiredFieldId);
 
     return Wrap(
       spacing: 10.0,
       runSpacing: 10.0,
       children: [
-        // Contador Total de Ítems (Total del backend antes de filtros locales)
+        // 1. TOTAL ÍTEMS
         Chip(
-          avatar: const Icon(Icons.inventory, size: 18),
+          avatar: isLoading && itemProvider.totalItems == 0
+              ? const SizedBox(
+                  width: 12,
+                  height: 12,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : const Icon(Icons.inventory, size: 18),
           label: Text('TOTAL ÍTEMS: ${itemProvider.totalItems}'),
           backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
         ),
 
-        // 🎯 Contador de Posesión (si está configurado)
-        if (assetType.possessionFieldId != null && assetType.possessionFieldId!.isNotEmpty)
-          Chip(
-            avatar: const Icon(Icons.check_circle_outline, size: 18),
-            label: Text('EN POSESIÓN: $possessionCount'),
-            backgroundColor: Colors.green.withOpacity(0.2),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        // 2. EN POSESIÓN
+        if (assetType.possessionFieldId != null)
+          _buildCounterChip(
+            context,
+            'EN POSESIÓN: $possessionCount',
+            Icons.check_circle_outline,
+            Colors.green,
           ),
 
-        // 🎯 Contador de Deseados (si está configurado)
-        if (assetType.desiredFieldId != null && assetType.desiredFieldId!.isNotEmpty)
-          Chip(
-            avatar: const Icon(Icons.favorite_outline, size: 18),
-            label: Text('DESEADOS: $desiredCount'),
-            backgroundColor: Colors.pink.withOpacity(0.2),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        // 3. DESEADOS
+        if (assetType.desiredFieldId != null)
+          _buildCounterChip(
+            context,
+            'DESEADOS: $desiredCount',
+            Icons.favorite_outline,
+            Colors.pink,
           ),
 
-        // 🎯 Contador Dinámico (solo si está activo - para filtros manuales)
-        if (selectedCountFieldId != null)
-          Chip(
-            avatar: const Icon(Icons.check_circle_outline, size: 18),
-            label: Text(
-              'CONTADOR ${dynamicFieldName} = "$totalCountLocal"',
-            ),
-            backgroundColor:
-                Theme.of(context).colorScheme.tertiary.withOpacity(0.3),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-          ),
-
-        // Sumatorios Agregados (basados en las definiciones isSummable)
-        ...itemProvider.aggregationDefinitions.map((def) {
+        // 4. SUMATORIOS DINÁMICOS
+        // 🔑 CORRECCIÓN: Iteramos sobre las definiciones del provider
+        ...itemProvider.aggregationDefinitions.where((def) {
+          final isSum = def['isSummable'];
+          return isSum == true || isSum.toString() == 'true' || isSum == 1;
+        }).map((def) {
           final fieldId = def['id'].toString();
-          final fieldName = def['name'] as String? ?? 'Campo Desconocido';
-          final bool isSummable = def['isSummable'] == true;
-
-          if (!isSummable) return const SizedBox.shrink();
-
+          final fieldName = def['name'] as String? ?? 'Suma';
           final sumKey = 'sum_$fieldId';
-          // Se usa el resultado del backend, pero si quieres la suma LOCAL,
-          // necesitas pasar localAggregations como parámetro.
-          // Por ahora, usamos el resultado del backend (itemProvider.aggregationResults).
-          final sumValue =
-              itemProvider.aggregationResults[sumKey]?.toString() ?? '0.0';
+
+          final dynamic rawValue = itemProvider.aggregationResults[sumKey];
+
+          String sumDisplay = itemProvider.isLoading ? "..." : "0.00";
+          if (rawValue != null) {
+            double? parsed = double.tryParse(rawValue.toString());
+            if (parsed != null) sumDisplay = parsed.toStringAsFixed(2);
+          }
 
           return Chip(
             avatar: const Icon(Icons.calculate, size: 18),
-            label: Text('SUMA ${fieldName}: ${sumValue}'),
-            backgroundColor:
-                Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+            label: Text('SUMA $fieldName: $sumDisplay'),
+            backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
           );
-        }).toList(),
+        }),
+
+        // 5. INDICADOR DE CARGA DE CÁLCULOS
+        if (isLoading && itemProvider.aggregationDefinitions.isEmpty)
+          Chip(
+            avatar: const SizedBox(
+              width: 12,
+              height: 12,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            label: const Text('Cargando cálculos...'),
+            backgroundColor: Colors.grey.withOpacity(0.1),
+          ),
       ],
     );
+  }
+
+  // --- MÉTODOS AUXILIARES ---
+
+  Widget _buildCounterChip(BuildContext context, String label, IconData icon, Color color) {
+    return Chip(
+      avatar: Icon(icon, size: 18, color: color.withOpacity(0.8)),
+      label: Text(label),
+      backgroundColor: color.withOpacity(0.1),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+    );
+  }
+
+  int _countField(List<InventoryItem> items, String? fieldId) {
+    if (fieldId == null || fieldId.isEmpty) return 0;
+    return items.where((item) {
+      final val = item.customFieldValues?[fieldId];
+      if (val is bool) return val;
+      if (val is int) return val == 1;
+      if (val is String) return val.toLowerCase() == 'true' || val == '1';
+      return false;
+    }).length;
   }
 }

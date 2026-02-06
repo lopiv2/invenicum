@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/services/veni_chatbot_service.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
 
@@ -19,6 +20,7 @@ import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
 import 'package:invenicum/providers/theme_provider.dart';
 import 'package:invenicum/providers/dashboard_provider.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
 
 // Services
 import 'package:invenicum/services/api_service.dart';
@@ -31,6 +33,7 @@ import 'package:invenicum/services/location_service.dart';
 import 'package:invenicum/services/theme_service.dart';
 import 'package:invenicum/services/voucher_service.dart';
 import 'package:invenicum/services/dashboard_service.dart';
+import 'package:invenicum/services/preferences_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -50,6 +53,7 @@ void main() async {
         Provider(create: (_) => ApiService()),
         Provider(create: (c) => DashboardService(c.read<ApiService>())),
         Provider(create: (c) => ThemeService(c.read<ApiService>())),
+        Provider(create: (c) => PreferencesService(c.read<ApiService>())),
         Provider(create: (c) => ContainerService(c.read<ApiService>())),
         Provider(create: (c) => LocationService(c.read<ApiService>())),
         Provider(create: (c) => AssetTypeService(c.read<ApiService>())),
@@ -57,11 +61,19 @@ void main() async {
         Provider(create: (c) => LoanService(c.read<ApiService>())),
         Provider(create: (c) => VoucherService(c.read<ApiService>())),
         Provider(create: (c) => AlertService(c.read<ApiService>())),
-
         // --- PROVEEDORES DE ESTADO ---
 
         // Auth es la raíz de la lógica
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+
+        ChangeNotifierProxyProvider<ApiService, ChatService>(
+          create: (context) => ChatService(context.read<ApiService>()),
+          update: (context, api, previous) {
+            // Si ya existe una instancia, simplemente la devolvemos para que no se resetee el historial
+            if (previous != null) return previous;
+            return ChatService(api);
+          },
+        ),
 
         // --- Dashboard ---
         ChangeNotifierProxyProvider<AuthProvider, DashboardProvider>(
@@ -112,6 +124,19 @@ void main() async {
           },
         ),
 
+        // Preferences: Carga de idioma y preferencias del usuario
+        ChangeNotifierProxyProvider<AuthProvider, PreferencesProvider>(
+          create: (c) => PreferencesProvider(c.read<PreferencesService>()),
+          update: (context, auth, prev) {
+            if (auth.isAuthenticated &&
+                auth.token != null &&
+                !prev!.isInitialized) {
+              Future.microtask(() => prev.loadPreferences());
+            }
+            return prev!;
+          },
+        ),
+
         // Contenedores: Carga inicial
         ChangeNotifierProxyProvider<AuthProvider, ContainerProvider>(
           create: (c) => ContainerProvider(
@@ -146,7 +171,8 @@ void main() async {
   );
 }
 
-class MyApp extends StatefulWidget { // 🚩 Cambiado a StatefulWidget
+class MyApp extends StatefulWidget {
+  // 🚩 Cambiado a StatefulWidget
   const MyApp({super.key});
 
   @override
@@ -170,9 +196,11 @@ class _MyAppState extends State<MyApp> {
     // Escuchamos Auth y Theme
     //final authProvider = Provider.of<AuthProvider>(context);
     final themeProvider = context.watch<ThemeProvider>();
+    final preferencesProvider = context.watch<PreferencesProvider>();
 
     return ToastificationWrapper(
       child: MaterialApp.router(
+        locale: preferencesProvider.locale,
         localizationsDelegates: const [
           AppLocalizations.delegate,
           GlobalMaterialLocalizations.delegate,

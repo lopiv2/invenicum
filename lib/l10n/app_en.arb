@@ -1,6 +1,418 @@
-{
+﻿{
   "@@locale": "en",
+  "@aiExtractionError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@assetTypeDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@assetUpdated": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteAssetType": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteContainer": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteLocationMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@containerCreated": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@containerDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@containerRenamed": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@customFieldsOf": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@deleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorDeletingAssetType": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorDeletingContainer": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorGeneratingPDF": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorLoadingListValues": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorLoadingLocations": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorReadingFile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorRegisteringLoan": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorChangingLanguage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorRenaming": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorSaving": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorUpdatingAsset": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@fieldRequiredWithName": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@loadingListField": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "@selectedLocationLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@systemThemesModal": {
+    "placeholders": {}
+  },
+  "@veniChatProcessing": {
+    "description": "AI loading message",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "@version": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "additionalInformation": "Additional Information",
+  "createdAt": "Creation Date",
+  "updatedAt": "Last Updated",
+  "assetDetail": "Asset Details",
+  "assetNotFound": "Asset not found",
+  "invalidAssetId": "Invalid asset ID",
+  "noImageAvailable": "No image available",
+  "minStock": "Minimum stock",
+  "location": "Location",
+  "aboutInvenicum": "About Invenicum",
+  "previous": "Previous",
+  "next": "Next",
+  "active": "Active",
+  "activeLoans": "Active loans",
+  "activeLoansCount": "Active loans",
+  "addAlert": "Add Alert",
+  "addAsset": "Add Asset",
+  "addContainer": "Add container",
+  "addNewLocation": "Add New Location",
+  "additionalThumbnails": "Additional Thumbnails",
+  "aiExtractionError": "AI could not extract data: {error}",
+  "aiPasteUrlDescription": "Paste the product link and AI will automatically extract information to populate fields.",
+  "all": "All",
+  "alertCritical": "Critical",
+  "alertCreated": "Alert created",
+  "alertDeleted": "Alert deleted",
+  "alertInfo": "Information",
+  "alertMessage": "Message",
+  "alertTitle": "Title",
+  "alertType": "Type",
+  "alertWarning": "Warning",
+  "alerts": "Alerts and Notifications",
   "appTitle": "Invenicum Inventory",
+  "applicationTheme": "Application theme",
+  "apply": "Apply",
+  "april": "April",
+  "assetImages": "Asset Images",
+  "assetImport": "Asset Import",
+  "assetName": "Asset Name",
+  "assetTypeDeleted": "Asset Type \"{name}\" deleted successfully.",
+  "assetTypes": "Asset Types",
+  "assetUpdated": "Asset \"{name}\" updated successfully.",
+  "assets": "Assets",
+  "assetsIn": "Assets in",
+  "august": "August",
+  "backToAssetTypes": "Back to Asset Types",
+  "borrowerEmail": "Borrower Email",
+  "borrowerName": "Borrower Name",
+  "borrowerPhone": "Borrower Phone",
+  "cancel": "Cancel",
+  "centerView": "Center View",
+  "chooseFile": "Choose File",
+  "clearCounter": "Clear Counter",
+  "collectionContainerInfo": "Collection containers have collection tracking bars, invested value, market value and Exposure view",
+  "collectionFieldsConfigured": "Collection fields configured.",
+  "configureCollectionFields": "Configure Collection Fields",
+  "configureDeliveryVoucher": "Configure Delivery Voucher",
+  "configureVoucherBody": "Configure the voucher body...",
+  "confirmDeleteAlert": "Delete Alert",
+  "confirmDeleteAlertMessage": "Are you sure you want to delete this record?",
+  "confirmDeleteAssetType": "Are you sure you want to delete asset type \"{name}\" and all its associated items? This action cannot be undone.",
+  "confirmDeleteContainer": "Are you sure you want to delete the container \"{name}\"? This action is irreversible and will remove all its assets and data.",
+  "confirmDeleteLocationMessage": "Are you sure you want to delete the location \"{name}\"?",
+  "confirmDeletion": "Confirm deletion",
+  "configurationSaved": "Configuration saved successfully.",
+  "containerCreated": "Container \"{name}\" created successfully.",
+  "containerDeleted": "Container \"{name}\" deleted successfully.",
+  "containerName": "Container name",
+  "containerOrAssetTypeNotFound": "Container or Asset Type not found.",
+  "containerRenamed": "Container renamed to \"{name}\".",
+  "containers": "Containers",
+  "countItemsByValue": "Count items by specific value",
+  "create": "Create",
+  "createFirstContainer": "Create your first container.",
+  "current": "Current",
+  "customColor": "Custom Color",
+  "customFields": "Custom Fields",
+  "customFieldsOf": "Custom Fields of {name}",
+  "customizeDeliveryVoucher": "Customize the PDF template for loans",
+  "darkMode": "Dark Mode",
+  "dashboard": "Dashboard",
+  "datalists": "Custom Lists",
+  "december": "December",
+  "definitionCustomFields": "Custom Fields Definition",
+  "delete": "Delete",
+  "deleteError": "Error deleting: {error}",
+  "deleteSuccess": "Location deleted successfully.",
+  "deliveryVoucher": "DELIVERY VOUCHER",
+  "deliveryVoucherEditor": "Delivery Voucher Editor",
+  "description": "Description (optional)",
+  "desiredField": "Desired Field",
+  "dueDate": "Due Date",
+  "edit": "Edit",
+  "enterContainerName": "Enter the container name",
+  "enterDescription": "Enter a description",
+  "enterURL": "Enter URL",
+  "enterValidUrl": "Enter a valid URL",
+  "errorCsvMinRows": "Please select a CSV file with headers and at least one data row.",
+  "errorDeletingAssetType": "Error deleting asset type: {error}",
+  "errorDeletingContainer": "Error deleting container: {error}",
+  "errorDuringImport": "Error during import",
+  "errorEmptyCsv": "The CSV file is empty.",
+  "errorGeneratingPDF": "Error generating PDF: {error}",
+  "errorInvalidPath": "Invalid file path.",
+  "errorLoadingData": "Error loading data",
+  "errorLoadingListValues": "Error loading list values: {error}",
+  "errorLoadingLocations": "Error loading locations: {error}",
+  "errorNameMappingRequired": "The 'Name' field is required and must be mapped.",
+  "errorNoVoucherTemplate": "No voucher template configured.",
+  "errorReadingBytes": "Could not read file bytes.",
+  "errorReadingFile": "Error reading file: {error}",
+  "errorRegisteringLoan": "Error registering loan: {error}",
+  "errorRenaming": "Error renaming: {error}",
+  "errorSaving": "Error saving: {error}",
+  "errorUpdatingAsset": "Error updating asset: {error}",
+  "exampleFilterHint": "Ex: Damaged, Red, 50",
+  "errorChangingLanguage": "Error changing language: {error}",
+  "february": "February",
+  "fieldChip": "Field",
+  "fieldRequiredWithName": "The field \"{field}\" is required.",
+  "fieldToCount": "Field to Count",
+  "fieldsFilledSuccess": "Fields populated successfully!",
+  "formatsPNG": "Formats: PNG, JPG",
+  "generalSettings": "General Settings",
+  "generateVoucher": "Generate Delivery Voucher",
+  "globalSearch": "Global Search",
   "greeting": "Hello, welcome!",
-  "rowsPerPageTitle": "Assets per page:"
+  "guest": "Guest",
+  "ignoreField": "🚫 Ignore Field",
+  "importAssetsTo": "Import Assets to",
+  "importSuccessMessage": "Import Successful! {count} assets created.",
+  "invalidNavigationIds": "Error: invalid navigation IDs.",
+  "january": "January",
+  "july": "July",
+  "june": "June",
+  "language": "Language",
+  "languageNotImplemented": "Language functionality to be implemented",
+  "lightMode": "Light Mode",
+  "loadingAssetType": "Loading Asset Type...",
+  "loadingListField": "Loading {field}...",
+  "loanDate": "Loan Date",
+  "languageChanged": "Language changed to English!",
+  "loanLanguageNotImplemented": "Language functionality to be implemented",
+  "loanManagement": "Loan Management",
+  "loanObject": "Loan Object",
+  "loans": "Loans",
+  "locations": "Locations",
+  "locationsScheme": "Locations Scheme",
+  "login": "Login",
+  "logoVoucher": "Voucher Logo",
+  "logout": "Logout",
+  "magicAssistant": "Magic AI Assistant",
+  "march": "March",
+  "may": "May",
+  "myCustomTheme": "My Theme",
+  "myProfile": "My Profile",
+  "myThemesStored": "My Themes Stored",
+  "nameCannotBeEmpty": "Name cannot be empty",
+  "nameSameAsCurrent": "The name is the same as the current one",
+  "newAlert": "New Manual Alert",
+  "newContainer": "New container",
+  "newName": "New name",
+  "noAssetsCreated": "No assets created yet.",
+  "noAssetsMatch": "No assets match the search/filter criteria.",
+  "noBooleanFields": "No boolean fields defined.",
+  "noContainerMessage": "Create your first container.",
+  "noCustomFields": "This asset type does not have custom fields.",
+  "noFileSelected": "No file selected",
+  "noImagesAdded": "No images added yet. The first image will be the primary.",
+  "noLoansFound": "No loans found in this container.",
+  "noLocationsMessage": "No locations created in this container. Add the first one!",
+  "noNotifications": "No notifications",
+  "noThemesSaved": "No themes saved yet",
+  "none": "None",
+  "november": "November",
+  "obligatory": "Obligatory",
+  "october": "October",
+  "optional": "Optional",
+  "overdue": "Overdue",
+  "password": "Password",
+  "pleaseEnterPassword": "Please enter your password",
+  "pleaseEnterUsername": "Please enter your username",
+  "pleasePasteUrl": "Please paste a URL",
+  "pleaseSelectCsvWithHeaders": "Please select a CSV file with headers.",
+  "pleaseSelectLocation": "Please select a location.",
+  "possessionFieldDef": "Possession Field",
+  "possessionFieldName": "In Possession",
+  "preferences": "Preferences",
+  "previewPDF": "PDF Preview",
+  "primaryImage": "Primary Image",
+  "productUrlLabel": "Product URL",
+  "quantity": "Quantity",
+  "registerNewLoan": "Register New Loan",
+  "reloadContainers": "Reload containers",
+  "reloadLocations": "Reload Locations",
+  "removeImage": "Remove Image",
+  "rename": "Rename",
+  "renameContainer": "Rename Container",
+  "returned": "Returned",
+  "rowsPerPageTitle": "Assets per page:",
+  "save": "Save",
+  "saveAndApply": "Save and Apply",
+  "saveAsset": "Save Asset",
+  "saveChanges": "Save Changes",
+  "saveConfiguration": "Save Configuration",
+  "saveCustomTheme": "Save Custom Theme",
+  "searchInAllColumns": "Search in all columns...",
+  "selectAndUploadImage": "Select and Upload Image",
+  "selectApplicationLanguage": "Select the application language",
+  "selectBooleanFields": "Select boolean fields to control collection:",
+  "selectCsvColumn": "Select CSV Column",
+  "selectField": "Select field...",
+  "selectFieldType": "Select field type",
+  "selectImage": "Select Image",
+  "selectLocationRequired": "You must select a location for the asset.",
+  "selectedLocationLabel": "Selected: {name}",
+  "selectTheme": "Select Theme",
+  "september": "September",
+  "settings": "Settings",
+  "showAsGrid": "Show as Grid",
+  "showAsList": "Show as List",
+  "specificValueToCount": "Specific Value to Count",
+  "startImport": "Start Import",
+  "startMagic": "Start Magic",
+  "status": "Status",
+  "step1SelectFile": "Step 1: Select CSV File",
+  "step2ColumnMapping": "Step 2: Column Mapping (CSV -> System)",
+  "syncingSession": "Syncing session...",
+  "systemThemes": "System Themes",
+  "systemThemesModal": "System Themes",
+  "themeNameLabel": "Theme Name",
+  "thisFieldIsRequired": "This field is required.",
+  "topLoanedItems": "Top Loaned Items",
+  "totalAssets": "Asset Types",
+  "totalItems": "Assets",
+  "totals": "Totals",
+  "upload": "Upload",
+  "uploadImage": "Upload Image",
+  "username": "Username",
+  "veniChatTitle": "Veni AI",
+  "veniChatStatus": "Online",
+  "veniChatWelcome": "Hi! I'm Veni, your Invenicum assistant. How can I help you with your inventory today?",
+  "veniChatPlaceholder": "Ask me anything...",
+  "veniChatPoweredBy": "Powered by ",
+  "veniChatProcessing": "I'm processing your query about \"{query}\"...",
+  "veniCmdHelpTitle": "Veni abilities",
+  "veniCmdDashboard": "Go to the dashboard",
+  "veniCmdInventory": "Check stock of an article",
+  "veniCmdLoans": "View active loans",
+  "veniCmdReport": "Generate inventory report",
+  "veniCmdScanQR": "Scan QR/Barcode",
+  "veniCmdUnknown": "I don't recognize that command. Write help to see what I can do.",
+  "version": "Version {name}",
+  "yes": "Yes",
+  "zoomToFit": "Zoom to Fit"
 }

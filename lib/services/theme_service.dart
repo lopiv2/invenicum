@@ -12,22 +12,6 @@ class ThemeService {
 
   ThemeService(this._apiService);
 
-  /// Obtiene las preferencias de tema del usuario desde la DB.
-  Future<Map<String, dynamic>?> getUserThemePreferences() async {
-    try {
-      final response = await _dio.get('/users/preferences/theme');
-
-      if (response.statusCode == 200) {
-        // Retorna el objeto con themeColor y themeBrightness
-        return response.data['data'];
-      }
-      return null;
-    } catch (e) {
-      print('Error al obtener preferencias de tema: $e');
-      return null;
-    }
-  }
-
   /// Actualiza (o crea) la preferencia de tema actual del usuario.
   /// Esto guarda el color y brillo en la tabla User o Preferences.
   Future<bool> updateUserTheme({
@@ -36,7 +20,7 @@ class ThemeService {
   }) async {
     try {
       final response = await _dio.put(
-        '/users/preferences/theme',
+        '/preferences/theme',
         data: {'themeColor': hexColor, 'themeBrightness': brightness},
       );
       return response.statusCode == 200;
@@ -56,7 +40,7 @@ class ThemeService {
 
     try {
       final response = await _dio.post(
-        '/users/custom-themes',
+        '/preferences/custom-themes',
         data: {
           "name": theme.name,
           "primaryColor": hexColor, // 👈 Mandamos el String formateado
@@ -72,7 +56,7 @@ class ThemeService {
 
   Future<List<CustomTheme>> getCustomThemes() async {
     try {
-      final response = await _dio.get('/users/custom-themes');
+      final response = await _dio.get('/preferences/custom-themes');
 
       if (response.statusCode == 200) {
         List<dynamic> data = response.data['data'];
@@ -112,7 +96,7 @@ class ThemeService {
     }
 
     try {
-      final response = await _dio.delete('/users/custom-themes/$themeId');
+      final response = await _dio.delete('/preferences/custom-themes/$themeId');
 
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Error al eliminar el tema de la base de datos.');

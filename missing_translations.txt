@@ -1,0 +1,61 @@
+{
+  "de": [
+    "additionalInformation",
+    "createdAt",
+    "updatedAt",
+    "assetDetail",
+    "assetNotFound",
+    "invalidAssetId",
+    "noImageAvailable",
+    "minStock",
+    "location",
+    "previous",
+    "next",
+    "loanLanguageNotImplemented"
+  ],
+
+  "fr": [
+    "additionalInformation",
+    "createdAt",
+    "updatedAt",
+    "assetDetail",
+    "assetNotFound",
+    "invalidAssetId",
+    "noImageAvailable",
+    "minStock",
+    "location",
+    "previous",
+    "next",
+    "loanLanguageNotImplemented"
+  ],
+
+  "it": [
+    "additionalInformation",
+    "createdAt",
+    "updatedAt",
+    "assetDetail",
+    "assetNotFound",
+    "invalidAssetId",
+    "noImageAvailable",
+    "minStock",
+    "location",
+    "previous",
+    "next",
+    "loanLanguageNotImplemented"
+  ],
+
+  "pt": [
+    "additionalInformation",
+    "createdAt",
+    "updatedAt",
+    "assetDetail",
+    "assetNotFound",
+    "invalidAssetId",
+    "noImageAvailable",
+    "minStock",
+    "location",
+    "previous",
+    "next",
+    "loanLanguageNotImplemented"
+  ]
+}

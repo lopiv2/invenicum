@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class MagicAiDialog extends StatefulWidget {
   const MagicAiDialog({super.key});
@@ -26,7 +27,7 @@ class _MagicAiDialogState extends State<MagicAiDialog> {
           const Icon(Icons.auto_awesome, color: Colors.amber),
           const SizedBox(width: 12),
           Text(
-            'Asistente Mágico IA',
+            AppLocalizations.of(context)!.magicAssistant,
             style: TextStyle(color: Colors.indigo.shade900),
           ),
         ],
@@ -37,16 +38,16 @@ class _MagicAiDialogState extends State<MagicAiDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Pega el enlace del producto y la IA extraerá automáticamente la información para rellenar los campos.',
-              style: TextStyle(color: Colors.black54),
+            Text(
+              AppLocalizations.of(context)!.aiPasteUrlDescription,
+              style: const TextStyle(color: Colors.black54),
             ),
             const SizedBox(height: 20),
             TextFormField(
               controller: _urlController,
               autofocus: true,
               decoration: InputDecoration(
-                labelText: 'URL del producto',
+                labelText: AppLocalizations.of(context)!.productUrlLabel,
                 hintText: 'https://www.amazon.es/...',
                 prefixIcon: const Icon(Icons.link),
                 border: OutlineInputBorder(
@@ -57,11 +58,11 @@ class _MagicAiDialogState extends State<MagicAiDialog> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Por favor, pega una URL';
+                  return AppLocalizations.of(context)!.pleasePasteUrl;
                 }
                 final uri = Uri.tryParse(value);
                 if (uri == null || !uri.hasAbsolutePath) {
-                  return 'Introduce una URL válida';
+                  return AppLocalizations.of(context)!.enterValidUrl;
                 }
                 return null;
               },
@@ -72,7 +73,7 @@ class _MagicAiDialogState extends State<MagicAiDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -88,7 +89,7 @@ class _MagicAiDialogState extends State<MagicAiDialog> {
               Navigator.pop(context, _urlController.text.trim());
             }
           },
-          child: const Text('Empezar Magia'),
+          child: Text(AppLocalizations.of(context)!.startMagic),
         ),
       ],
     );

@@ -1,7 +1,6 @@
 // (Al final del archivo asset_data_table.dart)
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
@@ -19,6 +18,7 @@ class InventoryDataSource extends DataTableSource {
   final Function(InventoryItem) deleteCallback;
   final Function(InventoryItem) editCallback;
   final Function(InventoryItem) copyCallback;
+  final Function(InventoryItem) onRowTap;
   final List<Location> availableLocations;
   final int containerId;
 
@@ -32,6 +32,7 @@ class InventoryDataSource extends DataTableSource {
     required this.copyCallback,
     required this.availableLocations,
     required this.containerId,
+    required this.onRowTap,
   }) : _items = items;
 
   void updateItems(List<InventoryItem> newItems) {
@@ -370,8 +371,13 @@ class InventoryDataSource extends DataTableSource {
     return DataRow(
       cells: cells,
       key: ValueKey(item.id),
-      // 🔑 Aplicamos el color aquí
       color: WidgetStateProperty.resolveWith<Color?>((states) => rowColor),
+      // 🔑 ESTO HACE QUE LA FILA SEA CLICABLE
+      onSelectChanged: (selected) {
+        if (selected != null) {
+          onRowTap(item);
+        }
+      },
     );
   }
 

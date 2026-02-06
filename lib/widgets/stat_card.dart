@@ -1,5 +1,6 @@
 // Definición del Widget Reutilizable para el Contador (StatCard)
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class StatCard extends StatelessWidget {
   final String title;
@@ -17,17 +18,19 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
         // 🔑 REDUCCIÓN CLAVE 1: Reducir el Padding vertical (simétrico a 12)
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0), 
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           // 🔑 ALINEACIÓN CLAVE: Center o Start para evitar que ocupe todo el espacio
-          mainAxisAlignment: MainAxisAlignment.center, 
-          mainAxisSize: MainAxisSize.min, // Ocupa solo el espacio necesario verticalmente
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize:
+              MainAxisSize.min, // Ocupa solo el espacio necesario verticalmente
           children: [
             Row(
               children: [
@@ -43,9 +46,9 @@ class StatCard extends StatelessWidget {
                 ),
               ],
             ),
-            
+
             // 🔑 REDUCCIÓN CLAVE 2: Reducir este espaciador
-            const SizedBox(height: 4), 
+            const SizedBox(height: 4),
 
             Text(
               count.toString(),
@@ -55,12 +58,11 @@ class StatCard extends StatelessWidget {
                 color: color,
               ),
             ),
-            
+
             // 🔑 REDUCCIÓN CLAVE 3: Reducir o eliminar este espaciador
             // const SizedBox(height: 4), // Se elimina o se reduce mucho
-
-            const Text(
-              'Totales',
+            Text(
+              l10n.totals,
               style: TextStyle(fontSize: 12, color: Colors.grey),
             ),
           ],

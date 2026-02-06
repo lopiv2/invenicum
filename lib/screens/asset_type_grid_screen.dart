@@ -33,53 +33,36 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
   }
 
   Future<void> _loadInitialAssetCounts() async {
-    // Usamos .read()
-    final containerProvider = context.read<ContainerProvider>();
-    final itemProvider = context.read<InventoryItemProvider>();
-    final cIdInt = int.tryParse(widget.containerId);
+  final containerProvider = context.read<ContainerProvider>();
+  final itemProvider = context.read<InventoryItemProvider>();
+  final cIdInt = int.tryParse(widget.containerId);
 
-    if (cIdInt == null) return;
+  if (cIdInt == null) return;
 
-    // 1. CARGAR CONTENEDORES SI ES NECESARIO (AWAIT)
-    // Es posible que necesitemos esperar a que la lista de contenedores se llene.
-    // Si la lista está vacía Y el proveedor NO está ya cargando...
-    if (containerProvider.containers.isEmpty && !containerProvider.isLoading) {
-      try {
-        // 🛑 Esperamos la carga de los contenedores
-        await containerProvider.loadContainers();
-        // En este punto, loadContainers DEBE haber llamado a notifyListeners()
-        // lo que causaría una reconstrucción. Pero como estamos usando .read(),
-        // la reconstrucción no se detiene aquí.
-      } catch (e) {
-        // Manejar error de carga
-        return;
-      }
-      if (!mounted) return;
-    }
-
-    // 2. BUSCAR el contenedor después de la carga
-    // Volvemos a leer el provider para obtener el estado MÁS RECIENTE.
-    // Como el build() se ejecuta de nuevo después de la carga, la búsqueda es segura.
-    final ContainerNode? container = containerProvider.containers
-        .cast<ContainerNode?>()
-        .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
-
-    // 3. Iniciar la carga de ítems para cada AssetType
-    if (!mounted) return;
-    if (container != null) {
-      for (var assetType in container.assetTypes) {
-        // Llama a la carga de ítems, que llamará a notifyListeners()
-        // en el InventoryItemProvider cuando termine.
-        itemProvider.loadInventoryItems(
-          containerId: cIdInt,
-          assetTypeId: assetType.id,
-        );
-      }
-    }
+  // 1. Forzar la carga si no hay contenedores
+  if (containerProvider.containers.isEmpty) {
+    await containerProvider.loadContainers();
   }
 
-  // ... (El resto del código _AssetTypeGridScreenState se mantiene igual) ...
-  // incluyendo los métodos _goToCreateAssetType, _goToAssetList y el método build
+  if (!mounted) return;
+
+  // 2. Buscar el contenedor después de asegurar la carga
+  final container = containerProvider.containers
+      .where((c) => c.id == cIdInt)
+      .firstOrNull;
+
+  // 3. Cargar los contadores
+  if (container != null) {
+    for (var assetType in container.assetTypes) {
+      // Importante: No esperes (await) aquí para que carguen en paralelo,
+      // pero asegúrate de que el provider sepa gestionar llamadas múltiples.
+      itemProvider.loadInventoryItems(
+        containerId: cIdInt,
+        assetTypeId: assetType.id,
+      );
+    }
+  }
+}
 
   void _goToCreateAssetType(BuildContext context) {
     context.go('/container/${widget.containerId}/asset-types/new');

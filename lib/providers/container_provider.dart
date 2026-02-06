@@ -6,6 +6,7 @@ import 'package:invenicum/models/list_data.dart';
 import 'package:invenicum/services/asset_type_service.dart';
 import 'package:invenicum/services/container_service.dart';
 import 'package:invenicum/services/location_service.dart';
+import 'package:flutter/material.dart';
 
 class ContainerProvider with ChangeNotifier {
   final ContainerService _containerService;
@@ -39,7 +40,9 @@ class ContainerProvider with ChangeNotifier {
 
       for (final containerFromApi in loadedContainers) {
         // Por cada contenedor, carga sus ubicaciones
-        final locations = await _locationService.getLocations(containerFromApi.id);
+        final locations = await _locationService.getLocations(
+          containerFromApi.id,
+        );
 
         // Busca el contenedor existente en el estado actual para preservar datos
         final existingContainer = _containers.firstWhere(
@@ -318,6 +321,62 @@ class ContainerProvider with ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  Future<List<Map<String, dynamic>>> searchAll(String query) async {
+    if (query.isEmpty) return [];
+    final String q = query.toLowerCase();
+    List<Map<String, dynamic>> results = [];
+
+    // --- 1. BÚSQUEDA LOCAL (Inmediata) ---
+    // Buscamos en lo que ya tenemos en memoria
+    for (var container in _containers) {
+      // Buscar en nombres de contenedores
+      if (container.name.toLowerCase().contains(q)) {
+        results.add({
+          'name': container.name,
+          'subtitle': 'Contenedor',
+          'icon': Icons.inventory_2_rounded,
+          'route': '/container/${container.id}/asset-types',
+        });
+      }
+
+      // Buscar en tipos de activos (categorías)
+      for (var type in container.assetTypes) {
+        if (type.name.toLowerCase().contains(q)) {
+          results.add({
+            'name': type.name,
+            'subtitle': 'Categoría en ${container.name}',
+            'icon': Icons.category_rounded,
+            'route': '/container/${container.id}/asset-types/${type.id}/assets',
+          });
+        }
+      }
+    }
+
+    // --- 2. BÚSQUEDA EN API (Profunda) ---
+    // Solo disparamos la búsqueda pesada si la query tiene una longitud mínima
+    if (q.length >= 3) {
+      try {
+        final apiItems = await _containerService.searchItemsGlobal(q);
+
+        for (var item in apiItems) {
+          // Mapeamos la respuesta de la API al fordadmato del desplegable
+          results.add({
+            'name': item['name'] ?? 'Sin nombre',
+            'subtitle': 'Activo en ${item['container_name']}',
+            'icon': Icons.precision_manufacturing_outlined,
+            // Construimos la ruta dinámica según tu estructura de GoRouter
+            'route': '/container/${item['container_id']}/asset-types/${item['asset_type_id']}/assets/${item['id']}',
+          });
+        }
+      } catch (e) {
+        print('Error en búsqueda híbrida: $e');
+        // No lanzamos el error para que al menos se vean los resultados locales
+      }
+    }
+
+    return results;
   }
 
   // 🎯 MÉTODO CORREGIDO: Añadiendo defaultLocationId

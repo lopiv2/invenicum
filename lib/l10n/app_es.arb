@@ -1,6 +1,414 @@
-{
+﻿{
   "@@locale": "es",
+  "@aiExtractionError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@assetTypeDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@assetUpdated": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteAssetType": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteContainer": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteLocationMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@containerCreated": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@containerDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@containerRenamed": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@customFieldsOf": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@deleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorDeletingAssetType": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorDeletingContainer": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorGeneratingPDF": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorLoadingListValues": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorLoadingLocations": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorReadingFile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorRegisteringLoan": {
+    "placeholders": {
+      "error": {}
+    }
+  },  "@errorChangingLanguage": {
+    "placeholders": {
+      "error": {}
+    }
+  },  "@errorRenaming": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorSaving": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorUpdatingAsset": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@fieldRequiredWithName": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@loadingListField": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "@selectedLocationLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@systemThemesModal": {
+    "placeholders": {}
+  },
+  "@veniChatProcessing": {
+    "description": "Mensaje de carga de la IA",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "@version": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "additionalInformation": "Información adicional",
+  "createdAt": "Fecha de creación",
+  "updatedAt": "Última actualización",
+  "assetDetail": "Detalles del Activo",
+  "assetNotFound": "Activo no encontrado",
+  "invalidAssetId": "ID de activo no válido",
+  "noImageAvailable": "No hay imagen disponible",
+  "minStock": "Stock mínimo",
+  "location": "Ubicación",
+  "aboutInvenicum": "Sobre Invenicum",
+  "previous": "Anterior",
+  "next": "Siguiente",
+  "active": "Activo",
+  "activeLoans": "Préstamos vigentes",
+  "activeLoansCount": "Préstamos vigentes",
+  "addAlert": "Añadir Alerta",
+  "addAsset": "Añadir Activo",
+  "addContainer": "Añadir contenedor",
+  "addNewLocation": "Añadir Nueva Ubicación",
+  "additionalThumbnails": "Miniaturas Adicionales",
+  "aiExtractionError": "La IA no pudo extraer los datos: {error}",
+  "aiPasteUrlDescription": "Pega el enlace del producto y la IA extraerá automáticamente la información para rellenar los campos.",
+  "all": "Todos",
+  "alertCritical": "Crítico",
+  "alertCreated": "Alerta creada",
+  "alertDeleted": "Alerta eliminada",
+  "alertInfo": "Información",
+  "alertMessage": "Mensaje",
+  "alertTitle": "Título",
+  "alertType": "Tipo",
+  "alertWarning": "Advertencia",
+  "alerts": "Alertas y Notificaciones",
   "appTitle": "Invenicum Inventario",
+  "applicationTheme": "Tema de la aplicación",
+  "apply": "Aplicar",
+  "april": "Abril",
+  "assetImages": "Imágenes del Activo",
+  "assetImport": "Importación de Activos",
+  "assetName": "Nombre",
+  "assetTypeDeleted": "Tipo de Activo \"{name}\" eliminado con éxito.",
+  "assetTypes": "Tipos de Activos",
+  "assetUpdated": "Activo \"{name}\" actualizado correctamente.",
+  "assets": "Activos",
+  "assetsIn": "Activos en",
+  "august": "Agosto",
+  "backToAssetTypes": "Volver a Tipos de Activo",
+  "borrowerEmail": "Email del Prestatario",
+  "borrowerName": "Nombre del Prestatario",
+  "borrowerPhone": "Teléfono del Prestatario",
+  "cancel": "Cancelar",
+  "centerView": "Centrar Vista",
+  "chooseFile": "Elegir Archivo",
+  "clearCounter": "Limpiar Contador",
+  "collectionContainerInfo": "Los contenedores de colección tienen barras de seguimiento de colecciones, valor invertido, valor de mercado y vista de Exposición",
+  "collectionFieldsConfigured": "Campos de colección configurados.",
+  "configureCollectionFields": "Configurar Campos de Colección",
+  "configureDeliveryVoucher": "Configurar Vale de Entrega",
+  "configureVoucherBody": "Configura el cuerpo del vale...",
+  "confirmDeleteAlert": "Eliminar Alerta",
+  "confirmDeleteAlertMessage": "¿Estás seguro de que deseas eliminar este registro?",
+  "confirmDeleteAssetType": "¿Estás seguro de que deseas eliminar el tipo de activo \"{name}\" y todos sus elementos asociados? Esta acción no se puede deshacer.",
+  "confirmDeleteContainer": "¿Estás seguro de que quieres eliminar el contenedor \"{name}\"? Esta acción es irreversible y eliminará todos sus activos y datos.",
+  "confirmDeleteLocationMessage": "¿Estás seguro de que quieres eliminar la ubicación \"{name}\"?",
+  "confirmDeletion": "Confirmar eliminación",
+  "configurationSaved": "Configuración guardada correctamente.",
+  "containerCreated": "Contenedor \"{name}\" creado correctamente.",
+  "containerDeleted": "Contenedor \"{name}\" eliminado correctamente.",
+  "containerName": "Nombre del contenedor",
+  "containerOrAssetTypeNotFound": "Contenedor o Tipo de Activo no encontrado.",
+  "containerRenamed": "Contenedor renombrado a \"{name}\".",
+  "containers": "Contenedores",
+  "countItemsByValue": "Contar ítems por valor específico",
+  "create": "Crear",
+  "createFirstContainer": "Crea tu primer contenedor.",
+  "current": "Actual",
+  "customColor": "Personalizar color",
+  "customFields": "Campos Personalizados",
+  "customFieldsOf": "Campos Personalizados de {name}",
+  "customizeDeliveryVoucher": "Personaliza la plantilla PDF para préstamos",
+  "darkMode": "Modo Oscuro",
+  "dashboard": "Panel de Control",
+  "datalists": "Listas Personalizadas",
+  "december": "Diciembre",
+  "definitionCustomFields": "Definición de Campos Personalizados",
+  "delete": "Eliminar",
+  "deleteError": "Error al eliminar: {error}",
+  "deleteSuccess": "Ubicación eliminada exitosamente.",
+  "deliveryVoucher": "VALE DE ENTREGA",
+  "deliveryVoucherEditor": "Editor de Vales de Entrega",
+  "description": "Descripción (opcional)",
+  "desiredField": "Campo de Deseados",
+  "dueDate": "Fecha Vencimiento",
+  "edit": "Editar",
+  "enterContainerName": "Ingrese el nombre del contenedor",
+  "enterDescription": "Ingrese una descripción",
+  "enterURL": "Ingrese la URL",
+  "enterValidUrl": "Introduce una URL válida",
+  "errorCsvMinRows": "Por favor, selecciona un archivo CSV con encabezados y al menos una fila de datos.",
+  "errorDeletingAssetType": "Error al eliminar el tipo de activo: {error}",
+  "errorDeletingContainer": "Error al eliminar el contenedor: {error}",
+  "errorDuringImport": "Error durante la importación",
+  "errorEmptyCsv": "El archivo CSV está vacío.",
+  "errorGeneratingPDF": "Error al generar PDF: {error}",
+  "errorInvalidPath": "Ruta de archivo no válida.",
+  "errorLoadingData": "Error al cargar los datos",
+  "errorLoadingListValues": "Error al cargar los valores de la lista: {error}",
+  "errorLoadingLocations": "Error al cargar ubicaciones: {error}",
+  "errorNameMappingRequired": "El campo 'Nombre' es obligatorio y debe ser mapeado.",
+  "errorNoVoucherTemplate": "No hay una plantilla de vale configurada.",
+  "errorReadingBytes": "No se pudieron leer los bytes del archivo.",
+  "errorReadingFile": "Error al leer el archivo: {error}",
+  "errorRegisteringLoan": "Error al registrar préstamo: {error}",
+  "errorRenaming": "Error al renombrar: {error}",
+  "errorSaving": "Error al guardar: {error}",
+  "errorUpdatingAsset": "Error al actualizar activo: {error}",
+  "exampleFilterHint": "Ej: Dañado, Rojo, 50",
+  "errorChangingLanguage": "Error al cambiar idioma: {error}",
+  "february": "Febrero",
+  "fieldChip": "Campo",
+  "fieldRequiredWithName": "El campo \"{field}\" es obligatorio.",
+  "fieldToCount": "Campo a Contar",
+  "fieldsFilledSuccess": "¡Campos completados con éxito!",
+  "formatsPNG": "Formatos: PNG, JPG",
+  "generalSettings": "Configuración General",
+  "generateVoucher": "Generar Vale de Entrega",
+  "globalSearch": "Búsqueda Global",
   "greeting": "¡Hola, bienvenido!",
-  "rowsPerPageTitle": "Activos por página:"
+  "guest": "Invitado",
+  "ignoreField": "🚫 Ignorar Campo",
+  "importAssetsTo": "Importar Activos a",
+  "importSuccessMessage": "¡Importación Exitosa! {count} activos creados.",
+  "invalidNavigationIds": "Error: IDs de navegación no válidos.",
+  "january": "Enero",
+  "july": "Julio",
+  "june": "Junio",
+  "language": "Idioma",
+  "languageNotImplemented": "Funcionalidad de idioma por implementar",
+  "lightMode": "Modo Claro",
+  "loadingAssetType": "Cargando Tipo de Activo...",
+  "loadingListField": "Cargando {field}...",
+  "loanDate": "Fecha Préstamo",  "languageChanged": "¡Idioma cambiado a Español!",  "loanLanguageNotImplemented": "Funcionalidad de idioma por implementar",
+  "loanManagement": "Gestión de Préstamos",
+  "loanObject": "Objeto a Prestar",
+  "loans": "Préstamos",
+  "locations": "Ubicaciones",
+  "locationsScheme": "Esquema de Ubicaciones",
+  "login": "Iniciar Sesión",
+  "logoVoucher": "Logo del Vale",
+  "logout": "Cerrar sesión",
+  "magicAssistant": "Asistente Mágico IA",
+  "march": "Marzo",
+  "may": "Mayo",
+  "myCustomTheme": "Mi Tema",
+  "myProfile": "Mi Perfil",
+  "myThemesStored": "Mis Temas Guardados",
+  "nameCannotBeEmpty": "El nombre no puede estar vacío",
+  "nameSameAsCurrent": "El nombre es el mismo que el actual",
+  "newAlert": "Nueva Alerta Manual",
+  "newContainer": "Nuevo contenedor",
+  "newName": "Nuevo nombre",
+  "noAssetsCreated": "No hay activos creados aún.",
+  "noAssetsMatch": "Ningún activo coincide con los criterios de búsqueda/filtro.",
+  "noBooleanFields": "No hay campos booleanos definidos.",
+  "noContainerMessage": "Crea tu primer contenedor.",
+  "noCustomFields": "Este tipo de activo no tiene campos personalizados.",
+  "noFileSelected": "Ningún archivo seleccionado",
+  "noImagesAdded": "Aún no hay imágenes añadidas. La primera imagen será la principal.",
+  "noLoansFound": "No se encontraron préstamos en este contenedor.",
+  "noLocationsMessage": "No hay ubicaciones creadas en este contenedor. ¡Añade la primera!",
+  "noNotifications": "No hay notificaciones",
+  "noThemesSaved": "Aún no hay temas guardados",
+  "none": "Ninguno",
+  "november": "Noviembre",
+  "obligatory": "Obligatorio",
+  "october": "Octubre",
+  "optional": "Opcional",
+  "overdue": "Atrasado",
+  "password": "Contraseña",
+  "pleaseEnterPassword": "Por favor ingrese su contraseña",
+  "pleaseEnterUsername": "Por favor ingrese su usuario",
+  "pleasePasteUrl": "Por favor, pega una URL",
+  "pleaseSelectCsvWithHeaders": "Por favor, selecciona un archivo CSV con encabezados.",
+  "pleaseSelectLocation": "Por favor, selecciona una ubicación.",
+  "possessionFieldDef": "Campo de Posesión",
+  "possessionFieldName": "En Posesión",
+  "preferences": "Preferencias",
+  "previewPDF": "Vista Previa",
+  "primaryImage": "Imagen Principal",
+  "productUrlLabel": "URL del producto",
+  "quantity": "Cantidad",
+  "registerNewLoan": "Registrar Nuevo Préstamo",
+  "reloadContainers": "Recargar contenedores",
+  "reloadLocations": "Recargar Ubicaciones",
+  "removeImage": "Eliminar Imagen",
+  "rename": "Renombrar",
+  "renameContainer": "Renombrar Contenedor",
+  "returned": "Devuelto",
+  "rowsPerPageTitle": "Activos por página:",
+  "save": "Guardar",
+  "saveAndApply": "Guardar y Aplicar",
+  "saveAsset": "Guardar Activo",
+  "saveChanges": "Guardar Cambios",
+  "saveConfiguration": "Guardar Configuración",
+  "saveCustomTheme": "Guardar Tema Personalizado",
+  "searchInAllColumns": "Buscar en todas las columnas...",
+  "selectAndUploadImage": "Seleccionar y Subir Imagen",
+  "selectApplicationLanguage": "Selecciona el idioma de la aplicación",
+  "selectBooleanFields": "Selecciona los campos booleanos para controlar la colección:",
+  "selectCsvColumn": "Seleccionar Columna CSV",
+  "selectField": "Seleccionar campo...",
+  "selectFieldType": "Seleccionar tipo de campo",
+  "selectImage": "Seleccionar Imagen",
+  "selectLocationRequired": "Debe seleccionar una ubicación para el activo.",
+  "selectedLocationLabel": "Seleccionado: {name}",
+  "selectTheme": "Seleccionar Tema",
+  "september": "Septiembre",
+  "settings": "Ajustes",
+  "showAsGrid": "Mostrar como Grid",
+  "showAsList": "Mostrar como Lista",
+  "specificValueToCount": "Valor Específico a Contar",
+  "startImport": "Iniciar Importación",
+  "startMagic": "Empezar Magia",
+  "status": "Estado",
+  "step1SelectFile": "Paso 1: Seleccionar Archivo CSV",
+  "step2ColumnMapping": "Paso 2: Mapeo de Columnas (CSV -> Sistema)",
+  "syncingSession": "Sincronizando sesión...",
+  "systemThemes": "Temas del Sistema",
+  "systemThemesModal": "Temas del Sistema",
+  "themeNameLabel": "Nombre del Tema",
+  "thisFieldIsRequired": "Este campo es obligatorio.",
+  "topLoanedItems": "Productos Más Prestados",
+  "totalAssets": "Tipos de Activos",
+  "totalItems": "Activos",
+  "totals": "Totales",
+  "upload": "Subir",
+  "uploadImage": "Subir Imagen",
+  "username": "Usuario",
+  "version": "Versión {name}",
+  "veniChatTitle": "Venibot AI",
+  "veniChatStatus": "En línea",
+  "veniChatWelcome": "¡Hola! Soy Venibot, tu asistente de Invenicum. ¿En qué puedo ayudarte con tu inventario hoy?",
+  "veniChatPlaceholder": "Pregúntame algo...",
+  "veniChatPoweredBy": "Powered by ",
+  "veniChatProcessing": "Estoy procesando tu consulta sobre \"{query}\"...",
+  "veniCmdHelpTitle": "Habilidades de Veni",
+  "veniCmdDashboard": "Ir al panel de control",
+  "veniCmdInventory": "Consultar stock de un artículo",
+  "veniCmdLoans": "Ver préstamos activos",
+  "veniCmdReport": "Generar reporte de inventario",
+  "veniCmdScanQR": "Escanear código QR/Barras",
+  "veniCmdUnknown": "No reconozco ese comando. Escribe ayuda para ver qué puedo hacer.",
+  "yes": "Sí",
+  "zoomToFit": "Ajustar Vista"
 }

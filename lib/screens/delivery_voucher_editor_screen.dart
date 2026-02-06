@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart'; // Restaurado FilePicker
 import 'package:flutter/material.dart';
 import 'package:invenicum/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:invenicum/services/voucher_service.dart';
@@ -127,9 +128,9 @@ Firma de quien recibe     | Firma de quien devuelve''';
         _templateController.text,
         _logoBytes,
       );
-      ToastService.success('Configuración guardada correctamente');
+      ToastService.success(AppLocalizations.of(context)!.configurationSaved);
     } catch (e) {
-      ToastService.error('Error al guardar: $e');
+      ToastService.error(AppLocalizations.of(context)!.errorSaving(e.toString()));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -203,7 +204,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Configurar Vale de Entrega')),
+      appBar: AppBar(title: Text(AppLocalizations.of(context)!.configureDeliveryVoucher)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -214,11 +215,11 @@ Firma de quien recibe     | Firma de quien devuelve''';
                 leading: _logoBytes != null
                     ? Image.memory(_logoBytes!, width: 50)
                     : const Icon(Icons.image),
-                title: const Text('Logo del Vale'),
-                subtitle: const Text('Formatos: PNG, JPG'),
+                title: Text(AppLocalizations.of(context)!.logoVoucher),
+                subtitle: Text(AppLocalizations.of(context)!.formatsPNG),
                 trailing: ElevatedButton(
                   onPressed: _pickImage,
-                  child: const Text('Subir'),
+                  child: Text(AppLocalizations.of(context)!.upload),
                 ),
               ),
             ),
@@ -257,9 +258,9 @@ Firma de quien recibe     | Firma de quien devuelve''';
             TextField(
               controller: _templateController,
               maxLines: 15,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Configura el cuerpo del vale...',
+              decoration: InputDecoration(
+                border: const OutlineInputBorder(),
+                hintText: AppLocalizations.of(context)!.configureVoucherBody,
               ),
             ),
             const SizedBox(height: 24),
@@ -270,7 +271,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
                 Expanded(
                   child: OutlinedButton.icon(
                     icon: const Icon(Icons.picture_as_pdf),
-                    label: const Text('Vista Previa'),
+                    label: Text(AppLocalizations.of(context)!.previewPDF),
                     onPressed: () async {
                       await Printing.layoutPdf(
                         onLayout: (format) async => await _generatePreviewPdf(),
@@ -288,7 +289,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save),
-                    label: const Text('Guardar'),
+                    label: Text(AppLocalizations.of(context)!.saveConfiguration),
                     onPressed: _isLoading ? null : _saveTemplate,
                   ),
                 ),

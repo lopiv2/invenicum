@@ -1,0 +1,407 @@
+{
+  "@@locale": "it",
+  "@aiExtractionError": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@assetTypeDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@assetUpdated": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteAssetType": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteContainer": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@confirmDeleteLocationMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@containerCreated": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@containerDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@containerRenamed": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@customFieldsOf": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "@deleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorDeletingAssetType": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorDeletingContainer": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorGeneratingPDF": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorLoadingListValues": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorLoadingLocations": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorReadingFile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorRegisteringLoan": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorChangingLanguage": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorRenaming": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorSaving": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@errorUpdatingAsset": {
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "@fieldRequiredWithName": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@loadingListField": {
+    "placeholders": {
+      "field": {}
+    }
+  },
+  "@selectedLocationLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@systemThemesModal": {
+    "placeholders": {}
+  },
+  "@veniChatProcessing": {
+    "description": "AI loading message",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "@version": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "about": "Informazioni su Invenicum",
+  "aboutInvenicum": "Informazioni su Invenicum",
+  "active": "Attivo",
+  "activeLoans": "Prestiti attivi",
+  "activeLoansCount": "Prestiti attivi",
+  "addAlert": "Aggiungi avviso",
+  "addAsset": "Aggiungi risorsa",
+  "addContainer": "Aggiungi contenitore",
+  "addNewLocation": "Aggiungi nuova posizione",
+  "additionalThumbnails": "Miniature aggiuntive",
+  "aiExtractionError": "L'IA non ha potuto estrarre i dati: {error}",
+  "aiPasteUrlDescription": "Incolla il link del prodotto e l'IA estrarrà automaticamente le informazioni per compilare i campi.",
+  "all": "Tutto",
+  "alertCritical": "Critico",
+  "alertCreated": "Avviso creato",
+  "alertDeleted": "Avviso eliminato",
+  "alertInfo": "Informazioni",
+  "alertMessage": "Messaggio",
+  "alertTitle": "Titolo",
+  "alertType": "Tipo",
+  "alertWarning": "Avviso",
+  "alerts": "Avvisi e notifiche",
+  "appTitle": "Invenicum Inventario",
+  "applicationTheme": "Tema dell'applicazione",
+  "apply": "Applica",
+  "april": "Aprile",
+  "assetImages": "Immagini risorse",
+  "assetImport": "Importazione risorse",
+  "assetName": "Nome risorsa",
+  "assetTypeDeleted": "Tipo di risorsa \"{name}\" eliminato con successo.",
+  "assetTypes": "Tipi di risorse",
+  "assetUpdated": "Risorsa \"{name}\" aggiornata con successo.",
+  "assets": "Risorse",
+  "assetsIn": "Risorse in",
+  "august": "Agosto",
+  "backToAssetTypes": "Torna ai tipi di risorse",
+  "borrowerEmail": "Email mutuatario",
+  "borrowerName": "Nome mutuatario",
+  "borrowerPhone": "Telefono mutuatario",
+  "cancel": "Annulla",
+  "centerView": "Vista centrale",
+  "chooseFile": "Scegli file",
+  "clearCounter": "Cancella contatore",
+  "collectionContainerInfo": "I contenitori di raccolta hanno barre di tracciamento della raccolta, valore investito, valore di mercato e vista Esposizione",
+  "collectionFieldsConfigured": "Campi di raccolta configurati.",
+  "configureCollectionFields": "Configura campi di raccolta",
+  "configureDeliveryVoucher": "Configura buono di consegna",
+  "configureVoucherBody": "Configura il corpo del buono...",
+  "confirmDeleteAlert": "Elimina avviso",
+  "confirmDeleteAlertMessage": "Sei sicuro di voler eliminare questo record?",
+  "confirmDeleteAssetType": "Sei sicuro di voler eliminare il tipo di risorsa \"{name}\" e tutti gli elementi associati? Questa azione non può essere annullata.",
+  "confirmDeleteContainer": "Sei sicuro di voler eliminare il contenitore \"{name}\"? Questa azione è irreversibile e rimuoverà tutte le sue risorse e dati.",
+  "confirmDeleteLocationMessage": "Sei sicuro di voler eliminare la posizione \"{name}\"?",
+  "confirmDeletion": "Conferma eliminazione",
+  "configurationSaved": "Configurazione salvata con successo.",
+  "containerCreated": "Contenitore \"{name}\" creato con successo.",
+  "containerDeleted": "Contenitore \"{name}\" eliminato con successo.",
+  "containerName": "Nome contenitore",
+  "containerOrAssetTypeNotFound": "Contenitore o tipo di risorsa non trovato.",
+  "containerRenamed": "Contenitore rinominato a \"{name}\".",
+  "containers": "Contenitori",
+  "countItemsByValue": "Conta elementi per valore specifico",
+  "create": "Crea",
+  "createFirstContainer": "Crea il tuo primo contenitore.",
+  "current": "Corrente",
+  "customColor": "Colore personalizzato",
+  "customFields": "Campi personalizzati",
+  "customFieldsOf": "Campi personalizzati di {name}",
+  "customizeDeliveryVoucher": "Personalizza il modello PDF per i prestiti",
+  "darkMode": "Modalità scura",
+  "dashboard": "Dashboard",
+  "datalists": "Elenchi personalizzati",
+  "december": "Dicembre",
+  "definitionCustomFields": "Definizione campi personalizzati",
+  "delete": "Elimina",
+  "deleteError": "Errore eliminazione: {error}",
+  "deleteSuccess": "Posizione eliminata con successo.",
+  "deliveryVoucher": "BUONO DI CONSEGNA",
+  "deliveryVoucherEditor": "Editor buono di consegna",
+  "description": "Descrizione (facoltativa)",
+  "desiredField": "Campo desiderato",
+  "dueDate": "Data scadenza",
+  "edit": "Modifica",
+  "enterContainerName": "Inserisci il nome del contenitore",
+  "enterDescription": "Inserisci una descrizione",
+  "enterURL": "Inserisci URL",
+  "enterValidUrl": "Inserisci un URL valido",
+  "errorCsvMinRows": "Selezionare un file CSV con intestazioni e almeno una riga di dati.",
+  "errorDeletingAssetType": "Errore eliminazione tipo di risorsa: {error}",
+  "errorDeletingContainer": "Errore eliminazione contenitore: {error}",
+  "errorDuringImport": "Errore durante l'importazione",
+  "errorEmptyCsv": "Il file CSV è vuoto.",
+  "errorGeneratingPDF": "Errore generazione PDF: {error}",
+  "errorInvalidPath": "Percorso file non valido.",
+  "errorLoadingData": "Errore caricamento dati",
+  "errorLoadingListValues": "Errore caricamento valori elenco: {error}",
+  "errorLoadingLocations": "Errore caricamento posizioni: {error}",
+  "errorNameMappingRequired": "Il campo \"Nome\" è obbligatorio e deve essere mappato.",
+  "errorNoVoucherTemplate": "Nessun modello di buono configurato.",
+  "errorReadingBytes": "Impossibile leggere i byte del file.",
+  "errorReadingFile": "Errore lettura file: {error}",
+  "errorRegisteringLoan": "Errore registrazione prestito: {error}",
+  "errorRenaming": "Errore rinomina: {error}",
+  "errorSaving": "Errore salvataggio: {error}",
+  "errorUpdatingAsset": "Errore aggiornamento risorsa: {error}",
+  "exampleFilterHint": "Es: Danneggiato, Rosso, 50",
+  "errorChangingLanguage": "Errore cambio lingua: {error}",
+  "february": "Febbraio",
+  "fieldChip": "Campo",
+  "fieldRequiredWithName": "Il campo \"{field}\" è obbligatorio.",
+  "fieldToCount": "Campo da contare",
+  "fieldsFilledSuccess": "Campi compilati con successo!",
+  "formatsPNG": "Formati: PNG, JPG",
+  "generalSettings": "Impostazioni generali",
+  "generateVoucher": "Genera buono di consegna",
+  "globalSearch": "Ricerca globale",
+  "greeting": "Ciao, benvenuto!",
+  "guest": "Ospite",
+  "ignoreField": "🚫 Ignora campo",
+  "importAssetsTo": "Importa risorse in",
+  "importSuccessMessage": "Importazione riuscita! {count} risorse create.",
+  "invalidNavigationIds": "Errore: ID di navigazione non validi.",
+  "january": "Gennaio",
+  "july": "Luglio",
+  "june": "Giugno",
+  "language": "Lingua",
+  "languageNotImplemented": "Funzionalità linguistica da implementare",
+  "languageChanged": "Lingua cambiata in italiano!",
+  "lightMode": "Modalità chiara",
+  "loadingAssetType": "Caricamento tipo di risorsa...",
+  "loadingListField": "Caricamento {field}...",
+  "loanDate": "Data prestito",
+  "loanManagement": "Gestione prestiti",
+  "loanObject": "Oggetto prestito",
+  "loans": "Prestiti",
+  "locations": "Posizioni",
+  "locationsScheme": "Schema posizioni",
+  "login": "Accedi",
+  "logoVoucher": "Logo buono",
+  "logout": "Esci",
+  "magicAssistant": "Assistente IA magico",
+  "march": "Marzo",
+  "may": "Maggio",
+  "myCustomTheme": "Mio tema",
+  "myProfile": "Mio profilo",
+  "myThemesStored": "I miei temi salvati",
+  "nameCannotBeEmpty": "Il nome non può essere vuoto",
+  "nameSameAsCurrent": "Il nome è uguale a quello corrente",
+  "newAlert": "Nuovo avviso manuale",
+  "newContainer": "Nuovo contenitore",
+  "newName": "Nuovo nome",
+  "noAssetsCreated": "Nessuna risorsa creata ancora.",
+  "noAssetsMatch": "Nessuna risorsa corrisponde ai criteri di ricerca/filtro.",
+  "noBooleanFields": "Nessun campo booleano definito.",
+  "noContainerMessage": "Crea il tuo primo contenitore.",
+  "noCustomFields": "Questo tipo di risorsa non ha campi personalizzati.",
+  "noFileSelected": "Nessun file selezionato",
+  "noImagesAdded": "Nessuna immagine aggiunta ancora. La prima immagine sarà quella principale.",
+  "noLoansFound": "Nessun prestito trovato in questo contenitore.",
+  "noLocationsMessage": "Nessuna posizione creata in questo contenitore. Aggiungine una!",
+  "noNotifications": "Nessuna notifica",
+  "noThemesSaved": "Nessun tema salvato ancora",
+  "none": "Nessuno",
+  "november": "Novembre",
+  "obligatory": "Obbligatorio",
+  "october": "Ottobre",
+  "optional": "Facoltativo",
+  "overdue": "Scaduto",
+  "password": "Password",
+  "pleaseEnterPassword": "Inserisci la password",
+  "pleaseEnterUsername": "Inserisci il nome utente",
+  "pleasePasteUrl": "Incolla un URL",
+  "pleaseSelectCsvWithHeaders": "Seleziona un file CSV con intestazioni.",
+  "pleaseSelectLocation": "Seleziona una posizione.",
+  "possessionFieldDef": "Campo possesso",
+  "possessionFieldName": "In possesso",
+  "preferences": "Preferenze",
+  "previewPDF": "Anteprima PDF",
+  "primaryImage": "Immagine principale",
+  "productUrlLabel": "URL prodotto",
+  "quantity": "Quantità",
+  "registerNewLoan": "Registra nuovo prestito",
+  "reloadContainers": "Ricarica contenitori",
+  "reloadLocations": "Ricarica posizioni",
+  "removeImage": "Rimuovi immagine",
+  "rename": "Rinomina",
+  "renameContainer": "Rinomina contenitore",
+  "returned": "Restituito",
+  "rowsPerPageTitle": "Risorse per pagina:",
+  "save": "Salva",
+  "saveAndApply": "Salva e applica",
+  "saveAsset": "Salva risorsa",
+  "saveChanges": "Salva modifiche",
+  "saveConfiguration": "Salva configurazione",
+  "saveCustomTheme": "Salva tema personalizzato",
+  "searchInAllColumns": "Ricerca in tutte le colonne...",
+  "selectAndUploadImage": "Seleziona e carica immagine",
+  "selectApplicationLanguage": "Seleziona la lingua dell'applicazione",
+  "selectBooleanFields": "Seleziona campi booleani per controllare la raccolta:",
+  "selectCsvColumn": "Seleziona colonna CSV",
+  "selectField": "Seleziona campo...",
+  "selectFieldType": "Seleziona tipo di campo",
+  "selectImage": "Seleziona immagine",
+  "selectLocationRequired": "Devi selezionare una posizione per la risorsa.",
+  "selectedLocationLabel": "Selezionato: {name}",
+  "selectTheme": "Seleziona tema",
+  "september": "Settembre",
+  "settings": "Impostazioni",
+  "showAsGrid": "Mostra come griglia",
+  "showAsList": "Mostra come elenco",
+  "specificValueToCount": "Valore specifico da contare",
+  "startImport": "Avvia importazione",
+  "startMagic": "Avvia magia",
+  "status": "Stato",
+  "step1SelectFile": "Passaggio 1: Seleziona file CSV",
+  "step2ColumnMapping": "Passaggio 2: Mappatura colonne (CSV -> Sistema)",
+  "syncingSession": "Sincronizzazione sessione...",
+  "systemThemes": "Temi di sistema",
+  "systemThemesModal": "Temi di sistema",
+  "themeNameLabel": "Nome tema",
+  "thisFieldIsRequired": "Questo campo è obbligatorio.",
+  "topLoanedItems": "Articoli più prestati",
+  "totalAssets": "Tipi di risorse",
+  "totalItems": "Risorse",
+  "totals": "Totali",
+  "upload": "Carica",
+  "uploadImage": "Carica immagine",
+  "username": "Nome utente",
+  "veniChatTitle": "Veni IA",
+  "veniChatStatus": "Online",
+  "veniChatWelcome": "Ciao! Sono Veni, il tuo assistente Invenicum. Come posso aiutarti con il tuo inventario oggi?",
+  "veniChatPlaceholder": "Chiedimi qualsiasi cosa...",
+  "veniChatPoweredBy": "Powered by ",
+  "veniChatProcessing": "Sto elaborando la tua query su \"{query}\"...",
+  "veniCmdHelpTitle": "Abilità Veni",
+  "veniCmdDashboard": "Vai al dashboard",
+  "veniCmdInventory": "Controlla l'inventario di un articolo",
+  "veniCmdLoans": "Visualizza prestiti attivi",
+  "veniCmdReport": "Genera rapporto inventario",
+  "veniCmdScanQR": "Scansiona QR/Codice a barre",
+  "veniCmdUnknown": "Non riconosco quel comando. Scrivi help per vedere cosa posso fare.",
+  "version": "Versione {name}",
+  "yes": "Sì",
+  "zoomToFit": "Zoom per adattarsi"
+}

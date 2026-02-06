@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart'; // Importación clave
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class ImagePreviewSection extends StatelessWidget {
   final List<String> imageUrls;
@@ -114,9 +115,9 @@ class ImagePreviewSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Imágenes del Activo',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Text(
+          AppLocalizations.of(context)!.assetImages,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const Divider(),
 
@@ -124,17 +125,17 @@ class ImagePreviewSection extends StatelessWidget {
         ElevatedButton.icon(
           onPressed: onAddImage,
           icon: const Icon(Icons.upload),
-          label: const Text('Seleccionar y Subir Imagen'),
+          label: Text(AppLocalizations.of(context)!.selectAndUploadImage),
         ),
         const SizedBox(height: 20),
 
         // --- PREVISUALIZACIÓN PRINCIPAL / EMPTY STATE ---
         if (imageUrls.isEmpty)
-          const Padding(
-            padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
             child: Text(
-              'Aún no hay imágenes añadidas. La primera imagen será la principal.',
-              style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
+              AppLocalizations.of(context)!.noImagesAdded,
+              style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
             ),
           )
         else
@@ -142,9 +143,9 @@ class ImagePreviewSection extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Imagen Principal',
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+              Text(
+                AppLocalizations.of(context)!.primaryImage,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
               ),
               const SizedBox(height: 10),
               // Previsualización de la PRIMERA IMAGEN (Grande)
@@ -158,9 +159,9 @@ class ImagePreviewSection extends StatelessWidget {
               // --- LISTA DE MINIATURAS (si hay más de una) ---
               if (imageUrls.length > 1) ...[
                 const SizedBox(height: 20),
-                const Text(
-                  'Miniaturas Adicionales',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                Text(
+                  AppLocalizations.of(context)!.additionalThumbnails,
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                 ),
                 const SizedBox(height: 10),
                 SingleChildScrollView(

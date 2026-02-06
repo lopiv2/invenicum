@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/widgets/container_tree_view.dart';
-import 'package:invenicum/widgets/sidebar.dart';
-import 'package:provider/provider.dart';
 
 class SidebarLayout extends StatefulWidget {
+  const SidebarLayout({super.key});
+
   @override
   State<SidebarLayout> createState() => _SidebarLayoutState();
 }
 
 class _SidebarLayoutState extends State<SidebarLayout> {
-  // initState ya no es necesario, el provider se encarga de la carga inicial.
-
   @override
   Widget build(BuildContext context) {
-    // 1. Obtenemos el tema actual
     final theme = Theme.of(context);
-    // 3. Observamos (watch) el ContainerProvider para reconstruir automáticamente
-    //    el widget cuando la lista de contenedores o el estado de carga cambien.
+    final colorScheme = theme.colorScheme;
+
+    // Selectores precisos para rendimiento
     final containers = context.select<ContainerProvider, List>(
       (p) => p.containers,
     );
@@ -28,94 +28,112 @@ class _SidebarLayoutState extends State<SidebarLayout> {
       (p) => p.isLoading,
     );
     final containerProvider = context.read<ContainerProvider>();
-    /*final containerProvider = context.watch<ContainerProvider>();
-    final containers = containerProvider.containers;
-    final isLoading = containerProvider.isLoading;*/
 
-    return SizedBox(
-      width: 250,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
-          border: Border(
-            right: BorderSide(color: theme.dividerColor, width: 0.5),
+    // Obtener la ruta actual para marcar el item seleccionado
+    final String location = GoRouterState.of(context).uri.toString();
+
+    return Container(
+      width: 260,
+      decoration: BoxDecoration(
+        // OPCIÓN A: Color Sólido Suave (Estilo moderno/limpio)
+        //color: colorScheme.surfaceContainerLow, // Un tono ligeramente distinto al fondo principal
+
+        // OPCIÓN B: Si prefieres un degradado sutil, descomenta esto:
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [colorScheme.surface, colorScheme.primary.withOpacity(0.05)],
+        ),
+
+        border: Border(
+          right: BorderSide(
+            color: colorScheme.outlineVariant.withOpacity(0.4),
+            width: 1,
           ),
         ),
+      ),
+      child: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Sidebar(
-              icon: Icons.dashboard,
-              title: 'Dashboard',
+            // --- ACCESOS DIRECTOS ---
+            _SidebarNavButton(
+              icon: Icons.dashboard_customize_outlined,
+              title: AppLocalizations.of(context)!.dashboard,
+              selected: location == '/dashboard',
               onTap: () => context.go('/dashboard'),
             ),
-            const Divider(),
+
+            const SizedBox(height: 6),
+
+            // --- SECCIÓN DE CONTENEDORES ---
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Row(
                 children: [
-                  const Text(
-                    'Contenedores',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  Text(
+                    AppLocalizations.of(context)!.containers.toUpperCase(),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colorScheme.onSurfaceVariant.withOpacity(0.6),
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.1,
+                    ),
                   ),
                   const Spacer(),
-                  // Botón Añadir: Muestra un indicador de carga si está activo.
-                  IconButton(
-                    icon: isLoading
-                        ? const SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.add),
-                    onPressed: isLoading
-                        ? null
-                        : () => _showNewContainerDialog(context),
-                    tooltip: 'Añadir contenedor',
+                  _AddIconButton(
+                    isLoading: isLoading,
+                    onTap: () => _showNewContainerDialog(context),
                   ),
-                  // Botón de Recarga (opcional)
-                  IconButton(
-                    icon: const Icon(Icons.refresh, size: 20),
-                    onPressed: isLoading
-                        ? null
-                        : containerProvider.loadContainers,
-                    tooltip: 'Recargar contenedores',
+                  _ActionIconButton(
+                    icon: Icons.refresh_rounded,
+                    onTap: isLoading ? null : containerProvider.loadContainers,
                   ),
                 ],
               ),
             ),
 
-            // 4. Se muestra el estado de carga o la lista (área scrollable)
             Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : containers.isEmpty
-                  ? const Center(child: Text('Crea tu primer contenedor.'))
-                  : ContainerTreeView(
-                      onDeleteContainer: _handleDeleteContainer,
-                      onRenameContainer: _handleRenameContainer,
-                      onContainerTap: (container, String? subSection) {
-                        if (subSection != null) {
-                          print(
-                            'Navegando a la sección $subSection del contenedor ${container.name}',
-                          );
-                        } else {
-                          print('Navegando al contenedor ${container.name}');
-                        }
-                      },
-                    ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: isLoading && containers.isEmpty
+                    ? const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : containers.isEmpty
+                    ? _buildEmptyState()
+                    : ContainerTreeView(
+                        // Key dinámica para evitar RangeError al borrar
+                        key: ValueKey('tree_sidebar_${containers.length}'),
+                        onDeleteContainer: _handleDeleteContainer,
+                        onRenameContainer: _handleRenameContainer,
+                        onContainerTap: (container, subSection) {
+                          // Navegación handled dentro del TreeView o aquí
+                        },
+                      ),
+              ),
             ),
-            const Divider(),
-            Sidebar(
-              icon: Icons.notifications_active,
-              title: 'Alertas y Notificaciones',
-              onTap: () => context.go('/alerts'),
-            ),
-            // 5. Sección de Preferencias (siempre visible, no scrollable)
-            const Divider(),
-            Sidebar(
-              icon: Icons.settings,
-              title: 'Preferencias',
-              onTap: () => context.go('/preferences'),
+
+            // --- FOOTER (Preferencias / Alertas) ---
+            const Divider(height: 1),
+            SizedBox(
+
+              child: Column(
+                children: [
+                  _SidebarNavButton(
+                    icon: Icons.notifications_none_rounded,
+                    title: AppLocalizations.of(context)!.alerts,
+                    selected: location == '/alerts',
+                    onTap: () => context.go('/alerts'),
+                    compact: true,
+                  ),
+                  _SidebarNavButton(
+                    icon: Icons.settings_outlined,
+                    title: AppLocalizations.of(context)!.preferences,
+                    selected: location == '/preferences',
+                    onTap: () => context.go('/preferences'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -123,103 +141,99 @@ class _SidebarLayoutState extends State<SidebarLayout> {
     );
   }
 
-  Future<void> _handleDeleteContainer(int containerId) async {
-    final containerNotifier = Provider.of<ContainerProvider>(
-      context,
-      listen: false,
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Text(
+          AppLocalizations.of(context)!.createFirstContainer,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurfaceVariant.withOpacity(0.5),
+            fontSize: 12,
+          ),
+        ),
+      ),
     );
+  }
 
-    await containerNotifier.deleteContainer(containerId);
+  // --- LÓGICA DE ACCIONES ---
+
+  Future<void> _handleDeleteContainer(int containerId) async {
+    await context.read<ContainerProvider>().deleteContainer(containerId);
   }
 
   Future<void> _handleRenameContainer(int containerId, String newName) async {
-    final containerNotifier = Provider.of<ContainerProvider>(
-      context,
-      listen: false,
+    await context.read<ContainerProvider>().renameContainer(
+      containerId,
+      newName,
     );
-
-    await containerNotifier.renameContainer(containerId, newName);
   }
 
   Future<void> _showNewContainerDialog(BuildContext context) async {
-    // Usamos context.read para la acción, ya que no queremos reconstruir aquí.
     final containerProvider = context.read<ContainerProvider>();
-
     final nameController = TextEditingController();
-    final descriptionController = TextEditingController();
-    bool isCollection = false; // Estado local para el checkbox
+    final descController = TextEditingController();
+    bool isCollection = false;
 
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          title: const Text('Nuevo contenedor'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre del contenedor',
-                  hintText: 'Ingrese el nombre del contenedor',
-                ),
-                autofocus: true,
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Descripción (opcional)',
-                  hintText: 'Ingrese una descripción',
-                ),
-                maxLines: 2,
-              ),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: CheckboxListTile(
-                      title: const Text('¿Es una colección?'),
-                      value: isCollection,
-                      onChanged: (value) {
-                        setState(() {
-                          isCollection = value ?? false;
-                        });
-                      },
-                      contentPadding: EdgeInsets.zero,
-                    ),
+        builder: (context, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Nuevo Contenedor'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: nameController,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    labelText: 'Nombre',
+                    hintText: 'Ej: Almacén Principal',
+                    prefixIcon: Icon(Icons.label_outline),
                   ),
-                  Tooltip(
-                    message:
-                        'Los contenedores de colección tienen barras de seguimiento de colecciones, valor invertido, valor de mercado y vista de Exposición',
-                    child: Icon(
-                      Icons.help_outline,
-                      size: 18,
-                      color: Colors.grey[600],
-                    ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: descController,
+                  maxLines: 2,
+                  decoration: const InputDecoration(
+                    labelText: 'Descripción',
+                    prefixIcon: Icon(Icons.description_outlined),
                   ),
-                ],
-              ),
-            ],
+                ),
+                const SizedBox(height: 8),
+                SwitchListTile(
+                  title: const Text('¿Es una colección?'),
+                  subtitle: const Text('Habilita vistas de exposición y valor'),
+                  value: isCollection,
+                  onChanged: (val) => setDialogState(() => isCollection = val),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Cancelar'),
             ),
-            ElevatedButton(
+            FilledButton(
               onPressed: () {
-                if (nameController.text.isNotEmpty) {
+                if (nameController.text.trim().isNotEmpty) {
                   Navigator.pop(context, {
-                    'name': nameController.text,
-                    'description': descriptionController.text.isEmpty
-                        ? null
-                        : descriptionController.text,
+                    'name': nameController.text.trim(),
+                    'description': descController.text.trim(),
                     'isCollection': isCollection,
                   });
                 }
               },
-              child: const Text('Crear'),
+              child: const Text('Crear Contenedor'),
             ),
           ],
         ),
@@ -228,28 +242,129 @@ class _SidebarLayoutState extends State<SidebarLayout> {
 
     if (result != null) {
       try {
-        // Llama al Provider, que ejecuta la lógica de la API y llama a notifyListeners().
         await containerProvider.createNewContainer(
-          result['name']!,
-          result['description'],
-          isCollection: result['isCollection'] ?? false,
+          result['name'],
+          result['description'].isEmpty ? null : result['description'],
+          isCollection: result['isCollection'],
         );
-
-        // ¡El setState() ya no es necesario! La llamada al Provider lo maneja.
-
-        if (mounted) {
-          ToastService.success(
-            'Contenedor "${result['name']}" creado correctamente.',
-          );
-        }
+        if (mounted) ToastService.success('Contenedor creado');
       } catch (e) {
-        if (mounted) {
-          ToastService.error(
-            'Error al crear el contenedor: ${e.toString()}',
-            5,
-          );
-        }
+        if (mounted) ToastService.error('Error: $e');
       }
     }
+  }
+}
+
+// --- COMPONENTES ATÓMICOS MODERNOS ---
+
+class _SidebarNavButton extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final bool selected;
+  final VoidCallback onTap;
+  final bool compact;
+
+  const _SidebarNavButton({
+    required this.icon,
+    required this.title,
+    required this.selected,
+    required this.onTap,
+    this.compact = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8, vertical: compact ? 1 : 2),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+          decoration: BoxDecoration(
+            color: selected ? colorScheme.primaryFixedDim : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: selected ? [
+              BoxShadow(
+                color: colorScheme.primary.withOpacity(0.3),
+                blurRadius: 8,
+                offset: const Offset(0, 4),
+              ),
+            ] : [],
+          ),
+          child: Row(
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: selected
+                    ? colorScheme.primary
+                    : colorScheme.onSurfaceVariant,
+              ),
+              const SizedBox(width: 14),
+              Text(
+                title,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+                  color: selected
+                      ? colorScheme.onSurface
+                      : colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddIconButton extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  const _AddIconButton({required this.isLoading, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      icon: isLoading
+          ? const SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(
+              Icons.add_circle_outline_rounded,
+              size: 20,
+              color: Theme.of(context).colorScheme.primary,
+            ),
+      onPressed: isLoading ? null : onTap,
+    );
+  }
+}
+
+class _ActionIconButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  const _ActionIconButton({required this.icon, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      visualDensity: VisualDensity.compact,
+      icon: Icon(
+        icon,
+        size: 18,
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+      ),
+      onPressed: onTap,
+    );
   }
 }

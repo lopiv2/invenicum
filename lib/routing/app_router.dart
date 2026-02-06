@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/screens/asset_detail_screen.dart';
 import 'package:provider/provider.dart';
 
 // Models
@@ -64,10 +65,7 @@ GoRouter createAppRouter(AuthProvider authProvider) {
     },
     routes: [
       // Ruta de Login fuera del Shell
-      GoRoute(
-        path: '/login',
-        builder: (context, state) => const LoginScreen(),
-      ),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
 
       // Rutas Protegidas dentro del MainLayout
       ShellRoute(
@@ -139,13 +137,21 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                 ),
               ),
               GoRoute(
-                path: ':assetItemId/edit',
+                path: ':assetId',
+                builder: (context, state) => AssetDetailScreen(
+                  containerId: state.pathParameters['containerId']!,
+                  assetTypeId: state.pathParameters['assetTypeId']!,
+                  itemId: state.pathParameters['assetId']!,
+                ),
+              ),
+              GoRoute(
+                path: ':assetId/edit',
                 builder: (context, state) {
                   final item = state.extra as InventoryItem?;
                   return AssetEditScreen(
                     containerId: state.pathParameters['containerId']!,
                     assetTypeId: state.pathParameters['assetTypeId']!,
-                    assetItemId: state.pathParameters['assetItemId']!,
+                    assetItemId: state.pathParameters['assetId']!,
                     initialItem: item,
                   );
                 },
@@ -173,7 +179,8 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                   return DataListEditScreen(
                     containerId: state.pathParameters['containerId']!,
                     dataListId: state.pathParameters['dataListId']!,
-                    initialData: listData!, // La pantalla debe manejar si esto es null
+                    initialData:
+                        listData!, // La pantalla debe manejar si esto es null
                   );
                 },
               ),
@@ -197,16 +204,20 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                 path: ':locationId/edit',
                 builder: (context, state) {
                   final containerId = state.pathParameters['containerId']!;
-                  final locationId = int.tryParse(state.pathParameters['locationId'] ?? '');
-                  
+                  final locationId = int.tryParse(
+                    state.pathParameters['locationId'] ?? '',
+                  );
+
                   // Intentar obtener del extra
                   Location? location = state.extra as Location?;
-                  
+
                   // Fallback: Si no hay extra (ej. refresh), buscar en el provider
                   if (location == null && locationId != null) {
                     final provider = context.read<LocationProvider>();
                     try {
-                      location = provider.locations.firstWhere((l) => l.id == locationId);
+                      location = provider.locations.firstWhere(
+                        (l) => l.id == locationId,
+                      );
                     } catch (_) {
                       // Si no está, la pantalla de edición deberá cargarla por ID o mostrar error
                     }
@@ -214,7 +225,8 @@ GoRouter createAppRouter(AuthProvider authProvider) {
 
                   return LocationEditScreen(
                     containerId: containerId,
-                    location: location!, // Puede ser null, la pantalla debe validarlo
+                    location:
+                        location!, // Puede ser null, la pantalla debe validarlo
                   );
                 },
               ),
@@ -224,9 +236,8 @@ GoRouter createAppRouter(AuthProvider authProvider) {
           // --- LOANS ---
           GoRoute(
             path: '/container/:containerId/loans',
-            builder: (context, state) => LoansScreen(
-              containerId: state.pathParameters['containerId']!,
-            ),
+            builder: (context, state) =>
+                LoansScreen(containerId: state.pathParameters['containerId']!),
             routes: [
               GoRoute(
                 path: 'new',

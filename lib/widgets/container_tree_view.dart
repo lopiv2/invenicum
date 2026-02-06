@@ -3,6 +3,7 @@ import 'package:animated_tree_view/animated_tree_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import '../models/container_node.dart';
 import '../providers/container_provider.dart';
@@ -66,7 +67,8 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
 
       final assetTypesNode = TreeNode(
         key: "${container.id}_assettypes",
-        data: "Tipos de activos (${container.assetTypes.length})",
+        data:
+            "${AppLocalizations.of(context)!.assetTypes} (${container.assetTypes.length})",
       );
       containerNode.add(assetTypesNode);
 
@@ -74,7 +76,8 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       // cuando el Provider llama a notifyListeners().
       final locationsNode = TreeNode(
         key: "${container.id}_locations",
-        data: "Ubicaciones (${container.locations.length})",
+        data:
+            "${AppLocalizations.of(context)!.locations} (${container.locations.length})",
       );
       containerNode.add(locationsNode);
 
@@ -82,13 +85,14 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       final loansCount = loanProvider.loans.length;
       final loansNode = TreeNode(
         key: "${container.id}_loans",
-        data: "Préstamos ($loansCount)",
+        data: "${AppLocalizations.of(context)!.loans} ($loansCount)",
       );
       containerNode.add(loansNode);
 
       final datalistsNode = TreeNode(
         key: "${container.id}_datalists",
-        data: "Listas Personalizadas (${container.dataLists.length})",
+        data:
+            "${AppLocalizations.of(context)!.datalists} (${container.dataLists.length})",
       );
       containerNode.add(datalistsNode);
 
@@ -112,12 +116,16 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     ContainerNode? container;
     if (isContainer) {
       final containerIdInt = int.tryParse(node.key.toString());
-      if (containerIdInt != null) {
-        try {
-          // Usa la lista inyectada para obtener el objeto ContainerNode correcto.
-          container = containers.firstWhere((c) => c.id == containerIdInt);
-        } catch (_) {}
-      }
+      // 🚩 PROTECCIÓN EXTRA: Validar que el ID no sea nulo y exista en la lista actual
+      if (containerIdInt == null) return const SizedBox.shrink();
+
+      final index = containers.indexWhere((c) => c.id == containerIdInt);
+
+      // Si el contenedor ya no está en la lista (por borrado o filtro),
+      // abortamos el renderizado de este nodo inmediatamente.
+      if (index == -1) return const SizedBox.shrink();
+
+      container = containers[index];
     }
 
     // Contenido visual del nodo (Icono y Texto)
@@ -185,6 +193,9 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
     final theme = Theme.of(context);
     return Consumer<ContainerProvider>(
       builder: (context, provider, child) {
+        if (provider.isLoading && provider.containers.isEmpty) {
+          return const Center(child: CircularProgressIndicator());
+        }
         final containers =
             provider.containers; // La lista siempre estará actualizada.
 
@@ -197,6 +208,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
         }
 
         return TreeView.simple(
+          key: ValueKey('tree_total_${containers.length}'),
           tree: root,
           showRootNode: false,
 
@@ -304,7 +316,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Renombrar Contenedor'),
+          title: Text(AppLocalizations.of(context)!.renameContainer),
           content: Form(
             key: formKey,
             child: TextFormField(
@@ -316,10 +328,10 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'El nombre no puede estar vacío';
+                  return AppLocalizations.of(context)!.nameCannotBeEmpty;
                 }
                 if (value.trim() == container.name) {
-                  return 'El nombre es el mismo que el actual';
+                  return AppLocalizations.of(context)!.nameSameAsCurrent;
                 }
                 return null;
               },
@@ -333,7 +345,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () {
@@ -341,7 +353,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
                   Navigator.of(context).pop(true);
                 }
               },
-              child: const Text('Renombrar'),
+              child: Text(AppLocalizations.of(context)!.rename),
             ),
           ],
         );
@@ -356,10 +368,14 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
         await widget.onRenameContainer(container.id, newName);
 
         if (!context.mounted) return;
-        ToastService.success('Contenedor renombrado a "$newName".');
+        ToastService.success(
+          AppLocalizations.of(context)!.containerRenamed(newName),
+        );
       } catch (e) {
         if (!context.mounted) return;
-        ToastService.error('Error al renombrar: ${e.toString()}');
+        ToastService.error(
+          AppLocalizations.of(context)!.errorRenaming(e.toString()),
+        );
       }
     }
   }
@@ -379,13 +395,13 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
         Offset.zero & overlay.size,
       ),
       items: <PopupMenuEntry<ContainerAction>>[
-        const PopupMenuItem<ContainerAction>(
+        PopupMenuItem<ContainerAction>(
           value: ContainerAction.rename,
-          child: Text('Renombrar'),
+          child: Text(AppLocalizations.of(context)!.rename),
         ),
-        const PopupMenuItem<ContainerAction>(
+        PopupMenuItem<ContainerAction>(
           value: ContainerAction.delete,
-          child: Text('Eliminar'),
+          child: Text(AppLocalizations.of(context)!.delete),
         ),
       ],
     ).then((result) {
@@ -404,14 +420,16 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirmar Eliminación'),
+          title: Text(AppLocalizations.of(context)!.confirmDeletion),
           content: Text(
-            '¿Estás seguro de que quieres eliminar el contenedor "${container.name}"? Esta acción es irreversible y eliminará todos sus activos y datos.',
+            AppLocalizations.of(
+              context,
+            )!.confirmDeleteContainer(container.name),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -419,7 +437,7 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
                 backgroundColor: theme.colorScheme.error,
               ),
               child: Text(
-                'Eliminar',
+                AppLocalizations.of(context)!.delete,
                 style: TextStyle(color: theme.colorScheme.error),
               ),
             ),
@@ -432,10 +450,14 @@ class _ContainerTreeViewState extends State<ContainerTreeView> {
       try {
         await widget.onDeleteContainer(container.id);
         if (!context.mounted) return;
-        ToastService.success('Contenedor "${container.name}" eliminado.');
+        ToastService.success(
+          AppLocalizations.of(context)!.containerDeleted(container.name),
+        );
       } catch (e) {
         if (!context.mounted) return;
-        ToastService.error('Error al eliminar: ${e.toString()}');
+        ToastService.error(
+          AppLocalizations.of(context)!.errorDeletingContainer(e.toString()),
+        );
       }
     }
   }

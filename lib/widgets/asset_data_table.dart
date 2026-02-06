@@ -53,6 +53,9 @@ class _AssetDataTableState extends State<AssetDataTable> {
       deleteCallback: (item) => _deleteAsset(context, item),
       editCallback: (item) => _editAsset(context, item),
       copyCallback: (item) => _copyAsset(context, item),
+      onRowTap: (item) => context.go(
+        '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}',
+      ),
       availableLocations: widget.availableLocations,
       containerId: widget.containerId,
     );
@@ -128,6 +131,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
       '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}/edit',
       extra: item,
     );
+    ToastService.info('Editando activo: ${item.name} (ID: ${item.id})');
   }
 
   void _deleteAsset(BuildContext context, InventoryItem item) {

@@ -11,6 +11,7 @@ import 'package:invenicum/utils/asset_form_utils.dart';
 import 'package:invenicum/widgets/image_preview_section.dart';
 import 'package:invenicum/widgets/location_dropdown_widget.dart';
 import 'package:invenicum/widgets/magic_ai_dialog_widget.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import '../models/asset_type_model.dart';
@@ -201,7 +202,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         }
       });
 
-      ToastService.success('¡Campos completados con éxito!');
+      ToastService.success(AppLocalizations.of(context)!.fieldsFilledSuccess);
       // --- EFECTO TEMPORAL ---
       // Quitamos el color verde después de 3 segundos
       Future.delayed(const Duration(seconds: 3), () {
@@ -215,7 +216,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         curve: Curves.easeInOut,
       );
     } catch (e) {
-      ToastService.error('La IA no pudo extraer los datos: $e');
+      ToastService.error(AppLocalizations.of(context)!.aiExtractionError(e.toString()));
     } finally {
       setState(() => _isMagicLoading = false);
     }
@@ -395,13 +396,13 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Campos Personalizados',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        Text(
+          AppLocalizations.of(context)!.customFields,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         const Divider(),
         if (_assetType!.fieldDefinitions.isEmpty)
-          const Text('Este tipo de activo no tiene campos personalizados.'),
+          Text(AppLocalizations.of(context)!.noCustomFields),
 
         ..._assetType!.fieldDefinitions.map((fieldDef) {
           if (fieldDef.type == CustomFieldType.boolean) {
@@ -410,8 +411,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
               child: CheckboxListTile(
                 title: Text(fieldDef.name),
                 subtitle: fieldDef.isRequired
-                    ? const Text('Obligatorio')
-                    : null,
+                  ? Text(AppLocalizations.of(context)!.obligatory)
+                  : null,
                 value: _booleanFieldValues[fieldDef.id] ?? false,
                 onChanged: (bool? newValue) {
                   setState(() {

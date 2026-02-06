@@ -1,59 +1,49 @@
 import 'package:flutter/foundation.dart';
 import 'package:invenicum/models/inventory_item.dart';
-// Asumimos que esta clase encapsula la lista de ítems, las definiciones y los resultados de agregación
 import 'package:invenicum/models/inventory_item_response.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
 
-// Definimos el tipo de datos esperado para los archivos que vienen del frontend
 typedef FileData = List<Map<String, dynamic>>;
 
 class InventoryItemProvider with ChangeNotifier {
   final InventoryItemService _itemService;
-
-  // 🔑 PROTECCIÓN 1: Flag para indicar si el Provider ha sido descartado
   bool _isDisposed = false;
 
-  // Estado de Filtrado y Ordenamiento
+  // --- Estado de Filtrado y Ordenamiento ---
   Map<String, String> _filters = {};
   Map<String, String> get filters => _filters;
   String? _globalSearchTerm;
   String? get globalSearchTerm => _globalSearchTerm;
 
-  // Campos para Totales y Agregaciones (actualizados desde InventoryResponse)
   List<dynamic> _aggregationDefinitions = [];
   Map<String, dynamic> _aggregationResults = {};
-
   List<dynamic> get aggregationDefinitions => _aggregationDefinitions;
   Map<String, dynamic> get aggregationResults => _aggregationResults;
 
   String sortKey = 'name';
   bool sortAscending = true;
 
-  // Estado de Paginación
+  // --- Estado de Paginación ---
   int _currentPage = 1;
   int _itemsPerPage = 10;
-
   int get currentPage => _currentPage;
   int get itemsPerPage => _itemsPerPage;
 
-  // IDs de la vista actual (necesarios para el caché y el getter)
-  int _currentContainerId = 0;
-  int _currentAssetTypeId = 0;
+  int? _currentContainerId;
+  int? _currentAssetTypeId;
 
-  // 🔑 CACHÉ CORREGIDA: Almacena el objeto InventoryResponse completo
+  int get currentContainerId => _currentContainerId ?? 0;
+  int get currentAssetTypeId => _currentAssetTypeId ?? 0;
+
+  // --- Gestión de Caché ---
   final Map<String, InventoryResponse> _itemsCache = {};
   bool _isLoading = false;
-
   bool get isLoading => _isLoading;
 
   int _totalFilteredItems = 0;
   int get totalItems => _totalFilteredItems;
 
   InventoryItemProvider(this._itemService);
-
-  // ----------------------------------------------------------------------
-  // MANEJO DE ESTADO Y CACHÉ
-  // ----------------------------------------------------------------------
 
   @override
   void dispose() {
@@ -63,337 +53,80 @@ class InventoryItemProvider with ChangeNotifier {
 
   @override
   void notifyListeners() {
-    if (!_isDisposed) {
-      super.notifyListeners();
-    }
+    if (!_isDisposed) super.notifyListeners();
   }
 
-  int get totalPages {
-    if (_totalFilteredItems == 0 || _itemsPerPage == 0) return 1;
-    return (_totalFilteredItems / _itemsPerPage).ceil();
-  }
+  // ----------------------------------------------------------------------
+  // MANEJO DE CACHÉ Y KEYS
+  // ----------------------------------------------------------------------
 
   String _getCacheKey(
     int containerId,
     int assetTypeId, {
     Map<String, String>? aggFilters,
   }) {
-    // Aseguramos un orden consistente del JSON
     final sortedAggFilters = aggFilters?.entries.toList()
       ?..sort((a, b) => a.key.compareTo(b.key));
-
-    final aggString = sortedAggFilters != null && sortedAggFilters.isNotEmpty
+    final aggString = (sortedAggFilters != null && sortedAggFilters.isNotEmpty)
         ? '&agg=${sortedAggFilters.map((e) => '${e.key}:${e.value}').join(',')}'
         : '';
-
     return '$containerId-$assetTypeId$aggString';
   }
 
-  Future<void> loadAllItemsGlobal() async {
-  // 🔑 GUARDIA DE SEGURIDAD: Si no hay token en el servicio, no disparamos.
-  // Esto evita el 401 si por alguna razón el ProxyProvider se dispara antes.
-  final token = await _itemService.getToken(); // Necesitarás añadir este método al service o acceder al apiService
-  if (token == null) {
-    debugPrint('[InventoryItemProvider] Abortando carga global: Sin token.');
-    return;
-  }
-
-  if (_isLoading) return; // Evita llamadas duplicadas
-
-  _isLoading = true;
-  notifyListeners();
-
-  try {
-    final response = await _itemService.fetchInventoryItems(
-      containerId: null, 
-      assetTypeId: null,
-    );
-
-    if (_isDisposed) return;
-
-    final dashboardKey = _getCacheKey(0, 0);
-    _itemsCache[dashboardKey] = response;
-
-    _currentContainerId = 0;
-    _currentAssetTypeId = 0;
-  } catch (e) {
-    debugPrint('Error cargando items globales: $e');
-    // Si es un 401, podrías limpiar la caché aquí
-  } finally {
-    _isLoading = false;
-    if (!_isDisposed) {
-      _recalculateTotalsAndNotify();
-    }
-  }
-}
-
+  // 🚩 RESTAURADA: Función para los contadores de las tarjetas de categorías
   int getItemCountForAssetType(int containerId, int assetTypeId) {
     final key = _getCacheKey(containerId, assetTypeId);
-    // 🔑 CORRECCIÓN: Acceder a la lista de ítems dentro del objeto caché
     return _itemsCache[key]?.items.length ?? 0;
   }
 
-  void clearViewItems() {
-    _currentContainerId = 0;
-    _currentAssetTypeId = 0;
-    _currentPage = 1;
-    _filters = {};
-    _globalSearchTerm = null;
-    _totalFilteredItems = 0;
-  }
-
   // ----------------------------------------------------------------------
-  // OBTENCIÓN Y PROCESAMIENTO DE ÍTEMS
+  // GETTER PRINCIPAL (PROCESAMIENTO)
   // ----------------------------------------------------------------------
 
   List<InventoryItem> get inventoryItems {
-    return _processAndPaginateItems(_currentContainerId, _currentAssetTypeId);
-  }
+    final cId = _currentContainerId ?? 0;
+    final atId = _currentAssetTypeId ?? 0;
 
-  List<InventoryItem> _processAndPaginateItems(
-    int containerId,
-    int assetTypeId,
-  ) {
-    final key = _getCacheKey(containerId, assetTypeId);
-    // 🔑 CORRECCIÓN: Extraer la lista de ítems del objeto InventoryResponse
-    final items = _itemsCache[key]?.items ?? [];
+    if (cId == 0 || atId == 0) return [];
 
-    // 1. Aplicar Filtros
-    Iterable<InventoryItem> processedItems = _applyFilters(items);
+    // 🚩 CAMBIO CLAVE: Usa la función _getCacheKey para que la llave sea EXACTAMENTE
+    // la misma que usaste en loadInventoryItems.
+    final key = _getCacheKey(cId, atId);
 
-    // 2. Ordenamiento
-    final sortedList = processedItems.toList();
+    final response = _itemsCache[key];
 
-    sortedList.sort((a, b) {
-      Comparable aValue;
-      Comparable bValue;
+    if (response == null) return [];
 
-      switch (sortKey) {
-        case 'name':
-          aValue = a.name.trim().toLowerCase();
-          bValue = b.name.trim().toLowerCase();
-          break;
-        case 'description':
-          aValue = (a.description ?? '').trim().toLowerCase();
-          bValue = (b.description ?? '').trim().toLowerCase();
-          break;
-        case 'quantity':
-          aValue = a.quantity;
-          bValue = b.quantity;
-          break;
-        case 'minStock':
-          aValue = a.minStock;
-          bValue = b.minStock;
-          break;
-        case 'createdAt':
-          // Usar una fecha muy antigua para valores nulos para que aparezcan al principio/final
-          aValue = a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          bValue = b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          break;
-        case 'updatedAt':
-          aValue = a.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          bValue = b.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0);
-          break;
-        case 'location':
-          aValue = (a.location?.name ?? '').trim().toLowerCase();
-          bValue = (b.location?.name ?? '').trim().toLowerCase();
+    // Filtrado por contexto
+    final filteredByContext = response.items.where((item) {
+      return item.containerId == cId && item.assetTypeId == atId;
+    }).toList();
 
-          // 🔑 Si las ubicaciones son iguales, usamos el nombre como segundo criterio
-          if (aValue == bValue) {
-            aValue = a.name.trim().toLowerCase();
-            bValue = b.name.trim().toLowerCase();
-          }
-          break;
-        default:
-          // Lógica para campos personalizados
-          final aCustom = a.customFieldValues ?? {};
-          final bCustom = b.customFieldValues ?? {};
-          final aRaw = (aCustom[sortKey]?.toString() ?? '').trim();
-          final bRaw = (bCustom[sortKey]?.toString() ?? '').trim();
-
-          final aNumber = num.tryParse(aRaw);
-          final bNumber = num.tryParse(bRaw);
-
-          if (aNumber != null && bNumber != null) {
-            aValue = aNumber;
-            bValue = bNumber;
-          } else {
-            aValue = aRaw.toLowerCase();
-            bValue = bRaw.toLowerCase();
-          }
-          break;
-      }
-
-      // 🔑 IMPORTANTE: Comparación segura
-      try {
-        final comparison = aValue.compareTo(bValue);
-        return sortAscending ? comparison : -comparison;
-      } catch (e) {
-        // Fallback en caso de que los tipos no coincidan (ej. comparar String con num)
-        return sortAscending
-            ? aValue.toString().compareTo(bValue.toString())
-            : bValue.toString().compareTo(aValue.toString());
-      }
-    });
+    Iterable<InventoryItem> processedItems = _applyFilters(filteredByContext);
+    List<InventoryItem> sortedList = processedItems.toList();
+    _applySort(sortedList);
 
     _totalFilteredItems = sortedList.length;
 
-    // 3. Paginación
-    final totalItems = _totalFilteredItems;
     final startIndex = (_currentPage - 1) * _itemsPerPage;
+    if (startIndex >= _totalFilteredItems) return [];
     final endIndex = startIndex + _itemsPerPage;
-
-    if (startIndex >= totalItems) {
-      return [];
-    }
 
     return sortedList.sublist(
       startIndex,
-      endIndex < totalItems ? endIndex : totalItems,
+      endIndex < _totalFilteredItems ? endIndex : _totalFilteredItems,
     );
   }
 
-  void resetState() {
-    _itemsCache.clear();
-    _filters.clear();
-    _globalSearchTerm = null;
-    _currentPage = 1;
-    _currentContainerId = 0;
-    _currentAssetTypeId = 0;
-    _totalFilteredItems = 0;
-    _isLoading = false;
+  // ----------------------------------------------------------------------
+  // CARGA DE DATOS
+  // ----------------------------------------------------------------------
+  void updateContextIds(int cId, int atId) {
+    if (_currentContainerId == cId && _currentAssetTypeId == atId) return;
+    _currentContainerId = cId;
+    _currentAssetTypeId = atId;
     notifyListeners();
   }
-
-  Iterable<InventoryItem> _applyFilters(List<InventoryItem> items) {
-    return items.where((item) {
-      // 1. FILTRO GLOBAL
-      if (_globalSearchTerm != null) {
-        final term = _globalSearchTerm!;
-        bool matches =
-            item.name.toLowerCase().contains(term) ||
-            (item.description ?? '').toLowerCase().contains(term) ||
-            (item.location?.name ?? '').toLowerCase().contains(
-              term,
-            ); // 📍 Búsqueda global incluye ubicación
-
-        if (!matches) {
-          matches =
-              item.customFieldValues?.values.any(
-                (value) =>
-                    (value?.toString().toLowerCase() ?? '').contains(term),
-              ) ??
-              false;
-        }
-        if (!matches) return false;
-      }
-
-      // 2. FILTRADO POR COLUMNA
-      if (_filters.isNotEmpty) {
-        return _filters.entries.every((filterEntry) {
-          final filterKey = filterEntry.key;
-          final filterValue = filterEntry.value.toLowerCase();
-
-          String itemValue = '';
-          if (filterKey == 'name')
-            itemValue = item.name;
-          else if (filterKey == 'description')
-            itemValue = item.description ?? '';
-          else if (filterKey == 'location')
-            itemValue =
-                item.location?.name ?? ''; // 📍 Filtro específico columna
-          else
-            itemValue = item.customFieldValues?[filterKey]?.toString() ?? '';
-
-          return itemValue.toLowerCase().contains(filterValue);
-        });
-      }
-
-      return true;
-    });
-  }
-
-  // ----------------------------------------------------------------------
-  // LÓGICA DE TOTALES Y NOTIFICACIÓN
-  // ----------------------------------------------------------------------
-
-  void _recalculateTotalsAndNotify() {
-    final key = _getCacheKey(_currentContainerId, _currentAssetTypeId);
-    final response = _itemsCache[key];
-
-    // 1. Actualizar agregaciones
-    if (response != null) {
-      _aggregationDefinitions = response.aggregationDefinitions;
-      _aggregationResults = response.aggregationResults;
-
-      // LÍNEAS ELIMINADAS: La lista _inventoryItems no existe ni es necesaria
-      // en esta arquitectura. La lista se lee directamente del caché en el getter.
-    } else {
-      // LÍNEAS ELIMINADAS: La lista _inventoryItems no existe ni es necesaria
-      _aggregationDefinitions = [];
-      _aggregationResults = {};
-    }
-
-    // 2. Forzar el cálculo de filtros/paginación
-    // Esto asegura que _totalFilteredItems se recalcule usando los datos ACTUALIZADOS del caché.
-    _processAndPaginateItems(_currentContainerId, _currentAssetTypeId);
-
-    // 3. Notificar a los oyentes
-    notifyListeners();
-  }
-
-  // --- LÓGICA DE FILTROS Y PAGINACIÓN (Llaman a _recalculateTotalsAndNotify) ---
-  void setFilter(String key, String? value) {
-    if (value == null || value.isEmpty) {
-      _filters.remove(key);
-    } else {
-      _filters[key] = value;
-    }
-    _recalculateTotalsAndNotify();
-  }
-
-  void setGlobalSearchTerm(String? term) {
-    if (term == null || term.trim().isEmpty) {
-      _globalSearchTerm = null;
-    } else {
-      _globalSearchTerm = term.trim().toLowerCase();
-    }
-    _recalculateTotalsAndNotify();
-  }
-
-  void sortInventoryItems({required String dataKey, required bool ascending}) {
-    sortKey = dataKey;
-    sortAscending = ascending;
-    _recalculateTotalsAndNotify();
-  }
-
-  void goToPage(int page) {
-    // Asegurarse de que la página es al menos 1 y no excede el total
-    // (El totalPages ya utiliza el _totalFilteredItems actualizado en _processAndPaginateItems)
-    final newPage = page.clamp(1, totalPages);
-
-    if (_currentPage != newPage) {
-      _currentPage = newPage;
-      _recalculateTotalsAndNotify();
-    } else if (_currentPage == newPage && page != newPage) {
-      // Caso especial: forzar la notificación si la página ya era inválida (ej: 11)
-      // pero se clamp a la página válida (ej: 2) y el estado visual debe cambiar.
-      _currentPage = newPage;
-      _recalculateTotalsAndNotify();
-    }
-  }
-
-  void setItemsPerPage(int count) {
-    if (_itemsPerPage != count) {
-      _itemsPerPage = count;
-      _currentPage = 1;
-      _recalculateTotalsAndNotify();
-    }
-  }
-
-  // ----------------------------------------------------------------------
-  // LÓGICA DE CARGA
-  // ----------------------------------------------------------------------
 
   Future<void> loadInventoryItems({
     required int containerId,
@@ -402,12 +135,15 @@ class InventoryItemProvider with ChangeNotifier {
     bool forceReload = false,
     bool goToPageOne = false,
   }) async {
+    if (_currentAssetTypeId != assetTypeId ||
+        _currentContainerId != containerId) {
+      _aggregationDefinitions = [];
+      _aggregationResults = {};
+      _itemsCache.clear(); // Limpieza selectiva
+    }
+    // 2. Sincronización inmediata
     _currentContainerId = containerId;
     _currentAssetTypeId = assetTypeId;
-
-    if (goToPageOne) {
-      _currentPage = 1;
-    }
 
     final key = _getCacheKey(
       containerId,
@@ -415,112 +151,55 @@ class InventoryItemProvider with ChangeNotifier {
       aggFilters: aggregationFilters,
     );
 
+    if (forceReload) _itemsCache.remove(key);
     if (_itemsCache.containsKey(key) && !forceReload) {
       _recalculateTotalsAndNotify();
       return;
     }
 
     _isLoading = true;
-    notifyListeners();
+    notifyListeners(); // Notifica a la UI que use los nuevos IDs (4 y 1)
 
     try {
-      // 🔑 Recibimos el objeto InventoryResponse completo (asumimos que el service fue actualizado)
       final InventoryResponse loadedResponse = await _itemService
           .fetchInventoryItems(
             containerId: containerId,
             assetTypeId: assetTypeId,
             aggregationFilters: aggregationFilters,
           );
-
-      if (_isDisposed) return;
-
-      // 🔑 Almacenamos el objeto InventoryResponse completo en la caché
+      _aggregationDefinitions = List.from(
+        loadedResponse.aggregationDefinitions,
+      );
+      _aggregationResults = Map.from(loadedResponse.aggregationResults);
       _itemsCache[key] = loadedResponse;
-    } catch (e) {
-      if (kDebugMode) {
-        print('Error al cargar ítems para $key: $e');
-      }
-      rethrow;
     } finally {
-      if (_isDisposed) return;
-
       _isLoading = false;
-
       _recalculateTotalsAndNotify();
     }
   }
 
-  Future<void> createBatchFromCSV({
-    required int containerId,
-    required int assetTypeId,
-    required List<Map<String, dynamic>> itemsToUpload,
-  }) async {
-    if (itemsToUpload.isEmpty) return;
-
+  Future<void> loadAllItemsGlobal() async {
+    if (_isLoading) return;
     _isLoading = true;
     notifyListeners();
-
     try {
-      // 🎯 CORRECCIÓN: Llamar al método del servicio (que está en _itemService)
-      await _itemService.createBatchInventoryItems(
-        containerId: containerId,
-        assetTypeId: assetTypeId,
-        itemsData: itemsToUpload,
+      final response = await _itemService.fetchInventoryItems(
+        containerId: null,
+        assetTypeId: null,
       );
-
       if (_isDisposed) return;
-
-      // Recarga forzada para refrescar la lista y los totales
-      await loadInventoryItems(
-        containerId: containerId,
-        assetTypeId: assetTypeId,
-        forceReload: true,
-        goToPageOne: true,
-      );
-    } catch (e) {
-      rethrow;
+      _itemsCache[_getCacheKey(0, 0)] = response;
+      _currentContainerId = 0;
+      _currentAssetTypeId = 0;
     } finally {
-      if (_isDisposed) return;
-    }
-  }
-
-  // NUEVO MÉTODO DE GESTIÓN DE ESTADO PARA CLONACIÓN
-  Future<void> cloneInventoryItem(InventoryItem item) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // 1. Llamada al servicio de clonación (backend)
-      await _itemService.cloneInventoryItem(item);
-
-      if (_isDisposed) return;
-
-      // 2. Forzar la recarga (loadInventoryItems)
-      await loadInventoryItems(
-        containerId: item.containerId,
-        assetTypeId: item.assetTypeId,
-        forceReload: true,
-        goToPageOne: true,
-      );
-      notifyListeners();
-    } catch (e) {
-      // 🔑 CORRECCIÓN CLAVE: Restablecer el estado de carga si hay un error
-      // Esto evita que la UI se quede "colgada" cargando.
       _isLoading = false;
-      notifyListeners();
-      rethrow;
-    } finally {
-      // Este 'finally' permanece vacío porque el estado de carga ahora se
-      // maneja en el 'catch' o al final de 'loadInventoryItems'.
+      _recalculateTotalsAndNotify();
     }
   }
 
   // ----------------------------------------------------------------------
-  // LÓGICA CRUD (SIMPLIFICADA)
+  // OPERACIONES CRUD
   // ----------------------------------------------------------------------
-
-  // Después de cualquier operación CRUD, la recarga forzada es la mejor práctica
-  // para garantizar que los totales agregados (count/sum) sean correctos.
 
   Future<void> createInventoryItem(
     InventoryItem newItem, {
@@ -528,23 +207,17 @@ class InventoryItemProvider with ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-
     try {
       await _itemService.createInventoryItem(newItem, filesData: filesData);
-
-      if (_isDisposed) return;
-
-      // 🔑 Recarga forzada: Obtiene el ítem recién creado y los nuevos totales.
       await loadInventoryItems(
         containerId: newItem.containerId,
         assetTypeId: newItem.assetTypeId,
         forceReload: true,
       );
     } catch (e) {
+      _isLoading = false;
+      notifyListeners();
       rethrow;
-    } finally {
-      // loadInventoryItems se encarga de _isLoading = false y notifyListeners.
-      if (_isDisposed) return;
     }
   }
 
@@ -555,26 +228,21 @@ class InventoryItemProvider with ChangeNotifier {
   }) async {
     _isLoading = true;
     notifyListeners();
-
     try {
       await _itemService.updateInventoryItem(
         updatedItem,
         filesToUpload: filesToUpload,
         imageIdsToDelete: imageIdsToDelete,
       );
-
-      if (_isDisposed) return;
-
-      // 🔑 Recarga forzada: Obtiene el ítem actualizado y los nuevos totales.
       await loadInventoryItems(
         containerId: updatedItem.containerId,
         assetTypeId: updatedItem.assetTypeId,
         forceReload: true,
       );
     } catch (e) {
+      _isLoading = false;
+      notifyListeners();
       rethrow;
-    } finally {
-      if (_isDisposed) return;
     }
   }
 
@@ -585,29 +253,260 @@ class InventoryItemProvider with ChangeNotifier {
   ) async {
     _isLoading = true;
     notifyListeners();
-
     try {
       await _itemService.deleteInventoryItem(itemId);
-
-      if (_isDisposed) return;
-
-      // 🎯 PASO 1: Establecer la página actual a 1.
       _currentPage = 1;
-
-      // 🎯 PASO 2: Recargar la lista. loadInventoryItems usará _currentPage=1.
       await loadInventoryItems(
         containerId: containerId,
         assetTypeId: assetTypeId,
         forceReload: true,
       );
     } catch (e) {
+      _isLoading = false;
+      notifyListeners();
       rethrow;
+    }
+  }
+
+  Future<void> cloneInventoryItem(InventoryItem item) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _itemService.cloneInventoryItem(item);
+      await loadInventoryItems(
+        containerId: item.containerId,
+        assetTypeId: item.assetTypeId,
+        forceReload: true,
+        goToPageOne: true,
+      );
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  Future<void> createBatchFromCSV({
+    required int containerId,
+    required int assetTypeId,
+    required List<Map<String, dynamic>> itemsToUpload,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      await _itemService.createBatchInventoryItems(
+        containerId: containerId,
+        assetTypeId: assetTypeId,
+        itemsData: itemsToUpload,
+      );
+      await loadInventoryItems(
+        containerId: containerId,
+        assetTypeId: assetTypeId,
+        forceReload: true,
+        goToPageOne: true,
+      );
     } finally {
-      if (_isDisposed) return;
-      if (_isLoading) {
-        _isLoading = false;
-        notifyListeners();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // ----------------------------------------------------------------------
+  // FILTRADO Y ORDENACIÓN
+  // ----------------------------------------------------------------------
+
+  Iterable<InventoryItem> _applyFilters(List<InventoryItem> items) {
+    return items.where((item) {
+      if (_globalSearchTerm != null) {
+        final term = _globalSearchTerm!;
+        bool matches =
+            item.name.toLowerCase().contains(term) ||
+            (item.description ?? '').toLowerCase().contains(term) ||
+            (item.location?.name ?? '').toLowerCase().contains(term);
+        if (!matches) {
+          matches =
+              item.customFieldValues?.values.any(
+                (v) => v.toString().toLowerCase().contains(term),
+              ) ??
+              false;
+        }
+        if (!matches) return false;
+      }
+      if (_filters.isNotEmpty) {
+        return _filters.entries.every((e) {
+          final val = e.value.toLowerCase();
+          // Manejo de Cantidad (Stock)
+          if (e.key == 'quantity') {
+            return _compareNumeric(item.quantity, val);
+          }
+          // Manejo de Stock Mínimo
+          if (e.key == 'minStock') {
+            return _compareNumeric(item.minStock, val);
+          }
+          if (e.key == 'name') return item.name.toLowerCase().contains(val);
+          if (e.key == 'description') {
+            return (item.description ?? '').toLowerCase().contains(val);
+          }
+          if (e.key == 'location') {
+            return (item.location?.name ?? '').toLowerCase().contains(val);
+          }
+          return (item.customFieldValues?[e.key]?.toString() ?? '')
+              .toLowerCase()
+              .contains(val);
+        });
+      }
+      return true;
+    });
+  }
+
+  bool _compareNumeric(num? itemValue, String filterText) {
+    if (itemValue == null) return false;
+
+    // Limpiamos el filtro (ej: "> 10" -> ">10")
+    final cleanFilter = filterText.replaceAll(' ', '');
+
+    try {
+      if (cleanFilter.startsWith('>=')) {
+        return itemValue >= (num.tryParse(cleanFilter.substring(2)) ?? 0);
+      } else if (cleanFilter.startsWith('<=')) {
+        return itemValue <= (num.tryParse(cleanFilter.substring(2)) ?? 0);
+      } else if (cleanFilter.startsWith('>')) {
+        return itemValue > (num.tryParse(cleanFilter.substring(1)) ?? 0);
+      } else if (cleanFilter.startsWith('<')) {
+        return itemValue < (num.tryParse(cleanFilter.substring(1)) ?? 0);
+      } else if (cleanFilter.startsWith('=')) {
+        return itemValue == (num.tryParse(cleanFilter.substring(1)) ?? 0);
+      }
+
+      // Si solo pone el número, buscamos coincidencia exacta o "contiene"
+      final target = num.tryParse(cleanFilter);
+      if (target != null) return itemValue == target;
+    } catch (e) {
+      return false;
+    }
+    return false;
+  }
+
+  void _applySort(List<InventoryItem> list) {
+    list.sort((a, b) {
+      Comparable aVal;
+      Comparable bVal;
+      switch (sortKey) {
+        case 'name':
+          aVal = a.name.toLowerCase();
+          bVal = b.name.toLowerCase();
+          break;
+        case 'description':
+          aVal = (a.description ?? '').toLowerCase();
+          bVal = (b.description ?? '').toLowerCase();
+          break;
+        case 'quantity':
+          aVal = a.quantity;
+          bVal = b.quantity;
+          break;
+        case 'minStock':
+          aVal = a.minStock;
+          bVal = b.minStock;
+          break;
+        case 'location':
+          aVal = (a.location?.name ?? '').toLowerCase();
+          bVal = (b.location?.name ?? '').toLowerCase();
+          break;
+        case 'createdAt':
+          aVal = a.createdAt ?? DateTime(0);
+          bVal = b.createdAt ?? DateTime(0);
+          break;
+        case 'updatedAt':
+          aVal = a.updatedAt ?? DateTime(0);
+          bVal = b.updatedAt ?? DateTime(0);
+          break;
+        default:
+          final aRaw = a.customFieldValues?[sortKey]?.toString() ?? '';
+          final bRaw = b.customFieldValues?[sortKey]?.toString() ?? '';
+          aVal = num.tryParse(aRaw) ?? aRaw.toLowerCase();
+          bVal = num.tryParse(bRaw) ?? bRaw.toLowerCase();
+      }
+      return sortAscending ? aVal.compareTo(bVal) : bVal.compareTo(aVal);
+    });
+  }
+
+  // ----------------------------------------------------------------------
+  // AUXILIARES
+  // ----------------------------------------------------------------------
+
+  void _recalculateTotalsAndNotify() {
+    final cId = _currentContainerId ?? 0;
+    final atId = _currentAssetTypeId ?? 0;
+
+    if (cId == 0 || atId == 0) return;
+
+    final key = _getCacheKey(cId, atId);
+    final response = _itemsCache[key];
+
+    if (response != null) {
+      // 🚩 SOLO actualizamos si la respuesta de esta llave tiene datos.
+      // No tocamos _aggregationDefinitions si ya fueron asignadas en loadInventoryItems.
+      _totalFilteredItems = _applyFilters(response.items).length;
+
+      // Solo sincronizamos resultados si vienen en este objeto
+      if (response.aggregationResults.isNotEmpty) {
+        _aggregationResults = Map.from(response.aggregationResults);
       }
     }
+    notifyListeners();
+  }
+
+  void setFilter(String key, String? value) {
+    if (value == null || value.isEmpty)
+      _filters.remove(key);
+    else
+      _filters[key] = value;
+    _recalculateTotalsAndNotify();
+  }
+
+  void setGlobalSearchTerm(String? term) {
+    _globalSearchTerm = (term == null || term.trim().isEmpty)
+        ? null
+        : term.trim().toLowerCase();
+    _currentPage = 1;
+    _recalculateTotalsAndNotify();
+  }
+
+  void sortInventoryItems({required String dataKey, required bool ascending}) {
+    sortKey = dataKey;
+    sortAscending = ascending;
+    _recalculateTotalsAndNotify();
+  }
+
+  int get totalPages {
+    if (_totalFilteredItems == 0 || _itemsPerPage == 0) return 1;
+    return (_totalFilteredItems / _itemsPerPage).ceil();
+  }
+
+  void goToPage(int page) {
+    _currentPage = page.clamp(1, totalPages);
+    notifyListeners();
+  }
+
+  void setItemsPerPage(int count) {
+    _itemsPerPage = count;
+    _currentPage = 1;
+    _recalculateTotalsAndNotify();
+  }
+
+  void clearViewItems() {
+    //_currentContainerId = 0;
+    //_currentAssetTypeId = 0;
+    _currentPage = 1;
+    _filters.clear();
+    _globalSearchTerm = null;
+    notifyListeners();
+  }
+
+  void resetState() {
+    _itemsCache.clear();
+    _currentContainerId = 0;
+    _currentAssetTypeId = 0;
+    clearViewItems();
   }
 }

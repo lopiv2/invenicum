@@ -17,6 +17,7 @@ import '../providers/container_provider.dart';
 import '../providers/inventory_item_provider.dart';
 import '../services/toast_service.dart';
 import 'package:invenicum/widgets/image_preview_section.dart'; // Tu widget de previsualización
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetEditScreen extends StatefulWidget {
   final String containerId;
@@ -80,7 +81,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error('Error al cargar los valores de la lista: $e');
+        ToastService.error(AppLocalizations.of(context)!.errorLoadingListValues(e.toString()));
       }
     }
   }
@@ -293,7 +294,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             ) {
       if (_selectedLocationId == null) {
         if (mounted) {
-          ToastService.error('Debe seleccionar una ubicación para el activo.');
+          ToastService.error(AppLocalizations.of(context)!.selectLocationRequired);
         }
       }
       return;
@@ -306,7 +307,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
     if (cIdInt == null || atIdInt == null || assetItemIdInt == null) {
       if (mounted) {
-        ToastService.error('Error: IDs de navegación no válidos.');
+        ToastService.error(AppLocalizations.of(context)!.invalidNavigationIds);
       }
       return;
     }
@@ -322,7 +323,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           updatedCustomValues[fieldId.toString()] = selectedValue;
         } else if (fieldDef.isRequired) {
           if (mounted) {
-            ToastService.error('El campo "${fieldDef.name}" es obligatorio.');
+            ToastService.error(AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name));
           }
           return;
         }
@@ -331,7 +332,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
         if (fieldDef.isRequired && boolValue == null) {
           if (mounted) {
-            ToastService.error('El campo "${fieldDef.name}" es obligatorio.');
+            ToastService.error(AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name));
           }
           return;
         }
@@ -345,7 +346,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           updatedCustomValues[fieldId.toString()] = controller.text;
         } else if (fieldDef.isRequired) {
           if (mounted) {
-            ToastService.error('El campo "${fieldDef.name}" es obligatorio.');
+            ToastService.error(AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name));
           }
           return;
         }
@@ -410,7 +411,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Campos Personalizados de ${_assetType!.name}',
+          AppLocalizations.of(context)!.customFieldsOf(_assetType!.name),
           style: Theme.of(context).textTheme.titleLarge,
         ),
         const Divider(height: 20),
@@ -442,10 +443,10 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               padding: const EdgeInsets.only(bottom: 16),
               child: DropdownButtonFormField<String>(
                 value: selectedValue,
-                decoration: InputDecoration(
+                  decoration: InputDecoration(
                   labelText: fieldDef.name,
                   border: const OutlineInputBorder(),
-                  helperText: fieldDef.isRequired ? 'Obligatorio' : 'Opcional',
+                  helperText: fieldDef.isRequired ? AppLocalizations.of(context)!.obligatory : AppLocalizations.of(context)!.optional,
                 ),
                 items: values.map((value) {
                   return DropdownMenuItem<String>(
@@ -460,7 +461,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                 },
                 validator: (value) {
                   if (fieldDef.isRequired && value == null) {
-                    return 'Este campo es obligatorio.';
+                    return AppLocalizations.of(context)!.thisFieldIsRequired;
                   }
                   return null;
                 },
@@ -476,7 +477,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                 initialValue: _booleanValues[fieldId],
                 validator: (value) {
                   if (fieldDef.isRequired && value == null) {
-                    return 'Este campo es obligatorio.';
+                    return AppLocalizations.of(context)!.thisFieldIsRequired;
                   }
                   return null;
                 },
@@ -484,9 +485,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                   return InputDecorator(
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      helperText: fieldDef.isRequired
-                          ? 'Obligatorio'
-                          : 'Opcional',
+                        helperText: fieldDef.isRequired
+                          ? AppLocalizations.of(context)!.obligatory
+                          : AppLocalizations.of(context)!.optional,
                       errorText: state.errorText,
                       contentPadding: EdgeInsets.zero,
                     ),

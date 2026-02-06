@@ -38,6 +38,21 @@ class ContainerService {
 
   // --- Métodos de Contenedores ---
 
+  Future<List<dynamic>> searchItemsGlobal(String query) async {
+    try {
+      // Asumimos que tu API tiene un endpoint de búsqueda global
+      final response = await _dio.get(
+        '/search/assets',
+        queryParameters: {'q': query},
+      );
+
+      // Usamos tu helper privado para extraer los datos
+      return _extractData(response) as List<dynamic>;
+    } on DioException catch (e) {
+      throw _handleError(e, 'buscar elementos en la API');
+    }
+  }
+
   Future<ContainerNode> createContainer(
     String name,
     String? description, {
@@ -61,7 +76,9 @@ class ContainerService {
   Future<List<ContainerNode>> getContainers() async {
     try {
       // Cargamos relaciones para evitar N+1 queries en el backend
-      final response = await _dio.get('/containers?include=datalists,assettypes');
+      final response = await _dio.get(
+        '/containers?include=datalists,assettypes',
+      );
       final List<dynamic> list = _extractData(response);
 
       return list.map((json) {
@@ -106,11 +123,7 @@ class ContainerService {
     try {
       final response = await _dio.post(
         '/containers/$containerId/datalists',
-        data: {
-          'name': name,
-          'description': description,
-          'items': items,
-        },
+        data: {'name': name, 'description': description, 'items': items},
       );
       return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {
@@ -127,11 +140,7 @@ class ContainerService {
     try {
       final response = await _dio.put(
         '/datalists/$dataListId',
-        data: {
-          'name': name,
-          'description': description,
-          'items': items,
-        },
+        data: {'name': name, 'description': description, 'items': items},
       );
       return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {

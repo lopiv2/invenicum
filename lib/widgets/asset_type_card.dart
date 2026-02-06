@@ -5,6 +5,7 @@ import 'package:invenicum/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetTypeCard extends StatelessWidget {
   final String containerId;
@@ -27,19 +28,17 @@ class AssetTypeCard extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Confirmar eliminación'),
-              content: Text(
-                '¿Estás seguro de que deseas eliminar el tipo de activo "${assetType.name}" y todos sus elementos asociados? Esta acción no se puede deshacer.',
-              ),
+              title: Text(AppLocalizations.of(context)!.confirmDeletion),
+              content: Text(AppLocalizations.of(context)!.confirmDeleteAssetType(assetType.name)),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Cancelar'),
+                  child: Text(AppLocalizations.of(context)!.cancel),
                 ),
                 TextButton(
                   style: TextButton.styleFrom(foregroundColor: Colors.red),
                   onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Eliminar'),
+                  child: Text(AppLocalizations.of(context)!.delete),
                 ),
               ],
             );
@@ -64,35 +63,35 @@ class AssetTypeCard extends StatelessWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Configurar Campos de Colección'),
+          title: Text(AppLocalizations.of(context)!.configureCollectionFields),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Selecciona los campos booleanos para controlar la colección:',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                Text(
+                  AppLocalizations.of(context)!.selectBooleanFields,
+                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 16),
-                const Text('Campo de Posesión:'),
+                Text(AppLocalizations.of(context)!.possessionFieldDef + ':'),
                 const SizedBox(height: 8),
                 if (booleanFields.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'No hay campos booleanos definidos.',
-                      style: TextStyle(color: Colors.grey),
+                      AppLocalizations.of(context)!.noBooleanFields,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   )
                 else
                   DropdownButtonFormField<String?>(
                     value: possessionFieldId,
-                    hint: const Text('Seleccionar campo...'),
+                    hint: Text(AppLocalizations.of(context)!.selectField),
                     items: [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: null,
-                        child: Text('Ninguno'),
+                        child: Text(AppLocalizations.of(context)!.none),
                       ),
                       ...booleanFields.map((field) {
                         return DropdownMenuItem(
@@ -108,24 +107,24 @@ class AssetTypeCard extends StatelessWidget {
                     },
                   ),
                 const SizedBox(height: 20),
-                const Text('Campo de Deseados:'),
+                Text(AppLocalizations.of(context)!.desiredField + ':'),
                 const SizedBox(height: 8),
                 if (booleanFields.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: Text(
-                      'No hay campos booleanos definidos.',
-                      style: TextStyle(color: Colors.grey),
+                      AppLocalizations.of(context)!.noBooleanFields,
+                      style: const TextStyle(color: Colors.grey),
                     ),
                   )
                 else
                   DropdownButtonFormField<String?>(
                     value: desiredFieldId,
-                    hint: const Text('Seleccionar campo...'),
+                    hint: Text(AppLocalizations.of(context)!.selectField),
                     items: [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         value: null,
-                        child: Text('Ninguno'),
+                        child: Text(AppLocalizations.of(context)!.none),
                       ),
                       ...booleanFields.map((field) {
                         return DropdownMenuItem(
@@ -146,14 +145,14 @@ class AssetTypeCard extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
+              child: Text(AppLocalizations.of(context)!.cancel),
             ),
             ElevatedButton(
               onPressed: () => Navigator.pop(context, {
                 'possession': possessionFieldId,
                 'desired': desiredFieldId,
               }),
-              child: const Text('Guardar'),
+              child: Text(AppLocalizations.of(context)!.save),
             ),
           ],
         ),

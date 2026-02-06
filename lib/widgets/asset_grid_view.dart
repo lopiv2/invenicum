@@ -35,6 +35,12 @@ class _AssetGridViewState extends State<AssetGridView> {
   final int minColumns = 3;
   final int maxColumns = 10;
 
+  void _viewAssetDetails(BuildContext context, InventoryItem item) {
+    context.go(
+      '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}',
+    );
+  }
+
   // --- FUNCIONES DE ACCIÓN (Ahora usan widget. para acceder a las propiedades) ---
 
   void _editAsset(BuildContext context, InventoryItem item) {
@@ -102,141 +108,148 @@ class _AssetGridViewState extends State<AssetGridView> {
         final fullImageUrl = _getFullImageUrl(item);
         final hasImage = fullImageUrl.isNotEmpty;
 
-        return Card(
-          elevation: 2,
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // 1. CONTENEDOR DE IMAGEN (Miniatura)
-              Flexible(
-                flex: 1,
-                child: Container(
-                  constraints: BoxConstraints(minWidth: 100, maxWidth: 500),
-                  clipBehavior: Clip.antiAlias,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(4),
-                      bottomLeft: Radius.circular(4),
+        return InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: () => _viewAssetDetails(context, item),
+          child: Card(
+            elevation: 2,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // 1. CONTENEDOR DE IMAGEN (Miniatura)
+                Flexible(
+                  flex: 1,
+                  child: Container(
+                    constraints: BoxConstraints(minWidth: 100, maxWidth: 500),
+                    clipBehavior: Clip.antiAlias,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(4),
+                        bottomLeft: Radius.circular(4),
+                      ),
+                      color: Colors.grey.shade100,
                     ),
-                    color: Colors.grey.shade100,
-                  ),
-                  child: hasImage
-                      ? Image.network(
-                          fullImageUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Center(
-                                child: Icon(
-                                  Icons.broken_image,
-                                  size: 30,
-                                  color: Colors.grey,
+                    child: hasImage
+                        ? Image.network(
+                            fullImageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Center(
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    size: 30,
+                                    color: Colors.grey,
+                                  ),
                                 ),
-                              ),
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return const Center(
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            );
-                          },
-                        )
-                      : const Center(
-                          child: Icon(
-                            Icons.inventory,
-                            size: 30,
-                            color: Colors.grey,
-                          ),
-                        ),
-                ),
-              ),
-
-              // 2. CONTENIDO DEL TEXTO Y ACCIONES
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Fila de Título y Acciones
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              item.name,
-                              style: Theme.of(context).textTheme.titleMedium
-                                  ?.copyWith(fontWeight: FontWeight.bold),
-                              overflow: TextOverflow.ellipsis,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              );
+                            },
+                          )
+                        : const Center(
+                            child: Icon(
+                              Icons.inventory,
+                              size: 30,
+                              color: Colors.grey,
                             ),
                           ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // Botones de acción
-                              IconButton(
-                                icon: const Icon(Icons.edit, size: 20),
-                                tooltip: 'Editar',
-                                onPressed: () => _editAsset(context, item),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                              const SizedBox(width: 8),
-                              IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  size: 20,
-                                  color: Colors.red,
-                                ),
-                                tooltip: 'Eliminar',
-                                onPressed: () => _deleteAsset(context, item),
-                                padding: EdgeInsets.zero,
-                                constraints: const BoxConstraints(),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-
-                      // Descripción
-                      Text(
-                        item.description ?? 'Sin descripción',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey[700],
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
-
-                      const Divider(height: 12),
-
-                      // Mostrar los dos primeros campos personalizados clave
-                      ...widget.assetType.fieldDefinitions.take(2).map((def) {
-                        final value =
-                            item.customFieldValues?[def.id.toString()] ?? '—';
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2.0),
-                          child: Row(
-                            children: [
-                              Text(
-                                '${def.name}: ',
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                              ),
-                              Flexible(
-                                child: Text(
-                                  value.toString(),
-                                  style: Theme.of(context).textTheme.bodySmall,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ],
                   ),
                 ),
-              ),
-            ],
+
+                // 2. CONTENIDO DEL TEXTO Y ACCIONES
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Fila de Título y Acciones
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                item.name,
+                                style: Theme.of(context).textTheme.titleMedium
+                                    ?.copyWith(fontWeight: FontWeight.bold),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // Botones de acción
+                                IconButton(
+                                  icon: const Icon(Icons.edit, size: 20),
+                                  tooltip: 'Editar',
+                                  onPressed: () => _editAsset(context, item),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                                const SizedBox(width: 8),
+                                IconButton(
+                                  icon: const Icon(
+                                    Icons.delete,
+                                    size: 20,
+                                    color: Colors.red,
+                                  ),
+                                  tooltip: 'Eliminar',
+                                  onPressed: () => _deleteAsset(context, item),
+                                  padding: EdgeInsets.zero,
+                                  constraints: const BoxConstraints(),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        // Descripción
+                        Text(
+                          item.description ?? 'Sin descripción',
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: Colors.grey[700]),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+
+                        const Divider(height: 12),
+
+                        // Mostrar los dos primeros campos personalizados clave
+                        ...widget.assetType.fieldDefinitions.take(2).map((def) {
+                          final value =
+                              item.customFieldValues?[def.id.toString()] ?? '—';
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2.0),
+                            child: Row(
+                              children: [
+                                Text(
+                                  '${def.name}: ',
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                ),
+                                Flexible(
+                                  child: Text(
+                                    value.toString(),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },

@@ -4,6 +4,8 @@ class Environment {
     defaultValue: 'http://localhost:3000', // URL por defecto para desarrollo
   );
 
+  static const String appVersion = '1.0.0'; // Versión por defecto
+
   static const String apiVersion = '/api/v1';
 
   static String get baseUrl => '$apiUrl$apiVersion';

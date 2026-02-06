@@ -1,6 +1,7 @@
 // lib/screens/alerts_screen.dart
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import '../providers/alert_provider.dart';
 import '../services/toast_service.dart';
 import 'package:intl/intl.dart';
@@ -27,7 +28,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Alertas y Notificaciones'),
+        title: Text(AppLocalizations.of(context)!.alerts),
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -38,7 +39,7 @@ class _AlertsScreenState extends State<AlertsScreen> {
       body: alertProvider.isLoading
           ? const Center(child: CircularProgressIndicator())
           : alertProvider.alerts.isEmpty
-              ? const Center(child: Text('No hay notificaciones'))
+              ? Center(child: Text(AppLocalizations.of(context)!.noNotifications))
               : ListView.builder(
                   itemCount: alertProvider.alerts.length,
                   itemBuilder: (context, index) {
@@ -116,18 +117,18 @@ class _AlertsScreenState extends State<AlertsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Eliminar Alerta'),
-        content: const Text('¿Estás seguro de que deseas eliminar esta notificación?'),
+        title: Text(AppLocalizations.of(context)!.confirmDeleteAlert),
+        content: Text(AppLocalizations.of(context)!.confirmDeleteAlertMessage),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               context.read<AlertProvider>().deleteAlert(alert.id);
               Navigator.pop(context);
-              ToastService.success('Notificación eliminada');
+              ToastService.success(AppLocalizations.of(context)!.alertDeleted);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+            child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -143,26 +144,26 @@ class _AlertsScreenState extends State<AlertsScreen> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Nueva Alerta Manual'),
+          title: Text(AppLocalizations.of(context)!.newAlert),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: titleController, decoration: const InputDecoration(labelText: 'Título')),
-              TextField(controller: messageController, decoration: const InputDecoration(labelText: 'Mensaje')),
+              TextField(controller: titleController, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.alertTitle)),
+              TextField(controller: messageController, decoration: InputDecoration(labelText: AppLocalizations.of(context)!.alertMessage)),
               DropdownButton<String>(
                 value: selectedType,
                 isExpanded: true,
-                items: const [
-                  DropdownMenuItem(value: 'info', child: Text('Información')),
-                  DropdownMenuItem(value: 'warning', child: Text('Advertencia')),
-                  DropdownMenuItem(value: 'critical', child: Text('Crítico')),
+                items: [
+                  DropdownMenuItem(value: 'info', child: Text(AppLocalizations.of(context)!.alertInfo)),
+                  DropdownMenuItem(value: 'warning', child: Text(AppLocalizations.of(context)!.alertWarning)),
+                  DropdownMenuItem(value: 'critical', child: Text(AppLocalizations.of(context)!.alertCritical)),
                 ],
                 onChanged: (val) => setState(() => selectedType = val!),
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(AppLocalizations.of(context)!.cancel)),
             ElevatedButton(
               onPressed: () {
                 context.read<AlertProvider>().createAlert(
@@ -171,9 +172,9 @@ class _AlertsScreenState extends State<AlertsScreen> {
                   selectedType,
                 );
                 Navigator.pop(context);
-                ToastService.success('Alerta creada');
+                ToastService.success(AppLocalizations.of(context)!.alertCreated);
               },
-              child: const Text('Guardar'),
+              child: Text(AppLocalizations.of(context)!.save),
             ),
           ],
         ),

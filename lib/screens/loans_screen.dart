@@ -1,11 +1,11 @@
 // lib/screens/loans_screen.dart
 
 import 'dart:typed_data';
-
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:invenicum/l10n/app_localizations.dart'; // Asegúrate de que la ruta sea correcta
 import 'package:invenicum/models/loan.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/services/toast_service.dart';
@@ -14,6 +14,11 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
+
+// Extensión útil para acceder rápido a las traducciones
+extension AppLocalizationsX on BuildContext {
+  AppLocalizations get l10n => AppLocalizations.of(this)!;
+}
 
 class LoansScreen extends StatefulWidget {
   final String containerId;
@@ -50,7 +55,8 @@ class _LoansScreenState extends State<LoansScreen> {
       await loanProvider.fetchLoans(containerIdInt);
     } catch (e) {
       if (mounted) {
-        ToastService.error('Error al cargar préstamos: ${e.toString()}');
+        // Usando clave de error genérica o específica si existiera
+        ToastService.error('${context.l10n.errorLoadingData}: ${e.toString()}');
       }
     }
   }
@@ -67,11 +73,11 @@ class _LoansScreenState extends State<LoansScreen> {
     try {
       await loanProvider.returnLoan(containerIdInt, loan.id);
       if (mounted) {
-        ToastService.success('Objeto devuelto exitosamente');
+        ToastService.success(context.l10n.configurationSaved); // O una clave específica de éxito
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error('Error al devolver: ${e.toString()}');
+        ToastService.error(e.toString());
       }
     }
   }
@@ -80,14 +86,14 @@ class _LoansScreenState extends State<LoansScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Confirmar Eliminación'),
+        title: Text(context.l10n.confirmDeletion),
         content: Text(
-          '¿Estás seguro de que quieres eliminar este préstamo de "${loan.itemName}"?',
+          '${context.l10n.confirmDeleteAlertMessage} (${loan.itemName})',
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar'),
+            child: Text(context.l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -99,15 +105,15 @@ class _LoansScreenState extends State<LoansScreen> {
               try {
                 await loanProvider.deleteLoan(containerIdInt, loan.id);
                 if (mounted) {
-                  ToastService.success('Préstamo eliminado exitosamente');
+                  ToastService.success(context.l10n.alertDeleted);
                 }
               } catch (e) {
                 if (mounted) {
-                  ToastService.error('Error al eliminar: ${e.toString()}');
+                  ToastService.error(e.toString());
                 }
               }
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text(context.l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -133,7 +139,7 @@ class _LoansScreenState extends State<LoansScreen> {
       final config = await voucherService.getVoucherConfig();
 
       if (config == null) {
-        ToastService.error("No hay una plantilla de vale configurada.");
+        ToastService.error(context.l10n.errorNoVoucherTemplate);
         return;
       }
 
@@ -147,7 +153,7 @@ class _LoansScreenState extends State<LoansScreen> {
 
       final String voucherIdStr = loan.formattedVoucherId;
 
-      // Mapeo de datos del Loan a las etiquetas
+      // Mapeo de datos usando las claves del template
       final String processedContent = template
           .replaceAll('{voucherId}', voucherIdStr)
           .replaceAll('{itemName}', loan.itemName)
@@ -167,7 +173,6 @@ class _LoansScreenState extends State<LoansScreen> {
           )
           .replaceAll('{notes}', loan.notes ?? '');
 
-      // Generar el PDF
       final doc = pw.Document();
       doc.addPage(
         pw.Page(
@@ -176,7 +181,6 @@ class _LoansScreenState extends State<LoansScreen> {
             return pw.Column(
               crossAxisAlignment: pw.CrossAxisAlignment.start,
               children: [
-                // CABECERA: Logo a la izquierda, Título e ID a la derecha
                 pw.Row(
                   mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -187,14 +191,14 @@ class _LoansScreenState extends State<LoansScreen> {
                       crossAxisAlignment: pw.CrossAxisAlignment.end,
                       children: [
                         pw.Text(
-                          'VALE DE ENTREGA',
+                          'DELIVERY VOUCHER', // O usar una traducción específica para el PDF
                           style: pw.TextStyle(
                             fontWeight: pw.FontWeight.bold,
                             fontSize: 18,
                           ),
                         ),
                         pw.Text(
-                          voucherIdStr, // 👈 El ID justo debajo del título
+                          voucherIdStr,
                           style: const pw.TextStyle(
                             fontSize: 14,
                             color: PdfColors.grey700,
@@ -207,13 +211,10 @@ class _LoansScreenState extends State<LoansScreen> {
                 pw.SizedBox(height: 10),
                 pw.Divider(thickness: 1),
                 pw.SizedBox(height: 20),
-
-                // CUERPO DEL TEXTO
                 pw.Text(
                   processedContent,
                   style: const pw.TextStyle(fontSize: 12, height: 1.5),
                 ),
-
                 pw.Spacer(),
               ],
             );
@@ -226,38 +227,40 @@ class _LoansScreenState extends State<LoansScreen> {
         name: 'Vale_${voucherIdStr}.pdf',
       );
     } catch (e) {
-      ToastService.error("Error al generar PDF: $e");
+      ToastService.error("${context.l10n.errorGeneratingPDF}: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final loanProvider = context.watch<LoanProvider>();
     final isLoading = loanProvider.isLoading;
     final loans = _getFilteredLoans(loanProvider.loans);
-    final theme = Theme.of(context); // 🎨 Tu tema personalizado
+    final theme = Theme.of(context);
+
     if (isLoading && loanProvider.loans.isEmpty) {
-    return Scaffold(
-      backgroundColor: Colors.transparent, // 👈 Deja ver el fondo del MainLayout
-      body: Center(child: CircularProgressIndicator(color: theme.primaryColor)),
-    );
-  }
+      return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text('Gestión de Préstamos'),
+        title: Text(l10n.loanManagement),
         backgroundColor: theme.colorScheme.surfaceContainer,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: isLoading ? null : _loadLoans,
-            tooltip: 'Recargar Préstamos',
+            tooltip: l10n.reloadLocations, // Reutilizando recargar o crear una nueva
           ),
           IconButton(
             icon: const Icon(Icons.add_task),
             onPressed: _addLoan,
-            tooltip: 'Nuevo Préstamo',
+            tooltip: l10n.registerNewLoan,
           ),
         ],
       ),
@@ -269,9 +272,9 @@ class _LoansScreenState extends State<LoansScreen> {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                const Text(
-                  'Filtrar: ',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  '${l10n.apply}: ', // O una etiqueta "Filtrar"
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -279,13 +282,13 @@ class _LoansScreenState extends State<LoansScreen> {
                     scrollDirection: Axis.horizontal,
                     child: Row(
                       children: [
-                        _buildFilterChip('Todos', 'all'),
+                        _buildFilterChip(l10n.all, 'all'),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Activos', 'active'),
+                        _buildFilterChip(l10n.active, 'active'),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Devueltos', 'returned'),
+                        _buildFilterChip(l10n.returned, 'returned'),
                         const SizedBox(width: 8),
-                        _buildFilterChip('Vencidos', 'overdue'),
+                        _buildFilterChip(l10n.overdue, 'overdue'),
                       ],
                     ),
                   ),
@@ -299,8 +302,8 @@ class _LoansScreenState extends State<LoansScreen> {
                 ? Center(
                     child: Text(
                       _filterStatus == 'all'
-                          ? 'No hay préstamos registrados'
-                          : 'No hay préstamos con este estado',
+                          ? l10n.noLoansFound
+                          : l10n.noLoansFound, // Podrías personalizar según filtro si quieres
                       style: const TextStyle(color: Colors.grey),
                     ),
                   )
@@ -309,17 +312,17 @@ class _LoansScreenState extends State<LoansScreen> {
                     child: Card(
                       child: DataTable2(
                         columnSpacing: 16,
-                        horizontalMargin: 0,
+                        horizontalMargin: 12,
                         minWidth: 800,
-                        columns: const [
-                          DataColumn(label: Text('Objeto')),
-                          DataColumn(label: Text('Prestatario')),
-                          DataColumn(label: Text('Contacto')),
-                          DataColumn(label: Text('Fecha Préstamo')),
-                          DataColumn(label: Text('Fecha Devolución')),
-                          DataColumn(label: Text('Estado')),
+                        columns: [
+                          DataColumn(label: Text(l10n.loanObject)),
+                          DataColumn(label: Text(l10n.borrowerName)),
+                          DataColumn(label: Text(l10n.alertInfo)), // "Contacto" o info
+                          DataColumn(label: Text(l10n.loanDate)),
+                          DataColumn(label: Text(l10n.dueDate)),
+                          DataColumn(label: Text(l10n.status)),
                           DataColumn(
-                            label: Text('Acciones'),
+                            label: Text(l10n.apply), // "Acciones"
                             headingRowAlignment: MainAxisAlignment.center,
                           ),
                         ],
@@ -332,7 +335,7 @@ class _LoansScreenState extends State<LoansScreen> {
                               if (loan.status == 'returned') {
                                 return Colors.green.shade50;
                               }
-                              return Colors.white;
+                              return null;
                             }),
                             cells: [
                               DataCell(Text(loan.itemName)),
@@ -364,12 +367,10 @@ class _LoansScreenState extends State<LoansScreen> {
                               ),
                               DataCell(
                                 Text(
-                                  loan.actualReturnDate != null
+                                  loan.expectedReturnDate != null
                                       ? DateFormat.yMd(
-                                          Localizations.localeOf(
-                                            context,
-                                          ).toString(),
-                                        ).format(loan.actualReturnDate!)
+                                          Localizations.localeOf(context).toString(),
+                                        ).format(loan.expectedReturnDate!)
                                       : '-',
                                 ),
                               ),
@@ -377,53 +378,41 @@ class _LoansScreenState extends State<LoansScreen> {
                                 Chip(
                                   label: Text(
                                     loan.isOverdue && loan.status == 'active'
-                                        ? 'Vencido'
+                                        ? l10n.overdue
                                         : loan.status == 'active'
-                                        ? 'Activo'
-                                        : 'Devuelto',
+                                            ? l10n.active
+                                            : l10n.returned,
                                   ),
                                   backgroundColor:
                                       loan.isOverdue && loan.status == 'active'
-                                      ? Colors.red
-                                      : loan.status == 'active'
-                                      ? Colors.orange
-                                      : Colors.green,
-                                  labelStyle: const TextStyle(
-                                    color: Colors.white,
-                                  ),
+                                          ? Colors.red
+                                          : loan.status == 'active'
+                                              ? Colors.orange
+                                              : Colors.green,
+                                  labelStyle: const TextStyle(color: Colors.white),
                                 ),
                               ),
                               DataCell(
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     if (loan.status == 'active')
                                       IconButton(
-                                        icon: const Icon(
-                                          Icons.check_circle,
-                                          color: Colors.green,
-                                        ),
+                                        icon: const Icon(Icons.check_circle, color: Colors.green),
                                         onPressed: () => _returnLoan(loan),
-                                        tooltip: 'Marcar como devuelto',
+                                        tooltip: l10n.returned,
                                       )
                                     else
                                       const SizedBox(width: 48),
                                     IconButton(
-                                      icon: const Icon(
-                                        Icons.print,
-                                        color: Colors.teal,
-                                      ),
+                                      icon: const Icon(Icons.print, color: Colors.teal),
                                       onPressed: () => _generateVoucher(loan),
-                                      tooltip: 'Generar Vale de Entrega',
+                                      tooltip: l10n.generateVoucher,
                                     ),
                                     IconButton(
-                                      icon: const Icon(
-                                        Icons.delete,
-                                        color: Colors.red,
-                                      ),
+                                      icon: const Icon(Icons.delete, color: Colors.red),
                                       onPressed: () => _deleteLoan(loan),
-                                      tooltip: 'Eliminar',
+                                      tooltip: l10n.delete,
                                     ),
                                   ],
                                 ),
