@@ -9,40 +9,7 @@ class AppLocalizationsIt extends AppLocalizations {
   AppLocalizationsIt([String locale = 'it']) : super(locale);
 
   @override
-  String get additionalInformation => 'Additional Information';
-
-  @override
-  String get createdAt => 'Creation Date';
-
-  @override
-  String get updatedAt => 'Last Updated';
-
-  @override
-  String get assetDetail => 'Asset Details';
-
-  @override
-  String get assetNotFound => 'Asset not found';
-
-  @override
-  String get invalidAssetId => 'Invalid asset ID';
-
-  @override
-  String get noImageAvailable => 'No image available';
-
-  @override
-  String get minStock => 'Minimum stock';
-
-  @override
-  String get location => 'Location';
-
-  @override
   String get aboutInvenicum => 'Informazioni su Invenicum';
-
-  @override
-  String get previous => 'Previous';
-
-  @override
-  String get next => 'Next';
 
   @override
   String get active => 'Attivo';
@@ -66,19 +33,19 @@ class AppLocalizationsIt extends AppLocalizations {
   String get addNewLocation => 'Aggiungi nuova posizione';
 
   @override
+  String get additionalInformation => 'Additional Information';
+
+  @override
   String get additionalThumbnails => 'Miniature aggiuntive';
 
   @override
-  String aiExtractionError(Object error) {
+  String aiExtractionError(String error) {
     return 'L\'IA non ha potuto estrarre i dati: $error';
   }
 
   @override
   String get aiPasteUrlDescription =>
       'Incolla il link del prodotto e l\'IA estrarrà automaticamente le informazioni per compilare i campi.';
-
-  @override
-  String get all => 'Tutto';
 
   @override
   String get alertCritical => 'Critico';
@@ -108,6 +75,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get alerts => 'Avvisi e notifiche';
 
   @override
+  String get all => 'Tutto';
+
+  @override
   String get appTitle => 'Invenicum Inventario';
 
   @override
@@ -120,6 +90,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get april => 'Aprile';
 
   @override
+  String get assetDetail => 'Asset Details';
+
+  @override
   String get assetImages => 'Immagini risorse';
 
   @override
@@ -129,7 +102,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get assetName => 'Nome risorsa';
 
   @override
-  String assetTypeDeleted(Object name) {
+  String get assetNotFound => 'Asset not found';
+
+  @override
+  String assetTypeDeleted(String name) {
     return 'Tipo di risorsa \"$name\" eliminato con successo.';
   }
 
@@ -137,7 +113,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get assetTypes => 'Tipi di risorse';
 
   @override
-  String assetUpdated(Object name) {
+  String assetUpdated(String name) {
     return 'Risorsa \"$name\" aggiornata con successo.';
   }
 
@@ -198,12 +174,12 @@ class AppLocalizationsIt extends AppLocalizations {
       'Sei sicuro di voler eliminare questo record?';
 
   @override
-  String confirmDeleteAssetType(Object name) {
+  String confirmDeleteAssetType(String name) {
     return 'Sei sicuro di voler eliminare il tipo di risorsa \"$name\" e tutti gli elementi associati? Questa azione non può essere annullata.';
   }
 
   @override
-  String confirmDeleteContainer(Object name) {
+  String confirmDeleteContainer(String name) {
     return 'Sei sicuro di voler eliminare il contenitore \"$name\"? Questa azione è irreversibile e rimuoverà tutte le sue risorse e dati.';
   }
 
@@ -219,12 +195,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get configurationSaved => 'Configurazione salvata con successo.';
 
   @override
-  String containerCreated(Object name) {
+  String containerCreated(String name) {
     return 'Contenitore \"$name\" creato con successo.';
   }
 
   @override
-  String containerDeleted(Object name) {
+  String containerDeleted(String name) {
     return 'Contenitore \"$name\" eliminato con successo.';
   }
 
@@ -236,7 +212,7 @@ class AppLocalizationsIt extends AppLocalizations {
       'Contenitore o tipo di risorsa non trovato.';
 
   @override
-  String containerRenamed(Object name) {
+  String containerRenamed(String name) {
     return 'Contenitore rinominato a \"$name\".';
   }
 
@@ -253,6 +229,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get createFirstContainer => 'Crea il tuo primo contenitore.';
 
   @override
+  String get createdAt => 'Creation Date';
+
+  @override
   String get current => 'Corrente';
 
   @override
@@ -262,7 +241,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get customFields => 'Campi personalizzati';
 
   @override
-  String customFieldsOf(Object name) {
+  String customFieldsOf(String name) {
     return 'Campi personalizzati di $name';
   }
 
@@ -327,16 +306,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enterValidUrl => 'Inserisci un URL valido';
 
   @override
+  String errorChangingLanguage(String error) {
+    return 'Errore cambio lingua: $error';
+  }
+
+  @override
   String get errorCsvMinRows =>
       'Selezionare un file CSV con intestazioni e almeno una riga di dati.';
 
   @override
-  String errorDeletingAssetType(Object error) {
+  String errorDeletingAssetType(String error) {
     return 'Errore eliminazione tipo di risorsa: $error';
   }
 
   @override
-  String errorDeletingContainer(Object error) {
+  String errorDeletingContainer(String error) {
     return 'Errore eliminazione contenitore: $error';
   }
 
@@ -347,7 +331,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get errorEmptyCsv => 'Il file CSV è vuoto.';
 
   @override
-  String errorGeneratingPDF(Object error) {
+  String errorGeneratingPDF(String error) {
     return 'Errore generazione PDF: $error';
   }
 
@@ -358,7 +342,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get errorLoadingData => 'Errore caricamento dati';
 
   @override
-  String errorLoadingListValues(Object error) {
+  String errorLoadingListValues(String error) {
     return 'Errore caricamento valori elenco: $error';
   }
 
@@ -383,32 +367,27 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String errorRegisteringLoan(Object error) {
+  String errorRegisteringLoan(String error) {
     return 'Errore registrazione prestito: $error';
   }
 
   @override
-  String errorRenaming(Object error) {
+  String errorRenaming(String error) {
     return 'Errore rinomina: $error';
   }
 
   @override
-  String errorSaving(Object error) {
+  String errorSaving(String error) {
     return 'Errore salvataggio: $error';
   }
 
   @override
-  String errorUpdatingAsset(Object error) {
+  String errorUpdatingAsset(String error) {
     return 'Errore aggiornamento risorsa: $error';
   }
 
   @override
   String get exampleFilterHint => 'Es: Danneggiato, Rosso, 50';
-
-  @override
-  String errorChangingLanguage(Object error) {
-    return 'Errore cambio lingua: $error';
-  }
 
   @override
   String get february => 'Febbraio';
@@ -417,7 +396,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get fieldChip => 'Campo';
 
   @override
-  String fieldRequiredWithName(Object field) {
+  String fieldRequiredWithName(String field) {
     return 'Il campo \"$field\" è obbligatorio.';
   }
 
@@ -446,15 +425,21 @@ class AppLocalizationsIt extends AppLocalizations {
   String get guest => 'Ospite';
 
   @override
+  String get helpDocs => 'Help & Documentation';
+
+  @override
   String get ignoreField => '🚫 Ignora campo';
 
   @override
   String get importAssetsTo => 'Importa risorse in';
 
   @override
-  String importSuccessMessage(String count) {
+  String importSuccessMessage(int count) {
     return 'Importazione riuscita! $count risorse create.';
   }
+
+  @override
+  String get invalidAssetId => 'Invalid asset ID';
 
   @override
   String get invalidNavigationIds => 'Errore: ID di navigazione non validi.';
@@ -472,6 +457,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get language => 'Lingua';
 
   @override
+  String get languageChanged => 'Lingua cambiata in italiano!';
+
+  @override
   String get languageNotImplemented =>
       'Funzionalità linguistica da implementare';
 
@@ -482,7 +470,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get loadingAssetType => 'Caricamento tipo di risorsa...';
 
   @override
-  String loadingListField(Object field) {
+  String loadingListField(String field) {
     return 'Caricamento $field...';
   }
 
@@ -490,11 +478,8 @@ class AppLocalizationsIt extends AppLocalizations {
   String get loanDate => 'Data prestito';
 
   @override
-  String get languageChanged => 'Lingua cambiata in italiano!';
-
-  @override
   String get loanLanguageNotImplemented =>
-      'Language functionality to be implemented';
+      'Language feature not yet implemented';
 
   @override
   String get loanManagement => 'Gestione prestiti';
@@ -504,6 +489,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get loans => 'Prestiti';
+
+  @override
+  String get location => 'Location';
 
   @override
   String get locations => 'Posizioni';
@@ -530,6 +518,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get may => 'Maggio';
 
   @override
+  String get minStock => 'Min stock';
+
+  @override
   String get myCustomTheme => 'Mio tema';
 
   @override
@@ -554,6 +545,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get newName => 'Nuovo nome';
 
   @override
+  String get next => 'Next';
+
+  @override
   String get noAssetsCreated => 'Nessuna risorsa creata ancora.';
 
   @override
@@ -572,6 +566,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get noFileSelected => 'Nessun file selezionato';
+
+  @override
+  String get noImageAvailable => 'No image available';
 
   @override
   String get noImagesAdded =>
@@ -628,6 +625,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get pleaseSelectLocation => 'Seleziona una posizione.';
 
   @override
+  String get plugins => 'Plugins';
+
+  @override
   String get possessionFieldDef => 'Campo possesso';
 
   @override
@@ -638,6 +638,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get previewPDF => 'Anteprima PDF';
+
+  @override
+  String get previous => 'Previous';
 
   @override
   String get primaryImage => 'Immagine principale';
@@ -741,6 +744,24 @@ class AppLocalizationsIt extends AppLocalizations {
   String get showAsList => 'Mostra come elenco';
 
   @override
+  String get slotDashboardBottom => 'Bottom Dashboard Panel';
+
+  @override
+  String get slotDashboardTop => 'Top Dashboard Panel';
+
+  @override
+  String get slotFloatingActionButton => 'Floating Button';
+
+  @override
+  String get slotInventoryHeader => 'Inventory Header';
+
+  @override
+  String get slotLeftSidebar => 'Sidebar';
+
+  @override
+  String get slotUnknown => 'Unknown Slot';
+
+  @override
   String get specificValueToCount => 'Valore specifico da contare';
 
   @override
@@ -787,6 +808,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get totals => 'Totali';
 
   @override
+  String get updatedAt => 'Last Update';
+
+  @override
   String get upload => 'Carica';
 
   @override
@@ -794,16 +818,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get username => 'Nome utente';
-
-  @override
-  String get veniChatTitle => 'Veni IA';
-
-  @override
-  String get veniChatStatus => 'Online';
-
-  @override
-  String get veniChatWelcome =>
-      'Ciao! Sono Veni, il tuo assistente Invenicum. Come posso aiutarti con il tuo inventario oggi?';
 
   @override
   String get veniChatPlaceholder => 'Chiedimi qualsiasi cosa...';
@@ -817,10 +831,20 @@ class AppLocalizationsIt extends AppLocalizations {
   }
 
   @override
-  String get veniCmdHelpTitle => 'Abilità Veni';
+  String get veniChatStatus => 'Online';
+
+  @override
+  String get veniChatTitle => 'Veni IA';
+
+  @override
+  String get veniChatWelcome =>
+      'Ciao! Sono Veni, il tuo assistente Invenicum. Come posso aiutarti con il tuo inventario oggi?';
 
   @override
   String get veniCmdDashboard => 'Vai al dashboard';
+
+  @override
+  String get veniCmdHelpTitle => 'Abilità Veni';
 
   @override
   String get veniCmdInventory => 'Controlla l\'inventario di un articolo';

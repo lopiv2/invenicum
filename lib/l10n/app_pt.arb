@@ -1,34 +1,202 @@
 {
   "@@locale": "pt",
-  "@aiExtractionError": {"placeholders": {"error": {}}},
-  "@assetTypeDeleted": {"placeholders": {"name": {}}},
-  "@assetUpdated": {"placeholders": {"name": {}}},
-  "@confirmDeleteAssetType": {"placeholders": {"name": {}}},
-  "@confirmDeleteContainer": {"placeholders": {"name": {}}},
-  "@confirmDeleteLocationMessage": {"placeholders": {"name": {"type": "String"}}},
-  "@containerCreated": {"placeholders": {"name": {}}},
-  "@containerDeleted": {"placeholders": {"name": {}}},
-  "@containerRenamed": {"placeholders": {"name": {}}},
-  "@customFieldsOf": {"placeholders": {"name": {}}},
-  "@deleteError": {"placeholders": {"error": {"type": "String"}}},
-  "@errorDeletingAssetType": {"placeholders": {"error": {}}},
-  "@errorDeletingContainer": {"placeholders": {"error": {}}},
-  "@errorGeneratingPDF": {"placeholders": {"error": {}}},
-  "@errorLoadingListValues": {"placeholders": {"error": {}}},
-  "@errorLoadingLocations": {"placeholders": {"error": {"type": "String"}}},
-  "@errorReadingFile": {"placeholders": {"error": {"type": "String"}}},
-  "@errorRegisteringLoan": {"placeholders": {"error": {}}},
-  "@errorChangingLanguage": {"placeholders": {"error": {}}},
-  "@errorRenaming": {"placeholders": {"error": {}}},
-  "@errorSaving": {"placeholders": {"error": {}}},
-  "@errorUpdatingAsset": {"placeholders": {"error": {}}},
-  "@fieldRequiredWithName": {"placeholders": {"field": {}}},
-  "@importSuccessMessage": {"placeholders": {"count": {"type": "String"}}},
-  "@loadingListField": {"placeholders": {"field": {}}},
-  "@selectedLocationLabel": {"placeholders": {"name": {"type": "String"}}},
-  "@systemThemesModal": {"placeholders": {}},
-  "@veniChatProcessing": {"description": "AI loading message", "placeholders": {"query": {"type": "String"}}},
-  "@version": {"placeholders": {"name": {"type": "String"}}},
+ "@aiExtractionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@assetTypeDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@assetUpdated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@confirmDeleteAssetType": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@confirmDeleteContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@confirmDeleteLocationMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@containerCreated": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@containerDeleted": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@containerRenamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@customFieldsOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@deleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorChangingLanguage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorDeletingAssetType": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorDeletingContainer": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorGeneratingPDF": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorLoadingListValues": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorLoadingLocations": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorReadingFile": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorRegisteringLoan": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorRenaming": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorSaving": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorUpdatingAsset": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@fieldRequiredWithName": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "@importSuccessMessage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@loadingListField": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      }
+    }
+  },
+  "@selectedLocationLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@veniChatProcessing": {
+    "description": "Mensaje de carga de la IA",
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "@version": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "about": "Sobre Invenicum",
   "aboutInvenicum": "Sobre Invenicum",
   "active": "Ativo",

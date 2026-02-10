@@ -9,40 +9,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get additionalInformation => 'Additional Information';
-
-  @override
-  String get createdAt => 'Creation Date';
-
-  @override
-  String get updatedAt => 'Last Updated';
-
-  @override
-  String get assetDetail => 'Asset Details';
-
-  @override
-  String get assetNotFound => 'Asset not found';
-
-  @override
-  String get invalidAssetId => 'Invalid asset ID';
-
-  @override
-  String get noImageAvailable => 'No image available';
-
-  @override
-  String get minStock => 'Minimum stock';
-
-  @override
-  String get location => 'Location';
-
-  @override
   String get aboutInvenicum => 'Über Invenicum';
-
-  @override
-  String get previous => 'Previous';
-
-  @override
-  String get next => 'Next';
 
   @override
   String get active => 'Aktiv';
@@ -66,19 +33,19 @@ class AppLocalizationsDe extends AppLocalizations {
   String get addNewLocation => 'Neuen Standort hinzufügen';
 
   @override
+  String get additionalInformation => 'Additional Information';
+
+  @override
   String get additionalThumbnails => 'Zusätzliche Miniaturansichten';
 
   @override
-  String aiExtractionError(Object error) {
+  String aiExtractionError(String error) {
     return 'Die KI konnte keine Daten extrahieren: $error';
   }
 
   @override
   String get aiPasteUrlDescription =>
       'Fügen Sie den Produktlink ein und die KI extrahiert automatisch die Informationen zum Ausfüllen der Felder.';
-
-  @override
-  String get all => 'Alle';
 
   @override
   String get alertCritical => 'Kritisch';
@@ -108,6 +75,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get alerts => 'Benachrichtigungen';
 
   @override
+  String get all => 'Alle';
+
+  @override
   String get appTitle => 'Invenicum Inventar';
 
   @override
@@ -120,6 +90,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get april => 'April';
 
   @override
+  String get assetDetail => 'Asset Details';
+
+  @override
   String get assetImages => 'Anlagenbilder';
 
   @override
@@ -129,7 +102,10 @@ class AppLocalizationsDe extends AppLocalizations {
   String get assetName => 'Anlagenname';
 
   @override
-  String assetTypeDeleted(Object name) {
+  String get assetNotFound => 'Asset not found';
+
+  @override
+  String assetTypeDeleted(String name) {
     return 'Anlagentyp \"$name\" erfolgreich gelöscht.';
   }
 
@@ -137,7 +113,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get assetTypes => 'Anlagentypen';
 
   @override
-  String assetUpdated(Object name) {
+  String assetUpdated(String name) {
     return 'Anlage \"$name\" erfolgreich aktualisiert.';
   }
 
@@ -198,12 +174,12 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sind Sie sicher, dass Sie diesen Datensatz löschen möchten?';
 
   @override
-  String confirmDeleteAssetType(Object name) {
+  String confirmDeleteAssetType(String name) {
     return 'Sind Sie sicher, dass Sie den Anlagentyp \"$name\" und alle zugehörigen Elemente löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.';
   }
 
   @override
-  String confirmDeleteContainer(Object name) {
+  String confirmDeleteContainer(String name) {
     return 'Sind Sie sicher, dass Sie den Behälter \"$name\" löschen möchten? Diese Aktion ist unwiderruflich und entfernt alle Anlagen und Daten.';
   }
 
@@ -219,12 +195,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get configurationSaved => 'Konfiguration erfolgreich gespeichert.';
 
   @override
-  String containerCreated(Object name) {
+  String containerCreated(String name) {
     return 'Behälter \"$name\" erfolgreich erstellt.';
   }
 
   @override
-  String containerDeleted(Object name) {
+  String containerDeleted(String name) {
     return 'Behälter \"$name\" erfolgreich gelöscht.';
   }
 
@@ -236,7 +212,7 @@ class AppLocalizationsDe extends AppLocalizations {
       'Behälter oder Anlagentyp nicht gefunden.';
 
   @override
-  String containerRenamed(Object name) {
+  String containerRenamed(String name) {
     return 'Behälter in \"$name\" umbenannt.';
   }
 
@@ -253,6 +229,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get createFirstContainer => 'Erstellen Sie Ihren ersten Behälter.';
 
   @override
+  String get createdAt => 'Creation Date';
+
+  @override
   String get current => 'Aktuell';
 
   @override
@@ -262,7 +241,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get customFields => 'Benutzerdefinierte Felder';
 
   @override
-  String customFieldsOf(Object name) {
+  String customFieldsOf(String name) {
     return 'Benutzerdefinierte Felder von $name';
   }
 
@@ -327,16 +306,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get enterValidUrl => 'Geben Sie eine gültige URL ein';
 
   @override
+  String errorChangingLanguage(String error) {
+    return 'Fehler beim Sprachwechsel: $error';
+  }
+
+  @override
   String get errorCsvMinRows =>
       'Wählen Sie eine CSV-Datei mit Überschriften und mindestens einer Datenzeile.';
 
   @override
-  String errorDeletingAssetType(Object error) {
+  String errorDeletingAssetType(String error) {
     return 'Fehler beim Löschen des Anlagentyps: $error';
   }
 
   @override
-  String errorDeletingContainer(Object error) {
+  String errorDeletingContainer(String error) {
     return 'Fehler beim Löschen des Behälters: $error';
   }
 
@@ -347,7 +331,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get errorEmptyCsv => 'Die CSV-Datei ist leer.';
 
   @override
-  String errorGeneratingPDF(Object error) {
+  String errorGeneratingPDF(String error) {
     return 'Fehler beim Generieren von PDF: $error';
   }
 
@@ -358,7 +342,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get errorLoadingData => 'Fehler beim Laden von Daten';
 
   @override
-  String errorLoadingListValues(Object error) {
+  String errorLoadingListValues(String error) {
     return 'Fehler beim Laden von Listenwerten: $error';
   }
 
@@ -384,32 +368,27 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String errorRegisteringLoan(Object error) {
+  String errorRegisteringLoan(String error) {
     return 'Fehler beim Registrieren des Darlehens: $error';
   }
 
   @override
-  String errorRenaming(Object error) {
+  String errorRenaming(String error) {
     return 'Fehler beim Umbenennen: $error';
   }
 
   @override
-  String errorSaving(Object error) {
+  String errorSaving(String error) {
     return 'Fehler beim Speichern: $error';
   }
 
   @override
-  String errorUpdatingAsset(Object error) {
+  String errorUpdatingAsset(String error) {
     return 'Fehler beim Aktualisieren der Anlage: $error';
   }
 
   @override
   String get exampleFilterHint => 'z.B. Beschädigt, Rot, 50';
-
-  @override
-  String errorChangingLanguage(Object error) {
-    return 'Fehler beim Sprachwechsel: $error';
-  }
 
   @override
   String get february => 'Februar';
@@ -418,7 +397,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get fieldChip => 'Feld';
 
   @override
-  String fieldRequiredWithName(Object field) {
+  String fieldRequiredWithName(String field) {
     return 'Das Feld \"$field\" ist erforderlich.';
   }
 
@@ -447,15 +426,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get guest => 'Gast';
 
   @override
+  String get helpDocs => 'Help & Documentation';
+
+  @override
   String get ignoreField => '🚫 Feld ignorieren';
 
   @override
   String get importAssetsTo => 'Anlagen importieren nach';
 
   @override
-  String importSuccessMessage(String count) {
+  String importSuccessMessage(int count) {
     return 'Import erfolgreich! $count Anlagen erstellt.';
   }
+
+  @override
+  String get invalidAssetId => 'Invalid asset ID';
 
   @override
   String get invalidNavigationIds => 'Fehler: Ungültige Navigations-IDs.';
@@ -473,6 +458,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get language => 'Sprache';
 
   @override
+  String get languageChanged => 'Sprache zu Deutsch gewechselt!';
+
+  @override
   String get languageNotImplemented =>
       'Sprachfunktionalität muss noch implementiert werden';
 
@@ -483,7 +471,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loadingAssetType => 'Anlagentyp wird geladen...';
 
   @override
-  String loadingListField(Object field) {
+  String loadingListField(String field) {
     return 'Lädt $field...';
   }
 
@@ -491,11 +479,8 @@ class AppLocalizationsDe extends AppLocalizations {
   String get loanDate => 'Leihdate';
 
   @override
-  String get languageChanged => 'Sprache zu Deutsch gewechselt!';
-
-  @override
   String get loanLanguageNotImplemented =>
-      'Language functionality to be implemented';
+      'Language feature not yet implemented';
 
   @override
   String get loanManagement => 'Darlehenverwaltung';
@@ -505,6 +490,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get loans => 'Darlehen';
+
+  @override
+  String get location => 'Location';
 
   @override
   String get locations => 'Standorte';
@@ -531,6 +519,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get may => 'Mai';
 
   @override
+  String get minStock => 'Min stock';
+
+  @override
   String get myCustomTheme => 'Mein Thema';
 
   @override
@@ -555,6 +546,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get newName => 'Neuer Name';
 
   @override
+  String get next => 'Next';
+
+  @override
   String get noAssetsCreated => 'Noch keine Anlagen erstellt.';
 
   @override
@@ -573,6 +567,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get noFileSelected => 'Keine Datei ausgewählt';
+
+  @override
+  String get noImageAvailable => 'No image available';
 
   @override
   String get noImagesAdded =>
@@ -629,6 +626,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get pleaseSelectLocation => 'Bitte wählen Sie einen Standort.';
 
   @override
+  String get plugins => 'Plugins';
+
+  @override
   String get possessionFieldDef => 'Besitzfeld';
 
   @override
@@ -639,6 +639,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get previewPDF => 'PDF-Vorschau';
+
+  @override
+  String get previous => 'Previous';
 
   @override
   String get primaryImage => 'Primärbild';
@@ -741,6 +744,24 @@ class AppLocalizationsDe extends AppLocalizations {
   String get showAsList => 'Als Liste anzeigen';
 
   @override
+  String get slotDashboardBottom => 'Bottom Dashboard Panel';
+
+  @override
+  String get slotDashboardTop => 'Top Dashboard Panel';
+
+  @override
+  String get slotFloatingActionButton => 'Floating Button';
+
+  @override
+  String get slotInventoryHeader => 'Inventory Header';
+
+  @override
+  String get slotLeftSidebar => 'Sidebar';
+
+  @override
+  String get slotUnknown => 'Unknown Slot';
+
+  @override
   String get specificValueToCount => 'Bestimmter Wert zum Zählen';
 
   @override
@@ -787,6 +808,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get totals => 'Gesamtsummen';
 
   @override
+  String get updatedAt => 'Last Update';
+
+  @override
   String get upload => 'Hochladen';
 
   @override
@@ -794,16 +818,6 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get username => 'Benutzername';
-
-  @override
-  String get veniChatTitle => 'Veni KI';
-
-  @override
-  String get veniChatStatus => 'Online';
-
-  @override
-  String get veniChatWelcome =>
-      'Hallo! Ich bin Veni, Ihr Invenicum-Assistent. Wie kann ich Ihnen heute bei Ihrem Inventar helfen?';
 
   @override
   String get veniChatPlaceholder => 'Fragen Sie mich alles...';
@@ -817,10 +831,20 @@ class AppLocalizationsDe extends AppLocalizations {
   }
 
   @override
-  String get veniCmdHelpTitle => 'Veni-Fähigkeiten';
+  String get veniChatStatus => 'Online';
+
+  @override
+  String get veniChatTitle => 'Veni KI';
+
+  @override
+  String get veniChatWelcome =>
+      'Hallo! Ich bin Veni, Ihr Invenicum-Assistent. Wie kann ich Ihnen heute bei Ihrem Inventar helfen?';
 
   @override
   String get veniCmdDashboard => 'Zum Dashboard gehen';
+
+  @override
+  String get veniCmdHelpTitle => 'Veni-Fähigkeiten';
 
   @override
   String get veniCmdInventory => 'Überprüfen Sie den Bestand eines Artikels';

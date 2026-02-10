@@ -21,6 +21,12 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
     final now = DateTime.now();
     _selectedYear = now.year;
     _selectedMonth = now.month;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final lp = context.read<LoanProvider>();
+      if (lp.loans.isEmpty) {
+        lp.fetchAllLoans(); // Asegúrate de que este método existe en tu Provider
+      }
+    });
   }
 
   /// Obtiene los 10 productos más prestados del mes y año seleccionados
@@ -44,16 +50,14 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
     final sortedItems = itemCounts.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
 
-    final topItems = Map.fromEntries(
-      sortedItems.take(10),
-    );
+    final topItems = Map.fromEntries(sortedItems.take(10));
 
     return topItems;
   }
 
   List<int> _getAvailableYears(List<Loan> loans) {
     if (loans.isEmpty) return [DateTime.now().year];
-    
+
     final years = loans.map((l) => l.loanDate.year).toSet().toList();
     years.sort((a, b) => b.compareTo(a));
     return years;
@@ -64,8 +68,11 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
     return Consumer<LoanProvider>(
       builder: (context, loanProvider, child) {
         final availableYears = _getAvailableYears(loanProvider.loans);
-        final topItems =
-            _getTopLoanedItems(loanProvider.loans, _selectedYear, _selectedMonth);
+        final topItems = _getTopLoanedItems(
+          loanProvider.loans,
+          _selectedYear,
+          _selectedMonth,
+        );
 
         if (topItems.isEmpty) {
           return Card(
@@ -76,10 +83,7 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                 children: [
                   const Text(
                     'Productos Más Prestados',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Row(
@@ -89,10 +93,12 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                           isExpanded: true,
                           value: _selectedYear,
                           items: availableYears
-                              .map((year) => DropdownMenuItem(
-                                    value: year,
-                                    child: Text(year.toString()),
-                                  ))
+                              .map(
+                                (year) => DropdownMenuItem(
+                                  value: year,
+                                  child: Text(year.toString()),
+                                ),
+                              )
                               .toList(),
                           onChanged: (value) {
                             if (value != null && value != _selectedYear) {
@@ -109,10 +115,12 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                           isExpanded: true,
                           value: _selectedMonth,
                           items: List.generate(12, (index) => index + 1)
-                              .map((month) => DropdownMenuItem(
-                                    value: month,
-                                    child: Text(_getMonthName(month)),
-                                  ))
+                              .map(
+                                (month) => DropdownMenuItem(
+                                  value: month,
+                                  child: Text(_getMonthName(month)),
+                                ),
+                              )
                               .toList(),
                           onChanged: (value) {
                             if (value != null && value != _selectedMonth) {
@@ -179,10 +187,12 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                         isExpanded: true,
                         value: _selectedYear,
                         items: availableYears
-                            .map((year) => DropdownMenuItem(
-                                  value: year,
-                                  child: Text('Año: $year'),
-                                ))
+                            .map(
+                              (year) => DropdownMenuItem(
+                                value: year,
+                                child: Text('Año: $year'),
+                              ),
+                            )
                             .toList(),
                         onChanged: (value) {
                           if (value != null && value != _selectedYear) {
@@ -199,10 +209,12 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                         isExpanded: true,
                         value: _selectedMonth,
                         items: List.generate(12, (index) => index + 1)
-                            .map((month) => DropdownMenuItem(
-                                  value: month,
-                                  child: Text(_getMonthName(month)),
-                                ))
+                            .map(
+                              (month) => DropdownMenuItem(
+                                value: month,
+                                child: Text(_getMonthName(month)),
+                              ),
+                            )
                             .toList(),
                         onChanged: (value) {
                           if (value != null && value != _selectedMonth) {
@@ -225,8 +237,7 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                       barTouchData: BarTouchData(
                         enabled: true,
                         touchTooltipData: BarTouchTooltipData(
-                          getTooltipColor: (group) =>
-                              Colors.blueGrey.shade900,
+                          getTooltipColor: (group) => Colors.blueGrey.shade900,
                           getTooltipItem: (group, groupIndex, rod, rodIndex) {
                             return BarTooltipItem(
                               '${itemNames[groupIndex]}\n${rod.toY.toStringAsFixed(0)} préstamos',
@@ -316,24 +327,21 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                           ),
                         ),
                       ),
-                      barGroups: List.generate(
-                        itemCounts.length,
-                        (index) {
-                          return BarChartGroupData(
-                            x: index,
-                            barRods: [
-                              BarChartRodData(
-                                toY: itemCounts[index].toDouble(),
-                                color: _getBarColor(index),
-                                width: 16,
-                                borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(6),
-                                ),
+                      barGroups: List.generate(itemCounts.length, (index) {
+                        return BarChartGroupData(
+                          x: index,
+                          barRods: [
+                            BarChartRodData(
+                              toY: itemCounts[index].toDouble(),
+                              color: _getBarColor(index),
+                              width: 16,
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(6),
                               ),
-                            ],
-                          );
-                        },
-                      ),
+                            ),
+                          ],
+                        );
+                      }),
                     ),
                   ),
                 ),

@@ -29,11 +29,11 @@ class InventoryItemProvider with ChangeNotifier {
   int get currentPage => _currentPage;
   int get itemsPerPage => _itemsPerPage;
 
-  int? _currentContainerId;
-  int? _currentAssetTypeId;
+  int _currentContainerId = 0;
+  int _currentAssetTypeId = 0;
 
-  int get currentContainerId => _currentContainerId ?? 0;
-  int get currentAssetTypeId => _currentAssetTypeId ?? 0;
+  int get currentContainerId => _currentContainerId;
+  int get currentAssetTypeId => _currentAssetTypeId;
 
   // --- Gestión de Caché ---
   final Map<String, InventoryResponse> _itemsCache = {};
@@ -84,32 +84,34 @@ class InventoryItemProvider with ChangeNotifier {
   // ----------------------------------------------------------------------
 
   List<InventoryItem> get inventoryItems {
-    final cId = _currentContainerId ?? 0;
-    final atId = _currentAssetTypeId ?? 0;
+    final cId = _currentContainerId;
+    final atId = _currentAssetTypeId;
 
-    if (cId == 0 || atId == 0) return [];
-
-    // 🚩 CAMBIO CLAVE: Usa la función _getCacheKey para que la llave sea EXACTAMENTE
-    // la misma que usaste en loadInventoryItems.
     final key = _getCacheKey(cId, atId);
-
     final response = _itemsCache[key];
 
     if (response == null) return [];
 
-    // Filtrado por contexto
-    final filteredByContext = response.items.where((item) {
-      return item.containerId == cId && item.assetTypeId == atId;
-    }).toList();
+    // ✅ CORRECCIÓN: Si estamos en modo global (0), usamos todos los items.
+    // Si tenemos IDs específicos, entonces sí filtramos por contexto.
+    final List<InventoryItem> filteredByContext = (cId == 0 && atId == 0)
+        ? response.items
+        : response.items.where((item) {
+            return item.containerId == cId && item.assetTypeId == atId;
+          }).toList();
 
+    // Aplicamos filtros de búsqueda (search bar), ordenamiento y paginación
     Iterable<InventoryItem> processedItems = _applyFilters(filteredByContext);
     List<InventoryItem> sortedList = processedItems.toList();
     _applySort(sortedList);
 
     _totalFilteredItems = sortedList.length;
 
+    // Paginación
     final startIndex = (_currentPage - 1) * _itemsPerPage;
-    if (startIndex >= _totalFilteredItems) return [];
+    if (startIndex >= _totalFilteredItems && _totalFilteredItems != 0)
+      return [];
+
     final endIndex = startIndex + _itemsPerPage;
 
     return sortedList.sublist(
@@ -181,19 +183,29 @@ class InventoryItemProvider with ChangeNotifier {
   Future<void> loadAllItemsGlobal() async {
     if (_isLoading) return;
     _isLoading = true;
+
+    // 🚩 CAMBIO 1: Sincronizamos los IDs a global inmediatamente
+    // Esto asegura que cualquier lectura durante la carga sepa que estamos en modo global
+    _currentPage = 1;
+    _currentContainerId = 0;
+    _currentAssetTypeId = 0;
     notifyListeners();
+
     try {
       final response = await _itemService.fetchInventoryItems(
-        containerId: null,
+        containerId: null, // Tu API debe entender que null = todo
         assetTypeId: null,
       );
+
       if (_isDisposed) return;
+
+      // Guardamos en la caché global
       _itemsCache[_getCacheKey(0, 0)] = response;
-      _currentContainerId = 0;
-      _currentAssetTypeId = 0;
+    } catch (e) {
+      debugPrint("Error en carga global: $e");
     } finally {
       _isLoading = false;
-      _recalculateTotalsAndNotify();
+      _recalculateTotalsAndNotify(); // Esto dispara el redibujado final
     }
   }
 
@@ -435,10 +447,10 @@ class InventoryItemProvider with ChangeNotifier {
   // ----------------------------------------------------------------------
 
   void _recalculateTotalsAndNotify() {
-    final cId = _currentContainerId ?? 0;
-    final atId = _currentAssetTypeId ?? 0;
+    final cId = _currentContainerId;
+    final atId = _currentAssetTypeId;
 
-    if (cId == 0 || atId == 0) return;
+    //if (cId == 0 || atId == 0) return;
 
     final key = _getCacheKey(cId, atId);
     final response = _itemsCache[key];

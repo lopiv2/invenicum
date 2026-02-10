@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      Text(
+                      /*Text(
                         AppLocalizations.of(context)!.appTitle,
                         style: const TextStyle(
                           fontSize: 28,
@@ -154,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           color: Colors.white,
                           letterSpacing: 0.5,
                         ),
-                      ),
+                      ),*/
                       const SizedBox(height: 8),
                       Text(
                         AppLocalizations.of(context)!.login,

@@ -1,28 +1,37 @@
 ﻿{
-  "@@locale": "en",
   "@aiExtractionError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@assetTypeDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@assetUpdated": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteAssetType": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteContainer": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteLocationMessage": {
@@ -34,22 +43,30 @@
   },
   "@containerCreated": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@containerDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@containerRenamed": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@customFieldsOf": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@deleteError": {
@@ -59,24 +76,39 @@
       }
     }
   },
+  "@errorChangingLanguage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "@errorDeletingAssetType": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorDeletingContainer": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorGeneratingPDF": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorLoadingListValues": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorLoadingLocations": {
@@ -95,44 +127,51 @@
   },
   "@errorRegisteringLoan": {
     "placeholders": {
-      "error": {}
-    }
-  },
-  "@errorChangingLanguage": {
-    "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorRenaming": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorSaving": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorUpdatingAsset": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@fieldRequiredWithName": {
     "placeholders": {
-      "field": {}
+      "field": {
+        "type": "String"
+      }
     }
   },
   "@importSuccessMessage": {
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
   "@loadingListField": {
     "placeholders": {
-      "field": {}
+      "field": {
+        "type": "String"
+      }
     }
   },
   "@selectedLocationLabel": {
@@ -142,11 +181,8 @@
       }
     }
   },
-  "@systemThemesModal": {
-    "placeholders": {}
-  },
   "@veniChatProcessing": {
-    "description": "AI loading message",
+    "description": "Mensaje de carga de la IA",
     "placeholders": {
       "query": {
         "type": "String"
@@ -160,29 +196,19 @@
       }
     }
   },
-  "additionalInformation": "Additional Information",
-  "createdAt": "Creation Date",
-  "updatedAt": "Last Updated",
-  "assetDetail": "Asset Details",
-  "assetNotFound": "Asset not found",
-  "invalidAssetId": "Invalid asset ID",
-  "noImageAvailable": "No image available",
-  "minStock": "Minimum stock",
-  "location": "Location",
+  "@@locale": "en",
   "aboutInvenicum": "About Invenicum",
-  "previous": "Previous",
-  "next": "Next",
   "active": "Active",
-  "activeLoans": "Active loans",
-  "activeLoansCount": "Active loans",
+  "activeLoans": "Current Loans",
+  "activeLoansCount": "Active Loans",
   "addAlert": "Add Alert",
   "addAsset": "Add Asset",
   "addContainer": "Add container",
   "addNewLocation": "Add New Location",
+  "additionalInformation": "Additional Information",
   "additionalThumbnails": "Additional Thumbnails",
   "aiExtractionError": "AI could not extract data: {error}",
-  "aiPasteUrlDescription": "Paste the product link and AI will automatically extract information to populate fields.",
-  "all": "All",
+  "aiPasteUrlDescription": "Paste the product link and AI will automatically extract information to fill the fields.",
   "alertCritical": "Critical",
   "alertCreated": "Alert created",
   "alertDeleted": "Alert deleted",
@@ -191,14 +217,17 @@
   "alertTitle": "Title",
   "alertType": "Type",
   "alertWarning": "Warning",
-  "alerts": "Alerts and Notifications",
+  "alerts": "Alerts & Notifications",
+  "all": "All",
   "appTitle": "Invenicum Inventory",
-  "applicationTheme": "Application theme",
+  "applicationTheme": "Application Theme",
   "apply": "Apply",
   "april": "April",
+  "assetDetail": "Asset Details",
   "assetImages": "Asset Images",
   "assetImport": "Asset Import",
-  "assetName": "Asset Name",
+  "assetName": "Name",
+  "assetNotFound": "Asset not found",
   "assetTypeDeleted": "Asset Type \"{name}\" deleted successfully.",
   "assetTypes": "Asset Types",
   "assetUpdated": "Asset \"{name}\" updated successfully.",
@@ -213,31 +242,32 @@
   "centerView": "Center View",
   "chooseFile": "Choose File",
   "clearCounter": "Clear Counter",
-  "collectionContainerInfo": "Collection containers have collection tracking bars, invested value, market value and Exposure view",
+  "collectionContainerInfo": "Collection containers have collection tracking bars, invested value, market value and Exhibition view",
   "collectionFieldsConfigured": "Collection fields configured.",
   "configureCollectionFields": "Configure Collection Fields",
   "configureDeliveryVoucher": "Configure Delivery Voucher",
-  "configureVoucherBody": "Configure the voucher body...",
+  "configureVoucherBody": "Configure voucher body...",
   "confirmDeleteAlert": "Delete Alert",
   "confirmDeleteAlertMessage": "Are you sure you want to delete this record?",
-  "confirmDeleteAssetType": "Are you sure you want to delete asset type \"{name}\" and all its associated items? This action cannot be undone.",
-  "confirmDeleteContainer": "Are you sure you want to delete the container \"{name}\"? This action is irreversible and will remove all its assets and data.",
-  "confirmDeleteLocationMessage": "Are you sure you want to delete the location \"{name}\"?",
+  "confirmDeleteAssetType": "Are you sure you want to delete asset type \"{name}\" and all associated items? This action cannot be undone.",
+  "confirmDeleteContainer": "Are you sure you want to delete container \"{name}\"? This action is irreversible and will delete all its assets and data.",
+  "confirmDeleteLocationMessage": "Are you sure you want to delete location \"{name}\"?",
   "confirmDeletion": "Confirm deletion",
   "configurationSaved": "Configuration saved successfully.",
   "containerCreated": "Container \"{name}\" created successfully.",
   "containerDeleted": "Container \"{name}\" deleted successfully.",
-  "containerName": "Container name",
+  "containerName": "Container Name",
   "containerOrAssetTypeNotFound": "Container or Asset Type not found.",
   "containerRenamed": "Container renamed to \"{name}\".",
   "containers": "Containers",
   "countItemsByValue": "Count items by specific value",
   "create": "Create",
   "createFirstContainer": "Create your first container.",
+  "createdAt": "Creation Date",
   "current": "Current",
-  "customColor": "Custom Color",
+  "customColor": "Custom color",
   "customFields": "Custom Fields",
-  "customFieldsOf": "Custom Fields of {name}",
+  "customFieldsOf": "Custom Fields for {name}",
   "customizeDeliveryVoucher": "Customize the PDF template for loans",
   "darkMode": "Dark Mode",
   "dashboard": "Dashboard",
@@ -245,23 +275,24 @@
   "december": "December",
   "definitionCustomFields": "Custom Fields Definition",
   "delete": "Delete",
-  "deleteError": "Error deleting: {error}",
+  "deleteError": "Delete error: {error}",
   "deleteSuccess": "Location deleted successfully.",
   "deliveryVoucher": "DELIVERY VOUCHER",
   "deliveryVoucherEditor": "Delivery Voucher Editor",
   "description": "Description (optional)",
-  "desiredField": "Desired Field",
+  "desiredField": "Wishlist Field",
   "dueDate": "Due Date",
   "edit": "Edit",
-  "enterContainerName": "Enter the container name",
+  "enterContainerName": "Enter container name",
   "enterDescription": "Enter a description",
   "enterURL": "Enter URL",
   "enterValidUrl": "Enter a valid URL",
+  "errorChangingLanguage": "Error changing language: {error}",
   "errorCsvMinRows": "Please select a CSV file with headers and at least one data row.",
   "errorDeletingAssetType": "Error deleting asset type: {error}",
   "errorDeletingContainer": "Error deleting container: {error}",
   "errorDuringImport": "Error during import",
-  "errorEmptyCsv": "The CSV file is empty.",
+  "errorEmptyCsv": "CSV file is empty.",
   "errorGeneratingPDF": "Error generating PDF: {error}",
   "errorInvalidPath": "Invalid file path.",
   "errorLoadingData": "Error loading data",
@@ -275,67 +306,72 @@
   "errorRenaming": "Error renaming: {error}",
   "errorSaving": "Error saving: {error}",
   "errorUpdatingAsset": "Error updating asset: {error}",
-  "exampleFilterHint": "Ex: Damaged, Red, 50",
-  "errorChangingLanguage": "Error changing language: {error}",
+  "exampleFilterHint": "e.g., Damaged, Red, 50",
   "february": "February",
   "fieldChip": "Field",
-  "fieldRequiredWithName": "The field \"{field}\" is required.",
+  "fieldRequiredWithName": "Field \"{field}\" is required.",
   "fieldToCount": "Field to Count",
-  "fieldsFilledSuccess": "Fields populated successfully!",
+  "fieldsFilledSuccess": "Fields filled successfully!",
   "formatsPNG": "Formats: PNG, JPG",
   "generalSettings": "General Settings",
   "generateVoucher": "Generate Delivery Voucher",
   "globalSearch": "Global Search",
   "greeting": "Hello, welcome!",
   "guest": "Guest",
+  "helpDocs": "Help & Documentation",
   "ignoreField": "🚫 Ignore Field",
-  "importAssetsTo": "Import Assets to",
+  "importAssetsTo": "Import Assets To",
   "importSuccessMessage": "Import Successful! {count} assets created.",
-  "invalidNavigationIds": "Error: invalid navigation IDs.",
+  "invalidAssetId": "Invalid asset ID",
+  "invalidNavigationIds": "Error: Invalid navigation IDs.",
   "january": "January",
   "july": "July",
   "june": "June",
   "language": "Language",
-  "languageNotImplemented": "Language functionality to be implemented",
+  "languageChanged": "Language changed to English!",
+  "languageNotImplemented": "Language feature not yet implemented",
   "lightMode": "Light Mode",
   "loadingAssetType": "Loading Asset Type...",
   "loadingListField": "Loading {field}...",
   "loanDate": "Loan Date",
-  "languageChanged": "Language changed to English!",
-  "loanLanguageNotImplemented": "Language functionality to be implemented",
+  "loanLanguageNotImplemented": "Language feature not yet implemented",
   "loanManagement": "Loan Management",
-  "loanObject": "Loan Object",
+  "loanObject": "Object to Loan",
   "loans": "Loans",
+  "location": "Location",
   "locations": "Locations",
   "locationsScheme": "Locations Scheme",
   "login": "Login",
   "logoVoucher": "Voucher Logo",
   "logout": "Logout",
-  "magicAssistant": "Magic AI Assistant",
+  "magicAssistant": "AI Magic Assistant",
   "march": "March",
   "may": "May",
+  "minStock": "Min stock",
   "myCustomTheme": "My Theme",
   "myProfile": "My Profile",
-  "myThemesStored": "My Themes Stored",
+  "myThemesStored": "My Stored Themes",
   "nameCannotBeEmpty": "Name cannot be empty",
-  "nameSameAsCurrent": "The name is the same as the current one",
+  "nameSameAsCurrent": "Name is the same as current",
   "newAlert": "New Manual Alert",
   "newContainer": "New container",
   "newName": "New name",
+  "next": "Next",
   "noAssetsCreated": "No assets created yet.",
-  "noAssetsMatch": "No assets match the search/filter criteria.",
+  "noAssetsMatch": "No assets match search/filter criteria.",
   "noBooleanFields": "No boolean fields defined.",
   "noContainerMessage": "Create your first container.",
-  "noCustomFields": "This asset type does not have custom fields.",
+  "noCustomFields": "This asset type has no custom fields.",
   "noFileSelected": "No file selected",
-  "noImagesAdded": "No images added yet. The first image will be the primary.",
+  "noImageAvailable": "No image available",
+  "noImagesAdded": "No images added yet. The first image will be the primary one.",
   "noLoansFound": "No loans found in this container.",
   "noLocationsMessage": "No locations created in this container. Add the first one!",
   "noNotifications": "No notifications",
   "noThemesSaved": "No themes saved yet",
   "none": "None",
   "november": "November",
-  "obligatory": "Obligatory",
+  "obligatory": "Required",
   "october": "October",
   "optional": "Optional",
   "overdue": "Overdue",
@@ -345,10 +381,12 @@
   "pleasePasteUrl": "Please paste a URL",
   "pleaseSelectCsvWithHeaders": "Please select a CSV file with headers.",
   "pleaseSelectLocation": "Please select a location.",
+  "plugins": "Plugins",
   "possessionFieldDef": "Possession Field",
   "possessionFieldName": "In Possession",
   "preferences": "Preferences",
-  "previewPDF": "PDF Preview",
+  "previewPDF": "Preview",
+  "previous": "Previous",
   "primaryImage": "Primary Image",
   "productUrlLabel": "Product URL",
   "quantity": "Quantity",
@@ -368,7 +406,7 @@
   "saveCustomTheme": "Save Custom Theme",
   "searchInAllColumns": "Search in all columns...",
   "selectAndUploadImage": "Select and Upload Image",
-  "selectApplicationLanguage": "Select the application language",
+  "selectApplicationLanguage": "Select application language",
   "selectBooleanFields": "Select boolean fields to control collection:",
   "selectCsvColumn": "Select CSV Column",
   "selectField": "Select field...",
@@ -381,6 +419,12 @@
   "settings": "Settings",
   "showAsGrid": "Show as Grid",
   "showAsList": "Show as List",
+  "slotDashboardBottom": "Bottom Dashboard Panel",
+  "slotDashboardTop": "Top Dashboard Panel",
+  "slotFloatingActionButton": "Floating Button",
+  "slotInventoryHeader": "Inventory Header",
+  "slotLeftSidebar": "Sidebar",
+  "slotUnknown": "Unknown Slot",
   "specificValueToCount": "Specific Value to Count",
   "startImport": "Start Import",
   "startMagic": "Start Magic",
@@ -396,22 +440,23 @@
   "totalAssets": "Asset Types",
   "totalItems": "Assets",
   "totals": "Totals",
+  "updatedAt": "Last Update",
   "upload": "Upload",
   "uploadImage": "Upload Image",
   "username": "Username",
-  "veniChatTitle": "Veni AI",
-  "veniChatStatus": "Online",
-  "veniChatWelcome": "Hi! I'm Veni, your Invenicum assistant. How can I help you with your inventory today?",
-  "veniChatPlaceholder": "Ask me anything...",
+  "veniChatPlaceholder": "Ask me something...",
   "veniChatPoweredBy": "Powered by ",
   "veniChatProcessing": "I'm processing your query about \"{query}\"...",
-  "veniCmdHelpTitle": "Veni abilities",
-  "veniCmdDashboard": "Go to the dashboard",
-  "veniCmdInventory": "Check stock of an article",
+  "veniChatStatus": "Online",
+  "veniChatTitle": "Venibot AI",
+  "veniChatWelcome": "Hi! I'm Venibot, your Invenicum assistant. How can I help you with your inventory today?",
+  "veniCmdDashboard": "Go to dashboard",
+  "veniCmdHelpTitle": "Veni's Skills",
+  "veniCmdInventory": "Check stock for an item",
   "veniCmdLoans": "View active loans",
   "veniCmdReport": "Generate inventory report",
   "veniCmdScanQR": "Scan QR/Barcode",
-  "veniCmdUnknown": "I don't recognize that command. Write help to see what I can do.",
+  "veniCmdUnknown": "I don't recognize that command. Type help to see what I can do.",
   "version": "Version {name}",
   "yes": "Yes",
   "zoomToFit": "Zoom to Fit"

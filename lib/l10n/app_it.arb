@@ -1,28 +1,38 @@
 {
   "@@locale": "it",
-  "@aiExtractionError": {
+ "@aiExtractionError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@assetTypeDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@assetUpdated": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteAssetType": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteContainer": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteLocationMessage": {
@@ -34,22 +44,30 @@
   },
   "@containerCreated": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@containerDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@containerRenamed": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@customFieldsOf": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@deleteError": {
@@ -59,24 +77,39 @@
       }
     }
   },
+  "@errorChangingLanguage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "@errorDeletingAssetType": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorDeletingContainer": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorGeneratingPDF": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorLoadingListValues": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorLoadingLocations": {
@@ -95,44 +128,51 @@
   },
   "@errorRegisteringLoan": {
     "placeholders": {
-      "error": {}
-    }
-  },
-  "@errorChangingLanguage": {
-    "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorRenaming": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorSaving": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorUpdatingAsset": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@fieldRequiredWithName": {
     "placeholders": {
-      "field": {}
+      "field": {
+        "type": "String"
+      }
     }
   },
   "@importSuccessMessage": {
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
   "@loadingListField": {
     "placeholders": {
-      "field": {}
+      "field": {
+        "type": "String"
+      }
     }
   },
   "@selectedLocationLabel": {
@@ -142,11 +182,8 @@
       }
     }
   },
-  "@systemThemesModal": {
-    "placeholders": {}
-  },
   "@veniChatProcessing": {
-    "description": "AI loading message",
+    "description": "Mensaje de carga de la IA",
     "placeholders": {
       "query": {
         "type": "String"

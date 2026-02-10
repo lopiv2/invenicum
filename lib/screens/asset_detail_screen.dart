@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/models/container_node.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/providers/container_provider.dart';
-import 'package:invenicum/widgets/threed_carousel.widget.dart';
+import 'package:invenicum/widgets/asset_image_gallery_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart'; // Asegúrate de que esta ruta es correcta
 import 'package:invenicum/models/inventory_item.dart';
@@ -32,8 +31,6 @@ class AssetDetailScreen extends StatefulWidget {
 
 class _AssetDetailScreenState extends State<AssetDetailScreen> {
   String? _selectedImageUrl; // Para la galería de imágenes
-  final FlutterCarouselController _carouselController =
-      FlutterCarouselController();
 
   @override
   void initState() {
@@ -286,165 +283,9 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
         // Galería de Imágenes (a la izquierda)
         Expanded(
           flex: 2,
-          child: Column(
-            children: [
-              // --- CARRUSEL 3D ---
-              ThreeDCarousel(
-                imageUrls: item.images
-                    .map((img) => '${Environment.apiUrl}${img.url}')
-                    .toList(),
-                onPageChanged: (index) {
-                  setState(() {
-                    _selectedImageUrl =
-                        '${Environment.apiUrl}${item.images[index].url}';
-                  });
-                },
-                onImageTap: (url) => _showFullScreenImage(context, url),
-              ),
-              item.images.isNotEmpty
-                  ? Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: FlutterCarousel.builder(
-                        itemCount: item.images.length,
-                        options: FlutterCarouselOptions(
-                          controller: _carouselController,
-                          height: 350,
-                          enlargeCenterPage:
-                              true, // 👈 Esto da el efecto de que la central resalta
-                          enlargeStrategy: CenterPageEnlargeStrategy.height,
-                          enableInfiniteScroll: true,
-                          showIndicator: true,
-                          floatingIndicator: false,
-                          slideIndicator: CircularSlideIndicator(
-                            slideIndicatorOptions: SlideIndicatorOptions(
-                              currentIndicatorColor: Theme.of(
-                                context,
-                              ).primaryColor,
-                              indicatorBackgroundColor: Colors.grey.shade300,
-                              indicatorRadius: 5,
-                              itemSpacing: 5,
-                            ),
-                          ),
-                          viewportFraction:
-                              0.7, // 👈 Permite ver un poco de las imágenes de los lados
-                          onPageChanged: (index, reason) {
-                            // 🚩 Solo actualizamos si el índice es válido para el ítem actual
-                            if (index < item.images.length) {
-                              setState(() {
-                                _selectedImageUrl =
-                                    '${Environment.apiUrl}${item.images[index].url}';
-                              });
-                            }
-                          },
-                        ),
-                        itemBuilder: (context, index, realIndex) {
-                          final imageUrl =
-                              '${Environment.apiUrl}${item.images[index].url}';
-                          return GestureDetector(
-                            onTap: () =>
-                                _showFullScreenImage(context, imageUrl),
-                            child: Stack(
-                              children: [
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(25),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(
-                                      15.0,
-                                    ), // Margen interno de la imagen
-                                    child: Image.network(
-                                      imageUrl,
-                                      fit: BoxFit.contain,
-                                      width: double.infinity,
-                                      height: double.infinity,
-                                    ),
-                                  ),
-                                ),
-                                // Lupa pequeña indicativa
-                                Positioned(
-                                  bottom: 15,
-                                  right: 120,
-                                  child: Icon(
-                                    Icons.zoom_in,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-                    )
-                  : Container(
-                      height: 350,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade200,
-                        borderRadius: BorderRadius.circular(25),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.image_not_supported, size: 50),
-                      ),
-                    ),
-              const SizedBox(height: 16),
-              // Miniaturas de la galería
-              if (item.images.length > 1)
-                SizedBox(
-                  height: 80, // Altura de las miniaturas
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: item.images.length,
-                    itemBuilder: (context, index) {
-                      if (item.images.isEmpty || index >= item.images.length) {
-                        return const Center(
-                          child: Icon(Icons.image_not_supported),
-                        );
-                      }
-                      final imageUrl =
-                          '${Environment.apiUrl}${item.images[index].url}';
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedImageUrl = imageUrl;
-                          });
-                          _carouselController.animateToPage(
-                            index, // Mueve el carrusel a la posición de la miniatura
-                            duration: const Duration(milliseconds: 1000),
-                            curve: Curves.ease,
-                          );
-                        },
-                        child: Container(
-                          width: 80,
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: _selectedImageUrl == imageUrl
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Colors.grey.shade300,
-                              width: _selectedImageUrl == imageUrl ? 3 : 1,
-                            ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(
-                                    Icons.image_not_supported,
-                                    size: 30,
-                                    color: Colors.grey,
-                                  ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
+          child: AssetImageGallery(
+            item: item,
+            onImageTap: (url) => _showFullScreenImage(context, url),
           ),
         ),
         const SizedBox(width: 32),
@@ -536,11 +377,11 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
           physics:
               const NeverScrollableScrollPhysics(), // Desactiva el scroll propio
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // 2 columnas por fila
+            crossAxisCount: 4, // 2 columnas por fila
             crossAxisSpacing: 24,
             mainAxisSpacing: 16,
             childAspectRatio:
-                4, // Ajusta esto según el espacio que necesites para cada campo
+                5, // Ajusta esto según el espacio que necesites para cada campo
           ),
           itemCount: displayedCustomFields.length,
           itemBuilder: (context, index) {
@@ -639,7 +480,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             l10n.additionalInformation, // Asegúrate de tener esta clave en l10n
@@ -647,7 +488,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
           ),
           const SizedBox(height: 12),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _buildMetadataItem(
                 l10n.createdAt,

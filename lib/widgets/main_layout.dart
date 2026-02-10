@@ -8,6 +8,7 @@ import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/widgets/chatbot_veni_widget.dart';
 import 'package:invenicum/widgets/search_bar_widget.dart';
 import 'package:invenicum/widgets/sidebar_layout.dart';
+import 'package:invenicum/widgets/stac_slot.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 
@@ -24,13 +25,25 @@ class MainLayout extends StatelessWidget {
 
     return Scaffold(
       // FAB Modernizado
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showChatbot(context),
-        label: Text(AppLocalizations.of(context)?.veniChatTitle ?? 'Veni'),
-        icon: const Icon(Icons.auto_awesome_rounded, size: 20),
-        elevation: 4,
-        backgroundColor: colorScheme.primary,
-        foregroundColor: colorScheme.onPrimary,
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end, // Alineados a la derecha
+        children: [
+          // Slot para botones dinámicos (Stac)
+          const StacSlot(slotName: 'floating_action_button'),
+
+          // Espacio entre el botón dinámico y el tuyo
+          const SizedBox(height: 12),
+
+          FloatingActionButton.extended(
+            onPressed: () => _showChatbot(context),
+            label: Text(AppLocalizations.of(context)?.veniChatTitle ?? 'Veni'),
+            icon: const Icon(Icons.auto_awesome_rounded, size: 20),
+            elevation: 4,
+            backgroundColor: colorScheme.primary,
+            foregroundColor: colorScheme.onPrimary,
+          ),
+        ],
       ),
 
       body: Column(
@@ -135,8 +148,9 @@ class _HeaderState extends State<_Header> {
           SizedBox(width: MediaQuery.of(context).size.width * 0.025),
 
           // Barra de búsqueda con autocompletado
-          const Expanded(flex: 2, child: InvenicumSearchBar()),
-
+          const Expanded(flex: 3, child: InvenicumSearchBar()),
+          const Spacer(),
+          const StacSlot(slotName: 'inventory_header'),
           const Spacer(),
 
           // Perfil de Usuario

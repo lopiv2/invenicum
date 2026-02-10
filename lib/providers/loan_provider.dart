@@ -24,6 +24,23 @@ class LoanProvider extends ChangeNotifier {
       _loans.where((l) => l.status == 'returned').toList();
   List<Loan> get overdueLoans => _loans.where((l) => l.isOverdue).toList();
 
+  /// Obtiene préstamos de forma global (para el Dashboard)
+  Future<void> fetchAllLoans() async {
+    _isLoading = true;
+    _errorMessage = null;
+    // No notificamos aquí para evitar parpadeos innecesarios si se llama junto a otros
+
+    try {
+      _loans = await _loanService.getAllLoans();
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Obtiene todos los préstamos de un contenedor
   Future<void> fetchLoans(int containerId) async {
     _isLoading = true;

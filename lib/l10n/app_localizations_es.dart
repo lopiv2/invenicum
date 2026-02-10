@@ -9,40 +9,7 @@ class AppLocalizationsEs extends AppLocalizations {
   AppLocalizationsEs([String locale = 'es']) : super(locale);
 
   @override
-  String get additionalInformation => 'Información adicional';
-
-  @override
-  String get createdAt => 'Fecha de creación';
-
-  @override
-  String get updatedAt => 'Última actualización';
-
-  @override
-  String get assetDetail => 'Detalles del Activo';
-
-  @override
-  String get assetNotFound => 'Activo no encontrado';
-
-  @override
-  String get invalidAssetId => 'ID de activo no válido';
-
-  @override
-  String get noImageAvailable => 'No hay imagen disponible';
-
-  @override
-  String get minStock => 'Stock mínimo';
-
-  @override
-  String get location => 'Ubicación';
-
-  @override
   String get aboutInvenicum => 'Sobre Invenicum';
-
-  @override
-  String get previous => 'Anterior';
-
-  @override
-  String get next => 'Siguiente';
 
   @override
   String get active => 'Activo';
@@ -66,19 +33,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get addNewLocation => 'Añadir Nueva Ubicación';
 
   @override
+  String get additionalInformation => 'Información adicional';
+
+  @override
   String get additionalThumbnails => 'Miniaturas Adicionales';
 
   @override
-  String aiExtractionError(Object error) {
+  String aiExtractionError(String error) {
     return 'La IA no pudo extraer los datos: $error';
   }
 
   @override
   String get aiPasteUrlDescription =>
       'Pega el enlace del producto y la IA extraerá automáticamente la información para rellenar los campos.';
-
-  @override
-  String get all => 'Todos';
 
   @override
   String get alertCritical => 'Crítico';
@@ -108,6 +75,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get alerts => 'Alertas y Notificaciones';
 
   @override
+  String get all => 'Todos';
+
+  @override
   String get appTitle => 'Invenicum Inventario';
 
   @override
@@ -120,6 +90,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get april => 'Abril';
 
   @override
+  String get assetDetail => 'Detalles del Activo';
+
+  @override
   String get assetImages => 'Imágenes del Activo';
 
   @override
@@ -129,7 +102,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get assetName => 'Nombre';
 
   @override
-  String assetTypeDeleted(Object name) {
+  String get assetNotFound => 'Activo no encontrado';
+
+  @override
+  String assetTypeDeleted(String name) {
     return 'Tipo de Activo \"$name\" eliminado con éxito.';
   }
 
@@ -137,7 +113,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get assetTypes => 'Tipos de Activos';
 
   @override
-  String assetUpdated(Object name) {
+  String assetUpdated(String name) {
     return 'Activo \"$name\" actualizado correctamente.';
   }
 
@@ -198,12 +174,12 @@ class AppLocalizationsEs extends AppLocalizations {
       '¿Estás seguro de que deseas eliminar este registro?';
 
   @override
-  String confirmDeleteAssetType(Object name) {
+  String confirmDeleteAssetType(String name) {
     return '¿Estás seguro de que deseas eliminar el tipo de activo \"$name\" y todos sus elementos asociados? Esta acción no se puede deshacer.';
   }
 
   @override
-  String confirmDeleteContainer(Object name) {
+  String confirmDeleteContainer(String name) {
     return '¿Estás seguro de que quieres eliminar el contenedor \"$name\"? Esta acción es irreversible y eliminará todos sus activos y datos.';
   }
 
@@ -219,12 +195,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get configurationSaved => 'Configuración guardada correctamente.';
 
   @override
-  String containerCreated(Object name) {
+  String containerCreated(String name) {
     return 'Contenedor \"$name\" creado correctamente.';
   }
 
   @override
-  String containerDeleted(Object name) {
+  String containerDeleted(String name) {
     return 'Contenedor \"$name\" eliminado correctamente.';
   }
 
@@ -236,7 +212,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Contenedor o Tipo de Activo no encontrado.';
 
   @override
-  String containerRenamed(Object name) {
+  String containerRenamed(String name) {
     return 'Contenedor renombrado a \"$name\".';
   }
 
@@ -253,6 +229,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get createFirstContainer => 'Crea tu primer contenedor.';
 
   @override
+  String get createdAt => 'Fecha de creación';
+
+  @override
   String get current => 'Actual';
 
   @override
@@ -262,7 +241,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get customFields => 'Campos Personalizados';
 
   @override
-  String customFieldsOf(Object name) {
+  String customFieldsOf(String name) {
     return 'Campos Personalizados de $name';
   }
 
@@ -327,16 +306,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get enterValidUrl => 'Introduce una URL válida';
 
   @override
+  String errorChangingLanguage(String error) {
+    return 'Error al cambiar idioma: $error';
+  }
+
+  @override
   String get errorCsvMinRows =>
       'Por favor, selecciona un archivo CSV con encabezados y al menos una fila de datos.';
 
   @override
-  String errorDeletingAssetType(Object error) {
+  String errorDeletingAssetType(String error) {
     return 'Error al eliminar el tipo de activo: $error';
   }
 
   @override
-  String errorDeletingContainer(Object error) {
+  String errorDeletingContainer(String error) {
     return 'Error al eliminar el contenedor: $error';
   }
 
@@ -347,7 +331,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorEmptyCsv => 'El archivo CSV está vacío.';
 
   @override
-  String errorGeneratingPDF(Object error) {
+  String errorGeneratingPDF(String error) {
     return 'Error al generar PDF: $error';
   }
 
@@ -358,7 +342,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get errorLoadingData => 'Error al cargar los datos';
 
   @override
-  String errorLoadingListValues(Object error) {
+  String errorLoadingListValues(String error) {
     return 'Error al cargar los valores de la lista: $error';
   }
 
@@ -384,32 +368,27 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String errorRegisteringLoan(Object error) {
+  String errorRegisteringLoan(String error) {
     return 'Error al registrar préstamo: $error';
   }
 
   @override
-  String errorRenaming(Object error) {
+  String errorRenaming(String error) {
     return 'Error al renombrar: $error';
   }
 
   @override
-  String errorSaving(Object error) {
+  String errorSaving(String error) {
     return 'Error al guardar: $error';
   }
 
   @override
-  String errorUpdatingAsset(Object error) {
+  String errorUpdatingAsset(String error) {
     return 'Error al actualizar activo: $error';
   }
 
   @override
   String get exampleFilterHint => 'Ej: Dañado, Rojo, 50';
-
-  @override
-  String errorChangingLanguage(Object error) {
-    return 'Error al cambiar idioma: $error';
-  }
 
   @override
   String get february => 'Febrero';
@@ -418,7 +397,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get fieldChip => 'Campo';
 
   @override
-  String fieldRequiredWithName(Object field) {
+  String fieldRequiredWithName(String field) {
     return 'El campo \"$field\" es obligatorio.';
   }
 
@@ -447,15 +426,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get guest => 'Invitado';
 
   @override
+  String get helpDocs => 'Ayuda y Documentación';
+
+  @override
   String get ignoreField => '🚫 Ignorar Campo';
 
   @override
   String get importAssetsTo => 'Importar Activos a';
 
   @override
-  String importSuccessMessage(String count) {
+  String importSuccessMessage(int count) {
     return '¡Importación Exitosa! $count activos creados.';
   }
+
+  @override
+  String get invalidAssetId => 'ID de activo no válido';
 
   @override
   String get invalidNavigationIds => 'Error: IDs de navegación no válidos.';
@@ -473,6 +458,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get language => 'Idioma';
 
   @override
+  String get languageChanged => '¡Idioma cambiado a Español!';
+
+  @override
   String get languageNotImplemented =>
       'Funcionalidad de idioma por implementar';
 
@@ -483,15 +471,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get loadingAssetType => 'Cargando Tipo de Activo...';
 
   @override
-  String loadingListField(Object field) {
+  String loadingListField(String field) {
     return 'Cargando $field...';
   }
 
   @override
   String get loanDate => 'Fecha Préstamo';
-
-  @override
-  String get languageChanged => '¡Idioma cambiado a Español!';
 
   @override
   String get loanLanguageNotImplemented =>
@@ -505,6 +490,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get loans => 'Préstamos';
+
+  @override
+  String get location => 'Ubicación';
 
   @override
   String get locations => 'Ubicaciones';
@@ -531,6 +519,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get may => 'Mayo';
 
   @override
+  String get minStock => 'Stock mínimo';
+
+  @override
   String get myCustomTheme => 'Mi Tema';
 
   @override
@@ -555,6 +546,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get newName => 'Nuevo nombre';
 
   @override
+  String get next => 'Siguiente';
+
+  @override
   String get noAssetsCreated => 'No hay activos creados aún.';
 
   @override
@@ -573,6 +567,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get noFileSelected => 'Ningún archivo seleccionado';
+
+  @override
+  String get noImageAvailable => 'No hay imagen disponible';
 
   @override
   String get noImagesAdded =>
@@ -629,6 +626,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pleaseSelectLocation => 'Por favor, selecciona una ubicación.';
 
   @override
+  String get plugins => 'Plugins';
+
+  @override
   String get possessionFieldDef => 'Campo de Posesión';
 
   @override
@@ -639,6 +639,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get previewPDF => 'Vista Previa';
+
+  @override
+  String get previous => 'Anterior';
 
   @override
   String get primaryImage => 'Imagen Principal';
@@ -742,6 +745,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get showAsList => 'Mostrar como Lista';
 
   @override
+  String get slotDashboardBottom => 'Panel de control Inferior';
+
+  @override
+  String get slotDashboardTop => 'Panel de control Superior';
+
+  @override
+  String get slotFloatingActionButton => 'Botón Flotante';
+
+  @override
+  String get slotInventoryHeader => 'Cabecera Inventario';
+
+  @override
+  String get slotLeftSidebar => 'Barra Lateral';
+
+  @override
+  String get slotUnknown => 'Ranura desconocida';
+
+  @override
   String get specificValueToCount => 'Valor Específico a Contar';
 
   @override
@@ -787,6 +808,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get totals => 'Totales';
 
   @override
+  String get updatedAt => 'Última actualización';
+
+  @override
   String get upload => 'Subir';
 
   @override
@@ -794,16 +818,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get username => 'Usuario';
-
-  @override
-  String get veniChatTitle => 'Venibot AI';
-
-  @override
-  String get veniChatStatus => 'En línea';
-
-  @override
-  String get veniChatWelcome =>
-      '¡Hola! Soy Venibot, tu asistente de Invenicum. ¿En qué puedo ayudarte con tu inventario hoy?';
 
   @override
   String get veniChatPlaceholder => 'Pregúntame algo...';
@@ -817,10 +831,20 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get veniCmdHelpTitle => 'Habilidades de Veni';
+  String get veniChatStatus => 'En línea';
+
+  @override
+  String get veniChatTitle => 'Venibot AI';
+
+  @override
+  String get veniChatWelcome =>
+      '¡Hola! Soy Venibot, tu asistente de Invenicum. ¿En qué puedo ayudarte con tu inventario hoy?';
 
   @override
   String get veniCmdDashboard => 'Ir al panel de control';
+
+  @override
+  String get veniCmdHelpTitle => 'Habilidades de Veni';
 
   @override
   String get veniCmdInventory => 'Consultar stock de un artículo';

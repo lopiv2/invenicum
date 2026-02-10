@@ -27,8 +27,7 @@ class _LowStockCardState extends State<LowStockCard> {
   Widget build(BuildContext context) {
     return Consumer<InventoryItemProvider>(
       builder: (context, itemProvider, child) {
-        // 2. Si el provider está cargando, mostramos un indicador
-        if (itemProvider.isLoading && itemProvider.inventoryItems.isEmpty) {
+        if (itemProvider.isLoading) {
           return const Card(
             child: Padding(
               padding: EdgeInsets.all(20),
@@ -37,7 +36,13 @@ class _LowStockCardState extends State<LowStockCard> {
           );
         }
 
-        final lowStockItems = itemProvider.inventoryItems
+        final items = itemProvider.inventoryItems;
+
+        if (items.isEmpty) {
+          return const Card(child: Text("No se encontraron artículos"));
+        }
+
+        final lowStockItems = items
             .where((item) => item.quantity < (item.minStock))
             .toList();
 

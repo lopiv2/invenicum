@@ -9,49 +9,16 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get additionalInformation => 'Additional Information';
-
-  @override
-  String get createdAt => 'Creation Date';
-
-  @override
-  String get updatedAt => 'Last Updated';
-
-  @override
-  String get assetDetail => 'Asset Details';
-
-  @override
-  String get assetNotFound => 'Asset not found';
-
-  @override
-  String get invalidAssetId => 'Invalid asset ID';
-
-  @override
-  String get noImageAvailable => 'No image available';
-
-  @override
-  String get minStock => 'Minimum stock';
-
-  @override
-  String get location => 'Location';
-
-  @override
   String get aboutInvenicum => 'About Invenicum';
-
-  @override
-  String get previous => 'Previous';
-
-  @override
-  String get next => 'Next';
 
   @override
   String get active => 'Active';
 
   @override
-  String get activeLoans => 'Active loans';
+  String get activeLoans => 'Current Loans';
 
   @override
-  String get activeLoansCount => 'Active loans';
+  String get activeLoansCount => 'Active Loans';
 
   @override
   String get addAlert => 'Add Alert';
@@ -66,19 +33,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addNewLocation => 'Add New Location';
 
   @override
+  String get additionalInformation => 'Additional Information';
+
+  @override
   String get additionalThumbnails => 'Additional Thumbnails';
 
   @override
-  String aiExtractionError(Object error) {
+  String aiExtractionError(String error) {
     return 'AI could not extract data: $error';
   }
 
   @override
   String get aiPasteUrlDescription =>
-      'Paste the product link and AI will automatically extract information to populate fields.';
-
-  @override
-  String get all => 'All';
+      'Paste the product link and AI will automatically extract information to fill the fields.';
 
   @override
   String get alertCritical => 'Critical';
@@ -105,13 +72,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get alertWarning => 'Warning';
 
   @override
-  String get alerts => 'Alerts and Notifications';
+  String get alerts => 'Alerts & Notifications';
+
+  @override
+  String get all => 'All';
 
   @override
   String get appTitle => 'Invenicum Inventory';
 
   @override
-  String get applicationTheme => 'Application theme';
+  String get applicationTheme => 'Application Theme';
 
   @override
   String get apply => 'Apply';
@@ -120,16 +90,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get april => 'April';
 
   @override
+  String get assetDetail => 'Asset Details';
+
+  @override
   String get assetImages => 'Asset Images';
 
   @override
   String get assetImport => 'Asset Import';
 
   @override
-  String get assetName => 'Asset Name';
+  String get assetName => 'Name';
 
   @override
-  String assetTypeDeleted(Object name) {
+  String get assetNotFound => 'Asset not found';
+
+  @override
+  String assetTypeDeleted(String name) {
     return 'Asset Type \"$name\" deleted successfully.';
   }
 
@@ -137,7 +113,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get assetTypes => 'Asset Types';
 
   @override
-  String assetUpdated(Object name) {
+  String assetUpdated(String name) {
     return 'Asset \"$name\" updated successfully.';
   }
 
@@ -176,7 +152,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get collectionContainerInfo =>
-      'Collection containers have collection tracking bars, invested value, market value and Exposure view';
+      'Collection containers have collection tracking bars, invested value, market value and Exhibition view';
 
   @override
   String get collectionFieldsConfigured => 'Collection fields configured.';
@@ -188,7 +164,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get configureDeliveryVoucher => 'Configure Delivery Voucher';
 
   @override
-  String get configureVoucherBody => 'Configure the voucher body...';
+  String get configureVoucherBody => 'Configure voucher body...';
 
   @override
   String get confirmDeleteAlert => 'Delete Alert';
@@ -198,18 +174,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Are you sure you want to delete this record?';
 
   @override
-  String confirmDeleteAssetType(Object name) {
-    return 'Are you sure you want to delete asset type \"$name\" and all its associated items? This action cannot be undone.';
+  String confirmDeleteAssetType(String name) {
+    return 'Are you sure you want to delete asset type \"$name\" and all associated items? This action cannot be undone.';
   }
 
   @override
-  String confirmDeleteContainer(Object name) {
-    return 'Are you sure you want to delete the container \"$name\"? This action is irreversible and will remove all its assets and data.';
+  String confirmDeleteContainer(String name) {
+    return 'Are you sure you want to delete container \"$name\"? This action is irreversible and will delete all its assets and data.';
   }
 
   @override
   String confirmDeleteLocationMessage(String name) {
-    return 'Are you sure you want to delete the location \"$name\"?';
+    return 'Are you sure you want to delete location \"$name\"?';
   }
 
   @override
@@ -219,24 +195,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get configurationSaved => 'Configuration saved successfully.';
 
   @override
-  String containerCreated(Object name) {
+  String containerCreated(String name) {
     return 'Container \"$name\" created successfully.';
   }
 
   @override
-  String containerDeleted(Object name) {
+  String containerDeleted(String name) {
     return 'Container \"$name\" deleted successfully.';
   }
 
   @override
-  String get containerName => 'Container name';
+  String get containerName => 'Container Name';
 
   @override
   String get containerOrAssetTypeNotFound =>
       'Container or Asset Type not found.';
 
   @override
-  String containerRenamed(Object name) {
+  String containerRenamed(String name) {
     return 'Container renamed to \"$name\".';
   }
 
@@ -253,17 +229,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get createFirstContainer => 'Create your first container.';
 
   @override
+  String get createdAt => 'Creation Date';
+
+  @override
   String get current => 'Current';
 
   @override
-  String get customColor => 'Custom Color';
+  String get customColor => 'Custom color';
 
   @override
   String get customFields => 'Custom Fields';
 
   @override
-  String customFieldsOf(Object name) {
-    return 'Custom Fields of $name';
+  String customFieldsOf(String name) {
+    return 'Custom Fields for $name';
   }
 
   @override
@@ -289,7 +268,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String deleteError(String error) {
-    return 'Error deleting: $error';
+    return 'Delete error: $error';
   }
 
   @override
@@ -305,7 +284,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get description => 'Description (optional)';
 
   @override
-  String get desiredField => 'Desired Field';
+  String get desiredField => 'Wishlist Field';
 
   @override
   String get dueDate => 'Due Date';
@@ -314,7 +293,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get edit => 'Edit';
 
   @override
-  String get enterContainerName => 'Enter the container name';
+  String get enterContainerName => 'Enter container name';
 
   @override
   String get enterDescription => 'Enter a description';
@@ -326,16 +305,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterValidUrl => 'Enter a valid URL';
 
   @override
+  String errorChangingLanguage(String error) {
+    return 'Error changing language: $error';
+  }
+
+  @override
   String get errorCsvMinRows =>
       'Please select a CSV file with headers and at least one data row.';
 
   @override
-  String errorDeletingAssetType(Object error) {
+  String errorDeletingAssetType(String error) {
     return 'Error deleting asset type: $error';
   }
 
   @override
-  String errorDeletingContainer(Object error) {
+  String errorDeletingContainer(String error) {
     return 'Error deleting container: $error';
   }
 
@@ -343,10 +327,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorDuringImport => 'Error during import';
 
   @override
-  String get errorEmptyCsv => 'The CSV file is empty.';
+  String get errorEmptyCsv => 'CSV file is empty.';
 
   @override
-  String errorGeneratingPDF(Object error) {
+  String errorGeneratingPDF(String error) {
     return 'Error generating PDF: $error';
   }
 
@@ -357,7 +341,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorLoadingData => 'Error loading data';
 
   @override
-  String errorLoadingListValues(Object error) {
+  String errorLoadingListValues(String error) {
     return 'Error loading list values: $error';
   }
 
@@ -382,32 +366,27 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String errorRegisteringLoan(Object error) {
+  String errorRegisteringLoan(String error) {
     return 'Error registering loan: $error';
   }
 
   @override
-  String errorRenaming(Object error) {
+  String errorRenaming(String error) {
     return 'Error renaming: $error';
   }
 
   @override
-  String errorSaving(Object error) {
+  String errorSaving(String error) {
     return 'Error saving: $error';
   }
 
   @override
-  String errorUpdatingAsset(Object error) {
+  String errorUpdatingAsset(String error) {
     return 'Error updating asset: $error';
   }
 
   @override
-  String get exampleFilterHint => 'Ex: Damaged, Red, 50';
-
-  @override
-  String errorChangingLanguage(Object error) {
-    return 'Error changing language: $error';
-  }
+  String get exampleFilterHint => 'e.g., Damaged, Red, 50';
 
   @override
   String get february => 'February';
@@ -416,15 +395,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldChip => 'Field';
 
   @override
-  String fieldRequiredWithName(Object field) {
-    return 'The field \"$field\" is required.';
+  String fieldRequiredWithName(String field) {
+    return 'Field \"$field\" is required.';
   }
 
   @override
   String get fieldToCount => 'Field to Count';
 
   @override
-  String get fieldsFilledSuccess => 'Fields populated successfully!';
+  String get fieldsFilledSuccess => 'Fields filled successfully!';
 
   @override
   String get formatsPNG => 'Formats: PNG, JPG';
@@ -445,18 +424,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get guest => 'Guest';
 
   @override
+  String get helpDocs => 'Help & Documentation';
+
+  @override
   String get ignoreField => '🚫 Ignore Field';
 
   @override
-  String get importAssetsTo => 'Import Assets to';
+  String get importAssetsTo => 'Import Assets To';
 
   @override
-  String importSuccessMessage(String count) {
+  String importSuccessMessage(int count) {
     return 'Import Successful! $count assets created.';
   }
 
   @override
-  String get invalidNavigationIds => 'Error: invalid navigation IDs.';
+  String get invalidAssetId => 'Invalid asset ID';
+
+  @override
+  String get invalidNavigationIds => 'Error: Invalid navigation IDs.';
 
   @override
   String get january => 'January';
@@ -471,8 +456,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get language => 'Language';
 
   @override
-  String get languageNotImplemented =>
-      'Language functionality to be implemented';
+  String get languageChanged => 'Language changed to English!';
+
+  @override
+  String get languageNotImplemented => 'Language feature not yet implemented';
 
   @override
   String get lightMode => 'Light Mode';
@@ -481,7 +468,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loadingAssetType => 'Loading Asset Type...';
 
   @override
-  String loadingListField(Object field) {
+  String loadingListField(String field) {
     return 'Loading $field...';
   }
 
@@ -489,20 +476,20 @@ class AppLocalizationsEn extends AppLocalizations {
   String get loanDate => 'Loan Date';
 
   @override
-  String get languageChanged => 'Language changed to English!';
-
-  @override
   String get loanLanguageNotImplemented =>
-      'Language functionality to be implemented';
+      'Language feature not yet implemented';
 
   @override
   String get loanManagement => 'Loan Management';
 
   @override
-  String get loanObject => 'Loan Object';
+  String get loanObject => 'Object to Loan';
 
   @override
   String get loans => 'Loans';
+
+  @override
+  String get location => 'Location';
 
   @override
   String get locations => 'Locations';
@@ -520,7 +507,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get logout => 'Logout';
 
   @override
-  String get magicAssistant => 'Magic AI Assistant';
+  String get magicAssistant => 'AI Magic Assistant';
 
   @override
   String get march => 'March';
@@ -529,19 +516,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get may => 'May';
 
   @override
+  String get minStock => 'Min stock';
+
+  @override
   String get myCustomTheme => 'My Theme';
 
   @override
   String get myProfile => 'My Profile';
 
   @override
-  String get myThemesStored => 'My Themes Stored';
+  String get myThemesStored => 'My Stored Themes';
 
   @override
   String get nameCannotBeEmpty => 'Name cannot be empty';
 
   @override
-  String get nameSameAsCurrent => 'The name is the same as the current one';
+  String get nameSameAsCurrent => 'Name is the same as current';
 
   @override
   String get newAlert => 'New Manual Alert';
@@ -553,10 +543,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newName => 'New name';
 
   @override
+  String get next => 'Next';
+
+  @override
   String get noAssetsCreated => 'No assets created yet.';
 
   @override
-  String get noAssetsMatch => 'No assets match the search/filter criteria.';
+  String get noAssetsMatch => 'No assets match search/filter criteria.';
 
   @override
   String get noBooleanFields => 'No boolean fields defined.';
@@ -565,14 +558,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noContainerMessage => 'Create your first container.';
 
   @override
-  String get noCustomFields => 'This asset type does not have custom fields.';
+  String get noCustomFields => 'This asset type has no custom fields.';
 
   @override
   String get noFileSelected => 'No file selected';
 
   @override
+  String get noImageAvailable => 'No image available';
+
+  @override
   String get noImagesAdded =>
-      'No images added yet. The first image will be the primary.';
+      'No images added yet. The first image will be the primary one.';
 
   @override
   String get noLoansFound => 'No loans found in this container.';
@@ -594,7 +590,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get november => 'November';
 
   @override
-  String get obligatory => 'Obligatory';
+  String get obligatory => 'Required';
 
   @override
   String get october => 'October';
@@ -625,6 +621,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseSelectLocation => 'Please select a location.';
 
   @override
+  String get plugins => 'Plugins';
+
+  @override
   String get possessionFieldDef => 'Possession Field';
 
   @override
@@ -634,7 +633,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get preferences => 'Preferences';
 
   @override
-  String get previewPDF => 'PDF Preview';
+  String get previewPDF => 'Preview';
+
+  @override
+  String get previous => 'Previous';
 
   @override
   String get primaryImage => 'Primary Image';
@@ -694,7 +696,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectAndUploadImage => 'Select and Upload Image';
 
   @override
-  String get selectApplicationLanguage => 'Select the application language';
+  String get selectApplicationLanguage => 'Select application language';
 
   @override
   String get selectBooleanFields =>
@@ -735,6 +737,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showAsList => 'Show as List';
+
+  @override
+  String get slotDashboardBottom => 'Bottom Dashboard Panel';
+
+  @override
+  String get slotDashboardTop => 'Top Dashboard Panel';
+
+  @override
+  String get slotFloatingActionButton => 'Floating Button';
+
+  @override
+  String get slotInventoryHeader => 'Inventory Header';
+
+  @override
+  String get slotLeftSidebar => 'Sidebar';
+
+  @override
+  String get slotUnknown => 'Unknown Slot';
 
   @override
   String get specificValueToCount => 'Specific Value to Count';
@@ -782,6 +802,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totals => 'Totals';
 
   @override
+  String get updatedAt => 'Last Update';
+
+  @override
   String get upload => 'Upload';
 
   @override
@@ -791,17 +814,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get username => 'Username';
 
   @override
-  String get veniChatTitle => 'Veni AI';
-
-  @override
-  String get veniChatStatus => 'Online';
-
-  @override
-  String get veniChatWelcome =>
-      'Hi! I\'m Veni, your Invenicum assistant. How can I help you with your inventory today?';
-
-  @override
-  String get veniChatPlaceholder => 'Ask me anything...';
+  String get veniChatPlaceholder => 'Ask me something...';
 
   @override
   String get veniChatPoweredBy => 'Powered by ';
@@ -812,13 +825,23 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get veniCmdHelpTitle => 'Veni abilities';
+  String get veniChatStatus => 'Online';
 
   @override
-  String get veniCmdDashboard => 'Go to the dashboard';
+  String get veniChatTitle => 'Venibot AI';
 
   @override
-  String get veniCmdInventory => 'Check stock of an article';
+  String get veniChatWelcome =>
+      'Hi! I\'m Venibot, your Invenicum assistant. How can I help you with your inventory today?';
+
+  @override
+  String get veniCmdDashboard => 'Go to dashboard';
+
+  @override
+  String get veniCmdHelpTitle => 'Veni\'s Skills';
+
+  @override
+  String get veniCmdInventory => 'Check stock for an item';
 
   @override
   String get veniCmdLoans => 'View active loans';
@@ -831,7 +854,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get veniCmdUnknown =>
-      'I don\'t recognize that command. Write help to see what I can do.';
+      'I don\'t recognize that command. Type help to see what I can do.';
 
   @override
   String version(String name) {

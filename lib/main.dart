@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/providers/plugin_provider.dart';
+import 'package:invenicum/services/plugin_service.dart';
 import 'package:invenicum/services/veni_chatbot_service.dart';
 import 'package:provider/provider.dart';
 import 'package:toastification/toastification.dart';
@@ -51,6 +53,7 @@ void main() async {
       providers: [
         // --- SERVICIOS (Singletons) ---
         Provider(create: (_) => ApiService()),
+        Provider(create: (c) => PluginService(c.read<ApiService>())),
         Provider(create: (c) => DashboardService(c.read<ApiService>())),
         Provider(create: (c) => ThemeService(c.read<ApiService>())),
         Provider(create: (c) => PreferencesService(c.read<ApiService>())),
@@ -72,6 +75,28 @@ void main() async {
             // Si ya existe una instancia, simplemente la devolvemos para que no se resetee el historial
             if (previous != null) return previous;
             return ChatService(api);
+          },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, PluginProvider>(
+          create: (c) => PluginProvider(c.read<PluginService>()),
+          update: (context, auth, prev) {
+            if (auth.isAuthenticated && auth.user != null && !auth.isLoading) {
+              // 1. Inyectamos el usuario actual en el Provider para el reemplazo de {{userName}}
+              prev?.updateCurrentUser(auth.user!);
+
+              // 2. Inicializamos el SDK de Stac con el nombre del usuario para el Parser
+              if (prev != null && !prev.isLoading && prev.installed.isEmpty) {
+                Future.microtask(() async {
+                  final pluginService = context.read<PluginService>();
+
+                  // Pasamos el nombre al initSdk para que el InvenicumSdkParser lo tenga
+                  await pluginService.initSdk(userName: auth.user!.name);
+
+                  await prev.refresh();
+                });
+              }
+            }
+            return prev!;
           },
         ),
 

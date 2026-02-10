@@ -9,6 +9,10 @@ class Environment {
   static const String apiVersion = '/api/v1';
 
   static String get baseUrl => '$apiUrl$apiVersion';
+
+  //Docs
+  static const String docsUrl = 'https://docs.invenicum.com';
+  static const String stacDocsUrl = "https://docs.stac.dev/introduction";
   
   // Timeouts
   static const int connectTimeout = 15000; // 15 segundos

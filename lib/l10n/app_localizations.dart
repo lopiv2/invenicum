@@ -106,77 +106,11 @@ abstract class AppLocalizations {
     Locale('pt'),
   ];
 
-  /// No description provided for @additionalInformation.
-  ///
-  /// In en, this message translates to:
-  /// **'Additional Information'**
-  String get additionalInformation;
-
-  /// No description provided for @createdAt.
-  ///
-  /// In en, this message translates to:
-  /// **'Creation Date'**
-  String get createdAt;
-
-  /// No description provided for @updatedAt.
-  ///
-  /// In en, this message translates to:
-  /// **'Last Updated'**
-  String get updatedAt;
-
-  /// No description provided for @assetDetail.
-  ///
-  /// In en, this message translates to:
-  /// **'Asset Details'**
-  String get assetDetail;
-
-  /// No description provided for @assetNotFound.
-  ///
-  /// In en, this message translates to:
-  /// **'Asset not found'**
-  String get assetNotFound;
-
-  /// No description provided for @invalidAssetId.
-  ///
-  /// In en, this message translates to:
-  /// **'Invalid asset ID'**
-  String get invalidAssetId;
-
-  /// No description provided for @noImageAvailable.
-  ///
-  /// In en, this message translates to:
-  /// **'No image available'**
-  String get noImageAvailable;
-
-  /// No description provided for @minStock.
-  ///
-  /// In en, this message translates to:
-  /// **'Minimum stock'**
-  String get minStock;
-
-  /// No description provided for @location.
-  ///
-  /// In en, this message translates to:
-  /// **'Location'**
-  String get location;
-
   /// No description provided for @aboutInvenicum.
   ///
   /// In en, this message translates to:
   /// **'About Invenicum'**
   String get aboutInvenicum;
-
-  /// No description provided for @previous.
-  ///
-  /// In en, this message translates to:
-  /// **'Previous'**
-  String get previous;
-
-  /// No description provided for @next.
-  ///
-  /// In en, this message translates to:
-  /// **'Next'**
-  String get next;
 
   /// No description provided for @active.
   ///
@@ -187,13 +121,13 @@ abstract class AppLocalizations {
   /// No description provided for @activeLoans.
   ///
   /// In en, this message translates to:
-  /// **'Active loans'**
+  /// **'Current Loans'**
   String get activeLoans;
 
   /// No description provided for @activeLoansCount.
   ///
   /// In en, this message translates to:
-  /// **'Active loans'**
+  /// **'Active Loans'**
   String get activeLoansCount;
 
   /// No description provided for @addAlert.
@@ -220,6 +154,12 @@ abstract class AppLocalizations {
   /// **'Add New Location'**
   String get addNewLocation;
 
+  /// No description provided for @additionalInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional Information'**
+  String get additionalInformation;
+
   /// No description provided for @additionalThumbnails.
   ///
   /// In en, this message translates to:
@@ -230,19 +170,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'AI could not extract data: {error}'**
-  String aiExtractionError(Object error);
+  String aiExtractionError(String error);
 
   /// No description provided for @aiPasteUrlDescription.
   ///
   /// In en, this message translates to:
-  /// **'Paste the product link and AI will automatically extract information to populate fields.'**
+  /// **'Paste the product link and AI will automatically extract information to fill the fields.'**
   String get aiPasteUrlDescription;
-
-  /// No description provided for @all.
-  ///
-  /// In en, this message translates to:
-  /// **'All'**
-  String get all;
 
   /// No description provided for @alertCritical.
   ///
@@ -295,8 +229,14 @@ abstract class AppLocalizations {
   /// No description provided for @alerts.
   ///
   /// In en, this message translates to:
-  /// **'Alerts and Notifications'**
+  /// **'Alerts & Notifications'**
   String get alerts;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
 
   /// No description provided for @appTitle.
   ///
@@ -307,7 +247,7 @@ abstract class AppLocalizations {
   /// No description provided for @applicationTheme.
   ///
   /// In en, this message translates to:
-  /// **'Application theme'**
+  /// **'Application Theme'**
   String get applicationTheme;
 
   /// No description provided for @apply.
@@ -321,6 +261,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'April'**
   String get april;
+
+  /// No description provided for @assetDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Details'**
+  String get assetDetail;
 
   /// No description provided for @assetImages.
   ///
@@ -337,14 +283,20 @@ abstract class AppLocalizations {
   /// No description provided for @assetName.
   ///
   /// In en, this message translates to:
-  /// **'Asset Name'**
+  /// **'Name'**
   String get assetName;
+
+  /// No description provided for @assetNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset not found'**
+  String get assetNotFound;
 
   /// No description provided for @assetTypeDeleted.
   ///
   /// In en, this message translates to:
   /// **'Asset Type \"{name}\" deleted successfully.'**
-  String assetTypeDeleted(Object name);
+  String assetTypeDeleted(String name);
 
   /// No description provided for @assetTypes.
   ///
@@ -356,7 +308,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Asset \"{name}\" updated successfully.'**
-  String assetUpdated(Object name);
+  String assetUpdated(String name);
 
   /// No description provided for @assets.
   ///
@@ -427,7 +379,7 @@ abstract class AppLocalizations {
   /// No description provided for @collectionContainerInfo.
   ///
   /// In en, this message translates to:
-  /// **'Collection containers have collection tracking bars, invested value, market value and Exposure view'**
+  /// **'Collection containers have collection tracking bars, invested value, market value and Exhibition view'**
   String get collectionContainerInfo;
 
   /// No description provided for @collectionFieldsConfigured.
@@ -451,7 +403,7 @@ abstract class AppLocalizations {
   /// No description provided for @configureVoucherBody.
   ///
   /// In en, this message translates to:
-  /// **'Configure the voucher body...'**
+  /// **'Configure voucher body...'**
   String get configureVoucherBody;
 
   /// No description provided for @confirmDeleteAlert.
@@ -469,19 +421,19 @@ abstract class AppLocalizations {
   /// No description provided for @confirmDeleteAssetType.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete asset type \"{name}\" and all its associated items? This action cannot be undone.'**
-  String confirmDeleteAssetType(Object name);
+  /// **'Are you sure you want to delete asset type \"{name}\" and all associated items? This action cannot be undone.'**
+  String confirmDeleteAssetType(String name);
 
   /// No description provided for @confirmDeleteContainer.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete the container \"{name}\"? This action is irreversible and will remove all its assets and data.'**
-  String confirmDeleteContainer(Object name);
+  /// **'Are you sure you want to delete container \"{name}\"? This action is irreversible and will delete all its assets and data.'**
+  String confirmDeleteContainer(String name);
 
   /// No description provided for @confirmDeleteLocationMessage.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete the location \"{name}\"?'**
+  /// **'Are you sure you want to delete location \"{name}\"?'**
   String confirmDeleteLocationMessage(String name);
 
   /// No description provided for @confirmDeletion.
@@ -500,18 +452,18 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Container \"{name}\" created successfully.'**
-  String containerCreated(Object name);
+  String containerCreated(String name);
 
   /// No description provided for @containerDeleted.
   ///
   /// In en, this message translates to:
   /// **'Container \"{name}\" deleted successfully.'**
-  String containerDeleted(Object name);
+  String containerDeleted(String name);
 
   /// No description provided for @containerName.
   ///
   /// In en, this message translates to:
-  /// **'Container name'**
+  /// **'Container Name'**
   String get containerName;
 
   /// No description provided for @containerOrAssetTypeNotFound.
@@ -524,7 +476,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Container renamed to \"{name}\".'**
-  String containerRenamed(Object name);
+  String containerRenamed(String name);
 
   /// No description provided for @containers.
   ///
@@ -550,6 +502,12 @@ abstract class AppLocalizations {
   /// **'Create your first container.'**
   String get createFirstContainer;
 
+  /// No description provided for @createdAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Creation Date'**
+  String get createdAt;
+
   /// No description provided for @current.
   ///
   /// In en, this message translates to:
@@ -559,7 +517,7 @@ abstract class AppLocalizations {
   /// No description provided for @customColor.
   ///
   /// In en, this message translates to:
-  /// **'Custom Color'**
+  /// **'Custom color'**
   String get customColor;
 
   /// No description provided for @customFields.
@@ -571,8 +529,8 @@ abstract class AppLocalizations {
   /// No description provided for @customFieldsOf.
   ///
   /// In en, this message translates to:
-  /// **'Custom Fields of {name}'**
-  String customFieldsOf(Object name);
+  /// **'Custom Fields for {name}'**
+  String customFieldsOf(String name);
 
   /// No description provided for @customizeDeliveryVoucher.
   ///
@@ -619,7 +577,7 @@ abstract class AppLocalizations {
   /// No description provided for @deleteError.
   ///
   /// In en, this message translates to:
-  /// **'Error deleting: {error}'**
+  /// **'Delete error: {error}'**
   String deleteError(String error);
 
   /// No description provided for @deleteSuccess.
@@ -649,7 +607,7 @@ abstract class AppLocalizations {
   /// No description provided for @desiredField.
   ///
   /// In en, this message translates to:
-  /// **'Desired Field'**
+  /// **'Wishlist Field'**
   String get desiredField;
 
   /// No description provided for @dueDate.
@@ -667,7 +625,7 @@ abstract class AppLocalizations {
   /// No description provided for @enterContainerName.
   ///
   /// In en, this message translates to:
-  /// **'Enter the container name'**
+  /// **'Enter container name'**
   String get enterContainerName;
 
   /// No description provided for @enterDescription.
@@ -688,6 +646,12 @@ abstract class AppLocalizations {
   /// **'Enter a valid URL'**
   String get enterValidUrl;
 
+  /// No description provided for @errorChangingLanguage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error changing language: {error}'**
+  String errorChangingLanguage(String error);
+
   /// No description provided for @errorCsvMinRows.
   ///
   /// In en, this message translates to:
@@ -698,13 +662,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Error deleting asset type: {error}'**
-  String errorDeletingAssetType(Object error);
+  String errorDeletingAssetType(String error);
 
   /// No description provided for @errorDeletingContainer.
   ///
   /// In en, this message translates to:
   /// **'Error deleting container: {error}'**
-  String errorDeletingContainer(Object error);
+  String errorDeletingContainer(String error);
 
   /// No description provided for @errorDuringImport.
   ///
@@ -715,14 +679,14 @@ abstract class AppLocalizations {
   /// No description provided for @errorEmptyCsv.
   ///
   /// In en, this message translates to:
-  /// **'The CSV file is empty.'**
+  /// **'CSV file is empty.'**
   String get errorEmptyCsv;
 
   /// No description provided for @errorGeneratingPDF.
   ///
   /// In en, this message translates to:
   /// **'Error generating PDF: {error}'**
-  String errorGeneratingPDF(Object error);
+  String errorGeneratingPDF(String error);
 
   /// No description provided for @errorInvalidPath.
   ///
@@ -740,7 +704,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Error loading list values: {error}'**
-  String errorLoadingListValues(Object error);
+  String errorLoadingListValues(String error);
 
   /// No description provided for @errorLoadingLocations.
   ///
@@ -776,37 +740,31 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Error registering loan: {error}'**
-  String errorRegisteringLoan(Object error);
+  String errorRegisteringLoan(String error);
 
   /// No description provided for @errorRenaming.
   ///
   /// In en, this message translates to:
   /// **'Error renaming: {error}'**
-  String errorRenaming(Object error);
+  String errorRenaming(String error);
 
   /// No description provided for @errorSaving.
   ///
   /// In en, this message translates to:
   /// **'Error saving: {error}'**
-  String errorSaving(Object error);
+  String errorSaving(String error);
 
   /// No description provided for @errorUpdatingAsset.
   ///
   /// In en, this message translates to:
   /// **'Error updating asset: {error}'**
-  String errorUpdatingAsset(Object error);
+  String errorUpdatingAsset(String error);
 
   /// No description provided for @exampleFilterHint.
   ///
   /// In en, this message translates to:
-  /// **'Ex: Damaged, Red, 50'**
+  /// **'e.g., Damaged, Red, 50'**
   String get exampleFilterHint;
-
-  /// No description provided for @errorChangingLanguage.
-  ///
-  /// In en, this message translates to:
-  /// **'Error changing language: {error}'**
-  String errorChangingLanguage(Object error);
 
   /// No description provided for @february.
   ///
@@ -823,8 +781,8 @@ abstract class AppLocalizations {
   /// No description provided for @fieldRequiredWithName.
   ///
   /// In en, this message translates to:
-  /// **'The field \"{field}\" is required.'**
-  String fieldRequiredWithName(Object field);
+  /// **'Field \"{field}\" is required.'**
+  String fieldRequiredWithName(String field);
 
   /// No description provided for @fieldToCount.
   ///
@@ -835,7 +793,7 @@ abstract class AppLocalizations {
   /// No description provided for @fieldsFilledSuccess.
   ///
   /// In en, this message translates to:
-  /// **'Fields populated successfully!'**
+  /// **'Fields filled successfully!'**
   String get fieldsFilledSuccess;
 
   /// No description provided for @formatsPNG.
@@ -874,6 +832,12 @@ abstract class AppLocalizations {
   /// **'Guest'**
   String get guest;
 
+  /// No description provided for @helpDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'Help & Documentation'**
+  String get helpDocs;
+
   /// No description provided for @ignoreField.
   ///
   /// In en, this message translates to:
@@ -883,19 +847,25 @@ abstract class AppLocalizations {
   /// No description provided for @importAssetsTo.
   ///
   /// In en, this message translates to:
-  /// **'Import Assets to'**
+  /// **'Import Assets To'**
   String get importAssetsTo;
 
   /// No description provided for @importSuccessMessage.
   ///
   /// In en, this message translates to:
   /// **'Import Successful! {count} assets created.'**
-  String importSuccessMessage(String count);
+  String importSuccessMessage(int count);
+
+  /// No description provided for @invalidAssetId.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid asset ID'**
+  String get invalidAssetId;
 
   /// No description provided for @invalidNavigationIds.
   ///
   /// In en, this message translates to:
-  /// **'Error: invalid navigation IDs.'**
+  /// **'Error: Invalid navigation IDs.'**
   String get invalidNavigationIds;
 
   /// No description provided for @january.
@@ -922,10 +892,16 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get language;
 
+  /// No description provided for @languageChanged.
+  ///
+  /// In en, this message translates to:
+  /// **'Language changed to English!'**
+  String get languageChanged;
+
   /// No description provided for @languageNotImplemented.
   ///
   /// In en, this message translates to:
-  /// **'Language functionality to be implemented'**
+  /// **'Language feature not yet implemented'**
   String get languageNotImplemented;
 
   /// No description provided for @lightMode.
@@ -944,7 +920,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Loading {field}...'**
-  String loadingListField(Object field);
+  String loadingListField(String field);
 
   /// No description provided for @loanDate.
   ///
@@ -952,16 +928,10 @@ abstract class AppLocalizations {
   /// **'Loan Date'**
   String get loanDate;
 
-  /// No description provided for @languageChanged.
-  ///
-  /// In en, this message translates to:
-  /// **'Language changed to English!'**
-  String get languageChanged;
-
   /// No description provided for @loanLanguageNotImplemented.
   ///
   /// In en, this message translates to:
-  /// **'Language functionality to be implemented'**
+  /// **'Language feature not yet implemented'**
   String get loanLanguageNotImplemented;
 
   /// No description provided for @loanManagement.
@@ -973,7 +943,7 @@ abstract class AppLocalizations {
   /// No description provided for @loanObject.
   ///
   /// In en, this message translates to:
-  /// **'Loan Object'**
+  /// **'Object to Loan'**
   String get loanObject;
 
   /// No description provided for @loans.
@@ -981,6 +951,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Loans'**
   String get loans;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
 
   /// No description provided for @locations.
   ///
@@ -1015,7 +991,7 @@ abstract class AppLocalizations {
   /// No description provided for @magicAssistant.
   ///
   /// In en, this message translates to:
-  /// **'Magic AI Assistant'**
+  /// **'AI Magic Assistant'**
   String get magicAssistant;
 
   /// No description provided for @march.
@@ -1029,6 +1005,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'May'**
   String get may;
+
+  /// No description provided for @minStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Min stock'**
+  String get minStock;
 
   /// No description provided for @myCustomTheme.
   ///
@@ -1045,7 +1027,7 @@ abstract class AppLocalizations {
   /// No description provided for @myThemesStored.
   ///
   /// In en, this message translates to:
-  /// **'My Themes Stored'**
+  /// **'My Stored Themes'**
   String get myThemesStored;
 
   /// No description provided for @nameCannotBeEmpty.
@@ -1057,7 +1039,7 @@ abstract class AppLocalizations {
   /// No description provided for @nameSameAsCurrent.
   ///
   /// In en, this message translates to:
-  /// **'The name is the same as the current one'**
+  /// **'Name is the same as current'**
   String get nameSameAsCurrent;
 
   /// No description provided for @newAlert.
@@ -1078,6 +1060,12 @@ abstract class AppLocalizations {
   /// **'New name'**
   String get newName;
 
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
   /// No description provided for @noAssetsCreated.
   ///
   /// In en, this message translates to:
@@ -1087,7 +1075,7 @@ abstract class AppLocalizations {
   /// No description provided for @noAssetsMatch.
   ///
   /// In en, this message translates to:
-  /// **'No assets match the search/filter criteria.'**
+  /// **'No assets match search/filter criteria.'**
   String get noAssetsMatch;
 
   /// No description provided for @noBooleanFields.
@@ -1105,7 +1093,7 @@ abstract class AppLocalizations {
   /// No description provided for @noCustomFields.
   ///
   /// In en, this message translates to:
-  /// **'This asset type does not have custom fields.'**
+  /// **'This asset type has no custom fields.'**
   String get noCustomFields;
 
   /// No description provided for @noFileSelected.
@@ -1114,10 +1102,16 @@ abstract class AppLocalizations {
   /// **'No file selected'**
   String get noFileSelected;
 
+  /// No description provided for @noImageAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No image available'**
+  String get noImageAvailable;
+
   /// No description provided for @noImagesAdded.
   ///
   /// In en, this message translates to:
-  /// **'No images added yet. The first image will be the primary.'**
+  /// **'No images added yet. The first image will be the primary one.'**
   String get noImagesAdded;
 
   /// No description provided for @noLoansFound.
@@ -1159,7 +1153,7 @@ abstract class AppLocalizations {
   /// No description provided for @obligatory.
   ///
   /// In en, this message translates to:
-  /// **'Obligatory'**
+  /// **'Required'**
   String get obligatory;
 
   /// No description provided for @october.
@@ -1216,6 +1210,12 @@ abstract class AppLocalizations {
   /// **'Please select a location.'**
   String get pleaseSelectLocation;
 
+  /// No description provided for @plugins.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugins'**
+  String get plugins;
+
   /// No description provided for @possessionFieldDef.
   ///
   /// In en, this message translates to:
@@ -1237,8 +1237,14 @@ abstract class AppLocalizations {
   /// No description provided for @previewPDF.
   ///
   /// In en, this message translates to:
-  /// **'PDF Preview'**
+  /// **'Preview'**
   String get previewPDF;
+
+  /// No description provided for @previous.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous'**
+  String get previous;
 
   /// No description provided for @primaryImage.
   ///
@@ -1357,7 +1363,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectApplicationLanguage.
   ///
   /// In en, this message translates to:
-  /// **'Select the application language'**
+  /// **'Select application language'**
   String get selectApplicationLanguage;
 
   /// No description provided for @selectBooleanFields.
@@ -1431,6 +1437,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show as List'**
   String get showAsList;
+
+  /// No description provided for @slotDashboardBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom Dashboard Panel'**
+  String get slotDashboardBottom;
+
+  /// No description provided for @slotDashboardTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Dashboard Panel'**
+  String get slotDashboardTop;
+
+  /// No description provided for @slotFloatingActionButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Floating Button'**
+  String get slotFloatingActionButton;
+
+  /// No description provided for @slotInventoryHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Header'**
+  String get slotInventoryHeader;
+
+  /// No description provided for @slotLeftSidebar.
+  ///
+  /// In en, this message translates to:
+  /// **'Sidebar'**
+  String get slotLeftSidebar;
+
+  /// No description provided for @slotUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown Slot'**
+  String get slotUnknown;
 
   /// No description provided for @specificValueToCount.
   ///
@@ -1522,6 +1564,12 @@ abstract class AppLocalizations {
   /// **'Totals'**
   String get totals;
 
+  /// No description provided for @updatedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Update'**
+  String get updatedAt;
+
   /// No description provided for @upload.
   ///
   /// In en, this message translates to:
@@ -1540,28 +1588,10 @@ abstract class AppLocalizations {
   /// **'Username'**
   String get username;
 
-  /// No description provided for @veniChatTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Veni AI'**
-  String get veniChatTitle;
-
-  /// No description provided for @veniChatStatus.
-  ///
-  /// In en, this message translates to:
-  /// **'Online'**
-  String get veniChatStatus;
-
-  /// No description provided for @veniChatWelcome.
-  ///
-  /// In en, this message translates to:
-  /// **'Hi! I\'m Veni, your Invenicum assistant. How can I help you with your inventory today?'**
-  String get veniChatWelcome;
-
   /// No description provided for @veniChatPlaceholder.
   ///
   /// In en, this message translates to:
-  /// **'Ask me anything...'**
+  /// **'Ask me something...'**
   String get veniChatPlaceholder;
 
   /// No description provided for @veniChatPoweredBy.
@@ -1570,28 +1600,46 @@ abstract class AppLocalizations {
   /// **'Powered by '**
   String get veniChatPoweredBy;
 
-  /// AI loading message
+  /// Mensaje de carga de la IA
   ///
   /// In en, this message translates to:
   /// **'I\'m processing your query about \"{query}\"...'**
   String veniChatProcessing(String query);
 
-  /// No description provided for @veniCmdHelpTitle.
+  /// No description provided for @veniChatStatus.
   ///
   /// In en, this message translates to:
-  /// **'Veni abilities'**
-  String get veniCmdHelpTitle;
+  /// **'Online'**
+  String get veniChatStatus;
+
+  /// No description provided for @veniChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Venibot AI'**
+  String get veniChatTitle;
+
+  /// No description provided for @veniChatWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Hi! I\'m Venibot, your Invenicum assistant. How can I help you with your inventory today?'**
+  String get veniChatWelcome;
 
   /// No description provided for @veniCmdDashboard.
   ///
   /// In en, this message translates to:
-  /// **'Go to the dashboard'**
+  /// **'Go to dashboard'**
   String get veniCmdDashboard;
+
+  /// No description provided for @veniCmdHelpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Veni\'s Skills'**
+  String get veniCmdHelpTitle;
 
   /// No description provided for @veniCmdInventory.
   ///
   /// In en, this message translates to:
-  /// **'Check stock of an article'**
+  /// **'Check stock for an item'**
   String get veniCmdInventory;
 
   /// No description provided for @veniCmdLoans.
@@ -1615,7 +1663,7 @@ abstract class AppLocalizations {
   /// No description provided for @veniCmdUnknown.
   ///
   /// In en, this message translates to:
-  /// **'I don\'t recognize that command. Write help to see what I can do.'**
+  /// **'I don\'t recognize that command. Type help to see what I can do.'**
   String get veniCmdUnknown;
 
   /// No description provided for @version.

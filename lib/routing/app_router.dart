@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/asset_detail_screen.dart';
+import 'package:invenicum/screens/plugins_screen.dart';
 import 'package:provider/provider.dart';
 
 // Models
@@ -39,10 +41,14 @@ import 'package:invenicum/widgets/main_layout.dart';
 
 // Services
 import 'package:invenicum/services/dashboard_service.dart';
+import 'package:stac/stac.dart';
+
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 GoRouter createAppRouter(AuthProvider authProvider) {
   return GoRouter(
     refreshListenable: authProvider,
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/dashboard',
     redirect: (context, state) {
       final bool isAuthenticated = authProvider.isAuthenticated;
@@ -112,6 +118,31 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                 ),
               ),
             ],
+          ),
+          // --- PLUGINS ---
+          GoRoute(
+            path: '/plugins-admin',
+            builder: (context, state) => const PluginAdminScreen(),
+          ),
+          GoRoute(
+            path: '/plugins/:pluginId',
+            builder: (context, state) {
+              final pluginId = state.pathParameters['pluginId']!;
+              final provider = context.read<PluginProvider>();
+
+              // Buscamos el plugin en la lista de instalados del provider
+              final plugin = provider.installed.firstWhere(
+                (p) => p['id'] == pluginId,
+                orElse: () => <String, dynamic>{},
+              );
+
+              return Scaffold(
+                appBar: AppBar(title: Text(plugin['name'] ?? 'Plugin')),
+                body: plugin.isEmpty
+                    ? const Center(child: Text("Plugin no encontrado"))
+                    : Stac(routeName: plugin['ui']),
+              );
+            },
           ),
 
           // --- ASSETS (ITEMS) ---

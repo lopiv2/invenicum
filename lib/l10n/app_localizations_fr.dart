@@ -9,40 +9,7 @@ class AppLocalizationsFr extends AppLocalizations {
   AppLocalizationsFr([String locale = 'fr']) : super(locale);
 
   @override
-  String get additionalInformation => 'Additional Information';
-
-  @override
-  String get createdAt => 'Creation Date';
-
-  @override
-  String get updatedAt => 'Last Updated';
-
-  @override
-  String get assetDetail => 'Asset Details';
-
-  @override
-  String get assetNotFound => 'Asset not found';
-
-  @override
-  String get invalidAssetId => 'Invalid asset ID';
-
-  @override
-  String get noImageAvailable => 'No image available';
-
-  @override
-  String get minStock => 'Minimum stock';
-
-  @override
-  String get location => 'Location';
-
-  @override
   String get aboutInvenicum => 'À propos d\'Invenicum';
-
-  @override
-  String get previous => 'Previous';
-
-  @override
-  String get next => 'Next';
 
   @override
   String get active => 'Actif';
@@ -66,19 +33,19 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addNewLocation => 'Ajouter une nouvelle localisation';
 
   @override
+  String get additionalInformation => 'Additional Information';
+
+  @override
   String get additionalThumbnails => 'Miniatures supplémentaires';
 
   @override
-  String aiExtractionError(Object error) {
+  String aiExtractionError(String error) {
     return 'L\'IA n\'a pas pu extraire les données: $error';
   }
 
   @override
   String get aiPasteUrlDescription =>
       'Collez le lien du produit et l\'IA extraira automatiquement les informations pour remplir les champs.';
-
-  @override
-  String get all => 'Tous';
 
   @override
   String get alertCritical => 'Critique';
@@ -108,6 +75,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get alerts => 'Alertes et notifications';
 
   @override
+  String get all => 'Tous';
+
+  @override
   String get appTitle => 'Invenicum Inventaire';
 
   @override
@@ -120,6 +90,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get april => 'Avril';
 
   @override
+  String get assetDetail => 'Asset Details';
+
+  @override
   String get assetImages => 'Images des ressources';
 
   @override
@@ -129,7 +102,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get assetName => 'Nom de la ressource';
 
   @override
-  String assetTypeDeleted(Object name) {
+  String get assetNotFound => 'Asset not found';
+
+  @override
+  String assetTypeDeleted(String name) {
     return 'Type de ressource \"$name\" supprimé avec succès.';
   }
 
@@ -137,7 +113,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get assetTypes => 'Types de ressources';
 
   @override
-  String assetUpdated(Object name) {
+  String assetUpdated(String name) {
     return 'Ressource \"$name\" mise à jour avec succès.';
   }
 
@@ -198,12 +174,12 @@ class AppLocalizationsFr extends AppLocalizations {
       'Êtes-vous sûr de vouloir supprimer cet enregistrement?';
 
   @override
-  String confirmDeleteAssetType(Object name) {
+  String confirmDeleteAssetType(String name) {
     return 'Êtes-vous sûr de vouloir supprimer le type de ressource \"$name\" et tous les éléments associés? Cette action ne peut pas être annulée.';
   }
 
   @override
-  String confirmDeleteContainer(Object name) {
+  String confirmDeleteContainer(String name) {
     return 'Êtes-vous sûr de vouloir supprimer le conteneur \"$name\"? Cette action est irréversible et supprimera toutes ses ressources et données.';
   }
 
@@ -219,12 +195,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get configurationSaved => 'Configuration enregistrée avec succès.';
 
   @override
-  String containerCreated(Object name) {
+  String containerCreated(String name) {
     return 'Conteneur \"$name\" créé avec succès.';
   }
 
   @override
-  String containerDeleted(Object name) {
+  String containerDeleted(String name) {
     return 'Conteneur \"$name\" supprimé avec succès.';
   }
 
@@ -236,7 +212,7 @@ class AppLocalizationsFr extends AppLocalizations {
       'Conteneur ou type de ressource non trouvé.';
 
   @override
-  String containerRenamed(Object name) {
+  String containerRenamed(String name) {
     return 'Conteneur renommé en \"$name\".';
   }
 
@@ -253,6 +229,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get createFirstContainer => 'Créez votre premier conteneur.';
 
   @override
+  String get createdAt => 'Creation Date';
+
+  @override
   String get current => 'Actuel';
 
   @override
@@ -262,7 +241,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get customFields => 'Champs personnalisés';
 
   @override
-  String customFieldsOf(Object name) {
+  String customFieldsOf(String name) {
     return 'Champs personnalisés de $name';
   }
 
@@ -327,16 +306,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enterValidUrl => 'Entrez une URL valide';
 
   @override
+  String errorChangingLanguage(String error) {
+    return 'Erreur lors du changement de langue: $error';
+  }
+
+  @override
   String get errorCsvMinRows =>
       'Veuillez sélectionner un fichier CSV avec en-têtes et au moins une ligne de données.';
 
   @override
-  String errorDeletingAssetType(Object error) {
+  String errorDeletingAssetType(String error) {
     return 'Erreur lors de la suppression du type de ressource: $error';
   }
 
   @override
-  String errorDeletingContainer(Object error) {
+  String errorDeletingContainer(String error) {
     return 'Erreur lors de la suppression du conteneur: $error';
   }
 
@@ -347,7 +331,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorEmptyCsv => 'Le fichier CSV est vide.';
 
   @override
-  String errorGeneratingPDF(Object error) {
+  String errorGeneratingPDF(String error) {
     return 'Erreur lors de la génération du PDF: $error';
   }
 
@@ -358,7 +342,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorLoadingData => 'Erreur lors du chargement des données';
 
   @override
-  String errorLoadingListValues(Object error) {
+  String errorLoadingListValues(String error) {
     return 'Erreur lors du chargement des valeurs de liste: $error';
   }
 
@@ -383,32 +367,27 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String errorRegisteringLoan(Object error) {
+  String errorRegisteringLoan(String error) {
     return 'Erreur lors de l\'enregistrement du prêt: $error';
   }
 
   @override
-  String errorRenaming(Object error) {
+  String errorRenaming(String error) {
     return 'Erreur lors du renommage: $error';
   }
 
   @override
-  String errorSaving(Object error) {
+  String errorSaving(String error) {
     return 'Erreur lors de l\'enregistrement: $error';
   }
 
   @override
-  String errorUpdatingAsset(Object error) {
+  String errorUpdatingAsset(String error) {
     return 'Erreur lors de la mise à jour de la ressource: $error';
   }
 
   @override
   String get exampleFilterHint => 'Ex: Endommagé, Rouge, 50';
-
-  @override
-  String errorChangingLanguage(Object error) {
-    return 'Erreur lors du changement de langue: $error';
-  }
 
   @override
   String get february => 'Février';
@@ -417,7 +396,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fieldChip => 'Champ';
 
   @override
-  String fieldRequiredWithName(Object field) {
+  String fieldRequiredWithName(String field) {
     return 'Le champ \"$field\" est obligatoire.';
   }
 
@@ -446,15 +425,21 @@ class AppLocalizationsFr extends AppLocalizations {
   String get guest => 'Invité';
 
   @override
+  String get helpDocs => 'Help & Documentation';
+
+  @override
   String get ignoreField => '🚫 Ignorer le champ';
 
   @override
   String get importAssetsTo => 'Importer les ressources vers';
 
   @override
-  String importSuccessMessage(String count) {
+  String importSuccessMessage(int count) {
     return 'Importation réussie! $count ressources créées.';
   }
+
+  @override
+  String get invalidAssetId => 'Invalid asset ID';
 
   @override
   String get invalidNavigationIds => 'Erreur: ID de navigation non valides.';
@@ -472,6 +457,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get language => 'Langue';
 
   @override
+  String get languageChanged => 'Langue changée en français!';
+
+  @override
   String get languageNotImplemented => 'Fonctionnalité de langue à implémenter';
 
   @override
@@ -481,7 +469,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loadingAssetType => 'Chargement du type de ressource...';
 
   @override
-  String loadingListField(Object field) {
+  String loadingListField(String field) {
     return 'Chargement de $field...';
   }
 
@@ -489,11 +477,8 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loanDate => 'Date du prêt';
 
   @override
-  String get languageChanged => 'Langue changée en français!';
-
-  @override
   String get loanLanguageNotImplemented =>
-      'Language functionality to be implemented';
+      'Language feature not yet implemented';
 
   @override
   String get loanManagement => 'Gestion des prêts';
@@ -503,6 +488,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loans => 'Prêts';
+
+  @override
+  String get location => 'Location';
 
   @override
   String get locations => 'Localisations';
@@ -529,6 +517,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get may => 'Mai';
 
   @override
+  String get minStock => 'Min stock';
+
+  @override
   String get myCustomTheme => 'Mon thème';
 
   @override
@@ -553,6 +544,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get newName => 'Nouveau nom';
 
   @override
+  String get next => 'Next';
+
+  @override
   String get noAssetsCreated => 'Aucune ressource créée pour le moment.';
 
   @override
@@ -571,6 +565,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get noFileSelected => 'Aucun fichier sélectionné';
+
+  @override
+  String get noImageAvailable => 'No image available';
 
   @override
   String get noImagesAdded =>
@@ -627,6 +624,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get pleaseSelectLocation => 'Veuillez sélectionner une localisation.';
 
   @override
+  String get plugins => 'Plugins';
+
+  @override
   String get possessionFieldDef => 'Champ de possession';
 
   @override
@@ -637,6 +637,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get previewPDF => 'Aperçu PDF';
+
+  @override
+  String get previous => 'Previous';
 
   @override
   String get primaryImage => 'Image principale';
@@ -740,6 +743,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get showAsList => 'Afficher sous forme de liste';
 
   @override
+  String get slotDashboardBottom => 'Bottom Dashboard Panel';
+
+  @override
+  String get slotDashboardTop => 'Top Dashboard Panel';
+
+  @override
+  String get slotFloatingActionButton => 'Floating Button';
+
+  @override
+  String get slotInventoryHeader => 'Inventory Header';
+
+  @override
+  String get slotLeftSidebar => 'Sidebar';
+
+  @override
+  String get slotUnknown => 'Unknown Slot';
+
+  @override
   String get specificValueToCount => 'Valeur spécifique à compter';
 
   @override
@@ -786,6 +807,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get totals => 'Totaux';
 
   @override
+  String get updatedAt => 'Last Update';
+
+  @override
   String get upload => 'Télécharger';
 
   @override
@@ -793,16 +817,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get username => 'Nom d\'utilisateur';
-
-  @override
-  String get veniChatTitle => 'Veni IA';
-
-  @override
-  String get veniChatStatus => 'En ligne';
-
-  @override
-  String get veniChatWelcome =>
-      'Bonjour! Je suis Veni, votre assistant Invenicum. Comment puis-je vous aider avec votre inventaire aujourd\'hui?';
 
   @override
   String get veniChatPlaceholder => 'Posez-moi n\'importe quelle question...';
@@ -816,10 +830,20 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
-  String get veniCmdHelpTitle => 'Capacités de Veni';
+  String get veniChatStatus => 'En ligne';
+
+  @override
+  String get veniChatTitle => 'Veni IA';
+
+  @override
+  String get veniChatWelcome =>
+      'Bonjour! Je suis Veni, votre assistant Invenicum. Comment puis-je vous aider avec votre inventaire aujourd\'hui?';
 
   @override
   String get veniCmdDashboard => 'Aller au tableau de bord';
+
+  @override
+  String get veniCmdHelpTitle => 'Capacités de Veni';
 
   @override
   String get veniCmdInventory => 'Vérifier le stock d\'un article';

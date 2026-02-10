@@ -268,7 +268,7 @@ class _AssetImportScreenState extends State<AssetImportScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.importSuccessMessage(itemsToUpload.length.toString())),
+            content: Text(l10n.importSuccessMessage(itemsToUpload.length)),
             backgroundColor: Colors.green,
           ),
         );

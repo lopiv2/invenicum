@@ -3,6 +3,7 @@ import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/services/dashboard_service.dart';
+import 'package:invenicum/widgets/stac_slot.dart';
 import 'package:invenicum/widgets/stat_card.dart';
 import 'package:invenicum/widgets/low_stock_card.dart';
 import 'package:invenicum/widgets/top_loaned_items_chart.dart';
@@ -15,17 +16,21 @@ class DashboardScreen extends StatelessWidget {
 
   Future<DashboardStats?> _fetchStats(BuildContext context) async {
     final auth = context.read<AuthProvider>();
-    
-    if (auth.token == null || auth.isLoading) {
-      debugPrint('[DashboardScreen] Esperando token... Petición abortada.');
-      return null; 
-    }
+
+    if (auth.token == null || auth.isLoading) return null;
 
     try {
-      return await dashboardService.getGlobalStats();
+      // Cargamos las estadísticas y los préstamos al mismo tiempo
+      // Esto asegura que cuando el FutureBuilder termine, la gráfica ya tenga datos
+      final results = await Future.wait([
+        dashboardService.getGlobalStats(),
+        context.read<LoanProvider>().fetchAllLoans(),
+      ]);
+
+      return results[0] as DashboardStats;
     } catch (e) {
-      debugPrint('[DashboardScreen] Error en fetch: $e');
-      rethrow;
+      debugPrint('[DashboardScreen] Error: $e');
+      return null; // O manejar el error
     }
   }
 
@@ -43,12 +48,13 @@ class DashboardScreen extends StatelessWidget {
             style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
-
+          const StacSlot(slotName: 'dashboard_top'),
+          const SizedBox(height: 24),
           FutureBuilder<DashboardStats?>(
-            future: _fetchStats(context), 
+            future: _fetchStats(context),
             builder: (context, snapshot) {
-              
-              if (snapshot.connectionState == ConnectionState.done && snapshot.data == null) {
+              if (snapshot.connectionState == ConnectionState.done &&
+                  snapshot.data == null) {
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(20),
@@ -74,11 +80,13 @@ class DashboardScreen extends StatelessWidget {
 
               if (snapshot.hasData) {
                 final stats = snapshot.data!;
-                
+
                 return Consumer<LoanProvider>(
                   builder: (context, loanProvider, child) {
                     return GridView.count(
-                      crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                      crossAxisCount: MediaQuery.of(context).size.width > 600
+                          ? 4
+                          : 2,
                       crossAxisSpacing: 20,
                       mainAxisSpacing: 12,
                       childAspectRatio: 1.8,
@@ -123,6 +131,8 @@ class DashboardScreen extends StatelessWidget {
           const LowStockCard(),
           const SizedBox(height: 24),
           const TopLoanedItemsChart(),
+          const SizedBox(height: 32),
+          const StacSlot(slotName: 'dashboard_bottom'),    
         ],
       ),
     );

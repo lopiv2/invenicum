@@ -10,16 +10,39 @@ class LoanService {
 
   LoanService(this._apiService);
 
-  /// Obtiene todos los préstamos de un contenedor
-  Future<List<Loan>> getLoans(int containerId) async {
+  /// Obtiene todos los préstamos de forma global (para el Dashboard)
+  Future<List<Loan>> getAllLoans() async {
     try {
-      final response = await _dio.get(
-        '/containers/$containerId/loans',
-      );
+      // 🚩 Ajusta esta ruta según tu API (ej: '/loans' o '/users/me/loans')
+      final response = await _dio.get('/loans');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = response.data as List<dynamic>;
-        return data.map((json) => Loan.fromJson(json as Map<String, dynamic>)).toList();
+        return data
+            .map((json) => Loan.fromJson(json as Map<String, dynamic>))
+            .toList();
+      } else {
+        throw Exception(
+          'Error al obtener todos los préstamos: ${response.statusCode}',
+        );
+      }
+    } on DioException {
+      rethrow;
+    } catch (e) {
+      throw Exception('Error en getAllLoans: $e');
+    }
+  }
+
+  /// Obtiene todos los préstamos de un contenedor
+  Future<List<Loan>> getLoans(int containerId) async {
+    try {
+      final response = await _dio.get('/containers/$containerId/loans');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data as List<dynamic>;
+        return data
+            .map((json) => Loan.fromJson(json as Map<String, dynamic>))
+            .toList();
       } else {
         throw Exception('Error al obtener préstamos: ${response.statusCode}');
       }
@@ -33,9 +56,7 @@ class LoanService {
   /// Obtiene un préstamo específico por ID
   Future<Loan> getLoan(int containerId, int loanId) async {
     try {
-      final response = await _dio.get(
-        '/containers/$containerId/loans/$loanId',
-      );
+      final response = await _dio.get('/containers/$containerId/loans/$loanId');
 
       if (response.statusCode == 200) {
         return Loan.fromJson(response.data as Map<String, dynamic>);

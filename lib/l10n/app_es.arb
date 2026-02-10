@@ -1,28 +1,37 @@
 ﻿{
-  "@@locale": "es",
   "@aiExtractionError": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@assetTypeDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@assetUpdated": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteAssetType": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteContainer": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@confirmDeleteLocationMessage": {
@@ -34,22 +43,30 @@
   },
   "@containerCreated": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@containerDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@containerRenamed": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@customFieldsOf": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@deleteError": {
@@ -59,24 +76,39 @@
       }
     }
   },
+  "@errorChangingLanguage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "@errorDeletingAssetType": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorDeletingContainer": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorGeneratingPDF": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorLoadingListValues": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorLoadingLocations": {
@@ -95,42 +127,51 @@
   },
   "@errorRegisteringLoan": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
-  },  "@errorChangingLanguage": {
+  },
+  "@errorRenaming": {
     "placeholders": {
-      "error": {}
-    }
-  },  "@errorRenaming": {
-    "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorSaving": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@errorUpdatingAsset": {
     "placeholders": {
-      "error": {}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "@fieldRequiredWithName": {
     "placeholders": {
-      "field": {}
+      "field": {
+        "type": "String"
+      }
     }
   },
   "@importSuccessMessage": {
     "placeholders": {
       "count": {
-        "type": "String"
+        "type": "int"
       }
     }
   },
   "@loadingListField": {
     "placeholders": {
-      "field": {}
+      "field": {
+        "type": "String"
+      }
     }
   },
   "@selectedLocationLabel": {
@@ -139,9 +180,6 @@
         "type": "String"
       }
     }
-  },
-  "@systemThemesModal": {
-    "placeholders": {}
   },
   "@veniChatProcessing": {
     "description": "Mensaje de carga de la IA",
@@ -158,18 +196,8 @@
       }
     }
   },
-  "additionalInformation": "Información adicional",
-  "createdAt": "Fecha de creación",
-  "updatedAt": "Última actualización",
-  "assetDetail": "Detalles del Activo",
-  "assetNotFound": "Activo no encontrado",
-  "invalidAssetId": "ID de activo no válido",
-  "noImageAvailable": "No hay imagen disponible",
-  "minStock": "Stock mínimo",
-  "location": "Ubicación",
+  "@@locale": "es",
   "aboutInvenicum": "Sobre Invenicum",
-  "previous": "Anterior",
-  "next": "Siguiente",
   "active": "Activo",
   "activeLoans": "Préstamos vigentes",
   "activeLoansCount": "Préstamos vigentes",
@@ -177,10 +205,10 @@
   "addAsset": "Añadir Activo",
   "addContainer": "Añadir contenedor",
   "addNewLocation": "Añadir Nueva Ubicación",
+  "additionalInformation": "Información adicional",
   "additionalThumbnails": "Miniaturas Adicionales",
   "aiExtractionError": "La IA no pudo extraer los datos: {error}",
   "aiPasteUrlDescription": "Pega el enlace del producto y la IA extraerá automáticamente la información para rellenar los campos.",
-  "all": "Todos",
   "alertCritical": "Crítico",
   "alertCreated": "Alerta creada",
   "alertDeleted": "Alerta eliminada",
@@ -190,13 +218,16 @@
   "alertType": "Tipo",
   "alertWarning": "Advertencia",
   "alerts": "Alertas y Notificaciones",
+  "all": "Todos",
   "appTitle": "Invenicum Inventario",
   "applicationTheme": "Tema de la aplicación",
   "apply": "Aplicar",
   "april": "Abril",
+  "assetDetail": "Detalles del Activo",
   "assetImages": "Imágenes del Activo",
   "assetImport": "Importación de Activos",
   "assetName": "Nombre",
+  "assetNotFound": "Activo no encontrado",
   "assetTypeDeleted": "Tipo de Activo \"{name}\" eliminado con éxito.",
   "assetTypes": "Tipos de Activos",
   "assetUpdated": "Activo \"{name}\" actualizado correctamente.",
@@ -232,6 +263,7 @@
   "countItemsByValue": "Contar ítems por valor específico",
   "create": "Crear",
   "createFirstContainer": "Crea tu primer contenedor.",
+  "createdAt": "Fecha de creación",
   "current": "Actual",
   "customColor": "Personalizar color",
   "customFields": "Campos Personalizados",
@@ -255,6 +287,7 @@
   "enterDescription": "Ingrese una descripción",
   "enterURL": "Ingrese la URL",
   "enterValidUrl": "Introduce una URL válida",
+  "errorChangingLanguage": "Error al cambiar idioma: {error}",
   "errorCsvMinRows": "Por favor, selecciona un archivo CSV con encabezados y al menos una fila de datos.",
   "errorDeletingAssetType": "Error al eliminar el tipo de activo: {error}",
   "errorDeletingContainer": "Error al eliminar el contenedor: {error}",
@@ -274,7 +307,6 @@
   "errorSaving": "Error al guardar: {error}",
   "errorUpdatingAsset": "Error al actualizar activo: {error}",
   "exampleFilterHint": "Ej: Dañado, Rojo, 50",
-  "errorChangingLanguage": "Error al cambiar idioma: {error}",
   "february": "Febrero",
   "fieldChip": "Campo",
   "fieldRequiredWithName": "El campo \"{field}\" es obligatorio.",
@@ -286,22 +318,27 @@
   "globalSearch": "Búsqueda Global",
   "greeting": "¡Hola, bienvenido!",
   "guest": "Invitado",
+  "helpDocs": "Ayuda y Documentación",
   "ignoreField": "🚫 Ignorar Campo",
   "importAssetsTo": "Importar Activos a",
   "importSuccessMessage": "¡Importación Exitosa! {count} activos creados.",
+  "invalidAssetId": "ID de activo no válido",
   "invalidNavigationIds": "Error: IDs de navegación no válidos.",
   "january": "Enero",
   "july": "Julio",
   "june": "Junio",
   "language": "Idioma",
+  "languageChanged": "¡Idioma cambiado a Español!",
   "languageNotImplemented": "Funcionalidad de idioma por implementar",
   "lightMode": "Modo Claro",
   "loadingAssetType": "Cargando Tipo de Activo...",
   "loadingListField": "Cargando {field}...",
-  "loanDate": "Fecha Préstamo",  "languageChanged": "¡Idioma cambiado a Español!",  "loanLanguageNotImplemented": "Funcionalidad de idioma por implementar",
+  "loanDate": "Fecha Préstamo",
+  "loanLanguageNotImplemented": "Funcionalidad de idioma por implementar",
   "loanManagement": "Gestión de Préstamos",
   "loanObject": "Objeto a Prestar",
   "loans": "Préstamos",
+  "location": "Ubicación",
   "locations": "Ubicaciones",
   "locationsScheme": "Esquema de Ubicaciones",
   "login": "Iniciar Sesión",
@@ -310,6 +347,7 @@
   "magicAssistant": "Asistente Mágico IA",
   "march": "Marzo",
   "may": "Mayo",
+  "minStock": "Stock mínimo",
   "myCustomTheme": "Mi Tema",
   "myProfile": "Mi Perfil",
   "myThemesStored": "Mis Temas Guardados",
@@ -318,12 +356,14 @@
   "newAlert": "Nueva Alerta Manual",
   "newContainer": "Nuevo contenedor",
   "newName": "Nuevo nombre",
+  "next": "Siguiente",
   "noAssetsCreated": "No hay activos creados aún.",
   "noAssetsMatch": "Ningún activo coincide con los criterios de búsqueda/filtro.",
   "noBooleanFields": "No hay campos booleanos definidos.",
   "noContainerMessage": "Crea tu primer contenedor.",
   "noCustomFields": "Este tipo de activo no tiene campos personalizados.",
   "noFileSelected": "Ningún archivo seleccionado",
+  "noImageAvailable": "No hay imagen disponible",
   "noImagesAdded": "Aún no hay imágenes añadidas. La primera imagen será la principal.",
   "noLoansFound": "No se encontraron préstamos en este contenedor.",
   "noLocationsMessage": "No hay ubicaciones creadas en este contenedor. ¡Añade la primera!",
@@ -341,10 +381,12 @@
   "pleasePasteUrl": "Por favor, pega una URL",
   "pleaseSelectCsvWithHeaders": "Por favor, selecciona un archivo CSV con encabezados.",
   "pleaseSelectLocation": "Por favor, selecciona una ubicación.",
+  "plugins": "Plugins",
   "possessionFieldDef": "Campo de Posesión",
   "possessionFieldName": "En Posesión",
   "preferences": "Preferencias",
   "previewPDF": "Vista Previa",
+  "previous": "Anterior",
   "primaryImage": "Imagen Principal",
   "productUrlLabel": "URL del producto",
   "quantity": "Cantidad",
@@ -377,6 +419,12 @@
   "settings": "Ajustes",
   "showAsGrid": "Mostrar como Grid",
   "showAsList": "Mostrar como Lista",
+  "slotDashboardBottom": "Panel de control Inferior",
+  "slotDashboardTop": "Panel de control Superior",
+  "slotFloatingActionButton": "Botón Flotante",
+  "slotInventoryHeader": "Cabecera Inventario",
+  "slotLeftSidebar": "Barra Lateral",
+  "slotUnknown": "Ranura desconocida",
   "specificValueToCount": "Valor Específico a Contar",
   "startImport": "Iniciar Importación",
   "startMagic": "Empezar Magia",
@@ -392,23 +440,24 @@
   "totalAssets": "Tipos de Activos",
   "totalItems": "Activos",
   "totals": "Totales",
+  "updatedAt": "Última actualización",
   "upload": "Subir",
   "uploadImage": "Subir Imagen",
   "username": "Usuario",
-  "version": "Versión {name}",
-  "veniChatTitle": "Venibot AI",
-  "veniChatStatus": "En línea",
-  "veniChatWelcome": "¡Hola! Soy Venibot, tu asistente de Invenicum. ¿En qué puedo ayudarte con tu inventario hoy?",
   "veniChatPlaceholder": "Pregúntame algo...",
   "veniChatPoweredBy": "Powered by ",
   "veniChatProcessing": "Estoy procesando tu consulta sobre \"{query}\"...",
-  "veniCmdHelpTitle": "Habilidades de Veni",
+  "veniChatStatus": "En línea",
+  "veniChatTitle": "Venibot AI",
+  "veniChatWelcome": "¡Hola! Soy Venibot, tu asistente de Invenicum. ¿En qué puedo ayudarte con tu inventario hoy?",
   "veniCmdDashboard": "Ir al panel de control",
+  "veniCmdHelpTitle": "Habilidades de Veni",
   "veniCmdInventory": "Consultar stock de un artículo",
   "veniCmdLoans": "Ver préstamos activos",
   "veniCmdReport": "Generar reporte de inventario",
   "veniCmdScanQR": "Escanear código QR/Barras",
   "veniCmdUnknown": "No reconozco ese comando. Escribe ayuda para ver qué puedo hacer.",
+  "version": "Versión {name}",
   "yes": "Sí",
   "zoomToFit": "Ajustar Vista"
 }
