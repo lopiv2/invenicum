@@ -90,6 +90,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
       ),
       body: Consumer<PluginProvider>(
         builder: (context, provider, _) {
+          debugPrint("Sincronizando UI - Instalados: ${provider.installed.length}");
           // 🚩 Simplificamos el loading: solo usamos provider.isLoading
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -97,6 +98,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
 
           return TabBarView(
             controller: _tabController,
+            key: ValueKey("tab_view_${provider.installed.length}_${provider.community.length}"),
             children: [
               _PluginListView(plugins: provider.installed, isStore: false),
               _PluginListView(plugins: provider.community, isStore: true),
@@ -140,17 +142,22 @@ class _PluginListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<PluginProvider>();
-    final List<Map<String, dynamic>> currentPlugins = List.from(plugins);
+    final List<Map<String, dynamic>> currentPlugins = isStore
+        ? provider.community
+        : provider.installed;
     final installedIds = provider.installed
         .map((p) => p['id'].toString())
         .toSet();
+    if (provider.isLoading && currentPlugins.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
     return ListView.builder(
       padding: const EdgeInsets.all(8),
-      key: PageStorageKey(isStore ? 'comunidad' : 'instalados'),
+      key: ValueKey("list_${isStore}_${currentPlugins.length}"),
       itemCount: currentPlugins.length,
       itemBuilder: (context, index) {
         if (index >= currentPlugins.length) return const SizedBox.shrink();
-        final plugin = plugins[index];
+        final plugin = currentPlugins[index];
         final String pluginId = plugin['id'].toString();
         final bool isAlreadyInstalled = installedIds.contains(pluginId);
         final bool isActive = isStore ? true : (plugin['isActive'] ?? true);
@@ -230,9 +237,13 @@ class _PluginListView extends StatelessWidget {
 
   Widget _buildAnimatedPreview(
     BuildContext context,
-    Map plugin,
+    Map<String, dynamic> plugin,
     bool isActive,
   ) {
+    // 1. Extraemos la UI si ya existe, o la URL si es de la comunidad
+    final dynamic localUi = plugin['ui'];
+    final String? downloadUrl = plugin['download_url'];
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       width: MediaQuery.of(context).size.width * 0.3,
@@ -262,17 +273,43 @@ class _PluginListView extends StatelessWidget {
                 0,
                 1,
                 0,
-              ]), // Escala de grises si está desactivado
+              ]),
         child: Transform.scale(
           scale: 0.6,
           child: IgnorePointer(
-            child:
-                Stac.fromJson(plugin['ui'], context) ??
-                const Icon(Icons.broken_image),
+            child: _buildStacContent(context, localUi, downloadUrl),
           ),
         ),
       ),
     );
+  }
+
+  /// Decide si renderizar la UI local o descargarla para la previa
+  Widget _buildStacContent(BuildContext context, dynamic localUi, String? url) {
+    // Caso A: Ya tenemos la UI (Plugins instalados)
+    if (localUi != null) {
+      return Stac.fromJson(localUi, context) ?? const Icon(Icons.broken_image);
+    }
+
+    // Caso B: Es de la comunidad y hay que descargar la previa
+    if (url != null && url.isNotEmpty) {
+      return FutureBuilder<Map<String, dynamic>>(
+        // Usamos el servicio que ya tienes para descargar el JSON
+        future: context.read<PluginProvider>().downloadPluginStac(url),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const CircularProgressIndicator(strokeWidth: 2);
+          }
+          if (snapshot.hasData) {
+            return Stac.fromJson(snapshot.data, context) ??
+                const Icon(Icons.broken_image);
+          }
+          return const Icon(Icons.cloud_off, color: Colors.grey);
+        },
+      );
+    }
+
+    return const Icon(Icons.help_outline, color: Colors.grey);
   }
 
   Widget _buildActionRow(
@@ -382,41 +419,124 @@ class _PluginListView extends StatelessWidget {
   }
 
   void _showLargePreview(BuildContext context, Map<String, dynamic> plugin) {
+    final pluginProvider = context.read<PluginProvider>();
+
+    // Detectamos el estado actual del plugin
+    final bool isInstalled = plugin['isActive'] != null || plugin['ui'] != null;
+    final String? downloadUrl = plugin['download_url'];
+    final dynamic localUi = plugin['ui'];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
       ),
       builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        maxChildSize: 0.9,
+        initialChildSize: 0.7,
+        maxChildSize: 0.95,
+        minChildSize: 0.5,
         expand: false,
         builder: (_, scrollController) => SingleChildScrollView(
           controller: scrollController,
           padding: const EdgeInsets.all(24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
+              // Barra superior de arrastre
+              Center(
+                child: Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 25),
+
+              // Título y Versión
               Text(
-                plugin['name'],
+                plugin['name'] ?? 'Plugin sin nombre',
+                textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontSize: 22,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const Divider(height: 30),
-              Stac.fromJson(plugin['ui'], ctx) ??
-                  const Text("Error al cargar UI"),
-              const SizedBox(height: 40),
+              if (plugin['version'] != null)
+                Text(
+                  "Versión ${plugin['version']}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                ),
+
+              const Divider(height: 40, thickness: 1),
+
+              // --- SECCIÓN DE PREVISUALIZACIÓN STAC ---
+              const Text(
+                "Previsualización",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              const SizedBox(height: 15),
+
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.grey.shade200),
+                ),
+                child: localUi != null
+                    // Si ya es local, lo dibujamos directo
+                    ? (Stac.fromJson(localUi, ctx) ??
+                          const Text("Error de renderizado"))
+                    // Si es de la comunidad, lo descargamos por el proxy
+                    : FutureBuilder<Map<String, dynamic>>(
+                        future: pluginProvider.downloadPluginStac(
+                          downloadUrl ?? '',
+                        ),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return const Center(
+                              child: Padding(
+                                padding: EdgeInsets.all(20),
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          }
+                          if (snapshot.hasData) {
+                            return Stac.fromJson(snapshot.data, ctx) ??
+                                const Text("Formato no soportado");
+                          }
+                          return const Center(
+                            child: Text("Previsualización no disponible"),
+                          );
+                        },
+                      ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Descripción
+              if (plugin['description'] != null) ...[
+                const Text(
+                  "Acerca de este plugin",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  plugin['description'],
+                  style: const TextStyle(color: Colors.black87),
+                ),
+              ],
             ],
           ),
         ),

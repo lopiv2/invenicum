@@ -52,17 +52,18 @@ class PluginService {
 
   /// Descarga el código STAC del plugin
   Future<Map<String, dynamic>> downloadPluginStac(String url) async {
-    try {
-      final response = await _dio.get(url);
-      if (response.data is String) {
-        return jsonDecode(response.data);
-      }
-      return response.data;
-    } catch (e) {
-      debugPrint("Error descargando STAC: $e");
-      rethrow;
-    }
+  try {
+    final response = await _dio.get(
+      '/plugins/preview-stac', 
+      queryParameters: {'url': url}
+    );
+    
+    return response.data;
+  } catch (e) {
+    debugPrint("Error obteniendo preview a través del backend: $e");
+    rethrow;
   }
+}
 
   Future<void> toggleUserPlugin(String pluginId, bool isActive) async {
     // Apuntamos al nuevo endpoint que maneja la tabla UserPlugin

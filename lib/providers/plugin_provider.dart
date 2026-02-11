@@ -53,6 +53,10 @@ class PluginProvider extends ChangeNotifier {
     return "Instalado";
   }
 
+  Future<Map<String, dynamic>> downloadPluginStac(String url) async {
+    return await _service.downloadPluginStac(url);
+  }
+
   /// 🚩 ANTES: installFromStore (Descargaba de GitHub)
   /// 🚩 AHORA: Simplemente llama al backend con el objeto del plugin
   Future<void> install(Map<String, dynamic> plugin) async {
@@ -60,11 +64,11 @@ class PluginProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Le mandamos el objeto completo. 
+      // Le mandamos el objeto completo.
       // El backend decidirá si es oficial (GitHub) o de la DB local.
       await _service.installPlugin(plugin);
-      
-      await refresh(); // Actualiza las listas localmente
+      await Future.delayed(const Duration(seconds: 1));
+      await refresh(force: true); // Actualiza las listas localmente
       ToastService.success("${plugin['name']} instalado");
     } catch (e) {
       debugPrint("❌ Error instalando: $e");
@@ -95,24 +99,32 @@ class PluginProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> refresh() async {
-    if (_isLoading) return;
-    _isLoading = true;
+  Future<void> refresh({bool force = false}) async {
+  // Solo retornamos si no es forzado y ya está cargando
+  if (_isLoading && !force) return; 
+  
+  _isLoading = true;
+  if (!force) notifyListeners(); // Evitamos notify duplicado si viene de install
+
+  try {
+    // 🚩 IMPORTANTE: Asegúrate de que _currentUser no sea null 
+    // o que el SDK maneje invitados
+    await _service.initSdk(userName: _currentUser?.name);
+
+    final nuevosInstalados = await _service.getMyPlugins();
+    final nuevosComunidad = await _service.getCommunityPlugins();
+    
+    _installed = nuevosInstalados;
+    _community = nuevosComunidad;
+    
+    debugPrint("✅ Refresh completado. Instalados: ${_installed.length}");
+  } catch (e) {
+    debugPrint("Error refrescando plugins: $e");
+  } finally {
+    _isLoading = false;
     notifyListeners();
-
-    try {
-      await _service.initSdk(userName: _currentUser?.name);
-
-      // Traemos las dos listas del backend
-      _installed = await _service.getMyPlugins();
-      _community = await _service.getCommunityPlugins();
-    } catch (e) {
-      debugPrint("Error refrescando plugins: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
   }
+}
 
   // --- CRUD PARA AUTORES ---
 
