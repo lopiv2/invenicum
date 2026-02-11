@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/services/api_service.dart';
@@ -37,6 +39,29 @@ class PluginService {
     );
     _isInitialized = true;
     debugPrint("✅ Stac SDK initialized for first time");
+  }
+
+  /// --- MÉTODOS PARA LA TIENDA DE GITHUB ---
+
+  /// Obtiene el catálogo (repository.json) desde GitHub
+  Future<List<Map<String, dynamic>>> getStoreCatalog() async {
+    // Ahora apuntas a TU propia API, no a GitHub
+    final response = await _dio.get('/store/plugins');
+    return List<Map<String, dynamic>>.from(response.data);
+  }
+
+  /// Descarga el código STAC del plugin
+  Future<Map<String, dynamic>> downloadPluginStac(String url) async {
+    try {
+      final response = await _dio.get(url);
+      if (response.data is String) {
+        return jsonDecode(response.data);
+      }
+      return response.data;
+    } catch (e) {
+      debugPrint("Error descargando STAC: $e");
+      rethrow;
+    }
   }
 
   Future<void> toggleUserPlugin(String pluginId, bool isActive) async {
@@ -79,14 +104,17 @@ class PluginService {
   }
 
   /// Obtiene los plugins de la comunidad
+  /// Ahora 'Community' ya trae los de GitHub + los de la DB mezclados
   Future<List<Map<String, dynamic>>> getCommunityPlugins() async {
     final response = await _dio.get('/plugins/community');
     return List<Map<String, dynamic>>.from(response.data);
   }
 
   /// Acción de instalar un plugin
-  Future<void> installPlugin(String pluginId) async {
-    await _dio.post('/plugins/install', data: {'id': pluginId});
+  Future<void> installPlugin(Map<String, dynamic> pluginData) async {
+    // Al enviar todo el mapa, el backend puede leer 'isOfficial'
+    // y 'download_url' para bajarlo de GitHub si hace falta.
+    await _dio.post('/plugins/install', data: pluginData);
   }
 
   Future<void> uninstallPlugin(String pluginId) async {

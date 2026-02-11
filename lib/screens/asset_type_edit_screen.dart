@@ -219,7 +219,6 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
       if (context.mounted) {
         ToastService.error(
           'Error al actualizar el Tipo de Activo: ${e.toString()}',
-          5,
         );
       }
     }

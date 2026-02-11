@@ -164,8 +164,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       } catch (e) {
         if (context.mounted) {
           ToastService.error(
-            'Error al crear el Tipo de Activo: ${e.toString()}',
-            5,
+            'Error al crear el Tipo de Activo: ${e.toString()}',         
           );
         }
       }

@@ -2,15 +2,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/services/plugin_service.dart';
 import 'package:invenicum/services/veni_chatbot_service.dart';
 import 'package:provider/provider.dart';
-import 'package:toastification/toastification.dart';
 
 // Localizations & Routing
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:toastification/toastification.dart';
 import 'routing/app_router.dart';
 
 // Providers
@@ -36,6 +37,9 @@ import 'package:invenicum/services/theme_service.dart';
 import 'package:invenicum/services/voucher_service.dart';
 import 'package:invenicum/services/dashboard_service.dart';
 import 'package:invenicum/services/preferences_service.dart';
+
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -225,6 +229,7 @@ class _MyAppState extends State<MyApp> {
 
     return ToastificationWrapper(
       child: MaterialApp.router(
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
         locale: preferencesProvider.locale,
         localizationsDelegates: const [
           AppLocalizations.delegate,
@@ -237,6 +242,10 @@ class _MyAppState extends State<MyApp> {
         title: 'Invenicum',
         theme: themeProvider.themeData,
         routerConfig: _router,
+        builder: (context, child) {
+    // Esto asegura que FToast tenga acceso al Overlay desde la raíz
+    return FToastBuilder()(context, child);
+  },
       ),
     );
   }

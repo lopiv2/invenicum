@@ -21,13 +21,8 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
   @override
   void initState() {
     super.initState();
-    // Creamos el controlador para 2 pestañas
     _tabController = TabController(length: 2, vsync: this);
-
-    // Escuchamos cuando cambia la pestaña
     _tabController.addListener(_handleTabSelection);
-
-    // Carga inicial
     _performInitialRefresh();
   }
 
@@ -40,26 +35,20 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (mounted) {
         await context.read<PluginProvider>().refresh();
-        _lastRefresh = DateTime.now(); // Marcamos el éxito inicial
+        _lastRefresh = DateTime.now();
       }
     });
   }
 
   void _handleTabSelection() {
-    // Si entramos a Comunidad (index 1) y no estamos ya animando
     if (_tabController.index == 1 && !_tabController.indexIsChanging) {
       final now = DateTime.now();
-
-      // Solo refresca si es la primera vez o si pasó más de 1 minuto
+      // 🚩 ELIMINADO: refreshStore().
+      // AHORA: Usamos loadCommunity() o simplemente refresh()
       if (_lastRefresh == null ||
           now.difference(_lastRefresh!) > _refreshThreshold) {
-        context.read<PluginProvider>().refresh();
+        context.read<PluginProvider>().loadCommunity(); // Método unificado
         _lastRefresh = now;
-        debugPrint("Sincronizando comunidad con el servidor...");
-      } else {
-        debugPrint(
-          "Usando datos en caché (frescos por ${60 - now.difference(_lastRefresh!).inSeconds}s más)",
-        );
       }
     }
   }
@@ -73,50 +62,47 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2,
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text("Plugin Manager"),
-          actions: [
-            // ➕ Botón de crear movido aquí
-            IconButton(
-              icon: const Icon(Icons.add_box_outlined),
-              tooltip: "Crear Plugin",
-              onPressed: () async {
-                final result = await showDialog<Map<String, dynamic>>(
-                  context: context,
-                  builder: (context) => const PluginEditorDialog(),
-                );
-                if (result != null && mounted) {
-                  context.read<PluginProvider>().savePlugin(result);
-                }
-              },
-            ),
-            const SizedBox(width: 8),
-          ],
-          bottom: TabBar(
-            controller: _tabController,
-            tabs: [
-              Tab(text: "Instalados"),
-              Tab(text: "Comunidad"),
-            ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Plugin Manager"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add_box_outlined),
+            onPressed: () async {
+              final result = await showDialog<Map<String, dynamic>>(
+                context: context,
+                builder: (context) => const PluginEditorDialog(),
+              );
+              if (result != null && mounted) {
+                context.read<PluginProvider>().savePlugin(result);
+              }
+            },
           ),
+          const SizedBox(width: 8),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: "Instalados"),
+            Tab(text: "Comunidad"),
+          ],
         ),
-        body: Consumer<PluginProvider>(
-          builder: (context, provider, _) {
-            if (provider.isLoading)
-              return const Center(child: CircularProgressIndicator());
+      ),
+      body: Consumer<PluginProvider>(
+        builder: (context, provider, _) {
+          // 🚩 Simplificamos el loading: solo usamos provider.isLoading
+          if (provider.isLoading) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-            return TabBarView(
-              controller: _tabController,
-              children: [
-                _PluginListView(plugins: provider.installed, isStore: false),
-                _PluginListView(plugins: provider.community, isStore: true),
-              ],
-            );
-          },
-        ),
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              _PluginListView(plugins: provider.installed, isStore: false),
+              _PluginListView(plugins: provider.community, isStore: true),
+            ],
+          );
+        },
       ),
     );
   }
@@ -292,7 +278,7 @@ class _PluginListView extends StatelessWidget {
   Widget _buildActionRow(
     BuildContext context,
     PluginProvider provider,
-    Map plugin,
+    Map<String, dynamic> plugin,
     bool isInstalled,
   ) {
     if (isStore) {
@@ -302,7 +288,7 @@ class _PluginListView extends StatelessWidget {
               children: [
                 Icon(Icons.check_circle, color: Colors.green, size: 24),
                 Text(
-                  "Activo",
+                  "Instalado",
                   style: TextStyle(
                     color: Colors.green,
                     fontSize: 10,
@@ -313,13 +299,14 @@ class _PluginListView extends StatelessWidget {
             )
           : IconButton(
               icon: const Icon(Icons.add_circle, color: Colors.blue, size: 28),
-              onPressed: () => provider.install(plugin['id'].toString()),
+              // 🚩 CAMBIO CLAVE: Enviamos el objeto 'plugin' completo, no solo el ID
+              onPressed: () => provider.install(plugin),
               tooltip: "Instalar",
             );
     } else {
       // --- NUEVA LÓGICA PARA INSTALADOS ---
       final bool isActive = plugin['isActive'] ?? true;
-      final String pluginId = plugin['id'].toString();
+
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -327,11 +314,16 @@ class _PluginListView extends StatelessWidget {
           Transform.scale(
             scale: 0.8,
             child: Switch(
-              key: ValueKey("switch_$pluginId"),
+              key: ValueKey("sw_${plugin['id']}_$isActive"),
               value: isActive,
               activeColor: Colors.green,
-              onChanged: (value) {
-                context.read<PluginProvider>().togglePluginStatus(pluginId, value);
+              onChanged: (value) async {
+                // 1. Ejecutamos el cambio en el provider (que ya es optimista)
+                // No pongas el Toast dentro del Provider, déjalo aquí en la UI
+                await provider.togglePluginStatus(
+                  plugin['id'].toString(),
+                  value,
+                );
               },
             ),
           ),
