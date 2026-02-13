@@ -351,6 +351,7 @@
   "myCustomTheme": "My Theme",
   "myProfile": "My Profile",
   "myThemesStored": "My Stored Themes",
+  "name": "Name",
   "nameCannotBeEmpty": "Name cannot be empty",
   "nameSameAsCurrent": "Name is the same as current",
   "newAlert": "New Manual Alert",

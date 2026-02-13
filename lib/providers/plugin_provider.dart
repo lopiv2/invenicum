@@ -20,6 +20,13 @@ class PluginProvider extends ChangeNotifier {
   List<Map<String, dynamic>> get community => _community;
   bool get isLoading => _isLoading;
 
+  // 📥 Solo los que instalé de la comunidad (No son míos)
+  List<Map<String, dynamic>> get installedFromStore =>
+      _installed.where((p) => p['isMine'] == false).toList();
+
+  List<Map<String, dynamic>> get myCreatedPlugins =>
+      _installed.where((p) => p['isMine'] == true).toList();
+
   List<Map<String, dynamic>> get activeInstalled =>
       _installed.where((p) => p['isActive'] ?? true).toList();
 
@@ -38,6 +45,7 @@ class PluginProvider extends ChangeNotifier {
 
   /// Compara un plugin de la comunidad con los instalados localmente
   String getStorePluginStatus(String id, String? version) {
+    // Buscamos si el ID de la comunidad existe en nuestra lista de instalados
     final localPlugin = _installed.firstWhere(
       (p) => p['id'].toString() == id.toString(),
       orElse: () => {},
@@ -45,7 +53,7 @@ class PluginProvider extends ChangeNotifier {
 
     if (localPlugin.isEmpty) return "Instalar";
 
-    // Si el plugin de la comunidad tiene una versión distinta a la que tengo
+    // Opcional: Si quieres manejar actualizaciones de versión
     if (version != null && localPlugin['version'] != version) {
       return "Actualizar";
     }
@@ -100,45 +108,59 @@ class PluginProvider extends ChangeNotifier {
   }
 
   Future<void> refresh({bool force = false}) async {
-  // Solo retornamos si no es forzado y ya está cargando
-  if (_isLoading && !force) return; 
-  
-  _isLoading = true;
-  if (!force) notifyListeners(); // Evitamos notify duplicado si viene de install
+    if (_isLoading && !force) return;
+    _isLoading = true;
 
-  try {
-    // 🚩 IMPORTANTE: Asegúrate de que _currentUser no sea null 
-    // o que el SDK maneje invitados
-    await _service.initSdk(userName: _currentUser?.name);
+    // Solo notificamos al inicio si no es un refresh forzado por otra acción
+    if (!force) notifyListeners();
 
-    final nuevosInstalados = await _service.getMyPlugins();
-    final nuevosComunidad = await _service.getCommunityPlugins();
-    
-    _installed = nuevosInstalados;
-    _community = nuevosComunidad;
-    
-    debugPrint("✅ Refresh completado. Instalados: ${_installed.length}");
-  } catch (e) {
-    debugPrint("Error refrescando plugins: $e");
-  } finally {
-    _isLoading = false;
-    notifyListeners();
+    try {
+      await _service.initSdk(userName: _currentUser?.name);
+
+      final nuevosInstalados = await _service.getMyPlugins();
+      final nuevosComunidad = await _service.getCommunityPlugins();
+
+      // 1. Actualizamos instalados (contiene tanto comunidad como propios)
+      _installed = nuevosInstalados;
+
+      // 2. 🚩 FILTRO DE UNICIDAD PARA COMUNIDAD
+      // Esto permite presencia dual: si el plugin está en instalados,
+      // sigue apareciendo en comunidad pero solo UNA vez.
+      final idsVistos = <String>{};
+      _community = nuevosComunidad.where((p) {
+        final id = p['id'].toString();
+        return idsVistos.add(id);
+      }).toList();
+
+      debugPrint(
+        "✅ Sincronizado: Total=${_installed.length}, Mios=${myCreatedPlugins.length}, Tienda=${_community.length}",
+      );
+    } catch (e) {
+      debugPrint("Error refrescando plugins: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
-}
 
   // --- CRUD PARA AUTORES ---
 
   Future<void> savePlugin(Map<String, dynamic> pluginData) async {
     try {
-      if (pluginData.containsKey('id') && pluginData['id'] != null) {
-        await _service.updatePlugin(pluginData);
-      } else {
-        await _service.createPlugin(pluginData);
+      // Si no tiene ID, es una creación nueva
+      if (pluginData['id'] == null || pluginData['id'].toString().isEmpty) {
+        // Generamos un ID amigable o dejamos que el back lo haga
+        pluginData['id'] = pluginData['name']
+            .toString()
+            .toLowerCase()
+            .replaceAll(' ', '_');
       }
-      await refresh();
-      ToastService.success("Guardado correctamente");
+
+      await _service.createPlugin(pluginData);
+      await refresh(force: true);
+      ToastService.success("¡Plugin creado y guardado!");
     } catch (e) {
-      ToastService.error("Error al guardar");
+      ToastService.error("Error al crear el plugin");
     }
   }
 

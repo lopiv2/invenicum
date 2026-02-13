@@ -351,6 +351,7 @@
   "myCustomTheme": "Mi Tema",
   "myProfile": "Mi Perfil",
   "myThemesStored": "Mis Temas Guardados",
+  "name": "Nombre",
   "nameCannotBeEmpty": "El nombre no puede estar vacío",
   "nameSameAsCurrent": "El nombre es el mismo que el actual",
   "newAlert": "Nueva Alerta Manual",

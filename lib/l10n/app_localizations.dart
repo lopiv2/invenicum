@@ -1030,6 +1030,12 @@ abstract class AppLocalizations {
   /// **'My Stored Themes'**
   String get myThemesStored;
 
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
   /// No description provided for @nameCannotBeEmpty.
   ///
   /// In en, this message translates to:

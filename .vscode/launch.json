@@ -6,7 +6,8 @@
             "request": "launch",
             "type": "dart",
             "args": [
-                "--dart-define=API_URL=http://localhost:3000"
+                "--dart-define=API_URL=http://localhost:3000",
+                "--web-port", "5555"
             ]
         },
         {

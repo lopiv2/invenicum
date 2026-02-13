@@ -8,7 +8,7 @@ class ApiService {
   static final ApiService _instance = ApiService._internal();
   final Dio dio = Dio();
   final _storage = const FlutterSecureStorage();
-  
+
   // 🚀 MEMORIA SÍNCRONA: El secreto para ganar la carrera de milisegundos.
   String? _cachedToken;
 
@@ -16,8 +16,12 @@ class ApiService {
 
   ApiService._internal() {
     dio.options.baseUrl = '${Environment.apiUrl}${Environment.apiVersion}';
-    dio.options.connectTimeout = Duration(milliseconds: Environment.connectTimeout);
-    dio.options.receiveTimeout = Duration(milliseconds: Environment.receiveTimeout);
+    dio.options.connectTimeout = Duration(
+      milliseconds: Environment.connectTimeout,
+    );
+    dio.options.receiveTimeout = Duration(
+      milliseconds: Environment.receiveTimeout,
+    );
 
     dio.interceptors.add(
       InterceptorsWrapper(
@@ -25,7 +29,7 @@ class ApiService {
           // 🚩 CAMBIO CRÍTICO: Eliminamos el 'await' de aquí.
           // Si el token no está en _cachedToken, no lo buscamos en el disco dentro del interceptor
           // porque el disco es demasiado lento para peticiones en ráfaga.
-          
+
           if (_cachedToken != null) {
             options.headers['Authorization'] = 'Bearer $_cachedToken';
           }
@@ -40,6 +44,88 @@ class ApiService {
         },
       ),
     );
+  }
+
+  // ----------------------------------------------------
+  // MÉTODOS DE USUARIO
+  // ----------------------------------------------------
+
+  Future<UserData?> updateProfile({
+    required String name,
+    String? username,
+    String? githubHandle,
+  }) async {
+    try {
+      final response = await dio.put(
+        '/users/profile', // Ajusta esta ruta según tu backend
+        data: {
+          'name': name,
+          'username': username,
+          'githubHandle': githubHandle,
+        },
+      );
+
+      // Tu backend devuelve { message: "...", user: {...} }
+      final responseData = response.data;
+
+      if (responseData['user'] != null) {
+        return UserData.fromJson(responseData['user']);
+      }
+      return null;
+    } on DioException catch (e) {
+      // Manejo de errores específico para saber si el username está duplicado
+      final errorMessage =
+          e.response?.data['error'] ?? 'Error al actualizar perfil';
+      throw Exception(errorMessage);
+    } catch (e) {
+      throw Exception('Error inesperado: $e');
+    }
+  }
+
+  // lib/services/api_service.dart
+
+  Future<Map<String, dynamic>?> getGitHubConfig() async {
+    try {
+      // Recuerda que esta ruta en Node.js debe ser pública (sin verifyToken)
+      // para que la app pueda consultarla antes de iniciar el flujo
+      final response = await dio.get('/auth/github/config');
+      return response.data;
+    } catch (e) {
+      print("ApiService: Error al pedir config de GitHub: $e");
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> completeGitHubOAuth(String code) async {
+    try {
+      // Enviamos el código al backend.
+      // Es el backend quien tiene el CLIENT_SECRET y hará el intercambio real.
+      final response = await dio.post(
+        '/auth/github/complete',
+        data: {'code': code},
+      );
+
+      return response.data;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, dynamic>?> validateGitHubWithBackend(String handle) async {
+    try {
+      final response = await dio.post(
+        '/users/verify-github',
+        data: {'handle': handle},
+      );
+
+      if (response.statusCode == 200) {
+        // Retornamos la data que nos da nuestro server (avatarUrl, etc)
+        return response.data['data'];
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 
   // ----------------------------------------------------
@@ -70,8 +156,8 @@ class ApiService {
       return loginResponse;
     } on DioException catch (e) {
       return LoginResponse(
-        success: false, 
-        message: e.response?.data['message'] ?? 'Error de autenticación'
+        success: false,
+        message: e.response?.data['message'] ?? 'Error de autenticación',
       );
     }
   }
@@ -84,16 +170,21 @@ class ApiService {
   // Getter síncrono para los Providers
   String? get currentToken => _cachedToken;
 
-  Future<String?> getToken() async => _cachedToken ?? await _storage.read(key: Environment.authTokenKey);
+  Future<String?> getToken() async =>
+      _cachedToken ?? await _storage.read(key: Environment.authTokenKey);
 
   Future<UserData?> getMe() async {
     try {
       final response = await dio.get('/auth/me');
       return UserData.fromJson(response.data['user'] ?? response.data);
-    } catch (_) { return null; }
+    } catch (_) {
+      return null;
+    }
   }
 
-  Future<bool> isAuthenticated() async => _cachedToken != null || (await _storage.read(key: Environment.authTokenKey)) != null;
+  Future<bool> isAuthenticated() async =>
+      _cachedToken != null ||
+      (await _storage.read(key: Environment.authTokenKey)) != null;
 
   Future<void> logout() async {
     _cachedToken = null;

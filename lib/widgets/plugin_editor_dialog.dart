@@ -18,6 +18,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _uiController;
+  late bool _isPublic;
   String? _jsonError;
   late String _selectedSlot;
 
@@ -52,6 +53,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.plugin?['name'] ?? '');
+    _isPublic = widget.plugin?['isPublic'] ?? true;
 
     // Usamos las constantes para el valor inicial
     final initialSlot = widget.plugin?['slot'] ?? AppSlots.dashboardTop;
@@ -131,6 +133,26 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                 validator: (v) => v!.isEmpty ? "Requerido" : null,
               ),
               const SizedBox(height: 16),
+              SwitchListTile(
+                title: const Text("Hacer público"),
+                subtitle: Text(
+                  _isPublic
+                      ? "Otros usuarios podrán ver e instalar este plugin."
+                      : "Solo tú podrás ver este plugin en tu lista.",
+                ),
+                value: _isPublic,
+                activeColor: Colors.blue,
+                secondary: Icon(
+                  _isPublic ? Icons.public : Icons.public_off,
+                  color: _isPublic ? Colors.blue : Colors.grey,
+                ),
+                onChanged: (bool value) {
+                  setState(() {
+                    _isPublic = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _selectedSlot,
                 decoration: const InputDecoration(
@@ -206,6 +228,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                 if (widget.plugin != null) 'id': widget.plugin!['id'],
                 'name': _nameController.text,
                 'slot': _selectedSlot,
+                'isPublic': _isPublic,
                 'ui': jsonDecode(_uiController.text),
               });
             }

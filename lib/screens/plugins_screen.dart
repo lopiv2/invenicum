@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/widgets/plugin_editor_dialog.dart';
@@ -21,7 +22,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_handleTabSelection);
     _performInitialRefresh();
   }
@@ -84,13 +85,13 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
           controller: _tabController,
           tabs: const [
             Tab(text: "Instalados"),
+            Tab(text: "Mis Plugins"),
             Tab(text: "Comunidad"),
           ],
         ),
       ),
       body: Consumer<PluginProvider>(
         builder: (context, provider, _) {
-          debugPrint("Sincronizando UI - Instalados: ${provider.installed.length}");
           // 🚩 Simplificamos el loading: solo usamos provider.isLoading
           if (provider.isLoading) {
             return const Center(child: CircularProgressIndicator());
@@ -98,9 +99,22 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
 
           return TabBarView(
             controller: _tabController,
-            key: ValueKey("tab_view_${provider.installed.length}_${provider.community.length}"),
+            key: ValueKey(
+              "tab_view_${provider.installed.length}_${provider.community.length}",
+            ),
             children: [
-              _PluginListView(plugins: provider.installed, isStore: false),
+              _PluginListView(
+                plugins: provider.installed
+                    .where((p) => p['isMine'] == false)
+                    .toList(),
+                isStore: false,
+              ),
+              _PluginListView(
+                plugins: provider.installed
+                    .where((p) => p['isMine'] == true)
+                    .toList(),
+                isStore: false,
+              ),
               _PluginListView(plugins: provider.community, isStore: true),
             ],
           );
@@ -142,9 +156,12 @@ class _PluginListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<PluginProvider>();
-    final List<Map<String, dynamic>> currentPlugins = isStore
-        ? provider.community
-        : provider.installed;
+    final List<Map<String, dynamic>> currentPlugins;
+    if (isStore) {
+      currentPlugins = provider.community;
+    } else {
+      currentPlugins = plugins;
+    }
     final installedIds = provider.installed
         .map((p) => p['id'].toString())
         .toSet();
@@ -166,7 +183,9 @@ class _PluginListView extends StatelessWidget {
           curve: Curves.easeInOut,
           duration: const Duration(milliseconds: 300),
           child: Card(
-            key: ValueKey("card_$pluginId"),
+            key: ValueKey(
+              "card_${isStore ? 'st' : 'ins'}_${pluginId}_$isAlreadyInstalled",
+            ),
             elevation: isActive ? 2 : 0,
             clipBehavior: Clip.antiAlias,
             margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
@@ -203,6 +222,46 @@ class _PluginListView extends StatelessWidget {
                                 color: Colors.grey.shade600,
                               ),
                             ),
+                            const SizedBox(height: 10),
+                            if (plugin['hasUpdate'] == true)
+                              Container(
+                                    margin: const EdgeInsets.only(right: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Icons.system_update_alt_rounded,
+                                        color: Colors.orange,
+                                        size: 20,
+                                      ),
+                                      tooltip:
+                                          "Actualización disponible: v${plugin['latestVersion'] ?? ''}",
+                                      onPressed: () =>
+                                          _confirmUpdate(context, plugin),
+                                    ),
+                                  )
+                                  .animate(
+                                    onPlay: (controller) => controller.repeat(),
+                                  ) // 🔄 Lo hace infinito
+                                  .moveY(
+                                    begin: 0,
+                                    end: -4,
+                                    duration: 600.ms,
+                                    curve: Curves.easeInOut,
+                                  ) // Sube
+                                  .then() // Espera a que termine lo anterior
+                                  .moveY(
+                                    begin: -4,
+                                    end: 0,
+                                    duration: 600.ms,
+                                    curve: Curves.easeInOut,
+                                  ) // Baja
+                                  .shake(
+                                    hz: 2,
+                                    duration: 1200.ms,
+                                  ), // Un pequeño temblor extra
                           ],
                         ),
                       ),
@@ -232,6 +291,68 @@ class _PluginListView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  void _confirmUpdate(BuildContext context, Map<String, dynamic> plugin) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Actualización disponible"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("¿Deseas actualizar '${plugin['name']}'?"),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text(
+                  "v${plugin['version']}",
+                  style: const TextStyle(color: Colors.grey),
+                ),
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Icon(
+                    Icons.arrow_forward,
+                    size: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+                Text(
+                  "v${plugin['latestVersion']}",
+                  style: const TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("CANCELAR"),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+
+              // 🚩 LA SOLUCIÓN:
+              // Creamos una copia para no modificar el objeto original de la lista
+              final updatedData = Map<String, dynamic>.from(plugin);
+
+              // Reemplazamos la versión vieja por la nueva antes de enviar al server
+              updatedData['version'] = plugin['latestVersion'];
+
+              // Ahora el backend recibirá la versión nueva en el campo 'version'
+              context.read<PluginProvider>().install(updatedData);
+            },
+            child: const Text("ACTUALIZAR AHORA"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -422,7 +543,6 @@ class _PluginListView extends StatelessWidget {
     final pluginProvider = context.read<PluginProvider>();
 
     // Detectamos el estado actual del plugin
-    final bool isInstalled = plugin['isActive'] != null || plugin['ui'] != null;
     final String? downloadUrl = plugin['download_url'];
     final dynamic localUi = plugin['ui'];
 
@@ -534,6 +654,16 @@ class _PluginListView extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text(
                   plugin['description'],
+                  style: const TextStyle(color: Colors.black87),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Version",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  plugin['version'] ?? 'N/A',
                   style: const TextStyle(color: Colors.black87),
                 ),
               ],

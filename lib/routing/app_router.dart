@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/asset_detail_screen.dart';
 import 'package:invenicum/screens/plugins_screen.dart';
+import 'package:invenicum/screens/profile_screen.dart';
 import 'package:provider/provider.dart';
 
 // Models
@@ -77,6 +78,11 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       ShellRoute(
         builder: (context, state, child) => MainLayout(child: child),
         routes: [
+          GoRoute(
+            path: '/myprofile',
+            builder: (context, state) =>
+                const UserProfileScreen(), // La pantalla que crearemos ahora
+          ),
           GoRoute(
             path: '/dashboard',
             builder: (context, state) => DashboardScreen(

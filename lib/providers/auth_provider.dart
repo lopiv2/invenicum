@@ -14,7 +14,9 @@ class AuthProvider with ChangeNotifier {
   UserData? get user => _user;
   String? get token => _token;
   bool get isLoading => _isLoading;
-  
+  String? _validatedAvatarUrl;
+  String? get validatedAvatarUrl => _validatedAvatarUrl;
+
   // 🚩 MEJORA: Comprobación más robusta de autenticación
   bool get isAuthenticated => _user != null && _token != null;
 
@@ -22,17 +24,17 @@ class AuthProvider with ChangeNotifier {
   Future<void> checkAuthStatus() async {
     _isLoading = true;
     // Importante: No notificamos aquí para evitar parpadeos innecesarios en el splash
-    
+
     try {
       // 1. Cargamos el token del storage a la memoria del ApiService inmediatamente
       await _apiService.initializeToken();
-      
+
       final savedToken = _apiService.currentToken;
-      
+
       if (savedToken != null) {
         // 2. Si hay token, intentamos recuperar el perfil del usuario
         final userData = await _apiService.getMe();
-        
+
         if (userData != null) {
           _token = savedToken;
           _user = userData;
@@ -51,6 +53,87 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  /// Obtiene la configuración pública de GitHub (ClientId) desde el backend
+  Future<Map<String, dynamic>> getGitHubConfig() async {
+    try {
+      final config = await _apiService.getGitHubConfig();
+      if (config != null && config['success'] == true) {
+        return {'clientId': config['clientId']};
+      }
+      return {};
+    } catch (e) {
+      debugPrint("Error obteniendo configuración de GitHub: $e");
+      return {};
+    }
+  }
+
+  Future<bool> linkGitHubAccount(String code) async {
+    _setLoading(true);
+
+    try {
+      final response = await _apiService.completeGitHubOAuth(code);
+
+      if (response != null && response['success'] == true) {
+        final githubData = response['data'];
+        _user = _user?.copyWith(
+          githubHandle: githubData['githubHandle'],
+          avatarUrl:
+              githubData['avatarUrl'], // Actualiza el avatar dentro del modelo
+          username: githubData['githubHandle'],
+          // Si el backend cambió el username o el name, deberías mapearlos también aquí
+        );
+
+        // Esto es para la previsualización del avatar si lo usas por separado
+        _validatedAvatarUrl = githubData['avatarUrl'];
+
+        _setLoading(false);
+        notifyListeners();
+        return true;
+      }
+
+      _setLoading(false);
+      return false;
+    } catch (e) {
+      _setLoading(false);
+      print("Error linking GitHub: $e");
+      return false;
+    }
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  // lib/providers/auth_provider.dart
+
+  Future<Map<String, dynamic>?> checkGitHubIdentity(String handle) async {
+    if (handle.isEmpty) return null;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final data = await _apiService.validateGitHubWithBackend(handle);
+
+      if (data != null) {
+        _validatedAvatarUrl = data['avatarUrl'];
+
+        _isLoading = false;
+        notifyListeners();
+        return data;
+      }
+
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      return null;
+    }
+  }
+
   /// Proceso de inicio de sesión
   Future<LoginResponse> login(String username, String password) async {
     _isLoading = true;
@@ -62,8 +145,8 @@ class AuthProvider with ChangeNotifier {
       if (response.success && response.token != null) {
         // 🚩 EL PUNTO CLAVE:
         // El ApiService ya guardó el token en su memoria interna (_cachedToken)
-        // dentro de su propio método login(). 
-        
+        // dentro de su propio método login().
+
         _token = response.token;
         _user = response.user;
 
@@ -75,7 +158,37 @@ class AuthProvider with ChangeNotifier {
       return LoginResponse(success: false, message: "Error: $e");
     } finally {
       _isLoading = false;
-      notifyListeners(); 
+      notifyListeners();
+    }
+  }
+
+  /// Actualiza el perfil del usuario (Nombre, Username, GitHub)
+  /// Actualiza el perfil del usuario y notifica a la app
+  Future<void> updateProfile({
+    required String name,
+    String? username,
+    String? githubHandle,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final updatedUser = await _apiService.updateProfile(
+        name: name,
+        username: username,
+        githubHandle: githubHandle,
+      );
+
+      if (updatedUser != null) {
+        _user = updatedUser; // Actualizamos el usuario local
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error en updateProfile: $e");
+      rethrow; // Devolvemos el error a la pantalla (ProfileScreen) para mostrar el SnackBar
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

@@ -530,6 +530,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get myThemesStored => 'I miei temi salvati';
 
   @override
+  String get name => 'Name';
+
+  @override
   String get nameCannotBeEmpty => 'Il nome non può essere vuoto';
 
   @override

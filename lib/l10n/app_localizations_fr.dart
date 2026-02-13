@@ -529,6 +529,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get myThemesStored => 'Mes thèmes enregistrés';
 
   @override
+  String get name => 'Name';
+
+  @override
   String get nameCannotBeEmpty => 'Le nom ne peut pas être vide';
 
   @override
