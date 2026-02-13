@@ -179,7 +179,16 @@ class _HeaderState extends State<_Header> {
                 ),
               ),
               child: ClipOval(
-                child: RandomAvatar(avatarSeed, width: 38, height: 38),
+                child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
+                    ? Image.network(
+                        user.avatarUrl!,
+                        width: 38,
+                        height: 38,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) =>
+                            RandomAvatar(avatarSeed, width: 38, height: 38),
+                      )
+                    : RandomAvatar(avatarSeed, width: 38, height: 38),
               ),
             ),
             itemBuilder: (context) => [

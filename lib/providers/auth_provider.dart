@@ -67,6 +67,32 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
+  Future<void> disconnectGitHubAccount() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final success = await _apiService.disconnectGitHub();
+
+      if (success) {
+        // 🚩 ACTUALIZACIÓN LOCAL:
+        // Usamos copyWith para limpiar los campos y que la UI reaccione (el tick verde desaparezca)
+        if (_user != null) {
+          _user = _user!.copyWith(
+            githubHandle: "", // O null si tu copyWith lo permite
+            avatarUrl: "", // Opcional: resetear el avatar
+          );
+        }
+        notifyListeners();
+      }
+    } catch (e) {
+      debugPrint("Error en AuthProvider al desconectar GitHub: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<bool> linkGitHubAccount(String code) async {
     _setLoading(true);
 
@@ -75,19 +101,19 @@ class AuthProvider with ChangeNotifier {
 
       if (response != null && response['success'] == true) {
         final githubData = response['data'];
+
         _user = _user?.copyWith(
           githubHandle: githubData['githubHandle'],
-          avatarUrl:
-              githubData['avatarUrl'], // Actualiza el avatar dentro del modelo
-          username: githubData['githubHandle'],
-          // Si el backend cambió el username o el name, deberías mapearlos también aquí
+          avatarUrl: githubData['avatarUrl'],
+          githubId: githubData['githubId']?.toString(),
+          githubLinkedAt: DateTime.now(),
+          username: githubData['username'],
         );
 
-        // Esto es para la previsualización del avatar si lo usas por separado
         _validatedAvatarUrl = githubData['avatarUrl'];
 
         _setLoading(false);
-        notifyListeners();
+        notifyListeners(); // Esto redibuja el perfil con el tick verde
         return true;
       }
 
@@ -95,7 +121,7 @@ class AuthProvider with ChangeNotifier {
       return false;
     } catch (e) {
       _setLoading(false);
-      print("Error linking GitHub: $e");
+      debugPrint("Error linking GitHub: $e");
       return false;
     }
   }

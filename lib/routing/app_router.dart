@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'dart:html' as html;
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/asset_detail_screen.dart';
 import 'package:invenicum/screens/plugins_screen.dart';
 import 'package:invenicum/screens/profile_screen.dart';
+import 'package:invenicum/services/toast_service.dart';
 import 'package:provider/provider.dart';
-
 // Models
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/list_data.dart';
@@ -52,19 +53,27 @@ GoRouter createAppRouter(AuthProvider authProvider) {
     navigatorKey: rootNavigatorKey,
     initialLocation: '/dashboard',
     redirect: (context, state) {
-      final bool isAuthenticated = authProvider.isAuthenticated;
-      final bool isLoggingIn = state.matchedLocation == '/login';
+      final authProvider = context.read<AuthProvider>();
+      final loggingIn = state.matchedLocation == '/login';
 
-      // 1. Mientras se verifica el token en disco, no redirigir
-      if (authProvider.isLoading) return null;
+      // 1. 🚩 CAPTURA DE CÓDIGO GITHUB (Nivel Global)
+      // Buscamos el código tanto en GoRouter como en la URL de la ventana (antes del #)
+      final uri = Uri.parse(html.window.location.href);
+      final String? githubCode =
+          state.uri.queryParameters['code'] ?? uri.queryParameters['code'];
 
-      // 2. Si NO está autenticado y no va a login, forzar login
-      if (!isAuthenticated) {
-        return isLoggingIn ? null : '/login';
+      // Si detectamos un código y estamos logueados, forzamos ir a perfil para procesarlo
+      if (githubCode != null &&
+          authProvider.isAuthenticated &&
+          state.matchedLocation != '/myprofile') {
+        return '/myprofile?code=$githubCode';
       }
 
-      // 3. Si ESTÁ autenticado e intenta ir a login o raíz, mandar a dashboard
-      if (isLoggingIn || state.matchedLocation == '/') {
+      if (!authProvider.isAuthenticated && !loggingIn) {
+        return '/login';
+      }
+
+      if (authProvider.isAuthenticated && loggingIn) {
         return '/dashboard';
       }
 
@@ -80,8 +89,32 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         routes: [
           GoRoute(
             path: '/myprofile',
-            builder: (context, state) =>
-                const UserProfileScreen(), // La pantalla que crearemos ahora
+            builder: (context, state) {
+              // 1. Intentamos obtener el código de GoRouter (por si acaso viniera después del #)
+              String? code = state.uri.queryParameters['code'];
+
+              // 2. 🚩 SI NO ESTÁ AHÍ, lo buscamos en la URL real del navegador (antes del #)
+              if (code == null) {
+                final Uri uri = Uri.parse(html.window.location.href);
+                code = uri.queryParameters['code'];
+              }
+
+              if (code != null) {
+                WidgetsBinding.instance.addPostFrameCallback((_) async {
+                  final authProvider = context.read<AuthProvider>();
+                  final success = await authProvider.linkGitHubAccount(code!);
+
+                  if (success) {
+                    // 3. Limpieza total: Esto eliminará el ?code= de la barra de direcciones
+                    html.window.history.replaceState(null, '', '/#/myprofile');
+
+                    ToastService.success("GitHub vinculado correctamente");
+                  }
+                });
+              }
+
+              return const UserProfileScreen();
+            },
           ),
           GoRoute(
             path: '/dashboard',

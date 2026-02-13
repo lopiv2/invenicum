@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:ui' as html;
+import 'package:go_router/go_router.dart';
 import 'package:web/web.dart' as web;
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
@@ -38,9 +38,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
     _initDeepLinks();
 
-    // NUEVO: Verificación específica para CHROME / WEB
     if (kIsWeb) {
-      _checkWebQueryParams();
+      // Esto le dice a Flutter: "Espera a terminar de dibujar y luego ejecuta esto"
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkWebQueryParams();
+      });
     }
   }
 
@@ -55,17 +57,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // NUEVO MÉTODO PARA WEB
   void _checkWebQueryParams() {
-    // Uri.base siempre funciona para LEER el código
-    final uri = Uri.base;
+    if (!kIsWeb) return;
 
-    if (uri.queryParameters.containsKey('code')) {
-      final code = uri.queryParameters['code'];
-      if (code != null) {
-        if (kIsWeb) {
-          // Usamos la librería 'web' o 'html' de forma segura
-          // Esto limpia la barra de direcciones de Chrome
-          web.window.history.replaceState(null, 'Profile', '/#/profile');
-        }
+    // 1. Obtenemos la URL real que ve el navegador (la que tiene el ?code=)
+    final String fullUrl = web.window.location.href;
+
+    // 2. Usamos una RegExp para sacar el código sin importar dónde esté
+    final regExp = RegExp(r'code=([a-zA-Z0-9]+)');
+    final match = regExp.firstMatch(fullUrl);
+
+    if (match != null) {
+      final String? code = match.group(1);
+
+      if (code != null && code.isNotEmpty) {
+        // 🚩 PRIMERO: Limpiamos la URL para que el usuario la vea bien
+        // Esto quita el ?code=... de la vista pero el valor ya está en nuestra variable 'code'
+        web.window.history.replaceState(null, 'Profile', '/#/myprofile');
+
+        // 🚩 SEGUNDO: Procesamos la vinculación con el código que ya guardamos
         _processGitHubCode(code);
       }
     }
@@ -92,29 +101,76 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
+  Future<void> _handleDisconnectGitHub() async {
+    final authProvider = context.read<AuthProvider>();
+
+    // Opcional: Mostrar un diálogo de confirmación
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Desconectar GitHub"),
+        content: const Text(
+          "¿Estás seguro de que quieres desvincular tu cuenta de GitHub?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("CANCELAR"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text(
+              "DESCONECTAR",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      await authProvider.disconnectGitHubAccount();
+      if (mounted) {
+        _usernameController.clear(); // Limpiamos el campo de username
+        _githubController.clear(); // Limpiamos el input visualmente
+        ToastService.success("GitHub desvinculado correctamente");
+      }
+    }
+  }
+
   Future<void> _processGitHubCode(String code) async {
     try {
-      // Aquí el provider llamará a tu backend (Node.js) enviando el code
-      final success = await context.read<AuthProvider>().linkGitHubAccount(
-        code,
-      );
+      final authProvider = context.read<AuthProvider>();
+      final success = await authProvider.linkGitHubAccount(code);
 
-      if (success) {
-        ToastService.success("¡GitHub vinculado correctamente!");
-        final updatedUser = context.read<AuthProvider>().user;
-        if (updatedUser != null) {
-          setState(() {
-            // Rellenamos los campos con la info que trajo el Provider
-            _usernameController.text = updatedUser.username ?? '';
-            _githubController.text = updatedUser.githubHandle ?? '';
-            // Al hacer setState, el avatar y el tick azul se redibujarán
-          });
+      if (success && mounted) {
+        // 🚩 EL CAMBIO: No dependas solo del updatedUser del provider aquí
+        // porque a veces el notifyListeners() y el context.go chocan.
+
+        final newUser = authProvider.user;
+        if (newUser != null) {
+          // Actualizamos los controladores ANTES de cualquier navegación
+          _usernameController.text = newUser.username ?? '';
+          _githubController.text = newUser.githubHandle ?? '';
+
+          // Forzamos un refresco visual
+          setState(() {});
         }
-        // Opcional: refrescar controllers con la nueva data
-        setState(() {});
+
+        ToastService.success("¡GitHub vinculado correctamente!");
+
+        // Usar pushReplacement o simplemente esperar un frame antes de irnos
+        // para que la UI no se limpie antes de tiempo
+        Future.delayed(Duration.zero, () {
+          if (mounted) context.go('/myprofile');
+        });
       }
     } catch (e) {
-      ToastService.error("Error al procesar la vinculación: $e");
+      if (mounted) {
+        ToastService.error("Error al procesar la vinculación: $e");
+        // Incluso si falla, limpiamos la URL para que el código usado no se quede ahí
+        context.go('/myprofile');
+      }
     }
   }
 
@@ -123,7 +179,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       // 1. Obtenemos la configuración desde tu backend
       final response = await context.read<AuthProvider>().getGitHubConfig();
       final String? clientId = response['clientId'];
-
       if (clientId == null || clientId.isEmpty) {
         ToastService.error("Error: Configuración de GitHub no disponible");
         return;
@@ -131,7 +186,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
       // 2. Construimos la URL con el ID que nos dio el server
       final String redirectUri = kIsWeb
-          ? "${Uri.base.origin}/"
+          ? "${Uri.base.origin}/" // Mandamos a la raíz, el script o el router se encargarán
           : "invenicum://auth-callback";
 
       final url = Uri.parse(
@@ -231,6 +286,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
                     TextFormField(
                       controller: _usernameController,
+                      readOnly: true,
                       decoration: InputDecoration(
                         labelText: 'Username (Comunidad)',
                         helperText: 'Requerido para publicar plugins.',
@@ -281,8 +337,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Widget _buildAvatarPreview(AuthProvider authProvider) {
-    final String seed = authProvider.user?.name ?? 'Guest';
-    final String? validatedUrl = authProvider.validatedAvatarUrl;
+    final user = authProvider.user;
+    final String seed = user?.name ?? 'Guest';
+
+    // Prioridad: 1. URL de la base de datos, 2. URL validada en sesión, 3. Null
+    final String? avatarUrl =
+        user?.avatarUrl ?? authProvider.validatedAvatarUrl;
 
     return Stack(
       alignment: Alignment.bottomRight,
@@ -297,18 +357,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           ),
           child: ClipOval(
-            child: validatedUrl != null
+            child: (avatarUrl != null && avatarUrl.isNotEmpty)
                 ? Image.network(
-                    validatedUrl,
+                    avatarUrl,
                     width: 100,
                     height: 100,
+                    fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) =>
                         RandomAvatar(seed, width: 100, height: 100),
                   )
                 : RandomAvatar(seed, width: 100, height: 100),
           ),
         ),
-        if (validatedUrl != null)
+        // Solo mostramos el check si el backend confirma que está verificado
+        if (user?.githubHandle != null && user!.githubHandle!.isNotEmpty)
           Container(
             padding: const EdgeInsets.all(4),
             decoration: const BoxDecoration(
@@ -333,7 +395,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: isLinked ? Colors.black.withOpacity(0.05) : colorScheme.surface,
+        color: isLinked ? Colors.green.withAlpha(50) : colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isLinked ? Colors.black : colorScheme.outlineVariant,
@@ -379,6 +441,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           // El campo de texto estilizado
           TextFormField(
             controller: _githubController,
+            readOnly: isLinked,
+            enabled: !isLinked,
             decoration: InputDecoration(
               hintText: "Tu usuario de GitHub",
               filled: true,
@@ -396,9 +460,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ElevatedButton(
             onPressed: authProvider.isLoading
                 ? null
-                : () => _handleGitHubOAuth(), // Disparamos el flujo OAuth
+                : (isLinked
+                      ? _handleDisconnectGitHub // Si está vinculado, desconecta
+                      : _handleGitHubOAuth), // Si no, vincula
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.black,
+              // Si está vinculado, lo ponemos en un tono rojo/gris para indicar "acción de desconexión"
+              backgroundColor: isLinked
+                  ? Colors.redAccent.withOpacity(0.8)
+                  : Colors.black,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 40),
             ),
@@ -414,10 +483,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 : Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const FaIcon(FontAwesomeIcons.github, size: 18),
+                      FaIcon(
+                        isLinked
+                            ? FontAwesomeIcons.linkSlash
+                            : FontAwesomeIcons.github,
+                        size: 18,
+                      ),
                       const SizedBox(width: 8),
                       Text(
-                        isLinked ? "Re-vincular cuenta" : "Vincular con GitHub",
+                        isLinked ? "Desconectar GitHub" : "Vincular con GitHub",
                       ),
                     ],
                   ),

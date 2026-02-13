@@ -96,6 +96,18 @@ class ApiService {
     }
   }
 
+  // Método específico para desconectar GitHub
+  Future<bool> disconnectGitHub() async {
+    try {
+      final response = await dio.post('/auth/github/disconnect');
+
+      return response.data['success'] == true;
+    } catch (e) {
+      print("ApiService: Error al desconectar GitHub: $e");
+      return false;
+    }
+  }
+
   Future<Map<String, dynamic>?> completeGitHubOAuth(String code) async {
     try {
       // Enviamos el código al backend.
