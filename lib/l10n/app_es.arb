@@ -322,6 +322,7 @@
   "ignoreField": "🚫 Ignorar Campo",
   "importAssetsTo": "Importar Activos a",
   "importSuccessMessage": "¡Importación Exitosa! {count} activos creados.",
+  "integrations": "Integraciones",
   "invalidAssetId": "ID de activo no válido",
   "invalidNavigationIds": "Error: IDs de navegación no válidos.",
   "january": "Enero",

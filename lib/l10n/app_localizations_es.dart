@@ -440,6 +440,9 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get integrations => 'Integraciones';
+
+  @override
   String get invalidAssetId => 'ID de activo no válido';
 
   @override

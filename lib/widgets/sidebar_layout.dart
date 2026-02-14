@@ -57,6 +57,15 @@ class SidebarLayout extends StatelessWidget {
                 const StacSlot(slotName: 'left_sidebar'), // Slot para plugins en la barra lateral
                 SidebarNavButton(
                   icon: Icons
+                      .integration_instructions_outlined, // Icono representativo de integraciones
+                  title: AppLocalizations.of(context)!.integrations,
+                  selected:
+                      GoRouterState.of(context).matchedLocation ==
+                      '/integrations',
+                  onTap: () => context.go('/integrations'),
+                ),
+                SidebarNavButton(
+                  icon: Icons
                       .extension_outlined, // Icono representativo de plugins
                   title: AppLocalizations.of(context)!.plugins,
                   selected:

@@ -856,6 +856,12 @@ abstract class AppLocalizations {
   /// **'Import Successful! {count} assets created.'**
   String importSuccessMessage(int count);
 
+  /// No description provided for @integrations.
+  ///
+  /// In en, this message translates to:
+  /// **'Integrations'**
+  String get integrations;
+
   /// No description provided for @invalidAssetId.
   ///
   /// In en, this message translates to:

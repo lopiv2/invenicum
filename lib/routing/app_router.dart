@@ -3,6 +3,7 @@ import 'dart:html' as html;
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/asset_detail_screen.dart';
+import 'package:invenicum/screens/integrations_screen.dart';
 import 'package:invenicum/screens/plugins_screen.dart';
 import 'package:invenicum/screens/profile_screen.dart';
 import 'package:invenicum/services/toast_service.dart';
@@ -157,6 +158,11 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                 ),
               ),
             ],
+          ),
+          // --- INTEGRACIONES ---
+          GoRoute(
+            path: '/integrations',
+            builder: (context, state) => IntegrationsScreen(),
           ),
           // --- PLUGINS ---
           GoRoute(

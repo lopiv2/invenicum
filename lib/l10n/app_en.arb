@@ -322,6 +322,7 @@
   "ignoreField": "🚫 Ignore Field",
   "importAssetsTo": "Import Assets To",
   "importSuccessMessage": "Import Successful! {count} assets created.",
+  "integrations": "Integrations",
   "invalidAssetId": "Invalid asset ID",
   "invalidNavigationIds": "Error: Invalid navigation IDs.",
   "january": "January",
