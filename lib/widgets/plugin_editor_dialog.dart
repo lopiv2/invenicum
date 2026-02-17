@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/utils/common_functions.dart';
 import 'package:invenicum/utils/constants.dart';
+import 'package:provider/provider.dart';
 import 'package:stac/stac.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class PluginEditorDialog extends StatefulWidget {
   final Map<String, dynamic>? plugin;
@@ -53,7 +57,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.plugin?['name'] ?? '');
-    _isPublic = widget.plugin?['isPublic'] ?? true;
+    _isPublic = widget.plugin?['isPublic'] ?? false;
 
     // Usamos las constantes para el valor inicial
     final initialSlot = widget.plugin?['slot'] ?? AppSlots.dashboardTop;
@@ -146,7 +150,50 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                   _isPublic ? Icons.public : Icons.public_off,
                   color: _isPublic ? Colors.blue : Colors.grey,
                 ),
-                onChanged: (bool value) {
+                onChanged: (bool value) async {
+                  // Si intenta marcarlo como público
+                  if (value == true) {
+                    final authProvider = context.read<AuthProvider>();
+
+                    // Usamos el getter que creamos antes
+                    if (!authProvider.isGitHubLinked) {
+                      // 1. Informamos al usuario por qué no puede
+                      bool? goToProfile = await showDialog<bool>(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text("Requiere GitHub"),
+                          content: const Text(
+                            "Para publicar plugins en la comunidad, debes vincular tu cuenta de GitHub para darte crédito como autor.",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx, false),
+                              child: Text(AppLocalizations.of(context)!.cancel),
+                            ),
+                            ElevatedButton(
+                              onPressed: () => Navigator.pop(ctx, true),
+                              child: const Text("IR AL PERFIL"),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      // 2. Si aceptó ir al perfil, navegamos
+                      if (goToProfile == true) {
+                        if (mounted) {
+                          Navigator.pop(
+                            context,
+                          ); // Cerramos el editor de plugin
+                          context.push(
+                            '/myprofile',
+                          ); // O context.go('/myprofile')
+                        }
+                      }
+                      return; // Detenemos el cambio del switch
+                    }
+                  }
+
+                  // Si ya estaba conectado o está desactivando el público, procedemos normal
                   setState(() {
                     _isPublic = value;
                   });
@@ -219,7 +266,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text("CANCELAR"),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
           onPressed: () {
@@ -233,7 +280,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
               });
             }
           },
-          child: const Text("GUARDAR"),
+          child: Text(AppLocalizations.of(context)!.save),
         ),
       ],
     );

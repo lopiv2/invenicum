@@ -708,31 +708,71 @@ class _PluginListView extends StatelessWidget {
     PluginProvider provider,
     Map plugin,
   ) {
+    bool deleteFromGitHub = false;
+    final bool isPublic = plugin['isPublic'] ?? false;
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text("⚠️ ¡Atención!"),
-        content: Text(
-          "Estás a punto de borrar '${plugin['name']}' para TODOS los usuarios. Esta acción no se puede deshacer.",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text("CANCELAR"),
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: const Text("¿Eliminar plugin?"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Estás a punto de borrar '${plugin['name']}'. Esta acción no se puede deshacer.",
+              ),
+              if (isPublic) ...[
+                const SizedBox(height: 20),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red.withOpacity(0.2)),
+                  ),
+                  child: CheckboxListTile(
+                    title: const Text(
+                      "Borrar de GitHub",
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      "Eliminará el archivo .json y la entrada en el repositorio público.",
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    value: deleteFromGitHub,
+                    activeColor: Colors.red,
+                    onChanged: (val) => setState(() => deleteFromGitHub = val!),
+                    controlAffinity: ListTileControlAffinity.leading,
+                  ),
+                ),
+              ],
+            ],
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              // Aquí llamarías a un nuevo método provider.deleteGlobalPlugin(id)
-              provider.deletePlugin(plugin['id']);
-              Navigator.pop(ctx);
-            },
-            child: const Text(
-              "BORRAR DE LA DB",
-              style: TextStyle(color: Colors.white),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text("CANCELAR"),
             ),
-          ),
-        ],
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              onPressed: () {
+                // Pasamos el booleano al provider
+                provider.deletePlugin(
+                  plugin['id'],
+                  deleteFromGitHub: deleteFromGitHub,
+                );
+                Navigator.pop(ctx);
+              },
+              child: const Text(
+                "BORRAR DEFINITIVAMENTE",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

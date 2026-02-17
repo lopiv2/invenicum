@@ -4,7 +4,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
+import 'package:invenicum/services/integrations_service.dart';
 import 'package:invenicum/services/plugin_service.dart';
 import 'package:invenicum/services/veni_chatbot_service.dart';
 import 'package:provider/provider.dart';
@@ -56,7 +58,25 @@ void main() async {
     MultiProvider(
       providers: [
         // --- SERVICIOS (Singletons) ---
-        Provider(create: (_) => ApiService()),
+        Provider<ApiService>(
+          create: (c) {
+            final api = ApiService();
+            // 🚩 CONEXIÓN: Le decimos a la API que cuando haya un 401,
+            // ejecute el logout del authProvider que inicializaste arriba.
+            api.onUnauthorized = () {
+              authProvider.logout();
+
+              // Opcional: Mostrar un aviso global
+              toastification.show(
+                type: ToastificationType.error,
+                title: const Text('Sesión expirada'),
+                description: const Text('Por favor, ingresa de nuevo.'),
+                autoCloseDuration: const Duration(seconds: 5),
+              );
+            };
+            return api;
+          },
+        ),
         Provider(create: (c) => PluginService(c.read<ApiService>())),
         Provider(create: (c) => DashboardService(c.read<ApiService>())),
         Provider(create: (c) => ThemeService(c.read<ApiService>())),
@@ -68,6 +88,7 @@ void main() async {
         Provider(create: (c) => LoanService(c.read<ApiService>())),
         Provider(create: (c) => VoucherService(c.read<ApiService>())),
         Provider(create: (c) => AlertService(c.read<ApiService>())),
+        Provider(create: (c) => IntegrationService(c.read<ApiService>())),
         // --- PROVEEDORES DE ESTADO ---
 
         // Auth es la raíz de la lógica
@@ -103,7 +124,19 @@ void main() async {
             return prev!;
           },
         ),
-
+        // --- Integraciones ---
+        ChangeNotifierProxyProvider<AuthProvider, IntegrationProvider>(
+          create: (c) => IntegrationProvider(c.read<IntegrationService>()),
+          update: (context, auth, prev) {
+            if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
+              // Cargamos los estados de los "checks" (isLinked) solo si están vacíos
+              if (prev != null && prev.statuses.isEmpty && !prev.isLoading) {
+                Future.microtask(() => prev.loadStatuses());
+              }
+            }
+            return prev!;
+          },
+        ),
         // --- Dashboard ---
         ChangeNotifierProxyProvider<AuthProvider, DashboardProvider>(
           create: (context) =>
@@ -243,9 +276,9 @@ class _MyAppState extends State<MyApp> {
         theme: themeProvider.themeData,
         routerConfig: _router,
         builder: (context, child) {
-    // Esto asegura que FToast tenga acceso al Overlay desde la raíz
-    return FToastBuilder()(context, child);
-  },
+          // Esto asegura que FToast tenga acceso al Overlay desde la raíz
+          return FToastBuilder()(context, child);
+        },
       ),
     );
   }

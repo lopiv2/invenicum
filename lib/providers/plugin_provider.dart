@@ -174,13 +174,26 @@ class PluginProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> deletePlugin(String pluginId) async {
+  Future<void> deletePlugin(
+    String pluginId, {
+    bool deleteFromGitHub = false,
+  }) async {
     try {
-      await _service.deletePlugin(pluginId);
+      // 1. Pasamos el flag al servicio (necesitarás actualizar el servicio también)
+      await _service.deletePlugin(pluginId, deleteFromGitHub);
+
+      // 2. Refrescamos la lista local
       await refresh();
-      ToastService.success("Eliminado globalmente");
+
+      // 3. Feedback personalizado
+      if (deleteFromGitHub) {
+        ToastService.success("Eliminado de la base de datos y de GitHub");
+      } else {
+        ToastService.success("Eliminado globalmente");
+      }
     } catch (e) {
       ToastService.error("No se pudo eliminar");
+      debugPrint("Error al eliminar plugin: $e");
     }
   }
 

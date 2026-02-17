@@ -20,6 +20,40 @@ class AuthProvider with ChangeNotifier {
   // 🚩 MEJORA: Comprobación más robusta de autenticación
   bool get isAuthenticated => _user != null && _token != null;
 
+  // 🚩 NUEVO: Verificación de cuenta de GitHub vinculada
+  bool get isGitHubLinked =>
+      _user?.githubHandle != null && _user!.githubHandle!.isNotEmpty;
+
+  AuthProvider() {
+    _apiService.onUnauthorized = () {
+      // Si la API detecta un 401, ejecutamos la limpieza local
+      _handleSessionExpired();
+    };
+  }
+
+  void _handleSessionExpired() {
+    _user = null;
+    _token = null;
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  /// Consulta al backend el estado actual de la vinculación con GitHub
+  Future<bool> checkGitHubStatus() async {
+    try {
+      final userData = await _apiService.getMe();
+      if (userData != null) {
+        _user = userData;
+        notifyListeners();
+        return isGitHubLinked;
+      }
+      return false;
+    } catch (e) {
+      debugPrint("Error verificando vinculación GitHub: $e");
+      return false;
+    }
+  }
+
   /// Verifica si hay una sesión guardada al abrir la app
   Future<void> checkAuthStatus() async {
     _isLoading = true;

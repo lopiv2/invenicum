@@ -14,6 +14,8 @@ class ApiService {
 
   factory ApiService() => _instance;
 
+  Function()? onUnauthorized;
+
   ApiService._internal() {
     dio.options.baseUrl = '${Environment.apiUrl}${Environment.apiVersion}';
     dio.options.connectTimeout = Duration(
@@ -39,6 +41,9 @@ class ApiService {
           if (e.response?.statusCode == 401) {
             _cachedToken = null;
             _storage.delete(key: Environment.authTokenKey);
+            if (onUnauthorized != null) {
+              onUnauthorized!();
+            }
           }
           return handler.next(e);
         },

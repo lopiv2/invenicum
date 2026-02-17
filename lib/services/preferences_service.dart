@@ -12,6 +12,23 @@ class PreferencesService {
   Future<Map<String, dynamic>> getPreferences() async {
     try {
       final response = await _dio.get('/preferences');
+      // Retornamos el mapa 'data' que el DTO en Flutter se encargará de parsear
+      return response.data['data'] as Map<String, dynamic>;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  /// Actualiza específicamente el estado de la IA
+  /// Usamos PATCH para indicar una actualización parcial del recurso
+  Future<Map<String, dynamic>> updateAiStatus(bool isEnabled) async {
+    try {
+      final response = await _dio.patch(
+        '/preferences/ai-status',
+        data: {
+          'aiEnabled': isEnabled,
+        },
+      );
       return response.data['data'] as Map<String, dynamic>;
     } catch (e) {
       rethrow;

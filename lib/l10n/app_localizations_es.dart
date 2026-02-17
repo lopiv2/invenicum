@@ -411,6 +411,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formatsPNG => 'Formatos: PNG, JPG';
 
   @override
+  String get geminiLabelModel =>
+      'Modelo Gemini recomendado: gemini-3-flash-preview';
+
+  @override
   String get generalSettings => 'Configuración General';
 
   @override
@@ -429,6 +433,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get helpDocs => 'Ayuda y Documentación';
 
   @override
+  String get helperGeminiKey =>
+      'Introduce tu clave de API de Gemini para habilitar la integración. Consiguela en https://aistudio.google.com/';
+
+  @override
   String get ignoreField => '🚫 Ignorar Campo';
 
   @override
@@ -441,6 +449,14 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get integrations => 'Integraciones';
+
+  @override
+  String get integrationGeminiDesc =>
+      'Conecta Invenicum con Gemini de Google para aprovechar las capacidades avanzadas de IA en la gestión de tu inventario.';
+
+  @override
+  String get integrationTelegramDesc =>
+      'Conecta Invenicum con Telegram para recibir notificaciones instantáneas sobre tu inventario directamente en tu dispositivo.';
 
   @override
   String get invalidAssetId => 'ID de activo no válido';

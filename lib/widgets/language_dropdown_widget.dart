@@ -7,6 +7,9 @@ import 'package:provider/provider.dart';
 class LanguageDropdownWidget extends StatelessWidget {
   final VoidCallback? onLanguageChanged;
 
+  // Definimos el tamaño aquí para cambiarlo fácilmente en un solo sitio
+  static const double _flagSize = 24.0;
+
   const LanguageDropdownWidget({
     super.key,
     this.onLanguageChanged,
@@ -23,72 +26,12 @@ class LanguageDropdownWidget extends StatelessWidget {
         onLanguageChanged?.call();
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
-          value: 'en',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('🇺🇸', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(width: 12),
-              const Text('English'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'es',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('🇪🇸', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(width: 12),
-              const Text('Español'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'it',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('🇮🇹', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(width: 12),
-              const Text('Italiano'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'pt',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('🇵🇹', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(width: 12),
-              const Text('Português'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'fr',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('🇫🇷', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(width: 12),
-              const Text('Français'),
-            ],
-          ),
-        ),
-        PopupMenuItem<String>(
-          value: 'de',
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('🇩🇪', style: Theme.of(context).textTheme.titleMedium),
-              const SizedBox(width: 12),
-              const Text('Deutsch'),
-            ],
-          ),
-        ),
+        _buildMenuItem(context, 'en', '🇺🇸', 'English'),
+        _buildMenuItem(context, 'es', '🇪🇸', 'Español'),
+        _buildMenuItem(context, 'it', '🇮🇹', 'Italiano'),
+        _buildMenuItem(context, 'pt', '🇵🇹', 'Português'),
+        _buildMenuItem(context, 'fr', '🇫🇷', 'Français'),
+        _buildMenuItem(context, 'de', '🇩🇪', 'Deutsch'),
       ],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -97,7 +40,7 @@ class LanguageDropdownWidget extends StatelessWidget {
           children: [
             Text(
               _getFlagForLanguage(currentLanguage),
-              style: Theme.of(context).textTheme.titleMedium,
+              style: const TextStyle(fontSize: _flagSize), // Bandera principal grande
             ),
             const SizedBox(width: 8),
             const Icon(Icons.arrow_drop_down, size: 20),
@@ -107,39 +50,41 @@ class LanguageDropdownWidget extends StatelessWidget {
     );
   }
 
+  // Método helper para no repetir código y aplicar el tamaño a todas
+  PopupMenuItem<String> _buildMenuItem(
+      BuildContext context, String value, String flag, String label) {
+    return PopupMenuItem<String>(
+      value: value,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(flag, style: const TextStyle(fontSize: _flagSize)), // Bandera del menú grande
+          const SizedBox(width: 12),
+          Text(label),
+        ],
+      ),
+    );
+  }
+
   String _getFlagForLanguage(String languageCode) {
     switch (languageCode) {
-      case 'es':
-        return '🇪🇸';
-      case 'it':
-        return '🇮🇹';
-      case 'pt':
-        return '🇵🇹';
-      case 'fr':
-        return '🇫🇷';
-      case 'de':
-        return '🇩🇪';
+      case 'es': return '🇪🇸';
+      case 'it': return '🇮🇹';
+      case 'pt': return '🇵🇹';
+      case 'fr': return '🇫🇷';
+      case 'de': return '🇩🇪';
       case 'en':
-      default:
-        return '🇺🇸';
+      default: return '🇺🇸';
     }
   }
 
   Future<void> _changeLanguage(BuildContext context, String languageCode) async {
     try {
       await context.read<PreferencesProvider>().setLanguage(languageCode);
-
-      final currentLocale = Localizations.localeOf(context);
-      if (currentLocale.languageCode != languageCode) {
-        ToastService.success(
-          languageCode == 'es'
-              ? AppLocalizations.of(context)!.languageChanged
-              : 'Language changed to English!',
-        );
-      }
+      ToastService.success(AppLocalizations.of(context)!.languageChanged);
     } catch (e) {
       final l10n = AppLocalizations.of(context)!;
-      ToastService.error('${l10n.errorChangingLanguage(e.toString())}');
+      ToastService.error(l10n.errorChangingLanguage(e.toString()));
     }
   }
 }

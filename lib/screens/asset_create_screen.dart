@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/location.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/services/ai_service.dart';
 import 'package:invenicum/services/api_service.dart';
 import 'package:invenicum/utils/asset_form_utils.dart';
@@ -216,7 +217,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         curve: Curves.easeInOut,
       );
     } catch (e) {
-      ToastService.error(AppLocalizations.of(context)!.aiExtractionError(e.toString()));
+      ToastService.error(
+        AppLocalizations.of(context)!.aiExtractionError(e.toString()),
+      );
     } finally {
       setState(() => _isMagicLoading = false);
     }
@@ -411,8 +414,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
               child: CheckboxListTile(
                 title: Text(fieldDef.name),
                 subtitle: fieldDef.isRequired
-                  ? Text(AppLocalizations.of(context)!.obligatory)
-                  : null,
+                    ? Text(AppLocalizations.of(context)!.obligatory)
+                    : null,
                 value: _booleanFieldValues[fieldDef.id] ?? false,
                 onChanged: (bool? newValue) {
                   setState(() {
@@ -493,7 +496,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   Widget build(BuildContext context) {
     // Escuchar al proveedor para reconstrucción en caso de recarga de datos
     context.watch<ContainerProvider>();
-
+    final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
     if (_assetType == null || _containerId == null || _assetTypeId == null) {
       // Intenta inicializar de nuevo si el assetType es nulo (puede ser la primera carga)
       if (_assetType == null) {
@@ -523,10 +526,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 10),
-                      // SUSTITÚYELO POR ESTO
                       Align(
                         alignment: Alignment.centerRight,
-                        child: AnimatedSwitcher(
+                        child: aiEnabled ? AnimatedSwitcher(
                           duration: const Duration(milliseconds: 300),
                           child: _isMagicLoading
                               ? ElevatedButton.icon(
@@ -567,7 +569,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                                     ),
                                   ),
                                 ),
-                        ),
+                        ) : null,
                       ),
                       const SizedBox(height: 10),
                       // --- CAMPOS COMUNES ---
@@ -714,7 +716,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
 
               // --- BOTÓN DE GUARDAR ---
               Align(
-                alignment: Alignment.centerRight,
+                alignment: Alignment.center,
                 child: ElevatedButton.icon(
                   onPressed: _saveAsset,
                   icon: const Icon(Icons.save),

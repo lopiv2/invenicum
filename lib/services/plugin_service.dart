@@ -50,18 +50,18 @@ class PluginService {
 
   /// Descarga el código STAC del plugin
   Future<Map<String, dynamic>> downloadPluginStac(String url) async {
-  try {
-    final response = await _dio.get(
-      '/plugins/preview-stac', 
-      queryParameters: {'url': url}
-    );
-    
-    return response.data;
-  } catch (e) {
-    debugPrint("Error obteniendo preview a través del backend: $e");
-    rethrow;
+    try {
+      final response = await _dio.get(
+        '/plugins/preview-stac',
+        queryParameters: {'url': url},
+      );
+
+      return response.data;
+    } catch (e) {
+      debugPrint("Error obteniendo preview a través del backend: $e");
+      rethrow;
+    }
   }
-}
 
   Future<void> toggleUserPlugin(String pluginId, bool isActive) async {
     // Apuntamos al nuevo endpoint que maneja la tabla UserPlugin
@@ -91,9 +91,12 @@ class PluginService {
   }
 
   /// [D] DELETE (Físico): Elimina el plugin de la base de datos global
-  Future<void> deletePlugin(String pluginId) async {
-    // 💡 El backend responderá 403 si el usuario no es el autor
-    await _dio.delete('/plugins/$pluginId');
+  Future<void> deletePlugin(String pluginId, bool deleteFromGitHub) async {
+    // 💡 Enviamos el flag como query parameter para que el backend lo reciba
+    await _dio.delete(
+      '/plugins/$pluginId',
+      queryParameters: {'deleteFromGitHub': deleteFromGitHub},
+    );
   }
 
   /// Obtiene los plugins que el usuario ya tiene comprados/instalados

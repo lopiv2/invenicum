@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/widgets/chatbot_veni_widget.dart';
 import 'package:invenicum/widgets/search_bar_widget.dart';
 import 'package:invenicum/widgets/sidebar_layout.dart';
@@ -12,56 +13,119 @@ import 'package:invenicum/widgets/stac_slot.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 
-class MainLayout extends StatelessWidget {
+class MainLayout extends StatefulWidget {
   final Widget child;
 
   const MainLayout({super.key, required this.child});
 
   @override
+  State<MainLayout> createState() => _MainLayoutState();
+}
+
+// lib/widgets/main_layout.dart
+
+class _MainLayoutState extends State<MainLayout> {
+  bool _isChatOpen = false;
+  late Offset _veniPosition;
+  bool _isInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      final size = MediaQuery.of(context).size;
+      // Posición inicial segura: un poco alejada de los bordes (bottom-right)
+      _veniPosition = Offset(size.width - 160, size.height - 120);
+      _isInitialized = true;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final isDarkMode = theme.brightness == Brightness.dark;
+    final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
+    final colorScheme = Theme.of(context).colorScheme;
+    final size = MediaQuery.of(context).size;
+
+    final showFAB = aiEnabled && !_isChatOpen;
+    final showChat = aiEnabled && _isChatOpen;
 
     return Scaffold(
-      // FAB Modernizado
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end, // Alineados a la derecha
+      body: Stack(
         children: [
-          // Slot para botones dinámicos (Stac)
-          const StacSlot(slotName: 'floating_action_button'),
+          _buildBaseApp(context),
 
-          // Espacio entre el botón dinámico y el tuyo
-          const SizedBox(height: 12),
-
-          FloatingActionButton.extended(
-            onPressed: () => _showChatbot(context),
-            label: Text(AppLocalizations.of(context)?.veniChatTitle ?? 'Veni'),
-            icon: const Icon(Icons.auto_awesome_rounded, size: 20),
-            elevation: 4,
-            backgroundColor: colorScheme.primary,
-            foregroundColor: colorScheme.onPrimary,
-          ),
-        ],
-      ),
-
-      body: Column(
-        children: [
-          const _Header(),
-          Expanded(
-            child: Row(
+          // Usamos un solo Positioned para el "Contenedor de Veni"
+          // Importante: No le damos ancho/alto fijo aquí para que no bloquee la pantalla
+          Positioned(
+            right: size.width - _veniPosition.dx,
+            bottom: size.height - _veniPosition.dy,
+            child: Stack(
+              clipBehavior: Clip.none,
+              // Alineamos al centro para que la expansión del chat sea simétrica
+              // o mantén bottomRight si prefieres que crezca hacia arriba/izquierda
+              alignment: Alignment.bottomRight,
               children: [
-                const SidebarLayout(),
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: isDarkMode
-                          ? colorScheme.surface
-                          : colorScheme
-                                .surfaceContainerLowest, // Fondo más limpio
+                // 1. EL CHAT (Se dibuja primero para que el botón pueda estar encima si coinciden)
+                IgnorePointer(
+                  ignoring: !showChat,
+                  child: AnimatedScale(
+                    scale: showChat ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOutBack,
+                    // Alineamos el crecimiento desde donde estaría el botón
+                    alignment: Alignment.bottomRight,
+                    child: AnimatedOpacity(
+                      opacity: showChat ? 1.0 : 0.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Material(
+                        elevation: 12,
+                        borderRadius: BorderRadius.circular(24),
+                        child: VeniChatbot(
+                          initialPath: GoRouterState.of(context).uri.toString(),
+                          onClose: () => setState(() => _isChatOpen = false),
+                          onDrag: (delta) {
+                            setState(() {
+                              _veniPosition += delta;
+                              // Ajustamos los límites para que el chat no se salga por ARRIBA (600px)
+                              _veniPosition = Offset(
+                                _veniPosition.dx.clamp(400.0, size.width),
+                                _veniPosition.dy.clamp(600.0, size.height),
+                              );
+                            });
+                          },
+                        ),
+                      ),
                     ),
-                    child: child,
+                  ),
+                ),
+
+                // 2. EL BOTÓN
+                IgnorePointer(
+                  ignoring: !showFAB,
+                  child: AnimatedScale(
+                    scale: showFAB ? 1.0 : 0.0,
+                    duration: const Duration(milliseconds: 400),
+                    curve: Curves.easeOutBack,
+                    child: GestureDetector(
+                      onPanUpdate: (details) {
+                        setState(() {
+                          _veniPosition += details.delta;
+                          // Limites para el BOTÓN (aprox 120 ancho x 50 alto)
+                          _veniPosition = Offset(
+                            _veniPosition.dx.clamp(0.0, size.width - 120),
+                            _veniPosition.dy.clamp(0.0, size.height - 60),
+                          );
+                        });
+                      },
+                      child: FloatingActionButton.extended(
+                        heroTag: 'veni_fab_unique',
+                        onPressed: () => setState(() => _isChatOpen = true),
+                        label: const Text('Veni'),
+                        icon: const Icon(Icons.auto_awesome_rounded),
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -72,23 +136,33 @@ class MainLayout extends StatelessWidget {
     );
   }
 
-  void _showChatbot(BuildContext context) {
-    final String currentPath = GoRouterState.of(context).uri.toString();
+  // Método auxiliar para limpiar el build
+  Widget _buildBaseApp(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
 
-    showDialog(
-      context: context,
-      barrierColor: Colors.black12,
-      builder: (context) => Align(
-        alignment: Alignment.bottomRight,
-        child: Padding(
-          padding: const EdgeInsets.only(right: 20, bottom: 90),
-          child: Material(
-            elevation: 12,
-            borderRadius: BorderRadius.circular(24),
-            child: VeniChatbot(initialPath: currentPath),
+    return Column(
+      children: [
+        const _Header(),
+        Expanded(
+          child: Row(
+            children: [
+              const SidebarLayout(),
+              Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? colorScheme.surface
+                        : colorScheme.surfaceContainerLowest,
+                  ),
+                  child: widget.child,
+                ),
+              ),
+            ],
           ),
         ),
-      ),
+      ],
     );
   }
 }

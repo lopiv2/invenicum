@@ -802,6 +802,12 @@ abstract class AppLocalizations {
   /// **'Formats: PNG, JPG'**
   String get formatsPNG;
 
+  /// No description provided for @geminiLabelModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended Gemini model: gemini-3-flash-preview'**
+  String get geminiLabelModel;
+
   /// No description provided for @generalSettings.
   ///
   /// In en, this message translates to:
@@ -838,6 +844,12 @@ abstract class AppLocalizations {
   /// **'Help & Documentation'**
   String get helpDocs;
 
+  /// No description provided for @helperGeminiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Gemini API key to enable integration. Get it at https://aistudio.google.com/'**
+  String get helperGeminiKey;
+
   /// No description provided for @ignoreField.
   ///
   /// In en, this message translates to:
@@ -861,6 +873,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Integrations'**
   String get integrations;
+
+  /// No description provided for @integrationGeminiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Invenicum with Google\'s Gemini to leverage advanced AI capabilities in managing your inventory.'**
+  String get integrationGeminiDesc;
+
+  /// No description provided for @integrationTelegramDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Invenicum with Telegram to receive instant notifications about your inventory directly on your device.'**
+  String get integrationTelegramDesc;
 
   /// No description provided for @invalidAssetId.
   ///
