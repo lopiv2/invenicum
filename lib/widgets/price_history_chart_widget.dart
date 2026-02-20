@@ -30,14 +30,15 @@ class PriceHistoryChart extends StatelessWidget {
           ),
         ),
         AspectRatio(
-          aspectRatio: 1.7,
+          aspectRatio: 6,
           child: Padding(
             padding: const EdgeInsets.only(right: 20, left: 10, top: 10, bottom: 10),
             child: LineChart(
               LineChartData(
+                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
                 gridData: FlGridData(
                   show: true,
-                  drawVerticalLine: false,
+                  drawVerticalLine: true,
                   getDrawingHorizontalLine: (value) => FlLine(
                     color: theme.dividerColor.withOpacity(0.1),
                     strokeWidth: 1,
@@ -50,7 +51,7 @@ class PriceHistoryChart extends StatelessWidget {
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 30,
+                      reservedSize: 40,
                       interval: _calculateInterval(),
                       getTitlesWidget: (value, meta) {
                         final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());

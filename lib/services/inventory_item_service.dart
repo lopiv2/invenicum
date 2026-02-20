@@ -304,18 +304,22 @@ class InventoryItemService {
 
   Future<List<PriceHistoryPoint>> getItemPriceHistory(int itemId) async {
   try {
-    // Hacemos la petición al endpoint que creamos en Node.js
-    final response = await _dio.get('/inventory/items/$itemId/history');
+    final response = await _dio.get('/items/$itemId/price-history');
 
-    if (response.data['success'] == true) {
-      final List data = response.data['data'];
-      // Mapeamos la lista de mapas a una lista de objetos de tipo PriceHistoryPoint
+    if (response.statusCode == 200) {
+      // Si el backend envía el array directamente [{}, {}]
+      // Usamos response.data directamente si Dio ya lo parseó a List
+      final List data = response.data is List 
+          ? response.data 
+          : response.data['data'] ?? []; 
+      
       return data.map((json) => PriceHistoryPoint.fromJson(json)).toList();
     } else {
       throw response.data['error'] ?? 'Error al obtener el historial';
     }
   } catch (e) {
-    rethrow; // Re-lanzamos para que el provider lo capture
+    print("Error en Service: $e");
+    rethrow;
   }
 }
 
