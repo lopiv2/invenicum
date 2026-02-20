@@ -6,8 +6,12 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
+import 'package:invenicum/services/ai_service.dart';
+import 'package:invenicum/services/api_service.dart';
 import 'package:invenicum/utils/asset_form_utils.dart';
 import 'package:invenicum/widgets/location_dropdown_widget.dart';
+import 'package:invenicum/widgets/magic_ai_dialog_widget.dart';
 import 'package:provider/provider.dart';
 import '../models/asset_type_model.dart';
 import '../models/container_node.dart';
@@ -44,8 +48,13 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // 1. Controllers para campos fijos
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
-  late TextEditingController _quantityController; // 🔑 NUEVA: Controlador de cantidad
-  late TextEditingController _minStockController; // 🔑 NUEVA: Controlador de minStock
+  late TextEditingController _quantityController;
+  late TextEditingController _minStockController;
+  late TextEditingController _barcodeController;
+  bool _isMagicLoading = false; // Controla el spinner del botón IA
+  Set<String> _highlightedFields = {}; // Para el efecto visual verde
+  late AIService _aiService; // El servicio de IA
+  final ScrollController _scrollController = ScrollController();
 
   // 🔑 ESTADO PARA UBICACIÓN
   List<Location> _availableLocations = [];
@@ -60,6 +69,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   // 🔑 ESTADO PARA CAMPOS BOOLEANOS (Checkbox)
   final Map<int, bool?> _booleanValues = {};
+  InventoryItem? currentItem;
+  bool _isInitialized = false;
 
   // Estado del modelo
   AssetType? _assetType;
@@ -81,7 +92,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error(AppLocalizations.of(context)!.errorLoadingListValues(e.toString()));
+        ToastService.error(
+          AppLocalizations.of(context)!.errorLoadingListValues(e.toString()),
+        );
       }
     }
   }
@@ -105,37 +118,180 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   void initState() {
     super.initState();
 
-    _nameController = TextEditingController(
-      text: widget.initialItem?.name ?? '',
-    );
-    _descriptionController = TextEditingController(
-      text: widget.initialItem?.description ?? '',
-    );
-    _quantityController = TextEditingController(
-      text: (widget.initialItem?.quantity ?? 1).toString(), // 🔑 NUEVA: Inicializar con cantidad
-    );
-    _minStockController = TextEditingController(
-      text: (widget.initialItem?.minStock ?? 1).toString(), // 🔑 NUEVA: Inicializar con minStock
-    );
+    super.initState();
+    _nameController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _quantityController = TextEditingController();
+    _minStockController = TextEditingController();
+    _barcodeController = TextEditingController();
     _dynamicControllers = {};
 
     // 🔑 Inicializar estado de ubicación con el valor del item inicial
-    _selectedLocationId = widget.initialItem?.locationId;
+    _selectedLocationId = currentItem?.locationId;
 
     // 🚀 Inicializar el estado de imágenes existentes haciendo una copia
-    _currentImages = List.from(widget.initialItem?.images ?? []);
+    _currentImages = List.from(currentItem?.images ?? []);
+    _aiService = AIService(context.read<ApiService>());
+  }
+
+  void _initializeAllFields(InventoryItem item) {
+    if (_isInitialized)
+      return; // Evita sobrescribir si el usuario ya empezó a escribir
+
+    _nameController.text = item.name;
+    _descriptionController.text = item.description ?? '';
+    _quantityController.text = item.quantity.toString();
+    _minStockController.text = item.minStock.toString();
+    _barcodeController.text = item.barcode ?? '';
+    _selectedLocationId = item.locationId;
+    _currentImages = List.from(item.images);
+
+    // Aquí llamamos a tu lógica de campos dinámicos
+    _initializeDynamicFields(item);
+
+    setState(() {
+      _isInitialized = true;
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (_assetType == null) {
-      _initializeDynamicFields();
+    final containerProvider = context.watch<ContainerProvider>();
+    final itemProvider = context.watch<InventoryItemProvider>();
+    final itemId = int.tryParse(widget.assetItemId);
+
+    // 1. Intentar encontrar el item (Widget o Caché)
+    currentItem =
+        widget.initialItem ??
+        (itemId != null ? itemProvider.getItemById(itemId) : null);
+
+    // 2. Si no existe en ningún lado, pedirlo a la API
+    if (currentItem == null && !itemProvider.isLoading && itemId != null) {
+      final cId = int.tryParse(widget.containerId) ?? 0;
+      final atId = int.tryParse(widget.assetTypeId) ?? 0;
+      Future.microtask(
+        () => itemProvider.loadInventoryItems(
+          containerId: cId,
+          assetTypeId: atId,
+        ),
+      );
+      return;
+    }
+
+    // 3. Cuando tengamos TODO, inicializamos los controladores una sola vez
+    if (!_isInitialized &&
+        currentItem != null &&
+        containerProvider.containers.isNotEmpty) {
+      _initializeAllFields(currentItem!);
     }
   }
 
-  void _initializeDynamicFields() {
+  Future<void> _runMagicAI(String url) async {
+    if (_assetType == null) return;
+
+    setState(() => _isMagicLoading = true);
+
+    try {
+      // 1. Obtener nombres de campos personalizados para enviarlos a la IA
+      final List<String> customFields = _assetType!.fieldDefinitions
+          .map((f) => f.name)
+          .toList();
+
+      final Map<String, dynamic> result = await _aiService.extractDataFromUrl(
+        url: url,
+        fields: customFields,
+      );
+
+      setState(() {
+        // 2. Procesar imagen si la IA devuelve una (Base64)
+        if (result['imageUrl'] != null &&
+            result['imageUrl'].toString().startsWith('data:image')) {
+          _newImagePreviewUrls.add(result['imageUrl']);
+        }
+
+        // 3. Rellenar campos comunes
+        if (result.containsKey('name') && result['name'] != null) {
+          _nameController.text = result['name'].toString();
+          _highlightedFields.add('name');
+        }
+        if (result.containsKey('description') &&
+            result['description'] != null) {
+          _descriptionController.text = result['description'].toString();
+          _highlightedFields.add('description');
+        }
+
+        // 4. Rellenar campos personalizados dinámicos
+        for (var fieldDef in _assetType!.fieldDefinitions) {
+          final key = fieldDef.name;
+          if (!result.containsKey(key) || result[key] == null) continue;
+
+          final value = result[key];
+          _highlightedFields.add(key);
+
+          if (fieldDef.type == CustomFieldType.boolean) {
+            _booleanValues[fieldDef.id!] = value is bool
+                ? value
+                : value.toString().toLowerCase() == 'true';
+          } else if (fieldDef.type == CustomFieldType.dropdown) {
+            final List<String> options = _listFieldValues[fieldDef.id] ?? [];
+            final String incomingValue = value.toString();
+
+            final matchedOption = options.firstWhere(
+              (opt) => opt.toLowerCase() == incomingValue.toLowerCase(),
+              orElse: () => '',
+            );
+
+            if (matchedOption.isNotEmpty) {
+              _selectedListValues[fieldDef.id!] = matchedOption;
+            }
+          } else {
+            final controller = _dynamicControllers[fieldDef.id];
+            if (controller != null) {
+              String valStr = value.toString();
+              if (fieldDef.type == CustomFieldType.number ||
+                  fieldDef.type == CustomFieldType.price) {
+                valStr = valStr.replaceAll(RegExp(r'[^0-9.,]'), '');
+              }
+              controller.text = valStr;
+            }
+          }
+        }
+      });
+
+      ToastService.success(AppLocalizations.of(context)!.fieldsFilledSuccess);
+
+      // Efecto visual temporal y scroll al inicio
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) setState(() => _highlightedFields.clear());
+      });
+
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    } catch (e) {
+      ToastService.error(e.toString().replaceAll('Exception: ', ''));
+    } finally {
+      setState(() => _isMagicLoading = false);
+    }
+  }
+
+  void _showMagicDialog() async {
+    final String? url = await showDialog<String>(
+      context: context,
+      builder: (context) => const MagicAiDialog(),
+    );
+
+    if (url != null && url.isNotEmpty) {
+      _runMagicAI(url);
+    }
+  }
+
+  void _initializeDynamicFields(InventoryItem item) {
+    // <--- Recibe el item
     final containerProvider = context.read<ContainerProvider>();
     final cIdInt = int.tryParse(widget.containerId);
     final atIdInt = int.tryParse(widget.assetTypeId);
@@ -152,27 +308,22 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     );
 
     if (assetType != null && container != null) {
-      // 🔑 Check para 'container'
       setState(() {
         _assetType = assetType;
-
-        // 🔑 Cargar ubicaciones disponibles del contenedor
         _availableLocations = container.locations;
 
         for (var fieldDef in assetType.fieldDefinitions) {
           final fieldId = fieldDef.id ?? 0;
-          final initialValue =
-              widget.initialItem?.customFieldValues?[fieldId.toString()];
+          // Usamos el item pasado por parámetro
+          final initialValue = item.customFieldValues?[fieldId.toString()];
 
           if (fieldDef.type == CustomFieldType.dropdown) {
             _selectedListValues[fieldId] = initialValue;
-
             if (fieldDef.dataListId != null) {
               _loadListValues(fieldDef.dataListId!, fieldId);
             }
           } else if (fieldDef.type == CustomFieldType.boolean) {
-            bool? value = AssetFormUtils.toBoolean(initialValue);
-            _booleanValues[fieldId] = value;
+            _booleanValues[fieldId] = AssetFormUtils.toBoolean(initialValue);
           } else {
             _dynamicControllers[fieldId] = TextEditingController(
               text: initialValue?.toString() ?? '',
@@ -187,8 +338,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   void dispose() {
     _nameController.dispose();
     _descriptionController.dispose();
-    _quantityController.dispose(); // 🔑 NUEVA: Limpiar controlador de cantidad
-    _minStockController.dispose(); // 🔑 NUEVA: Limpiar controlador de minStock
+    _quantityController.dispose();
+    _minStockController.dispose();
+    _barcodeController.dispose();
     _dynamicControllers.values.forEach((controller) => controller.dispose());
     super.dispose();
   }
@@ -294,7 +446,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             ) {
       if (_selectedLocationId == null) {
         if (mounted) {
-          ToastService.error(AppLocalizations.of(context)!.selectLocationRequired);
+          ToastService.error(
+            AppLocalizations.of(context)!.selectLocationRequired,
+          );
         }
       }
       return;
@@ -323,7 +477,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           updatedCustomValues[fieldId.toString()] = selectedValue;
         } else if (fieldDef.isRequired) {
           if (mounted) {
-            ToastService.error(AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name));
+            ToastService.error(
+              AppLocalizations.of(
+                context,
+              )!.fieldRequiredWithName(fieldDef.name),
+            );
           }
           return;
         }
@@ -332,7 +490,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
         if (fieldDef.isRequired && boolValue == null) {
           if (mounted) {
-            ToastService.error(AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name));
+            ToastService.error(
+              AppLocalizations.of(
+                context,
+              )!.fieldRequiredWithName(fieldDef.name),
+            );
           }
           return;
         }
@@ -346,7 +508,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           updatedCustomValues[fieldId.toString()] = controller.text;
         } else if (fieldDef.isRequired) {
           if (mounted) {
-            ToastService.error(AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name));
+            ToastService.error(
+              AppLocalizations.of(
+                context,
+              )!.fieldRequiredWithName(fieldDef.name),
+            );
           }
           return;
         }
@@ -366,8 +532,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       assetTypeId: atIdInt,
       // 🔑 MODIFICADO: Añadir la ubicación seleccionada
       locationId: _selectedLocationId!,
-      quantity: int.tryParse(_quantityController.text) ?? 1, // 🔑 NUEVA: Obtener cantidad del controlador
-      minStock: int.tryParse(_minStockController.text) ?? 1, // 🔑 NUEVA: Obtener minStock del controlador
+      barcode: _barcodeController.text.trim().isEmpty
+          ? null
+          : _barcodeController.text.trim(),
+      quantity:
+          int.tryParse(_quantityController.text) ??
+          1, // 🔑 NUEVA: Obtener cantidad del controlador
+      minStock:
+          int.tryParse(_minStockController.text) ??
+          1, // 🔑 NUEVA: Obtener minStock del controlador
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: updatedCustomValues,
@@ -443,10 +616,14 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               padding: const EdgeInsets.only(bottom: 16),
               child: DropdownButtonFormField<String>(
                 value: selectedValue,
-                  decoration: InputDecoration(
+                decoration: InputDecoration(
                   labelText: fieldDef.name,
                   border: const OutlineInputBorder(),
-                  helperText: fieldDef.isRequired ? AppLocalizations.of(context)!.obligatory : AppLocalizations.of(context)!.optional,
+                  filled: _highlightedFields.contains(fieldDef.name),
+                  fillColor: Colors.green.withValues(alpha: 0.1),
+                  helperText: fieldDef.isRequired
+                      ? AppLocalizations.of(context)!.obligatory
+                      : AppLocalizations.of(context)!.optional,
                 ),
                 items: values.map((value) {
                   return DropdownMenuItem<String>(
@@ -485,7 +662,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                   return InputDecorator(
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                        helperText: fieldDef.isRequired
+                      helperText: fieldDef.isRequired
                           ? AppLocalizations.of(context)!.obligatory
                           : AppLocalizations.of(context)!.optional,
                       errorText: state.errorText,
@@ -547,18 +724,19 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     // Si _assetType no está cargado o initialItem es null, muestra un indicador de carga.
     // Usamos context.watch para asegurarnos de que el widget se reconstruya si el proveedor cambia.
     context.watch<ContainerProvider>();
-    if (widget.initialItem == null || _assetType == null) {
+    if (_assetType == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Editar Activo')),
+        appBar: AppBar(title: const Text('Cargando Activo...')),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
-    final assetName = widget.initialItem!.name;
-
+    final assetName = currentItem!.name;
+    final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
     return Scaffold(
       appBar: AppBar(title: Text('Editar Activo: $assetName')),
       body: SingleChildScrollView(
+        controller: _scrollController,
         padding: const EdgeInsets.all(32.0),
         child: Form(
           key: _formKey,
@@ -567,11 +745,41 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             children: [
               // --- TÍTULO ---
               Text(
-                'Editando Activo: ${widget.initialItem!.name}',
+                'Editando Activo: ${currentItem!.name}',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
               ),
+              if (aiEnabled)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: _isMagicLoading
+                      ? ElevatedButton.icon(
+                          onPressed: null,
+                          icon: const SizedBox(
+                            width: 18,
+                            height: 18,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.amber,
+                            ),
+                          ),
+                          label: const Text('Analizando...'),
+                        )
+                      : ElevatedButton.icon(
+                          key: const ValueKey('idle'),
+                          onPressed: _showMagicDialog,
+                          icon: const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.amber,
+                          ),
+                          label: const Text('Rellenar con IA'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.amber.shade100,
+                            foregroundColor: Colors.amber.shade900,
+                          ),
+                        ),
+                ),
               const SizedBox(height: 30),
 
               // 🔑 NUEVO: Selector de Ubicación
@@ -590,9 +798,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               // --- 1. CAMPOS FIJOS ---
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Nombre del Activo',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  filled: _highlightedFields.contains('name'), // 🔑 EFECTO IA
+                  fillColor: Colors.green.withValues(alpha: 0.1),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -603,10 +813,26 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               ),
               const SizedBox(height: 30),
               TextFormField(
+                controller: _barcodeController,
+                decoration: InputDecoration(
+                  labelText: 'Código de Barras / UPC',
+                  border: const OutlineInputBorder(),
+                  prefixIcon: const Icon(Icons.qr_code_scanner),
+                  filled: _highlightedFields.contains('barcode'),
+                  fillColor: Colors.green.withValues(alpha: 0.1),
+                  helperText: 'Código identificador del producto',
+                ),
+              ),
+              const SizedBox(height: 30),
+              TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Descripción del Activo',
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
+                  filled: _highlightedFields.contains(
+                    'description',
+                  ), // 🔑 EFECTO IA
+                  fillColor: Colors.green.withValues(alpha: 0.1),
                 ),
                 maxLines: 3,
               ),
@@ -622,9 +848,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     helperText: 'Cantidad disponible del artículo',
                   ),
                   keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor introduce una cantidad.';
@@ -672,9 +896,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     helperText: 'Cantidad mínima recomendada del artículo',
                   ),
                   keyboardType: TextInputType.number,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Por favor introduce un stock mínimo.';

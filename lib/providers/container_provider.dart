@@ -367,7 +367,8 @@ class ContainerProvider with ChangeNotifier {
             'subtitle': 'Activo en ${item['container_name']}',
             'icon': Icons.precision_manufacturing_outlined,
             // Construimos la ruta dinámica según tu estructura de GoRouter
-            'route': '/container/${item['container_id']}/asset-types/${item['asset_type_id']}/assets/${item['id']}',
+            'route':
+                '/container/${item['container_id']}/asset-types/${item['asset_type_id']}/assets/${item['id']}',
           });
         }
       } catch (e) {
@@ -431,6 +432,23 @@ class ContainerProvider with ChangeNotifier {
     } catch (e) {
       rethrow;
     }
+  }
+
+  List<CustomFieldDefinition> get allDefinitions {
+    final List<CustomFieldDefinition> allDefs = [];
+    final Set<int> seenIds = {}; // Para evitar duplicados si un ID se repite
+
+    for (var container in _containers) {
+      for (var assetType in container.assetTypes) {
+        for (var def in assetType.fieldDefinitions) {
+          if (def.id != null && !seenIds.contains(def.id)) {
+            allDefs.add(def);
+            seenIds.add(def.id!);
+          }
+        }
+      }
+    }
+    return allDefs;
   }
 
   // --- Lógica de Listas Personalizadas (Mantenido igual) ---

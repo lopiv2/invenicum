@@ -1,33 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:invenicum/models/dashboard_stats.dart';
 import 'api_service.dart'; // Importamos el servicio base
-
-/// Define la estructura de los datos que esperamos del endpoint de estadísticas.
-class DashboardStats {
-  final int totalContainers;
-  final int totalItems;
-  final int totalAssets;
-  final int itemsPending;
-  final int itemsLowStock;
-
-  DashboardStats({
-    required this.totalContainers,
-    required this.totalItems,
-    required this.totalAssets,
-    required this.itemsPending,
-    required this.itemsLowStock,
-  });
-
-  // Constructor de fábrica para parsear la respuesta JSON de la API
-  factory DashboardStats.fromJson(Map<String, dynamic> json) {
-    return DashboardStats(
-      totalAssets: json['totalAssets'] as int? ?? 0,
-      totalContainers: json['totalContainers'] as int? ?? 0,
-      totalItems: json['totalItems'] as int? ?? 0,
-      itemsPending: json['itemsPending'] as int? ?? 0,
-      itemsLowStock: json['itemsLowStock'] as int? ?? 0,
-    );
-  }
-}
 
 class DashboardService {
   final ApiService _apiService;

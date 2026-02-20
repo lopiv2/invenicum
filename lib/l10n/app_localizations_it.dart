@@ -683,6 +683,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get reloadLocations => 'Ricarica posizioni';
 
   @override
+  String get reloadLoans => 'Reload loans';
+
+  @override
   String get removeImage => 'Rimuovi immagine';
 
   @override

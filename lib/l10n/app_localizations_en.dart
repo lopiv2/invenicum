@@ -676,7 +676,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get reloadContainers => 'Reload containers';
 
   @override
-  String get reloadLocations => 'Reload Locations';
+  String get reloadLocations => 'Reload locations';
+
+  @override
+  String get reloadLoans => 'Reload loans';
 
   @override
   String get removeImage => 'Remove Image';
@@ -812,7 +815,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get thisFieldIsRequired => 'This field is required.';
 
   @override
-  String get topLoanedItems => 'Top Loaned Items';
+  String get topLoanedItems => 'Top loaned items per months';
 
   @override
   String get totalAssets => 'Asset Types';

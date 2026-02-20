@@ -681,7 +681,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reloadContainers => 'Recargar contenedores';
 
   @override
-  String get reloadLocations => 'Recargar Ubicaciones';
+  String get reloadLocations => 'Recargar ubicaciones';
+
+  @override
+  String get reloadLoans => 'Recargar préstamos';
 
   @override
   String get removeImage => 'Eliminar Imagen';
@@ -818,7 +821,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get thisFieldIsRequired => 'Este campo es obligatorio.';
 
   @override
-  String get topLoanedItems => 'Productos Más Prestados';
+  String get topLoanedItems => 'Productos más prestados por meses';
 
   @override
   String get totalAssets => 'Tipos de Activos';

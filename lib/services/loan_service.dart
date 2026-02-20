@@ -1,5 +1,3 @@
-// lib/services/loan_service.dart
-
 import 'package:dio/dio.dart';
 import 'package:invenicum/models/loan.dart';
 import 'api_service.dart';
@@ -10,10 +8,10 @@ class LoanService {
 
   LoanService(this._apiService);
 
-  /// Obtiene todos los préstamos de forma global (para el Dashboard)
+  /// Obtiene todos los préstamos globales (Dashboard)
+  /// El backend ya filtra por el userId del Token JWT
   Future<List<Loan>> getAllLoans() async {
     try {
-      // 🚩 Ajusta esta ruta según tu API (ej: '/loans' o '/users/me/loans')
       final response = await _dio.get('/loans');
 
       if (response.statusCode == 200) {
@@ -22,18 +20,14 @@ class LoanService {
             .map((json) => Loan.fromJson(json as Map<String, dynamic>))
             .toList();
       } else {
-        throw Exception(
-          'Error al obtener todos los préstamos: ${response.statusCode}',
-        );
+        throw Exception('Error al obtener préstamos globales');
       }
-    } on DioException {
-      rethrow;
-    } catch (e) {
-      throw Exception('Error en getAllLoans: $e');
+    } on DioException catch (e) {
+      throw Exception('Error de red: ${e.message}');
     }
   }
 
-  /// Obtiene todos los préstamos de un contenedor
+  /// Obtiene los préstamos de un contenedor específico
   Future<List<Loan>> getLoans(int containerId) async {
     try {
       final response = await _dio.get('/containers/$containerId/loans');
@@ -44,73 +38,34 @@ class LoanService {
             .map((json) => Loan.fromJson(json as Map<String, dynamic>))
             .toList();
       } else {
-        throw Exception('Error al obtener préstamos: ${response.statusCode}');
+        throw Exception('Error al obtener préstamos del contenedor');
       }
-    } on DioException {
-      rethrow;
-    } catch (e) {
-      throw Exception('Error en getLoans: $e');
-    }
-  }
-
-  /// Obtiene un préstamo específico por ID
-  Future<Loan> getLoan(int containerId, int loanId) async {
-    try {
-      final response = await _dio.get('/containers/$containerId/loans/$loanId');
-
-      if (response.statusCode == 200) {
-        return Loan.fromJson(response.data as Map<String, dynamic>);
-      } else {
-        throw Exception('Error al obtener el préstamo: ${response.statusCode}');
-      }
-    } on DioException {
-      rethrow;
-    } catch (e) {
-      throw Exception('Error en getLoan: $e');
+    } on DioException catch (e) {
+      throw Exception('Error de red: ${e.message}');
     }
   }
 
   /// Crea un nuevo préstamo
+  /// Nota: Ya no pasamos el userId en el body, el backend lo pone del Token
   Future<Loan> createLoan(int containerId, Loan loan) async {
     try {
       final response = await _dio.post(
         '/containers/$containerId/loans',
-        data: loan.toJson(),
+        data: loan.toJson(), // El backend ignora campos que no necesita
       );
 
       if (response.statusCode == 201 || response.statusCode == 200) {
         return Loan.fromJson(response.data as Map<String, dynamic>);
       } else {
-        throw Exception('Error al crear préstamo: ${response.statusCode}');
+        throw Exception('Error al crear el préstamo');
       }
-    } on DioException {
-      rethrow;
-    } catch (e) {
-      throw Exception('Error en createLoan: $e');
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['error'] ?? 'Error al crear préstamo');
     }
   }
 
-  /// Actualiza un préstamo existente
-  Future<Loan> updateLoan(int containerId, Loan loan) async {
-    try {
-      final response = await _dio.put(
-        '/containers/$containerId/loans/${loan.id}',
-        data: loan.toJsonForUpdate(),
-      );
-
-      if (response.statusCode == 200) {
-        return Loan.fromJson(response.data as Map<String, dynamic>);
-      } else {
-        throw Exception('Error al actualizar préstamo: ${response.statusCode}');
-      }
-    } on DioException {
-      rethrow;
-    } catch (e) {
-      throw Exception('Error en updateLoan: $e');
-    }
-  }
-
-  /// Devuelve un objeto prestado (marca como returned)
+  /// Marca un préstamo como devuelto
+  /// El backend ya incrementa el stock automáticamente
   Future<Loan> returnLoan(int containerId, int loanId) async {
     try {
       final response = await _dio.put(
@@ -120,16 +75,14 @@ class LoanService {
       if (response.statusCode == 200) {
         return Loan.fromJson(response.data as Map<String, dynamic>);
       } else {
-        throw Exception('Error al devolver préstamo: ${response.statusCode}');
+        throw Exception('Error al devolver el objeto');
       }
-    } on DioException {
-      rethrow;
-    } catch (e) {
-      throw Exception('Error en returnLoan: $e');
+    } on DioException catch (e) {
+      throw Exception(e.response?.data['error'] ?? 'Error en la devolución');
     }
   }
 
-  /// Elimina un préstamo
+  /// Elimina un préstamo (Solo si eres el dueño)
   Future<void> deleteLoan(int containerId, int loanId) async {
     try {
       final response = await _dio.delete(
@@ -137,12 +90,23 @@ class LoanService {
       );
 
       if (response.statusCode != 200 && response.statusCode != 204) {
-        throw Exception('Error al eliminar préstamo: ${response.statusCode}');
+        throw Exception('No se pudo eliminar el préstamo');
       }
-    } on DioException {
-      rethrow;
-    } catch (e) {
-      throw Exception('Error en deleteLoan: $e');
+    } on DioException catch (e) {
+      throw Exception('Error al borrar: ${e.message}');
+    }
+  }
+
+  /// Obtiene estadísticas para el widget del contenedor
+  Future<Map<String, dynamic>> getLoanStats(int containerId) async {
+    try {
+      final response = await _dio.get('/containers/$containerId/loans-stats');
+      if (response.statusCode == 200) {
+        return response.data as Map<String, dynamic>;
+      }
+      throw Exception('Error al obtener estadísticas');
+    } on DioException catch (e) {
+      throw Exception('Error de estadísticas: ${e.message}');
     }
   }
 }

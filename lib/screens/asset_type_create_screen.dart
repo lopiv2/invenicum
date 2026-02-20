@@ -110,6 +110,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
           // 🔑 Inicialización de los nuevos campos
           isSummable: false,
           isCountable: false,
+          isMonetary: false,
         ),
       );
     });
@@ -164,7 +165,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       } catch (e) {
         if (context.mounted) {
           ToastService.error(
-            'Error al crear el Tipo de Activo: ${e.toString()}',         
+            'Error al crear el Tipo de Activo: ${e.toString()}',
           );
         }
       }
@@ -216,17 +217,43 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
             Card(
               color: theme.secondaryHeaderColor,
               child: CheckboxListTile(
-                title: const Text('¿Es un artículo seriado?'),
-                subtitle: const Text(
-                  'Los artículos seriados tienen cantidad fija de 1 (ej: número de serie). '
-                  'Los no seriados pueden tener cantidades variables (ej: consumibles).',
-                ),
                 value: _isSerialized,
                 onChanged: (value) {
                   setState(() {
                     _isSerialized = value ?? true;
                   });
                 },
+                // Usamos el título para poner el texto y el icono de ayuda
+                title: Row(
+                  children: [
+                    const Text('¿Es un artículo seriado?'),
+                    const SizedBox(width: 8),
+                    Tooltip(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.symmetric(horizontal: 20),
+                      showDuration: const Duration(
+                        seconds: 5,
+                      ), // Duración en móvil tras pulsar
+                      triggerMode: TooltipTriggerMode
+                          .longPress, // En móvil se activa con pulsación larga
+                      message:
+                          'Los artículos seriados tienen cantidad fija de 1 (ej: número de serie).\n\n'
+                          'Los no seriados pueden tener cantidades variables (ej: consumibles), '
+                          'y añaden campos de "Cantidad" y "Stock Mínimo" en la creación de elementos.',
+                      child: Icon(
+                        Icons.help_outline,
+                        size: 18,
+                        color: theme.primaryColor.withOpacity(0.7),
+                      ),
+                    ),
+                  ],
+                ),
+                subtitle: Text(
+                  _isSerialized
+                      ? 'Cantidad fija (1 unidad).'
+                      : 'Cantidad variable y control de stock.',
+                  style: const TextStyle(fontSize: 12),
+                ),
               ),
             ),
             const SizedBox(height: 30),
@@ -330,6 +357,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
 
             // --- Botones de Guardar y Cancelar ---
             Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton.icon(
                   onPressed: _saveAssetType,
@@ -349,10 +377,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                 OutlinedButton.icon(
                   onPressed: () => context.pop(),
                   icon: const Icon(Icons.cancel),
-                  label: const Text(
-                    'Cancelar',
-                    style: TextStyle(fontSize: 16),
-                  ),
+                  label: const Text('Cancelar', style: TextStyle(fontSize: 16)),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 30,

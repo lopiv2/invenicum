@@ -126,29 +126,48 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                 final bool isSensitive = sensitiveIds.contains(field.id);
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 16),
-                  child: TextFormField(
-                    controller: _controllers[field.id],
-                    obscureText: isSensitive ? (_obscureTextMap[field.id] ?? true) : false,
-                    decoration: InputDecoration(
-                      labelText: field.label,
-                      helperText: field.helperText,
-                      border: const OutlineInputBorder(),
-                      suffixIcon: isSensitive
-                          ? IconButton(
-                              icon: Icon(
-                                _obscureTextMap[field.id] == true
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                              ),
-                              onPressed: () {
-                                setState(() {
-                                  _obscureTextMap[field.id] =
-                                      !(_obscureTextMap[field.id] ?? true);
-                                });
-                              },
-                            )
-                          : null, // Si no es sensible, no hay icono
-                    ),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _controllers[field.id],
+                        obscureText: isSensitive
+                            ? (_obscureTextMap[field.id] ?? true)
+                            : false,
+                        decoration: InputDecoration(
+                          labelText: field.label,
+                          helperText: field.helperText,
+                          border: const OutlineInputBorder(),
+                          suffixIcon: isSensitive
+                              ? IconButton(
+                                  icon: Icon(
+                                    _obscureTextMap[field.id] == true
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureTextMap[field.id] =
+                                          !(_obscureTextMap[field.id] ?? true);
+                                    });
+                                  },
+                                )
+                              : null, // Si no es sensible, no hay icono
+                        ),
+                      ),
+                      if (widget.integration.id == 'upcitemdb' &&
+                          field.id == 'apiKey')
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, left: 4),
+                          child: Text(
+                            "Deja este campo vacío para usar el modo Gratuito (Limitado).",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blueGrey[400],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 );
               }

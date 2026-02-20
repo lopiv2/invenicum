@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:invenicum/models/inventory_item.dart';
 // 🔑 Importamos la clase que contiene la lista de ítems Y los totales
 import 'package:invenicum/models/inventory_item_response.dart';
+import 'package:invenicum/models/price_history_point.dart';
 import 'api_service.dart';
 import 'dart:typed_data';
 import 'dart:convert';
@@ -24,22 +25,15 @@ class InventoryItemService {
     Map<String, String>? aggregationFilters,
   }) async {
     try {
-      // 🔑 LÓGICA DE RUTA DINÁMICA
-      // Si faltan los IDs, apuntamos a una ruta global, no a la jerárquica
-      String path;
-      if (containerId != null && assetTypeId != null) {
-        path = '/containers/$containerId/asset-types/$assetTypeId/items';
-      } else {
-        path = '/items'; // <--- Esta ruta debe existir en tu backend
-      }
+      String path = (containerId != null && assetTypeId != null)
+          ? '/containers/$containerId/asset-types/$assetTypeId/items'
+          : '/items';
 
       final Map<String, dynamic> queryParameters = {};
-
       if (aggregationFilters != null && aggregationFilters.isNotEmpty) {
-        final aggString = aggregationFilters.entries
+        queryParameters['aggFilters'] = aggregationFilters.entries
             .map((e) => '${e.key}:${e.value}')
             .join(',');
-        queryParameters['aggFilters'] = aggString;
       }
 
       final response = await _dio.get(
@@ -47,34 +41,37 @@ class InventoryItemService {
         queryParameters: queryParameters.isNotEmpty ? queryParameters : null,
       );
 
-      // 🔑 Verificar y extraer correctamente
+      // 1. Verificación básica de nulidad
       if (response.data == null) {
-        return InventoryResponse(
-          items: [],
-          aggregationDefinitions: [],
-          aggregationResults: {},
-        );
+        //return InventoryResponse.empty(); // Asegúrate de tener un constructor vacío
       }
 
       final responseData = response.data as Map<String, dynamic>;
-      final dataField = responseData['data'] as Map<String, dynamic>?;
 
-      if (dataField == null) {
-        return InventoryResponse(
-          items: [],
-          aggregationDefinitions: [],
-          aggregationResults: {},
-        );
+      // 2. Extraer el campo 'data'.
+      // OJO: Si tu backend en la ruta global no envuelve en 'data', usa responseData
+      final dataField = responseData['data'] is Map<String, dynamic>
+          ? responseData['data'] as Map<String, dynamic>
+          : responseData;
+
+      try {
+        // 3. Llamada al parser
+        return InventoryResponse.fromJson(dataField);
+      } catch (e) {
+        // 🕵️ DEBUG: Esto te dirá qué campo del JSON está rompiendo el modelo
+        print("❌ Error en el parser de InventoryResponse: $e");
+        print("JSON recibido: $dataField");
+        rethrow;
       }
-
-      // Ahora pasamos el contenido correcto a fromJson
-      return InventoryResponse.fromJson(dataField);
-    } on DioException {
+    } on DioException catch (e) {
+      print("DioError: ${e.response?.data}");
       rethrow;
     } catch (e) {
       throw Exception('Error inesperado al obtener ítems: $e');
     }
   }
+
+  // inventory_item_service.dart
 
   Future<String?> getToken() async {
     return await _apiService.getToken();
@@ -112,6 +109,7 @@ class InventoryItemService {
 
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
+      formData.fields.add(MapEntry('barcode', item.barcode ?? ''));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
@@ -182,6 +180,7 @@ class InventoryItemService {
 
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
+      formData.fields.add(MapEntry('barcode', item.barcode ?? ''));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
@@ -300,6 +299,43 @@ class InventoryItemService {
     } catch (e) {
       // Captura cualquier otro error (ej: JSON parsing).
       throw Exception('Error inesperado durante la importación por lotes: $e');
+    }
+  }
+
+  Future<List<PriceHistoryPoint>> getItemPriceHistory(int itemId) async {
+  try {
+    // Hacemos la petición al endpoint que creamos en Node.js
+    final response = await _dio.get('/inventory/items/$itemId/history');
+
+    if (response.data['success'] == true) {
+      final List data = response.data['data'];
+      // Mapeamos la lista de mapas a una lista de objetos de tipo PriceHistoryPoint
+      return data.map((json) => PriceHistoryPoint.fromJson(json)).toList();
+    } else {
+      throw response.data['error'] ?? 'Error al obtener el historial';
+    }
+  } catch (e) {
+    rethrow; // Re-lanzamos para que el provider lo capture
+  }
+}
+
+  Future<InventoryItem> syncItemWithUPC(int itemId) async {
+    try {
+      final response = await _dio.post('/market/sync-item/$itemId');
+      return InventoryItem.fromJson(response.data['data']);
+    } on DioException catch (e) {
+      // 🛡️ Extraemos el mensaje enviado por el backend
+      String errorMessage = "Error al sincronizar";
+
+      if (e.response?.data != null && e.response?.data['error'] != null) {
+        errorMessage = e
+            .response!
+            .data['error']; // "El ítem no tiene código de barras", etc.
+      }
+
+      throw errorMessage; // Lanzamos solo el texto del error
+    } catch (e) {
+      throw "Error inesperado: $e";
     }
   }
 }

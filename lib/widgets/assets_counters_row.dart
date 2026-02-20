@@ -96,7 +96,7 @@ class AssetCountersRow extends StatelessWidget {
             avatar: const Icon(Icons.calculate, size: 18),
             label: Text('SUMA $fieldName: $sumDisplay'),
             backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           );
         }),
 

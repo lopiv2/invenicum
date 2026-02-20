@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/models/loan.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:provider/provider.dart';
@@ -81,8 +82,8 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Productos Más Prestados',
+                  Text(
+                    AppLocalizations.of(context)!.topLoanedItems,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
@@ -170,8 +171,8 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
                       size: 28,
                     ),
                     const SizedBox(width: 12),
-                    const Text(
-                      'Productos Más Prestados',
+                    Text(
+                      AppLocalizations.of(context)!.topLoanedItems,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

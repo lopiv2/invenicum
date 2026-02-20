@@ -20,18 +20,23 @@ class Location {
   });
 
   factory Location.fromJson(Map<String, dynamic> json) {
-    // Nota: El backend debería devolver la lista de 'children' si se solicita en la consulta.
-    return Location(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      containerId: json['containerId'],
-      parentId: json['parentId'],
-      children: (json['children'] as List<dynamic>?)
-          ?.map((e) => Location.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+  return Location(
+    // 🛡️ Usamos (value ?? 0).toInt() para asegurar que nunca sea null ni double
+    id: (json['id'] ?? 0).toInt(),
+    name: json['name'] as String? ?? 'Sin nombre',
+    description: json['description'] as String?,
+    
+    // 🚩 CAMBIO CRÍTICO: Si el JSON viene de un "item", no trae containerId.
+    // Le asignamos 0 por defecto o cámbialo a 'int?' en la definición de la clase.
+    containerId: (json['containerId'] ?? 0).toInt(),
+    
+    parentId: json['parentId'] != null ? (json['parentId'] as num).toInt() : null,
+    
+    children: (json['children'] as List<dynamic>?)
+        ?.map((e) => Location.fromJson(e as Map<String, dynamic>))
+        .toList(),
+  );
+}
 
   Map<String, dynamic> toJson() {
     return {

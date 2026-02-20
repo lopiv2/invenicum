@@ -52,11 +52,13 @@ class _LoansScreenState extends State<LoansScreen> {
 
     final loanProvider = context.read<LoanProvider>();
     try {
+      // 🚀 Ahora el provider maneja la carga limpia
       await loanProvider.fetchLoans(containerIdInt);
+      // Opcional: cargar estadísticas para resúmenes visuales
+      await loanProvider.fetchStats(containerIdInt);
     } catch (e) {
       if (mounted) {
-        // Usando clave de error genérica o específica si existiera
-        ToastService.error('${context.l10n.errorLoadingData}: ${e.toString()}');
+        ToastService.error('${context.l10n.errorLoadingData}: $e');
       }
     }
   }
@@ -71,14 +73,13 @@ class _LoansScreenState extends State<LoansScreen> {
     if (containerIdInt == null) return;
 
     try {
+      // 💡 El backend ahora se encarga de sumar el stock, el front solo espera el nuevo estado
       await loanProvider.returnLoan(containerIdInt, loan.id);
       if (mounted) {
-        ToastService.success(context.l10n.configurationSaved); // O una clave específica de éxito
+        ToastService.success(context.l10n.configurationSaved);
       }
     } catch (e) {
-      if (mounted) {
-        ToastService.error(e.toString());
-      }
+      if (mounted) ToastService.error(e.toString());
     }
   }
 
@@ -113,23 +114,26 @@ class _LoansScreenState extends State<LoansScreen> {
                 }
               }
             },
-            child: Text(context.l10n.delete, style: const TextStyle(color: Colors.red)),
+            child: Text(
+              context.l10n.delete,
+              style: const TextStyle(color: Colors.red),
+            ),
           ),
         ],
       ),
     );
   }
 
-  List<Loan> _getFilteredLoans(List<Loan> loans) {
+  List<Loan> _getFilteredLoans(LoanProvider provider) {
     switch (_filterStatus) {
       case 'active':
-        return loans.where((l) => l.status == 'active').toList();
+        return provider.activeLoans;
       case 'returned':
-        return loans.where((l) => l.status == 'returned').toList();
+        return provider.returnedLoans;
       case 'overdue':
-        return loans.where((l) => l.isOverdue).toList();
+        return provider.overdueLoans; // 🚩 Usa .isOverdue del servidor
       default:
-        return loans;
+        return provider.loans;
     }
   }
 
@@ -236,13 +240,14 @@ class _LoansScreenState extends State<LoansScreen> {
     final l10n = context.l10n;
     final loanProvider = context.watch<LoanProvider>();
     final isLoading = loanProvider.isLoading;
-    final loans = _getFilteredLoans(loanProvider.loans);
+    // 💡 Obtenemos la lista filtrada de forma eficiente
+    final loans = _getFilteredLoans(loanProvider);
     final theme = Theme.of(context);
 
     if (isLoading && loanProvider.loans.isEmpty) {
-      return Scaffold(
+      return const Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+        body: Center(child: CircularProgressIndicator()),
       );
     }
 
@@ -255,7 +260,8 @@ class _LoansScreenState extends State<LoansScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: isLoading ? null : _loadLoans,
-            tooltip: l10n.reloadLocations, // Reutilizando recargar o crear una nueva
+            tooltip:
+                l10n.reloadLoans, // Reutilizando recargar o crear una nueva
           ),
           IconButton(
             icon: const Icon(Icons.add_task),
@@ -267,6 +273,8 @@ class _LoansScreenState extends State<LoansScreen> {
       body: Column(
         children: [
           if (isLoading) const LinearProgressIndicator(),
+          if (loanProvider.currentStats != null)
+            _buildQuickStats(loanProvider.currentStats!),
           // Filtros
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -317,7 +325,9 @@ class _LoansScreenState extends State<LoansScreen> {
                         columns: [
                           DataColumn(label: Text(l10n.loanObject)),
                           DataColumn(label: Text(l10n.borrowerName)),
-                          DataColumn(label: Text(l10n.alertInfo)), // "Contacto" o info
+                          DataColumn(
+                            label: Text(l10n.alertInfo),
+                          ), // "Contacto" o info
                           DataColumn(label: Text(l10n.loanDate)),
                           DataColumn(label: Text(l10n.dueDate)),
                           DataColumn(label: Text(l10n.status)),
@@ -327,96 +337,36 @@ class _LoansScreenState extends State<LoansScreen> {
                           ),
                         ],
                         rows: loans.map((loan) {
+                          // 🎨 Color de fila basado en el DTO
+                          Color? rowColor;
+                          if (loan.status == 'returned') {
+                            rowColor = Colors.green.shade50;
+                          } else if (loan.isOverdue) {
+                            // 🚩 Confiamos en el backend
+                            rowColor = Colors.red.shade50;
+                          }
                           return DataRow(
-                            color: WidgetStateProperty.resolveWith((states) {
-                              if (loan.isOverdue && loan.status == 'active') {
-                                return Colors.red.shade50;
-                              }
-                              if (loan.status == 'returned') {
-                                return Colors.green.shade50;
-                              }
-                              return null;
-                            }),
+                            color: WidgetStateProperty.all(rowColor),
                             cells: [
                               DataCell(Text(loan.itemName)),
                               DataCell(Text(loan.borrowerName ?? '-')),
+                              DataCell(Text(loan.borrowerEmail ?? loan.borrowerPhone ?? '-')),
                               DataCell(
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (loan.borrowerEmail != null)
-                                      Text(
-                                        loan.borrowerEmail!,
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                    if (loan.borrowerPhone != null)
-                                      Text(
-                                        loan.borrowerPhone!,
-                                        style: const TextStyle(fontSize: 12),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  DateFormat.yMd(
-                                    Localizations.localeOf(context).toString(),
-                                  ).format(loan.loanDate),
-                                ),
+                                Text(DateFormat.yMd().format(loan.loanDate)),
                               ),
                               DataCell(
                                 Text(
                                   loan.expectedReturnDate != null
-                                      ? DateFormat.yMd(
-                                          Localizations.localeOf(context).toString(),
-                                        ).format(loan.expectedReturnDate!)
+                                      ? DateFormat.yMd().format(
+                                          loan.expectedReturnDate!,
+                                        )
                                       : '-',
                                 ),
                               ),
-                              DataCell(
-                                Chip(
-                                  label: Text(
-                                    loan.isOverdue && loan.status == 'active'
-                                        ? l10n.overdue
-                                        : loan.status == 'active'
-                                            ? l10n.active
-                                            : l10n.returned,
-                                  ),
-                                  backgroundColor:
-                                      loan.isOverdue && loan.status == 'active'
-                                          ? Colors.red
-                                          : loan.status == 'active'
-                                              ? Colors.orange
-                                              : Colors.green,
-                                  labelStyle: const TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              DataCell(
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    if (loan.status == 'active')
-                                      IconButton(
-                                        icon: const Icon(Icons.check_circle, color: Colors.green),
-                                        onPressed: () => _returnLoan(loan),
-                                        tooltip: l10n.returned,
-                                      )
-                                    else
-                                      const SizedBox(width: 48),
-                                    IconButton(
-                                      icon: const Icon(Icons.print, color: Colors.teal),
-                                      onPressed: () => _generateVoucher(loan),
-                                      tooltip: l10n.generateVoucher,
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => _deleteLoan(loan),
-                                      tooltip: l10n.delete,
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              // 🏷️ Badge de Estado
+                              DataCell(_buildStatusBadge(loan, l10n)),
+                              // ⚙️ Botones de Acción
+                              DataCell(_buildActions(loan, l10n)),
                             ],
                           );
                         }).toList(),
@@ -426,6 +376,81 @@ class _LoansScreenState extends State<LoansScreen> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildStatusBadge(Loan loan, AppLocalizations l10n) {
+    String label = l10n.active;
+    Color color = Colors.orange;
+
+    if (loan.status == 'returned') {
+      label = l10n.returned;
+      color = Colors.green;
+    } else if (loan.isOverdue) {
+      // 🚩 El backend ya hizo la comparación de fechas
+      label = l10n.overdue;
+      color = Colors.red;
+    }
+
+    return Chip(
+      label: Text(
+        label,
+        style: const TextStyle(color: Colors.white, fontSize: 11),
+      ),
+      backgroundColor: color,
+      visualDensity: VisualDensity.compact,
+    );
+  }
+
+  Widget _buildActions(Loan loan, AppLocalizations l10n) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (loan.status == 'active')
+          IconButton(
+            icon: const Icon(Icons.check_circle, color: Colors.green),
+            onPressed: () => _returnLoan(loan),
+            tooltip: l10n.returned,
+          ),
+        IconButton(
+          icon: const Icon(Icons.print, color: Colors.teal),
+          onPressed: () => _generateVoucher(loan),
+        ),
+        IconButton(
+          icon: const Icon(Icons.delete, color: Colors.red),
+          onPressed: () => _deleteLoan(loan),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickStats(Map<String, dynamic> stats) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _statItem("Total", stats['totalLoans']),
+          _statItem("Activos", stats['activeLoans'], color: Colors.orange),
+          _statItem("Vencidos", stats['overdueLoans'], color: Colors.red),
+        ],
+      ),
+    );
+  }
+
+  Widget _statItem(String label, dynamic value, {Color? color}) {
+    return Column(
+      children: [
+        Text(
+          value.toString(),
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: color,
+            fontSize: 18,
+          ),
+        ),
+        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+      ],
     );
   }
 

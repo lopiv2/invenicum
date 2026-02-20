@@ -38,62 +38,65 @@ class ContainerTreeView extends StatelessWidget {
 
             return Theme(
               data: theme.copyWith(dividerColor: Colors.transparent),
-              child: ExpansionTile(
-                key: PageStorageKey('container_${container.id}'),
-                leading: Icon(
-                  container.isCollection
-                      ? Icons.collections_outlined
-                      : Icons.inventory_2_outlined,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-                title: GestureDetector(
-                  onSecondaryTapDown: (details) => _showContextMenu(
-                    context,
-                    details.globalPosition,
-                    container,
+              child: ListTileTheme(
+                horizontalTitleGap: 10,
+                child: ExpansionTile(
+                  key: PageStorageKey('container_${container.id}'),
+                  leading: Icon(
+                    container.isCollection
+                        ? Icons.collections_outlined
+                        : Icons.inventory_2_outlined,
+                    size: 20,
+                    color: theme.colorScheme.primary,
                   ),
-                  child: Text(
-                    container.name,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
+                  title: GestureDetector(
+                    onSecondaryTapDown: (details) => _showContextMenu(
+                      context,
+                      details.globalPosition,
+                      container,
+                    ),
+                    child: Text(
+                      container.name,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
+                  childrenPadding: const EdgeInsets.only(left: 10),
+                  children: [
+                    _buildSubItem(
+                      context,
+                      icon: Icons.category_outlined,
+                      label:
+                          "${AppLocalizations.of(context)!.assetTypes} (${container.assetTypes.length})",
+                      onTap: () =>
+                          context.go('/container/${container.id}/asset-types'),
+                    ),
+                    _buildSubItem(
+                      context,
+                      icon: Icons.place_outlined,
+                      label:
+                          "${AppLocalizations.of(context)!.locations} (${container.locations.length})",
+                      onTap: () =>
+                          context.go('/container/${container.id}/locations'),
+                    ),
+                    _buildSubItem(
+                      context,
+                      icon: Icons.handshake_outlined,
+                      label:
+                          "${AppLocalizations.of(context)!.loans} (${loanProvider.loans.length})",
+                      onTap: () => context.go('/container/${container.id}/loans'),
+                    ),
+                    _buildSubItem(
+                      context,
+                      icon: Icons.list_alt,
+                      label:
+                          "${AppLocalizations.of(context)!.datalists} (${container.dataLists.length})",
+                      onTap: () =>
+                          context.go('/container/${container.id}/datalists'),
+                    ),
+                  ],
                 ),
-                childrenPadding: const EdgeInsets.only(left: 24),
-                children: [
-                  _buildSubItem(
-                    context,
-                    icon: Icons.category_outlined,
-                    label:
-                        "${AppLocalizations.of(context)!.assetTypes} (${container.assetTypes.length})",
-                    onTap: () =>
-                        context.go('/container/${container.id}/asset-types'),
-                  ),
-                  _buildSubItem(
-                    context,
-                    icon: Icons.place_outlined,
-                    label:
-                        "${AppLocalizations.of(context)!.locations} (${container.locations.length})",
-                    onTap: () =>
-                        context.go('/container/${container.id}/locations'),
-                  ),
-                  _buildSubItem(
-                    context,
-                    icon: Icons.handshake_outlined,
-                    label:
-                        "${AppLocalizations.of(context)!.loans} (${loanProvider.loans.length})",
-                    onTap: () => context.go('/container/${container.id}/loans'),
-                  ),
-                  _buildSubItem(
-                    context,
-                    icon: Icons.list_alt,
-                    label:
-                        "${AppLocalizations.of(context)!.datalists} (${container.dataLists.length})",
-                    onTap: () =>
-                        context.go('/container/${container.id}/datalists'),
-                  ),
-                ],
               ),
             );
           },

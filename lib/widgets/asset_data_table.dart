@@ -313,6 +313,16 @@ class _AssetDataTableState extends State<AssetDataTable> {
           size: ColumnSize.L,
           onSort: (idx, asc) => _sortItems(context, idx, 'description', asc),
         ),
+        DataColumn2(
+          label: _buildFilterHeader(context, 'Código de Barras', 'barcode'),
+          size: ColumnSize.L,
+          onSort: (idx, asc) => _sortItems(context, idx, 'barcode', asc),
+        ),
+        DataColumn2(
+          label: _buildFilterHeader(context, 'Precio de mercado', 'marketValue'),
+          size: ColumnSize.L,
+          onSort: (idx, asc) => _sortItems(context, idx, 'marketValue', asc),
+        ),
         // Columnas dinámicas
         ...widget.assetType.fieldDefinitions.asMap().entries.map((entry) {
           final fieldDef = entry.value;
@@ -329,7 +339,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
             size: columnSize,
             onSort: (idx, asc) => _sortItems(context, idx, filterKey, asc),
           );
-        }).toList(),
+        }),
         const DataColumn2(
           label: Text(
             'Acciones',

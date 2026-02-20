@@ -314,6 +314,18 @@ class InventoryDataSource extends DataTableSource {
           child: Text(item.description ?? '—', overflow: TextOverflow.ellipsis),
         ),
       ),
+      DataCell(
+        Tooltip(
+          message: item.barcode ?? '—',
+          child: Text(item.barcode ?? '—', overflow: TextOverflow.ellipsis),
+        ),
+      ),
+      DataCell(
+        Tooltip(
+          message: item.marketValue.toString(),
+          child: Text(item.marketValue.toString(), overflow: TextOverflow.ellipsis),
+        ),
+      ),
     ];
 
     // 5+. Campos Personalizados

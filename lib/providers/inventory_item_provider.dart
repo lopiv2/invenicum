@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
+import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/inventory_item_response.dart';
+import 'package:invenicum/models/price_history_point.dart';
 import 'package:invenicum/services/inventory_item_service.dart';
 
 typedef FileData = List<Map<String, dynamic>>;
@@ -35,10 +37,24 @@ class InventoryItemProvider with ChangeNotifier {
   int get currentContainerId => _currentContainerId;
   int get currentAssetTypeId => _currentAssetTypeId;
 
+  double _globalEconomicValue = 0.0;
+  bool _isStatsLoading = false;
+
+  double get globalEconomicValue => _globalEconomicValue;
+  bool get isStatsLoading => _isStatsLoading;
+
+  List<PriceHistoryPoint> _itemHistory = [];
+  List<PriceHistoryPoint> get itemHistory => _itemHistory;
+
+  bool _loadingHistory = false;
+  bool get loadingHistory => _loadingHistory;
+
   // --- Gestión de Caché ---
   final Map<String, InventoryResponse> _itemsCache = {};
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  bool _isSyncing = false;
+  bool get isSyncing => _isSyncing;
 
   int _totalFilteredItems = 0;
   int get totalItems => _totalFilteredItems;
@@ -71,6 +87,57 @@ class InventoryItemProvider with ChangeNotifier {
         ? '&agg=${sortedAggFilters.map((e) => '${e.key}:${e.value}').join(',')}'
         : '';
     return '$containerId-$assetTypeId$aggString';
+  }
+
+  Future<void> loadPriceHistory(int itemId) async {
+    _loadingHistory = true;
+    _itemHistory = []; // Reset para evitar mostrar datos viejos
+    notifyListeners();
+
+    try {
+      // 🚀 Llamada al SERVICIO
+      final history = await _itemService.getItemPriceHistory(itemId);
+      _itemHistory = history;
+    } catch (e) {
+      debugPrint("Error en Provider: $e");
+      // Aquí puedes manejar el error o guardarlo en una variable para la UI
+    } finally {
+      _loadingHistory = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> syncWithUPC(int itemId) async {
+    _isSyncing = true;
+    notifyListeners();
+
+    try {
+      // 1. Llamada al servicio (UI -> Provider -> Service -> API)
+      final updatedItem = await _itemService.syncItemWithUPC(itemId);
+
+      // 2. Actualizamos el ítem en TODAS las entradas de la caché donde resida
+      // (Ya que un ítem puede estar en la caché específica y en la caché global)
+      bool updated = false;
+
+      _itemsCache.forEach((key, response) {
+        final index = response.items.indexWhere((item) => item.id == itemId);
+        if (index != -1) {
+          response.items[index] = updatedItem;
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        // Recalculamos totales (por si el marketValue afectó las agregaciones)
+        _recalculateTotalsAndNotify();
+      }
+    } catch (e) {
+      debugPrint("Error en Provider syncWithUPC: $e");
+      rethrow; // Permitimos que la UI capture el error para mostrar un mensaje
+    } finally {
+      _isSyncing = false;
+      notifyListeners();
+    }
   }
 
   // 🚩 RESTAURADA: Función para los contadores de las tarjetas de categorías
@@ -125,9 +192,71 @@ class InventoryItemProvider with ChangeNotifier {
   // ----------------------------------------------------------------------
   void updateContextIds(int cId, int atId) {
     if (_currentContainerId == cId && _currentAssetTypeId == atId) return;
+
     _currentContainerId = cId;
     _currentAssetTypeId = atId;
+
+    // 🧹 LIMPIEZA: Al cambiar de categoría, reseteamos la paginación y filtros
+    // para que la UI no intente mostrar la página 5 de la categoría anterior.
+    _currentPage = 1;
+    _filters.clear();
+    _globalSearchTerm = null;
+    _isLoading = true; // Forzamos el estado de carga inmediatamente
+
     notifyListeners();
+  }
+
+  /// Calcula el valor económico total de TODO el inventario en caché,
+  /// agrupando las definiciones monetarias de todos los tipos de activos.
+  // En InventoryItemProvider
+  double getTotalGlobalEconomicValue(
+    List<CustomFieldDefinition> allDefinitions,
+  ) {
+    double totalValue = 0.0;
+
+    // Filtramos solo los IDs que son monetarios
+    final monetaryFieldIds = allDefinitions
+        .where((def) => def.isMonetary)
+        .map((def) => def.id.toString())
+        .toSet();
+
+    if (monetaryFieldIds.isEmpty) return 0.0;
+
+    // Sumamos todos los items que tengamos en la caché
+    for (var response in _itemsCache.values) {
+      for (var item in response.items) {
+        item.customFieldValues?.forEach((fieldId, value) {
+          if (monetaryFieldIds.contains(fieldId)) {
+            double unitValue = double.tryParse(value.toString()) ?? 0.0;
+            totalValue += (unitValue * (item.quantity));
+          }
+        });
+      }
+    }
+    return totalValue;
+  }
+
+  InventoryItem? getItemFromCache(int id) {
+    for (var response in _itemsCache.values) {
+      final item = response.items.cast<InventoryItem?>().firstWhere(
+        (i) => i?.id == id,
+        orElse: () => null,
+      );
+      if (item != null) return item;
+    }
+    return null;
+  }
+
+  InventoryItem? getItemById(int id) {
+    // Buscamos en todas las respuestas guardadas en caché
+    for (var response in _itemsCache.values) {
+      final item = response.items.cast<InventoryItem?>().firstWhere(
+        (i) => i?.id == id,
+        orElse: () => null,
+      );
+      if (item != null) return item;
+    }
+    return null;
   }
 
   Future<void> loadInventoryItems({
@@ -137,16 +266,6 @@ class InventoryItemProvider with ChangeNotifier {
     bool forceReload = false,
     bool goToPageOne = false,
   }) async {
-    if (_currentAssetTypeId != assetTypeId ||
-        _currentContainerId != containerId) {
-      _aggregationDefinitions = [];
-      _aggregationResults = {};
-      _itemsCache.clear(); // Limpieza selectiva
-    }
-    // 2. Sincronización inmediata
-    _currentContainerId = containerId;
-    _currentAssetTypeId = assetTypeId;
-
     final key = _getCacheKey(
       containerId,
       assetTypeId,
@@ -154,13 +273,18 @@ class InventoryItemProvider with ChangeNotifier {
     );
 
     if (forceReload) _itemsCache.remove(key);
+
     if (_itemsCache.containsKey(key) && !forceReload) {
+      _isLoading = false; // Por si acaso venía de updateContextIds
       _recalculateTotalsAndNotify();
       return;
     }
 
-    _isLoading = true;
-    notifyListeners(); // Notifica a la UI que use los nuevos IDs (4 y 1)
+    // Si ya es true (por el updateContextIds), no hace falta notificar otra vez aquí
+    if (!_isLoading) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     try {
       final InventoryResponse loadedResponse = await _itemService
@@ -169,11 +293,22 @@ class InventoryItemProvider with ChangeNotifier {
             assetTypeId: assetTypeId,
             aggregationFilters: aggregationFilters,
           );
-      _aggregationDefinitions = List.from(
+
+      // 🛡️ PROTECCIÓN: Usa dynamic o Map para evitar el error de subtype
+      _aggregationDefinitions = List<dynamic>.from(
         loadedResponse.aggregationDefinitions,
       );
-      _aggregationResults = Map.from(loadedResponse.aggregationResults);
+
+      _aggregationResults = Map<String, dynamic>.from(
+        loadedResponse.aggregationResults,
+      );
+
       _itemsCache[key] = loadedResponse;
+    } catch (e, stack) {
+      // 🕵️ ESTO ES VITAL: Si vuelve a fallar, mira la consola y verás la línea exacta
+      print("❌ Error en Provider: $e");
+      print("Stack: $stack");
+      rethrow;
     } finally {
       _isLoading = false;
       _recalculateTotalsAndNotify();

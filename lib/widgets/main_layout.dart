@@ -35,7 +35,7 @@ class _MainLayoutState extends State<MainLayout> {
     if (!_isInitialized) {
       final size = MediaQuery.of(context).size;
       // Posición inicial segura: un poco alejada de los bordes (bottom-right)
-      _veniPosition = Offset(size.width - 160, size.height - 120);
+      _veniPosition = Offset(size.width - 60, size.height - 20);
       _isInitialized = true;
     }
   }
@@ -112,8 +112,8 @@ class _MainLayoutState extends State<MainLayout> {
                           _veniPosition += details.delta;
                           // Limites para el BOTÓN (aprox 120 ancho x 50 alto)
                           _veniPosition = Offset(
-                            _veniPosition.dx.clamp(0.0, size.width - 120),
-                            _veniPosition.dy.clamp(0.0, size.height - 60),
+                            _veniPosition.dx.clamp(0.0, size.width - 20),
+                            _veniPosition.dy.clamp(0.0, size.height - 6),
                           );
                         });
                       },

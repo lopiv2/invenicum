@@ -39,27 +39,48 @@ class _AssetListScreenState extends State<AssetListScreen> {
   int? _selectedLocationId;
 
   @override
+  @override
   void initState() {
     super.initState();
-    _itemProvider = context.read<InventoryItemProvider>();
-
+    // Usamos read porque no queremos "escuchar" aquí, solo ejecutar una acción única
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final cId = int.tryParse(widget.containerId) ?? 0;
-      final atId = int.tryParse(widget.assetTypeId) ?? 0;
-
-      _itemProvider.updateContextIds(cId, atId);
-
-      // 1. Establecemos la búsqueda SIN notificar o después de los IDs
-      // Para evitar el error "Unexpected null value", primero cargamos
-      _itemProvider.loadInventoryItems(
-        containerId: cId,
-        assetTypeId: atId,
-        forceReload: true,
-        goToPageOne: true,
+      final itemProvider = Provider.of<InventoryItemProvider>(
+        context,
+        listen: false,
       );
+      final cIdInt = int.tryParse(widget.containerId) ?? 0;
+      final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
 
-      _searchController.addListener(_onSearchChanged);
+      if (itemProvider.currentContainerId != cIdInt ||
+          itemProvider.currentAssetTypeId != atIdInt) {
+        itemProvider.updateContextIds(cIdInt, atIdInt);
+      }
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final cIdInt = int.tryParse(widget.containerId) ?? 0;
+    final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
+
+    final itemProvider = Provider.of<InventoryItemProvider>(
+      context,
+      listen: false,
+    );
+
+    if (itemProvider.currentContainerId != cIdInt ||
+        itemProvider.currentAssetTypeId != atIdInt) {
+      // 🔑 LA SOLUCIÓN: Pospone la ejecución al siguiente micro-ciclo
+      Future.microtask(() {
+        itemProvider.updateContextIds(cIdInt, atIdInt);
+        itemProvider.loadInventoryItems(
+          containerId: cIdInt,
+          assetTypeId: atIdInt,
+        );
+      });
+    }
   }
 
   @override
@@ -196,6 +217,9 @@ class _AssetListScreenState extends State<AssetListScreen> {
     final containerProvider = context.watch<ContainerProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
 
+    // 2. Detectar si esta es la pantalla activa
+    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
+
     final cIdInt = int.tryParse(widget.containerId) ?? 0;
     final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
 
@@ -215,11 +239,6 @@ class _AssetListScreenState extends State<AssetListScreen> {
       return Center(child: Text(l10n.invalidNavigationIds));
     }
 
-    if (itemProvider.currentContainerId != cIdInt ||
-        itemProvider.currentAssetTypeId != atIdInt) {
-      Future.microtask(() => itemProvider.updateContextIds(cIdInt, atIdInt));
-    }
-
     final container = containerProvider.containers
         .cast<ContainerNode?>()
         .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
@@ -229,7 +248,7 @@ class _AssetListScreenState extends State<AssetListScreen> {
     );
 
     if (container == null || assetType == null) {
-      return Center(child: Text(l10n.containerOrAssetTypeNotFound));
+      return const Center(child: CircularProgressIndicator());
     }
 
     final viewItems = _getFilteredItems(
@@ -287,25 +306,60 @@ class _AssetListScreenState extends State<AssetListScreen> {
             else
               Expanded(
                 child: Card(
-                  child: _isListView
-                      ? AssetDataTable(
-                          assetType: assetType,
-                          containerId: cIdInt,
-                          assetTypeId: atIdInt,
-                          inventoryItems: viewItems,
-                          availableLocations: container.locations,
-                        )
-                      : AssetGridView(
-                          assetType: assetType,
-                          items: viewItems,
-                          containerId: cIdInt,
-                          assetTypeId: atIdInt,
-                        ),
+                  // 4. USAMOS UNA FUNCIÓN PARA ENCAPSULAR LA LÓGICA DE LA TABLA
+                  child: _buildMainContent(
+                    isCurrentRoute: isCurrentRoute,
+                    assetType: assetType,
+                    cIdInt: cIdInt,
+                    atIdInt: atIdInt,
+                    viewItems: viewItems,
+                    locations: container.locations,
+                  ),
                 ),
               ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildMainContent({
+    required bool isCurrentRoute,
+    required dynamic assetType,
+    required int cIdInt,
+    required int atIdInt,
+    required List<InventoryItem> viewItems,
+    required dynamic locations,
+  }) {
+    // Si no estamos en esta pantalla (estamos en Details), devolvemos un widget
+    // que no cambie. Al ser 'const' o un widget simple, Flutter no bajará al DataTable2.
+    if (!isCurrentRoute) {
+      // Retornamos un placeholder o simplemente mantenemos el estado anterior
+      // RepaintBoundary ayuda a que no se intente repintar la capa de la tabla.
+      return const RepaintBoundary(
+        child: SizedBox.expand(
+          child: Center(child: CircularProgressIndicator.adaptive()),
+        ),
+      );
+    }
+
+    if (_isListView) {
+      return AssetDataTable(
+        // Usamos una ValueKey para que Flutter identifique la tabla correctamente
+        key: ValueKey('table_${atIdInt}'),
+        assetType: assetType,
+        containerId: cIdInt,
+        assetTypeId: atIdInt,
+        inventoryItems: viewItems,
+        availableLocations: locations,
+      );
+    } else {
+      return AssetGridView(
+        assetType: assetType,
+        items: viewItems,
+        containerId: cIdInt,
+        assetTypeId: atIdInt,
+      );
+    }
   }
 }

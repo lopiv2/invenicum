@@ -7,7 +7,7 @@
             "type": "dart",
             "args": [
                 "--dart-define=API_URL=http://localhost:3000",
-                "--web-port", "5555"
+                "--web-port", "5555",
             ]
         },
         {

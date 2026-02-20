@@ -684,6 +684,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get reloadLocations => 'Standorte neu laden';
 
   @override
+  String get reloadLoans => 'Reload loans';
+
+  @override
   String get removeImage => 'Bild entfernen';
 
   @override

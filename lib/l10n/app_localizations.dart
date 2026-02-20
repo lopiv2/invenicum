@@ -1315,8 +1315,14 @@ abstract class AppLocalizations {
   /// No description provided for @reloadLocations.
   ///
   /// In en, this message translates to:
-  /// **'Reload Locations'**
+  /// **'Reload locations'**
   String get reloadLocations;
+
+  /// No description provided for @reloadLoans.
+  ///
+  /// In en, this message translates to:
+  /// **'Reload loans'**
+  String get reloadLoans;
 
   /// No description provided for @removeImage.
   ///
@@ -1579,7 +1585,7 @@ abstract class AppLocalizations {
   /// No description provided for @topLoanedItems.
   ///
   /// In en, this message translates to:
-  /// **'Top Loaned Items'**
+  /// **'Top loaned items per months'**
   String get topLoanedItems;
 
   /// No description provided for @totalAssets.

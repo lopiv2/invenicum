@@ -113,8 +113,18 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             isLinked: false,
             onTap: () => _openConfig(context, AppIntegrations.priceCharting),
           ),
+          _buildIntegrationCard(
+            context,
+            title: "UPCitemdb",
+            subtitle: "Valoración por código de barras y EAN.",
+            icon: FontAwesomeIcons.barcode, // Icono de escáner muy intuitivo
+            iconColor: Colors.blueAccent,
+            isLinked: integrationProv.isLinked(AppIntegrations.upcitemdb),
+            onTap: () => _openConfig(context, AppIntegrations.upcitemdb),
+          ),
           const SizedBox(height: 24),
 
+          // --- HARDWARE Y ETIQUETAS ---
           _buildSectionHeader("Hardware y Etiquetas"),
           _buildIntegrationCard(
             context,

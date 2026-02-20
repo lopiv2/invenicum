@@ -9,9 +9,11 @@ class AppIntegrations {
   static const String gemini = 'gemini';
   static const String telegram = 'telegram';
   static const String whatsapp = 'whatsapp'; // Nuevo
-  static const String ebay = 'ebay';         // Nuevo
+  static const String ebay = 'ebay'; // Nuevo
   static const String qrLabels = 'qr_labels';
   static const String priceCharting = 'price_charting';
+  static const String upcitemdb = 'upcitemdb';
+
 
   /// Retorna la lista de modelos completa para la UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {
@@ -137,6 +139,20 @@ class AppIntegrations {
           ),
         ],
       ),
+      IntegrationModel(
+        id: upcitemdb,
+        name: 'UPCitemdb',
+        icon: FontAwesomeIcons.barcode,
+        description: 'Búsqueda global de precios por código de barras.',
+        fields: [
+          // Campo para que el usuario pegue su API Key de UPCitemdb
+          IntegrationField(
+            id: 'apiKey',
+            label: 'API Key (user_key)',
+            type: IntegrationFieldType.text
+          ),
+        ],
+      ),
     ];
   }
 }
@@ -161,12 +177,18 @@ class AppSlots {
     if (l10n == null) return slot;
 
     switch (slot) {
-      case dashboardTop: return l10n.slotDashboardTop;
-      case dashboardBottom: return l10n.slotDashboardBottom;
-      case leftSidebar: return l10n.slotLeftSidebar;
-      case inventoryHeader: return l10n.slotInventoryHeader;
-      case floatingActionButton: return l10n.slotFloatingActionButton;
-      default: return l10n.slotUnknown;
+      case dashboardTop:
+        return l10n.slotDashboardTop;
+      case dashboardBottom:
+        return l10n.slotDashboardBottom;
+      case leftSidebar:
+        return l10n.slotLeftSidebar;
+      case inventoryHeader:
+        return l10n.slotInventoryHeader;
+      case floatingActionButton:
+        return l10n.slotFloatingActionButton;
+      default:
+        return l10n.slotUnknown;
     }
   }
 }

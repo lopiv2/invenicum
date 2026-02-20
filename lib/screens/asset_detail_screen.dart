@@ -4,7 +4,10 @@ import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/models/container_node.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/providers/container_provider.dart';
+import 'package:invenicum/providers/integrations_provider.dart';
+import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/widgets/asset_image_gallery_widget.dart';
+import 'package:invenicum/widgets/price_history_chart_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart'; // Asegúrate de que esta ruta es correcta
 import 'package:invenicum/models/inventory_item.dart';
@@ -46,6 +49,11 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
         forceReload: false, // No forzar recarga si ya está en caché
       );
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<InventoryItemProvider>().loadPriceHistory(
+        int.parse(widget.itemId),
+      );
+    });
   }
 
   @override
@@ -76,7 +84,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
           containerId: int.parse(widget.containerId),
           assetTypeId: int.parse(widget.assetTypeId),
           forceReload:
-              true, // Forzamos para evitar ver datos del container anterior
+              false, // Forzamos para evitar ver datos del container anterior
         );
       });
     }
@@ -181,7 +189,15 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
             // Sección de Campos Personalizados
             _buildCustomFieldsSection(context, item, itemProvider, l10n),
             const SizedBox(height: 32),
+            Consumer<InventoryItemProvider>(
+              builder: (context, provider, child) {
+                if (provider.loadingHistory) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
+                return PriceHistoryChart(history: provider.itemHistory);
+              },
+            ),
             // Información Adicional (Creación, Actualización)
             _buildMetadataSection(context, item, l10n),
             const SizedBox(height: 32),
@@ -277,6 +293,10 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
     InventoryItem item,
     AppLocalizations l10n,
   ) {
+    final integrationProv = context.watch<IntegrationProvider>();
+    final itemProvider = context.watch<InventoryItemProvider>();
+    // 2. Verificamos si la integración está activa
+    final bool isUpcEnabled = integrationProv.isLinked('upcitemdb');
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -306,6 +326,48 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
               _buildInfoRow(l10n.minStock, item.minStock.toString()),
               if (item.location != null)
                 _buildInfoRow(l10n.location, item.location!.name),
+              // --- SECCIÓN DE VALOR DE MERCADO ---
+              if (item.marketValue > 0) ...[
+                const SizedBox(height: 12),
+                Text(
+                  "${item.marketValue} ${item.currency}",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.green.shade700,
+                  ),
+                ),
+                Text(
+                  "Total: ${item.totalMarketValue} ${item.currency}",
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                ),
+              ],
+              if (isUpcEnabled) ...[
+                const SizedBox(height: 20),
+                itemProvider.isSyncing
+                    ? const CircularProgressIndicator()
+                    : ElevatedButton.icon(
+                        onPressed: () async {
+                          try {
+                            await itemProvider.syncWithUPC(item.id);
+                            ToastService.success(
+                              "Datos actualizados correctamente",
+                            );
+                          } catch (e) {
+                            if (mounted) {
+                              ToastService.error("Error al sincronizar: $e");
+                            }
+                          }
+                        },
+                        icon: const Icon(Icons.cloud_sync_outlined),
+                        label: const Text("Obtener valor de mercado"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blue.shade50,
+                          foregroundColor: Colors.blue.shade800,
+                          elevation: 0,
+                        ),
+                      ),
+              ],
               // Puedes añadir más campos clave aquí
             ],
           ),

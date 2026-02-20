@@ -34,6 +34,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
   // 🔑 NUEVOS ESTADOS
   late bool _isSummable;
   late bool _isCountable;
+  late bool _isMonetary;
 
   Timer? _debounceTimer;
 
@@ -52,6 +53,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
     // 🔑 Inicialización de los nuevos estados
     _isSummable = widget.field.isSummable;
     _isCountable = widget.field.isCountable;
+    _isMonetary = widget.field.isMonetary;
 
     _nameController.addListener(_onNameChanged);
   }
@@ -70,6 +72,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
       // 🔑 Sincronización de los nuevos estados
       _isSummable = widget.field.isSummable;
       _isCountable = widget.field.isCountable;
+      _isMonetary = widget.field.isMonetary;
 
       _nameController.addListener(_onNameChanged);
     }
@@ -103,6 +106,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         // 🔑 Envío de los nuevos campos
         isSummable: finalIsSummable,
         isCountable: _isCountable,
+        isMonetary: _isMonetary,
       ),
     );
   }
@@ -207,15 +211,21 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                   setState(() {
                     _selectedType = newValue;
                     // Limpiar dataListId si el tipo no es dropdown
+                    // 🚀 LÓGICA AUTOMÁTICA PARA PRECIOS
+                    if (_selectedType == CustomFieldType.price) {
+                      _isMonetary = true;
+                      _isSummable =
+                          true; // Generalmente los precios se quieren sumar
+                    }
                     if (_selectedType != CustomFieldType.dropdown) {
-                      _selectedListDataId = null;
-                    } else if (availableLists.isEmpty) {
                       _selectedListDataId = null;
                     }
 
-                    // 🔑 Si el nuevo tipo no es numérico, desactivar el sumatorio
-                    if (!_isNumericType) {
+                    // 🔑 Si el nuevo tipo no es numérico ni precio, desactivar monetario y sumatorio
+                    if (_selectedType != CustomFieldType.number &&
+                        _selectedType != CustomFieldType.price) {
                       _isSummable = false;
+                      _isMonetary = false;
                     }
                   });
                   _notifyUpdate(); // Notificar cambio de tipo
@@ -253,6 +263,25 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 onChanged: (bool newValue) {
                   setState(() {
                     _isSummable = newValue;
+                  });
+                  _notifyUpdate();
+                },
+                dense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+            // 💰 5. NUEVO: Es Monetario (Visible para tipos numéricos y precios)
+            if (_selectedType == CustomFieldType.number ||
+                _selectedType == CustomFieldType.price)
+              SwitchListTile(
+                title: const Text('Es Valor Monetario'),
+                subtitle: const Text(
+                  'Se usará para calcular la inversión total en el Dashboard',
+                ),
+                value: _isMonetary,
+                activeColor: Colors.green, // Color sugerente para dinero
+                onChanged: (bool newValue) {
+                  setState(() {
+                    _isMonetary = newValue;
                   });
                   _notifyUpdate();
                 },

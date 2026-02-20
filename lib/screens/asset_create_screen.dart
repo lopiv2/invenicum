@@ -41,6 +41,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _barcodeController = TextEditingController();
   final _quantityController = TextEditingController(
     text: '1',
   ); // 🔑 NUEVA: Controlador de cantidad
@@ -134,38 +135,70 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     setState(() => _isMagicLoading = true);
 
     try {
-      // 1. Obtener nombres de campos personalizados definidos para este AssetType
-      final List<String> customFields = _assetType!.fieldDefinitions
+      // 1. Obtener nombres de campos personalizados
+      final List<String> fieldsToExtract = _assetType!.fieldDefinitions
           .map((f) => f.name)
           .toList();
 
-      // 2. Llamada al servicio (AIService)
-      // Se incluye 'name' y 'description' como campos estándar que la IA siempre debe buscar
+      // 💡 AÑADIMOS ESTO: Forzamos a la IA a buscar códigos de barras
+      if (!fieldsToExtract.any((f) => f.toLowerCase() == 'barcode'))
+        fieldsToExtract.add('barcode');
+      if (!fieldsToExtract.any((f) => f.toLowerCase() == 'upc'))
+        fieldsToExtract.add('upc');
+
       final Map<String, dynamic> result = await _aiService.extractDataFromUrl(
         url: url,
-        fields: ['name', 'description', ...customFields],
+        fields: fieldsToExtract,
+      );
+
+      // Normalizamos las llaves a minúsculas para que UPC, upc, Upc... todo valga.
+      final lowerCaseResult = result.map(
+        (key, value) => MapEntry(key.toLowerCase(), value),
       );
 
       setState(() {
-        // 3. Rellenar campos comunes
-        if (result.containsKey('name')) {
-          _nameController.text = result['name'].toString();
+        // 2. Imagen (Soportamos varias llaves posibles)
+        final imageUrl =
+            lowerCaseResult['imageurl'] ??
+            lowerCaseResult['image'] ??
+            lowerCaseResult['thumbnail'];
+        if (imageUrl != null && imageUrl.toString().startsWith('data:image')) {
+          _imagePreviewUrls.add(imageUrl.toString());
+        }
+
+        // 3. Nombre y Descripción
+        if (lowerCaseResult['name'] != null) {
+          _nameController.text = lowerCaseResult['name'].toString();
           _highlightedFields.add('name');
         }
-        if (result.containsKey('description')) {
-          _descriptionController.text = result['description'].toString();
+        if (lowerCaseResult['description'] != null) {
+          _descriptionController.text = lowerCaseResult['description']
+              .toString();
           _highlightedFields.add('description');
         }
 
-        // 4. Rellenar campos personalizados dinámicos
+        // 4. Código de Barras / UPC / EAN (Limpiando espacios y guiones)
+        final dynamic barcodeValue =
+            lowerCaseResult['barcode'] ??
+            lowerCaseResult['upc'] ??
+            lowerCaseResult['ean'];
+        if (barcodeValue != null) {
+          // 💡 LIMPIEZA: Eliminamos cualquier cosa que no sea un número o letra
+          _barcodeController.text = barcodeValue.toString().replaceAll(
+            RegExp(r'[^a-zA-Z0-9]'),
+            '',
+          );
+          _highlightedFields.add('barcode');
+        }
+
+        // 5. Rellenar campos personalizados dinámicos
         for (var fieldDef in _assetType!.fieldDefinitions) {
           final key = fieldDef.name;
-          if (result.containsKey(key)) {
-            _highlightedFields.add(key); // Usamos el nombre del campo como ID
-          }
-          if (!result.containsKey(key)) continue;
+          // Aquí buscamos en el 'result' original para respetar mayúsculas si el usuario las definió así
+          if (!result.containsKey(key) || result[key] == null) continue;
 
           final value = result[key];
+          _highlightedFields.add(key);
 
           if (fieldDef.type == CustomFieldType.boolean) {
             _booleanFieldValues[fieldDef.id!] = value is bool
@@ -173,30 +206,21 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                 : value.toString().toLowerCase() == 'true';
           } else if (fieldDef.type == CustomFieldType.dropdown) {
             final List<String> options = _listFieldValues[fieldDef.id] ?? [];
-            final String incomingValue = value.toString();
-
-            // Búsqueda flexible (case-insensitive)
             final matchedOption = options.firstWhere(
-              (opt) => opt.toLowerCase() == incomingValue.toLowerCase(),
+              (opt) => opt.toLowerCase() == value.toString().toLowerCase(),
               orElse: () => '',
             );
-
             if (matchedOption.isNotEmpty) {
               _selectedListValues[fieldDef.id!] = matchedOption;
             }
           } else {
-            // Para text, number, price, url, date
             final controller = _customControllers[fieldDef.id];
             if (controller != null) {
               String valStr = value.toString();
-
-              // Si el campo es numérico o de precio, opcionalmente podrías limpiar símbolos
               if (fieldDef.type == CustomFieldType.number ||
                   fieldDef.type == CustomFieldType.price) {
-                // Esto quita todo lo que no sea número, coma o punto
                 valStr = valStr.replaceAll(RegExp(r'[^0-9.,]'), '');
               }
-
               controller.text = valStr;
             }
           }
@@ -204,22 +228,18 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       });
 
       ToastService.success(AppLocalizations.of(context)!.fieldsFilledSuccess);
-      // --- EFECTO TEMPORAL ---
-      // Quitamos el color verde después de 3 segundos
+
       Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) {
-          setState(() => _highlightedFields.clear());
-        }
+        if (mounted) setState(() => _highlightedFields.clear());
       });
+
       _scrollController.animateTo(
         0,
         duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
     } catch (e) {
-      ToastService.error(
-        AppLocalizations.of(context)!.aiExtractionError(e.toString()),
-      );
+      ToastService.error(e.toString().replaceAll('Exception: ', ''));
     } finally {
       setState(() => _isMagicLoading = false);
     }
@@ -248,8 +268,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
     _nameController.dispose();
     _scrollController.dispose();
     _descriptionController.dispose();
-    _quantityController.dispose(); // 🔑 NUEVA: Limpiar controlador de cantidad
-    _minStockController.dispose(); // 🔑 NUEVA: Limpiar controlador de minStock
+    _barcodeController.dispose();
+    _quantityController.dispose();
+    _minStockController.dispose();
     _customControllers.forEach((_, controller) => controller.dispose());
     super.dispose();
   }
@@ -360,6 +381,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
       id: 0,
       containerId: _containerId!,
       assetTypeId: _assetTypeId!,
+      barcode: _barcodeController.text.trim(),
       locationId:
           _selectedLocationId, // 🔑 Ahora puede ser null si no hay ubicaciones
       quantity:
@@ -528,48 +550,54 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                       const SizedBox(height: 10),
                       Align(
                         alignment: Alignment.centerRight,
-                        child: aiEnabled ? AnimatedSwitcher(
-                          duration: const Duration(milliseconds: 300),
-                          child: _isMagicLoading
-                              ? ElevatedButton.icon(
-                                  key: const ValueKey('loading'),
-                                  onPressed:
-                                      null, // Deshabilitado mientras carga
-                                  icon: const SizedBox(
-                                    width: 18,
-                                    height: 18,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: Colors.amber,
-                                    ),
-                                  ),
-                                  label: const Text('Analizando web...'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.amber.shade50,
-                                    disabledBackgroundColor:
-                                        Colors.amber.shade50,
-                                  ),
-                                )
-                              : ElevatedButton.icon(
-                                  key: const ValueKey('idle'),
-                                  onPressed: _showMagicDialog,
-                                  icon: const Icon(
-                                    Icons.auto_awesome,
-                                    color: Colors.amber,
-                                  ),
-                                  label: const Text('Rellenar con IA'),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.amber.shade100,
-                                    foregroundColor: Colors.amber.shade900,
-                                    side: BorderSide(
-                                      color: Colors.amber.shade300,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                  ),
-                                ),
-                        ) : null,
+                        child: aiEnabled
+                            ? AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 300),
+                                child: _isMagicLoading
+                                    ? ElevatedButton.icon(
+                                        key: const ValueKey('loading'),
+                                        onPressed:
+                                            null, // Deshabilitado mientras carga
+                                        icon: const SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.amber,
+                                          ),
+                                        ),
+                                        label: const Text('Analizando web...'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.amber.shade50,
+                                          disabledBackgroundColor:
+                                              Colors.amber.shade50,
+                                        ),
+                                      )
+                                    : ElevatedButton.icon(
+                                        key: const ValueKey('idle'),
+                                        onPressed: _showMagicDialog,
+                                        icon: const Icon(
+                                          Icons.auto_awesome,
+                                          color: Colors.amber,
+                                        ),
+                                        label: const Text('Rellenar con IA'),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor:
+                                              Colors.amber.shade100,
+                                          foregroundColor:
+                                              Colors.amber.shade900,
+                                          side: BorderSide(
+                                            color: Colors.amber.shade300,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                              )
+                            : null,
                       ),
                       const SizedBox(height: 10),
                       // --- CAMPOS COMUNES ---
@@ -621,7 +649,18 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
                         maxLines: 3,
                       ),
                       const SizedBox(height: 16),
-
+                      TextFormField(
+                        controller: _barcodeController,
+                        decoration: const InputDecoration(
+                          labelText: 'Código de Barras (Opcional)',
+                          border: OutlineInputBorder(),
+                          prefixIcon: Icon(Icons.qr_code_scanner),
+                          helperText:
+                              'Escanée o introduzca el código del producto',
+                        ),
+                        keyboardType: TextInputType.text,
+                      ),
+                      const SizedBox(height: 16),
                       // 🔑 NUEVA: Campo de Cantidad (solo si no es seriado)
                       if (!_assetType!.isSerialized)
                         TextFormField(

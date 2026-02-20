@@ -1,8 +1,8 @@
-// lib/models/inventory_item.dart (Actualizado)
+// lib/models/inventory_item.dart
 
-// --- NUEVA CLASE PARA LAS IMÁGENES (Sin cambios) ---
 import 'package:invenicum/models/location.dart';
 
+// --- CLASE PARA LAS IMÁGENES BLINDADA ---
 class InventoryItemImage {
   final int id;
   final String url;
@@ -18,12 +18,14 @@ class InventoryItemImage {
 
   factory InventoryItemImage.fromJson(Map<String, dynamic> json) {
     return InventoryItemImage(
-      id: json['id'] as int,
-      url: json['url'] as String,
+      // 🛡️ Cambiado 'as int' por protección contra nulos y casts de JS
+      id: (json['id'] ?? 0).toInt(),
+      url: json['url'] as String? ?? '',
       altText: json['altText'] as String?,
-      order: json['order'] as int? ?? 0,
+      order: (json['order'] ?? 0).toInt(),
     );
   }
+
   Map<String, dynamic> toJson() {
     return {'id': id, 'url': url, 'altText': altText, 'order': order};
   }
@@ -43,66 +45,66 @@ class InventoryItemImage {
   }
 }
 
-// --- CLASE PRINCIPAL (MODIFICADA) ---
+// --- CLASE PRINCIPAL BLINDADA ---
 class InventoryItem {
   final int id;
   final String name;
   final String? description;
+  final String? barcode;
   final int containerId;
   final int assetTypeId;
-  final int? locationId; // 🔑 AÑADIDO: ID de la ubicación (nullable)
-  final int
-  quantity; // 🔑 NUEVA: Cantidad del artículo (1 para seriados, variable para no seriados)
-  final int minStock; // 🔑 NUEVA: Stock mínimo recomendado (umbral de alerta)
+  final int? locationId;
+  final int quantity;
+  final int minStock;
   final Location? location;
-
   final List<InventoryItemImage> images;
-
   final DateTime? createdAt;
   final DateTime? updatedAt;
-
   final Map<String, dynamic>? customFieldValues;
+
+  // Mercado
+  final double marketValue;
+  final String currency;
+  final double totalMarketValue;
+  final DateTime? lastPriceUpdate;
 
   InventoryItem({
     required this.id,
     required this.name,
     this.description,
+    this.barcode,
     required this.containerId,
     required this.assetTypeId,
-    this.locationId, // 🔑 AÑADIDO AL CONSTRUCTOR (ahora nullable)
-    this.quantity = 1, // 🔑 NUEVA: Por defecto 1
-    this.minStock = 1, // 🔑 NUEVA: Por defecto 1
+    this.locationId,
+    this.quantity = 1,
+    this.minStock = 1,
     this.createdAt,
     this.updatedAt,
     this.customFieldValues,
     this.images = const [],
     this.location,
+    this.marketValue = 0.0,
+    this.currency = 'EUR',
+    this.totalMarketValue = 0.0,
+    this.lastPriceUpdate,
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
+    // 1. Desempaquetado seguro (soporta wrappers del backend)
     final itemData = json['itemData'] ?? json;
-    //print(itemData);
-    // 1. Obtener el valor JSON de los campos custom
-    final dynamic rawCustomFieldValues = itemData['customFieldValues'];
 
-    // 2. Conversión segura a Map<String, dynamic>?
-    final Map<String, dynamic>? customFieldValues =
-        rawCustomFieldValues != null && rawCustomFieldValues is Map
-        ? Map<String, dynamic>.from(rawCustomFieldValues)
+    // 2. Custom fields con limpieza de llaves (JS a veces envía ints como keys)
+    final Map<String, dynamic>? rawCustomFields = itemData['customFieldValues'] is Map 
+        ? Map<String, dynamic>.from(itemData['customFieldValues']) 
         : null;
 
-    // 3. Procesar las imágenes
-    final List<dynamic> imageListJson =
-        itemData['images'] as List<dynamic>? ?? [];
+    // 3. Imágenes con filtrado de nulos y tipos
+    final List<dynamic> imageListJson = itemData['images'] as List<dynamic>? ?? [];
     final List<InventoryItemImage> images = imageListJson
-        .where((e) => e != null)
-        .map(
-          (imgJson) =>
-              InventoryItemImage.fromJson(imgJson as Map<String, dynamic>),
-        )
+        .where((e) => e != null && e is Map<String, dynamic>)
+        .map((imgJson) => InventoryItemImage.fromJson(imgJson as Map<String, dynamic>))
         .toList();
 
-    // Función auxiliar (queda igual)
     DateTime? parseDate(dynamic value) {
       if (value is String) {
         try {
@@ -115,22 +117,33 @@ class InventoryItem {
     }
 
     return InventoryItem(
-      id: itemData['id'] as int,
+      // 🛡️ PROTECCIÓN TOTAL CONTRA TIPOS NULOS E INT/DOUBLE EN WEB
+      id: (itemData['id'] ?? 0).toInt(),
       name: itemData['name'] as String? ?? 'N/A',
       description: itemData['description'] as String?,
-      containerId: itemData['containerId'] as int,
-      assetTypeId: itemData['assetTypeId'] as int,
-      locationId:
-          itemData['locationId'] as int?, // 🔑 AÑADIDO: Ahora permite null
-      quantity: itemData['quantity'] as int? ?? 1, // 🔑 NUEVA: Por defecto 1
-      minStock: itemData['minStock'] as int? ?? 1, // 🔑 NUEVA: Por defecto 1
+      barcode: itemData['barcode'] as String?,
+      containerId: (itemData['containerId'] ?? 0).toInt(),
+      assetTypeId: (itemData['assetTypeId'] ?? 0).toInt(),
+      
+      // Para campos opcionales usamos chequeo de nulidad previo
+      locationId: itemData['locationId'] != null ? (itemData['locationId'] as num).toInt() : null,
+      
+      quantity: (itemData['quantity'] ?? 1).toInt(),
+      minStock: (itemData['minStock'] ?? 1).toInt(),
+      
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
-      customFieldValues: customFieldValues,
+      customFieldValues: rawCustomFields,
       images: images,
+      
       location: itemData['location'] != null
-        ? Location.fromJson(itemData['location'] as Map<String, dynamic>)
-        : null,
+          ? Location.fromJson(itemData['location'] as Map<String, dynamic>)
+          : null,
+
+      marketValue: (itemData['marketValue'] ?? 0.0).toDouble(),
+      currency: itemData['currency'] as String? ?? 'EUR',
+      totalMarketValue: (itemData['totalMarketValue'] ?? 0.0).toDouble(),
+      lastPriceUpdate: parseDate(itemData['lastPriceUpdate']),
     );
   }
 
@@ -139,38 +152,45 @@ class InventoryItem {
       'id': id,
       'containerId': containerId,
       'assetTypeId': assetTypeId,
-      'locationId': locationId, // 🔑 AÑADIDO: Incluido en el JSON de salida
-      'quantity': quantity, // 🔑 NUEVA: Incluido en el JSON de salida
-      'minStock': minStock, // 🔑 NUEVA: Incluido en el JSON de salida
+      'locationId': locationId,
+      'quantity': quantity,
+      'minStock': minStock,
       'name': name,
       'description': description,
+      'barcode': barcode,
       'customFieldValues': customFieldValues,
       'images': images.map((img) => img.toJson()).toList(),
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
       'location': location?.toJson(),
+      'marketValue': marketValue,
+      'currency': currency,
+      'totalMarketValue': totalMarketValue,
+      'lastPriceUpdate': lastPriceUpdate?.toIso8601String(),
     };
   }
 
   InventoryItem copyWith({
     int? id,
     String? name,
+    double? marketValue,
+    double? totalMarketValue,
+    String? currency,
+    DateTime? lastPriceUpdate,
     String? description,
+    String? barcode,
     int? containerId,
     int? assetTypeId,
-    int? locationId, // 🔑 AÑADIDO: Incluido en copyWith
-    int? quantity, // 🔑 NUEVA: Incluido en copyWith
-    int? minStock, // 🔑 NUEVA: Incluido en copyWith
+    int? locationId,
+    int? quantity,
+    int? minStock,
     List<InventoryItemImage>? images,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? customFieldValues,
-    // Flag para forzar el reseteo de IDs de imagen (para la operación de copia)
     bool resetImageIds = false,
   }) {
-    // 1. Lógica de Imágenes (sin cambios)
     List<InventoryItemImage> finalImages;
-
     if (images != null) {
       finalImages = images;
     } else if (resetImageIds) {
@@ -182,30 +202,23 @@ class InventoryItem {
     return InventoryItem(
       id: id ?? this.id,
       name: name ?? this.name,
+      marketValue: marketValue ?? this.marketValue,
+      totalMarketValue: totalMarketValue ?? this.totalMarketValue,
+      currency: currency ?? this.currency,
+      lastPriceUpdate: lastPriceUpdate ?? this.lastPriceUpdate,
       description: description ?? this.description,
+      barcode: barcode ?? this.barcode,
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,
-      locationId:
-          locationId ??
-          this.locationId, // 🔑 AÑADIDO: Usamos el nuevo o el existente
-      quantity:
-          quantity ?? this.quantity, // 🔑 NUEVA: Usamos el nuevo o el existente
-      minStock:
-          minStock ?? this.minStock, // 🔑 NUEVA: Usamos el nuevo o el existente
+      locationId: locationId ?? this.locationId,
+      quantity: quantity ?? this.quantity,
+      minStock: minStock ?? this.minStock,
       images: finalImages,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       location: location,
-      customFieldValues:
-          customFieldValues ??
-          (this.customFieldValues != null
-              ? Map.from(this.customFieldValues!)
-              : null),
+      customFieldValues: customFieldValues ?? 
+          (this.customFieldValues != null ? Map.from(this.customFieldValues!) : null),
     );
-  }
-
-  @override
-  String toString() {
-    return 'Item(id: $id, name: $name, locationId: $locationId, images: ${images.length})';
   }
 }
