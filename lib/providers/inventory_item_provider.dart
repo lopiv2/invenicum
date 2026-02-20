@@ -49,6 +49,12 @@ class InventoryItemProvider with ChangeNotifier {
   bool _loadingHistory = false;
   bool get loadingHistory => _loadingHistory;
 
+  double _totalMarketValue = 0.0;
+bool _isMarketValueLoading = false;
+
+double get totalMarketValue => _totalMarketValue;
+bool get isMarketValueLoading => _isMarketValueLoading;
+
   // --- Gestión de Caché ---
   final Map<String, InventoryResponse> _itemsCache = {};
   bool _isLoading = false;
@@ -88,6 +94,20 @@ class InventoryItemProvider with ChangeNotifier {
         : '';
     return '$containerId-$assetTypeId$aggString';
   }
+
+  Future<void> loadTotalMarketValue() async {
+  _isMarketValueLoading = true;
+  notifyListeners(); // Notificamos para mostrar el estado de carga en el widget
+
+  try {
+    _totalMarketValue = await _itemService.fetchTotalMarketValue();
+  } catch (e) {
+    debugPrint("Error cargando valor de mercado en Provider: $e");
+  } finally {
+    _isMarketValueLoading = false;
+    notifyListeners(); // Notificamos para mostrar el valor final
+  }
+}
 
   Future<void> loadPriceHistory(int itemId) async {
     _loadingHistory = true;

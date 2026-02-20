@@ -302,26 +302,46 @@ class InventoryItemService {
     }
   }
 
-  Future<List<PriceHistoryPoint>> getItemPriceHistory(int itemId) async {
-  try {
-    final response = await _dio.get('/items/$itemId/price-history');
+  Future<double> fetchTotalMarketValue() async {
+    try {
+      // Llamada al endpoint global definido en el backend
+      final response = await _dio.get('/total-market-value');
 
-    if (response.statusCode == 200) {
-      // Si el backend envía el array directamente [{}, {}]
-      // Usamos response.data directamente si Dio ya lo parseó a List
-      final List data = response.data is List 
-          ? response.data 
-          : response.data['data'] ?? []; 
-      
-      return data.map((json) => PriceHistoryPoint.fromJson(json)).toList();
-    } else {
-      throw response.data['error'] ?? 'Error al obtener el historial';
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        // Extraemos el valor sumado por el servidor
+        return (data['totalMarketValue'] as num).toDouble();
+      } else {
+        throw Exception('Error al obtener el valor de mercado');
+      }
+    } on DioException catch (e) {
+      print("Error Dio en fetchTotalMarketValue: ${e.response?.data}");
+      rethrow;
+    } catch (e) {
+      throw Exception('Error inesperado: $e');
     }
-  } catch (e) {
-    print("Error en Service: $e");
-    rethrow;
   }
-}
+
+  Future<List<PriceHistoryPoint>> getItemPriceHistory(int itemId) async {
+    try {
+      final response = await _dio.get('/items/$itemId/price-history');
+
+      if (response.statusCode == 200) {
+        // Si el backend envía el array directamente [{}, {}]
+        // Usamos response.data directamente si Dio ya lo parseó a List
+        final List data = response.data is List
+            ? response.data
+            : response.data['data'] ?? [];
+
+        return data.map((json) => PriceHistoryPoint.fromJson(json)).toList();
+      } else {
+        throw response.data['error'] ?? 'Error al obtener el historial';
+      }
+    } catch (e) {
+      print("Error en Service: $e");
+      rethrow;
+    }
+  }
 
   Future<InventoryItem> syncItemWithUPC(int itemId) async {
     try {

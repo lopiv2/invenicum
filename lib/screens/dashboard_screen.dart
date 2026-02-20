@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/models/dashboard_stats.dart';
+import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/services/dashboard_service.dart';
 import 'package:invenicum/widgets/expiring_loan_widget.dart';
@@ -9,6 +10,7 @@ import 'package:invenicum/widgets/stac_slot.dart';
 import 'package:invenicum/widgets/stat_card.dart';
 import 'package:invenicum/widgets/top_demanded_items_widget.dart';
 import 'package:invenicum/widgets/top_loaned_items_chart.dart';
+import 'package:invenicum/widgets/total_market_value_widget.dart';
 import 'package:invenicum/widgets/total_spending_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -36,6 +38,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
       if (mounted) {
         context.read<LoanProvider>().fetchAllLoans();
       }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<InventoryItemProvider>().loadTotalMarketValue();
+      // También podrías cargar la inversión económica aquí
     });
   }
 
@@ -78,11 +84,27 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return Column(
                 children: [
                   // 1. Widget de Inversión
-                  TotalSpendingWidget(
-                    amount: stats.totalValue,
-                    isLoading: false,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TotalSpendingWidget(
+                          amount: stats.totalValue,
+                          isLoading: false,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Consumer<InventoryItemProvider>(
+                          builder: (context, itemProvider, child) {
+                            return TotalMarketValueWidget(
+                              marketValue: itemProvider.totalMarketValue,
+                              isLoading: itemProvider.isMarketValueLoading,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-
                   const SizedBox(height: 24),
 
                   // 2. Grid de Estadísticas
