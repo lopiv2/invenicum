@@ -10,13 +10,14 @@ class PreferencesProvider with ChangeNotifier {
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
-  // El objeto de preferencias centralizado
   UserPreferences _prefs = UserPreferences.empty();
   UserPreferences get prefs => _prefs;
 
-  // Helpers para facilitar el acceso desde la UI
+  // Helpers actualizados
   Locale get locale => Locale(_prefs.language);
   bool get aiEnabled => _prefs.aiEnabled;
+  // 🔑 Ahora la moneda viene de las preferencias guardadas
+  String get selectedCurrency => _prefs.currency;
 
   PreferencesProvider(this._preferencesService);
 
@@ -30,14 +31,34 @@ class PreferencesProvider with ChangeNotifier {
     } catch (e) {
       debugPrint('Error cargando preferencias: $e');
       _isInitialized = true;
-      notifyListeners(); // Notificamos para que la app sepa que ya terminó de intentar cargar
+      notifyListeners();
+    }
+  }
+
+  Future<void> setCurrency(String currencyCode) async {
+    final previousPrefs = _prefs;
+
+    // 1. Actualización optimista (instantánea en la UI)
+    _prefs = _prefs.copyWith(currency: currencyCode);
+    notifyListeners();
+
+    try {
+      // 2. Persistencia en el backend (usando tu servicio existente)
+      // Asegúrate de añadir 'updateCurrency' en tu PreferencesService
+      await _preferencesService.updateCurrency(currencyCode);
+    } catch (e) {
+      // 3. Rollback si falla la red
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error actualizando moneda: $e');
+      rethrow;
     }
   }
 
   /// Actualiza el idioma localmente y en el backend
   Future<void> setLanguage(String languageCode) async {
     final previousPrefs = _prefs;
-    
+
     // Actualización optimista
     _prefs = _prefs.copyWith(language: languageCode);
     notifyListeners();
@@ -55,7 +76,7 @@ class PreferencesProvider with ChangeNotifier {
   /// Actualiza el estado de la IA (On/Off)
   Future<void> setAiEnabled(bool enabled) async {
     final previousPrefs = _prefs;
-    
+
     // Actualización optimista
     _prefs = _prefs.copyWith(aiEnabled: enabled);
     notifyListeners();

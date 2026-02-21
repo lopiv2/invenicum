@@ -334,6 +334,18 @@ abstract class AppLocalizations {
   /// **'Back to Asset Types'**
   String get backToAssetTypes;
 
+  /// No description provided for @averageMarketValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Average market price'**
+  String get averageMarketValue;
+
+  /// No description provided for @barCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Barcode (UPC)'**
+  String get barCode;
+
   /// No description provided for @borrowerEmail.
   ///
   /// In en, this message translates to:
@@ -507,6 +519,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Creation Date'**
   String get createdAt;
+
+  /// No description provided for @currency.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get currency;
 
   /// No description provided for @current.
   ///
@@ -1401,6 +1419,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select and Upload Image'**
   String get selectAndUploadImage;
+
+  /// No description provided for @selectApplicationCurrency.
+  ///
+  /// In en, this message translates to:
+  /// **'Select application currency'**
+  String get selectApplicationCurrency;
 
   /// No description provided for @selectApplicationLanguage.
   ///

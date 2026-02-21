@@ -1,6 +1,7 @@
 // lib/models/inventory_item.dart
 
 import 'package:invenicum/models/location.dart';
+import 'package:invenicum/models/price_history_point.dart';
 
 // --- CLASE PARA LAS IMÁGENES BLINDADA ---
 class InventoryItemImage {
@@ -61,6 +62,7 @@ class InventoryItem {
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final Map<String, dynamic>? customFieldValues;
+  final List<PriceHistoryPoint>? priceHistory;
 
   // Mercado
   final double marketValue;
@@ -87,6 +89,7 @@ class InventoryItem {
     this.currency = 'EUR',
     this.totalMarketValue = 0.0,
     this.lastPriceUpdate,
+    this.priceHistory,
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
@@ -94,15 +97,29 @@ class InventoryItem {
     final itemData = json['itemData'] ?? json;
 
     // 2. Custom fields con limpieza de llaves (JS a veces envía ints como keys)
-    final Map<String, dynamic>? rawCustomFields = itemData['customFieldValues'] is Map 
-        ? Map<String, dynamic>.from(itemData['customFieldValues']) 
+    final Map<String, dynamic>? rawCustomFields =
+        itemData['customFieldValues'] is Map
+        ? Map<String, dynamic>.from(itemData['customFieldValues'])
         : null;
 
     // 3. Imágenes con filtrado de nulos y tipos
-    final List<dynamic> imageListJson = itemData['images'] as List<dynamic>? ?? [];
+    final List<dynamic> imageListJson =
+        itemData['images'] as List<dynamic>? ?? [];
     final List<InventoryItemImage> images = imageListJson
         .where((e) => e != null && e is Map<String, dynamic>)
-        .map((imgJson) => InventoryItemImage.fromJson(imgJson as Map<String, dynamic>))
+        .map(
+          (imgJson) =>
+              InventoryItemImage.fromJson(imgJson as Map<String, dynamic>),
+        )
+        .toList();
+
+    final List<dynamic> priceHistoryJson =
+        itemData['priceHistory'] as List<dynamic>? ?? [];
+    final List<PriceHistoryPoint> history = priceHistoryJson
+        .where((e) => e != null && e is Map<String, dynamic>)
+        .map(
+          (hJson) => PriceHistoryPoint.fromJson(hJson as Map<String, dynamic>),
+        )
         .toList();
 
     DateTime? parseDate(dynamic value) {
@@ -124,18 +141,20 @@ class InventoryItem {
       barcode: itemData['barcode'] as String?,
       containerId: (itemData['containerId'] ?? 0).toInt(),
       assetTypeId: (itemData['assetTypeId'] ?? 0).toInt(),
-      
+      priceHistory: history,
       // Para campos opcionales usamos chequeo de nulidad previo
-      locationId: itemData['locationId'] != null ? (itemData['locationId'] as num).toInt() : null,
-      
+      locationId: itemData['locationId'] != null
+          ? (itemData['locationId'] as num).toInt()
+          : null,
+
       quantity: (itemData['quantity'] ?? 1).toInt(),
       minStock: (itemData['minStock'] ?? 1).toInt(),
-      
+
       createdAt: parseDate(itemData['createdAt']),
       updatedAt: parseDate(itemData['updatedAt']),
       customFieldValues: rawCustomFields,
       images: images,
-      
+
       location: itemData['location'] != null
           ? Location.fromJson(itemData['location'] as Map<String, dynamic>)
           : null,
@@ -189,6 +208,7 @@ class InventoryItem {
     DateTime? updatedAt,
     Map<String, dynamic>? customFieldValues,
     bool resetImageIds = false,
+    List<PriceHistoryPoint>? priceHistory,
   }) {
     List<InventoryItemImage> finalImages;
     if (images != null) {
@@ -217,8 +237,12 @@ class InventoryItem {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       location: location,
-      customFieldValues: customFieldValues ?? 
-          (this.customFieldValues != null ? Map.from(this.customFieldValues!) : null),
+      priceHistory: priceHistory ?? this.priceHistory,
+      customFieldValues:
+          customFieldValues ??
+          (this.customFieldValues != null
+              ? Map.from(this.customFieldValues!)
+              : null),
     );
   }
 }

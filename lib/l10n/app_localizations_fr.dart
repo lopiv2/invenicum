@@ -130,6 +130,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get backToAssetTypes => 'Retour aux types de ressources';
 
   @override
+  String get averageMarketValue => 'Average market price';
+
+  @override
+  String get barCode => 'Barcode (UPC)';
+
+  @override
   String get borrowerEmail => 'Email de l\'emprunteur';
 
   @override
@@ -230,6 +236,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get createdAt => 'Creation Date';
+
+  @override
+  String get currency => 'Currency';
 
   @override
   String get current => 'Actuel';
@@ -722,6 +731,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectAndUploadImage => 'Sélectionner et télécharger une image';
+
+  @override
+  String get selectApplicationCurrency => 'Select application currency';
 
   @override
   String get selectApplicationLanguage =>

@@ -128,37 +128,40 @@ bool get isMarketValueLoading => _isMarketValueLoading;
   }
 
   Future<void> syncWithUPC(int itemId) async {
-    _isSyncing = true;
-    notifyListeners();
+  _isSyncing = true;
+  notifyListeners();
 
-    try {
-      // 1. Llamada al servicio (UI -> Provider -> Service -> API)
-      final updatedItem = await _itemService.syncItemWithUPC(itemId);
+  try {
+    // 1. Llamada al servicio
+    final updatedItem = await _itemService.syncItemWithUPC(itemId);
 
-      // 2. Actualizamos el ítem en TODAS las entradas de la caché donde resida
-      // (Ya que un ítem puede estar en la caché específica y en la caché global)
-      bool updated = false;
-
-      _itemsCache.forEach((key, response) {
-        final index = response.items.indexWhere((item) => item.id == itemId);
-        if (index != -1) {
-          response.items[index] = updatedItem;
-          updated = true;
-        }
-      });
-
-      if (updated) {
-        // Recalculamos totales (por si el marketValue afectó las agregaciones)
-        _recalculateTotalsAndNotify();
-      }
-    } catch (e) {
-      debugPrint("Error en Provider syncWithUPC: $e");
-      rethrow; // Permitimos que la UI capture el error para mostrar un mensaje
-    } finally {
-      _isSyncing = false;
-      notifyListeners();
+    // 2. 🔑 CLAVE: Actualizamos el historial que el Consumer está escuchando
+    // Como el backend devuelve el item con el historial actualizado:
+    if (updatedItem.priceHistory != null) {
+      _itemHistory = updatedItem.priceHistory!;
     }
+
+    // 3. Actualizamos el ítem en la caché (tu lógica actual)
+    bool updated = false;
+    _itemsCache.forEach((key, response) {
+      final index = response.items.indexWhere((item) => item.id == itemId);
+      if (index != -1) {
+        response.items[index] = updatedItem;
+        updated = true;
+      }
+    });
+
+    if (updated) {
+      _recalculateTotalsAndNotify(); // Esto ya llama a notifyListeners()
+    }
+  } catch (e) {
+    debugPrint("Error en Provider syncWithUPC: $e");
+    rethrow;
+  } finally {
+    _isSyncing = false;
+    notifyListeners(); // Notifica el fin de la carga para que el gráfico se repinte
   }
+}
 
   // 🚩 RESTAURADA: Función para los contadores de las tarjetas de categorías
   int getItemCountForAssetType(int containerId, int assetTypeId) {

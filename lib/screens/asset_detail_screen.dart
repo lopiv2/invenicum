@@ -295,6 +295,33 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   ) {
     final integrationProv = context.watch<IntegrationProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
+    final history = item.priceHistory ?? [];
+    IconData? trendIcon;
+    Color? trendColor;
+    String? percentageText;
+    if (history.length >= 2) {
+      final lastPrice = history.last.price;
+      final previousPrice = history[history.length - 2].price;
+
+      if (previousPrice > 0) {
+        // Cálculo del porcentaje: ((Actual - Anterior) / Anterior) * 100
+        final double change =
+            ((lastPrice - previousPrice) / previousPrice) * 100;
+
+        // Formateamos con un decimal y el signo + si es positivo
+        percentageText =
+            "${change > 0 ? '+' : ''}${change.toStringAsFixed(1)}%";
+
+        if (change > 0) {
+          trendIcon = Icons.trending_up;
+          trendColor = Colors.green.shade700;
+        } else if (change < 0) {
+          trendIcon = Icons.trending_down;
+          trendColor = Colors.red.shade700;
+        }
+        // Si change == 0, trendIcon se queda nulo y no se muestra nada
+      }
+    }
     // 2. Verificamos si la integración está activa
     final bool isUpcEnabled = integrationProv.isLinked('upcitemdb');
     return Row(
@@ -326,21 +353,52 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
               _buildInfoRow(l10n.minStock, item.minStock.toString()),
               if (item.location != null)
                 _buildInfoRow(l10n.location, item.location!.name),
+              if (item.barcode != null)
+                _buildInfoRow(l10n.barCode, item.barcode!),
               // --- SECCIÓN DE VALOR DE MERCADO ---
               if (item.marketValue > 0) ...[
                 const SizedBox(height: 12),
-                Text(
-                  "${item.marketValue} ${item.currency}",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green.shade700,
-                  ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      "${item.marketValue.toStringAsFixed(2)} ${item.currency}",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green.shade700,
+                      ),
+                    ),
+                    if (trendIcon != null) ...[
+                      const SizedBox(width: 8),
+                      Icon(trendIcon, color: trendColor, size: 24),
+                      const SizedBox(width: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: trendColor!.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          percentageText!,
+                          style: TextStyle(
+                            color: trendColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 Text(
-                  "Total: ${item.totalMarketValue} ${item.currency}",
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                  "(${l10n.averageMarketValue})",
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                 ),
+                const SizedBox(height: 4),
               ],
               if (isUpcEnabled) ...[
                 const SizedBox(height: 20),

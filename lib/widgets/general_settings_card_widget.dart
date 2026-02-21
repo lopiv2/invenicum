@@ -3,6 +3,7 @@ import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/services/toast_service.dart';
+import 'package:invenicum/widgets/currency_dropdown_widget.dart';
 import 'package:invenicum/widgets/language_dropdown_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -51,6 +52,15 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                 AppLocalizations.of(context)!.selectApplicationLanguage,
               ),
               trailing: const LanguageDropdownWidget(),
+              onTap: null,
+            ),
+            ListTile(
+              leading: const Icon(Icons.money),
+              title: Text(AppLocalizations.of(context)!.currency),
+              subtitle: Text(
+                AppLocalizations.of(context)!.selectApplicationCurrency,
+              ),
+              trailing: const CurrencyDropdownWidget(),
               onTap: null,
             ),
             SwitchListTile(

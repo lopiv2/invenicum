@@ -25,9 +25,7 @@ class PreferencesService {
     try {
       final response = await _dio.patch(
         '/preferences/ai-status',
-        data: {
-          'aiEnabled': isEnabled,
-        },
+        data: {'aiEnabled': isEnabled},
       );
       return response.data['data'] as Map<String, dynamic>;
     } catch (e) {
@@ -35,15 +33,14 @@ class PreferencesService {
     }
   }
 
+  Future<void> updateCurrency(String currencyCode) async {
+    await _dio.patch('/preferences/currency', data: {'currency': currencyCode});
+  }
+
   /// Actualiza la preferencia de idioma en el backend
   Future<void> updateLanguage(String languageCode) async {
     try {
-      await _dio.put(
-        '/preferences/language',
-        data: {
-          'language': languageCode,
-        },
-      );
+      await _dio.put('/preferences/language', data: {'language': languageCode});
     } catch (e) {
       rethrow;
     }
