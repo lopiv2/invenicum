@@ -291,48 +291,64 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   }
 
   void _initializeDynamicFields(InventoryItem item) {
-    // <--- Recibe el item
-    final containerProvider = context.read<ContainerProvider>();
-    final cIdInt = int.tryParse(widget.containerId);
-    final atIdInt = int.tryParse(widget.assetTypeId);
+  final containerProvider = context.read<ContainerProvider>();
+  // 🔑 Necesitamos el PreferencesProvider para convertir el precio al mostrarlo
+  final preferences = context.read<PreferencesProvider>(); 
+  
+  final cIdInt = int.tryParse(widget.containerId);
+  final atIdInt = int.tryParse(widget.assetTypeId);
 
-    if (cIdInt == null || atIdInt == null) return;
+  if (cIdInt == null || atIdInt == null) return;
 
-    final container = containerProvider.containers
-        .cast<ContainerNode?>()
-        .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
+  final container = containerProvider.containers
+      .cast<ContainerNode?>()
+      .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
 
-    final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
-      (at) => at?.id == atIdInt,
-      orElse: () => null,
-    );
+  final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
+    (at) => at?.id == atIdInt,
+    orElse: () => null,
+  );
 
-    if (assetType != null && container != null) {
-      setState(() {
-        _assetType = assetType;
-        _availableLocations = container.locations;
+  if (assetType != null && container != null) {
+    setState(() {
+      _assetType = assetType;
+      _availableLocations = container.locations;
 
-        for (var fieldDef in assetType.fieldDefinitions) {
-          final fieldId = fieldDef.id ?? 0;
-          // Usamos el item pasado por parámetro
-          final initialValue = item.customFieldValues?[fieldId.toString()];
+      for (var fieldDef in assetType.fieldDefinitions) {
+        final fieldId = fieldDef.id ?? 0;
+        final initialValue = item.customFieldValues?[fieldId.toString()];
 
-          if (fieldDef.type == CustomFieldType.dropdown) {
-            _selectedListValues[fieldId] = initialValue;
-            if (fieldDef.dataListId != null) {
-              _loadListValues(fieldDef.dataListId!, fieldId);
-            }
-          } else if (fieldDef.type == CustomFieldType.boolean) {
-            _booleanValues[fieldId] = AssetFormUtils.toBoolean(initialValue);
-          } else {
-            _dynamicControllers[fieldId] = TextEditingController(
-              text: initialValue?.toString() ?? '',
-            );
+        if (fieldDef.type == CustomFieldType.dropdown) {
+          _selectedListValues[fieldId] = initialValue;
+          if (fieldDef.dataListId != null) {
+            _loadListValues(fieldDef.dataListId!, fieldId);
           }
+        } else if (fieldDef.type == CustomFieldType.boolean) {
+          _booleanValues[fieldId] = AssetFormUtils.toBoolean(initialValue);
+        } else {
+          // ---------------------------------------------------------
+          // 🔑 LÓGICA DE CARGA PARA PRECIOS
+          // ---------------------------------------------------------
+          String textToShow = initialValue?.toString() ?? '';
+
+          if (fieldDef.type == CustomFieldType.price && initialValue != null) {
+            // 1. Leemos el valor "universal" de la BBDD (ej: 17.66)
+            double dbValue = double.tryParse(initialValue.toString()) ?? 0.0;
+            
+            // 2. Lo convertimos a la moneda actual del usuario (ej: de USD a EUR)
+            double localValue = preferences.convertPrice(dbValue);
+            
+            // 3. Formateamos para que el usuario vea "15.00"
+            textToShow = localValue.toStringAsFixed(2);
+          }
+
+          _dynamicControllers[fieldId] = TextEditingController(text: textToShow);
+          // ---------------------------------------------------------
         }
-      });
-    }
+      }
+    });
   }
+}
 
   @override
   void dispose() {
@@ -455,6 +471,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     }
 
     final itemProvider = context.read<InventoryItemProvider>();
+    final preferences = context.read<PreferencesProvider>();
     final cIdInt = int.tryParse(widget.containerId);
     final atIdInt = int.tryParse(widget.assetTypeId);
     final assetItemIdInt = int.tryParse(widget.assetItemId);
@@ -505,8 +522,25 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       } else {
         final controller = _dynamicControllers[fieldId];
         if (controller != null && controller.text.isNotEmpty) {
-          updatedCustomValues[fieldId.toString()] = controller.text;
+          var valueToSave = controller.text;
+
+          // 🔑 Lógica para el campo de tipo precio
+          if (fieldDef.type == CustomFieldType.price) {
+            // 1. Limpiamos el texto por si el usuario usó comas para los decimales
+            double localValue =
+                double.tryParse(valueToSave.replaceAll(',', '.')) ?? 0;
+
+            // 2. Convertimos a la moneda base (USD) usando tu método del provider
+            double baseValue = preferences.convertToBase(localValue);
+
+            // 3. 🚀 CRÍTICO: Redondeamos a 2 decimales para evitar el 17.662893...
+            // Esto hará que en la base de datos se guarde "17.66"
+            valueToSave = baseValue.toStringAsFixed(2);
+          }
+
+          updatedCustomValues[fieldId.toString()] = valueToSave;
         } else if (fieldDef.isRequired) {
+          // Mantén tu validación de campos obligatorios aquí
           if (mounted) {
             ToastService.error(
               AppLocalizations.of(
@@ -689,6 +723,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
           // 3. Otros campos (Texto, Número, URL, etc.)
           final controller = _dynamicControllers[fieldDef.id];
+          final preferences = context.read<PreferencesProvider>();
           if (controller == null) return const SizedBox.shrink();
 
           return Padding(
@@ -699,6 +734,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               inputFormatters: AssetFormUtils.getInputFormatters(fieldDef.type),
               decoration: InputDecoration(
                 labelText: fieldDef.name,
+                prefixText: fieldDef.type == CustomFieldType.price
+                    ? '${preferences.getSymbolForCurrency(preferences.selectedCurrency)} '
+                    : null,
                 border: const OutlineInputBorder(),
                 helperText: fieldDef.isRequired ? 'Obligatorio' : 'Opcional',
                 hintText: AssetFormUtils.getHintText(fieldDef.type),

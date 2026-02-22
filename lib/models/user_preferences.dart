@@ -5,27 +5,37 @@ class UserPreferences {
   final bool aiEnabled;
   final int? userId;
   final DateTime? updatedAt;
+  final Map<String, double>? exchangeRates;
 
   UserPreferences({
     this.id,
     this.language = 'es',
-    this.currency = 'EUR', // 🔑 Por defecto siempre EUR
+    this.currency = 'EUR',
     this.aiEnabled = true,
     this.userId,
     this.updatedAt,
+    this.exchangeRates, // Nuevo
   });
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) {
+    // Procesamos los rates asegurándonos de convertirlos a double
+    Map<String, double>? parsedRates;
+    if (json['exchangeRates'] != null) {
+      parsedRates = (json['exchangeRates'] as Map<String, dynamic>).map(
+        (key, value) => MapEntry(key, (value as num).toDouble()),
+      );
+    }
+
     return UserPreferences(
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'es',
-      // 🔑 Mapeamos la moneda desde el JSON
-      currency: json['currency'] as String? ?? 'EUR', 
+      currency: json['currency'] as String? ?? 'EUR',
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       userId: json['userId'] as int?,
-      updatedAt: json['updatedAt'] != null 
-          ? DateTime.parse(json['updatedAt'] as String) 
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'] as String)
           : null,
+      exchangeRates: parsedRates, // Asignamos los rates
     );
   }
 
@@ -51,18 +61,20 @@ class UserPreferences {
   UserPreferences copyWith({
     int? id,
     String? language,
-    String? currency, // 🔑 Añadido
+    String? currency,
     bool? aiEnabled,
     int? userId,
     DateTime? updatedAt,
+    Map<String, double>? exchangeRates, // Añadido al copyWith
   }) {
     return UserPreferences(
       id: id ?? this.id,
       language: language ?? this.language,
-      currency: currency ?? this.currency, // 🔑 Añadido
+      currency: currency ?? this.currency,
       aiEnabled: aiEnabled ?? this.aiEnabled,
       userId: userId ?? this.userId,
       updatedAt: updatedAt ?? this.updatedAt,
+      exchangeRates: exchangeRates ?? this.exchangeRates,
     );
   }
 
@@ -71,6 +83,7 @@ class UserPreferences {
       language: 'es',
       currency: 'EUR',
       aiEnabled: true,
+      exchangeRates: {},
     );
   }
 }

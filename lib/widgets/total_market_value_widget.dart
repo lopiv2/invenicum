@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
+import 'package:provider/provider.dart';
+// 🔑 Ya no necesitas importar intl aquí, PriceDisplayWidget se encarga
+import './price_display_widget.dart'; 
 
 class TotalMarketValueWidget extends StatelessWidget {
   final double marketValue;
@@ -12,6 +16,8 @@ class TotalMarketValueWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final prefsProvider = context.watch<PreferencesProvider>();
+
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -20,7 +26,6 @@ class TotalMarketValueWidget extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            // Cambiamos a tonos azules/púrpuras para diferenciarlo de la inversión (verde)
             colors: [Colors.indigo.shade800, Colors.blue.shade600],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -45,7 +50,6 @@ class TotalMarketValueWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            
             if (isLoading)
               const SizedBox(
                 height: 34,
@@ -61,18 +65,21 @@ class TotalMarketValueWidget extends StatelessWidget {
                 ),
               )
             else
-              Text(
-                '${marketValue.toStringAsFixed(2)} €',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: PriceDisplayWidget(
+                  value: marketValue,
+                  // 🔑 Personalizamos el estilo para que se vea grande y blanco
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              
             const SizedBox(height: 4),
             Text(
-              'Basado en precios de mercado actuales',
+              'Convertido a ${prefsProvider.selectedCurrency} (Precios actuales)',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.6),
                 fontSize: 11,

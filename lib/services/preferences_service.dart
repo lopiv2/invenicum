@@ -34,7 +34,7 @@ class PreferencesService {
   }
 
   Future<void> updateCurrency(String currencyCode) async {
-    await _dio.patch('/preferences/currency', data: {'currency': currencyCode});
+    await _dio.put('/preferences/currency', data: {'currency': currencyCode});
   }
 
   /// Actualiza la preferencia de idioma en el backend

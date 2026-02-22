@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import './price_display_widget.dart'; // Importamos el widget centralizado
 
 class TotalSpendingWidget extends StatelessWidget {
-  // Ahora el widget recibe los datos por constructor
   final double amount;
   final bool isLoading;
 
@@ -32,7 +32,7 @@ class TotalSpendingWidget extends StatelessWidget {
           children: [
             const Row(
               children: [
-                Icon(Icons.monetization_on, color: Colors.white70, size: 20),
+                Icon(Icons.account_balance_wallet, color: Colors.white70, size: 20),
                 SizedBox(width: 8),
                 Text(
                   'Inversión Total Económica',
@@ -46,7 +46,6 @@ class TotalSpendingWidget extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             
-            // Usamos la variable isLoading que viene por parámetro
             if (isLoading)
               const SizedBox(
                 height: 34,
@@ -62,18 +61,23 @@ class TotalSpendingWidget extends StatelessWidget {
                 ),
               )
             else
-              Text(
-                '${amount.toStringAsFixed(2)} €',
-                style: const TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              // 🔑 REUTILIZACIÓN: Usamos el widget centralizado
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: PriceDisplayWidget(
+                  value: amount,
+                  // Personalizamos el estilo para este Card específico
+                  style: const TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
               
             const SizedBox(height: 4),
             Text(
-              'Valor calculado desde el servidor',
+              'Basado en precios de adquisición',
               style: TextStyle(
                 color: Colors.white.withOpacity(0.6),
                 fontSize: 11,

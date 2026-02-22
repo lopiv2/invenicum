@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/asset_type_model.dart';
 import '../models/inventory_item.dart';
+import '../models/custom_field_definition.dart';
 import '../providers/inventory_item_provider.dart';
+import './price_display_widget.dart';
 
 class AssetCountersRow extends StatelessWidget {
   final AssetType assetType;
@@ -22,12 +24,9 @@ class AssetCountersRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Escuchamos el provider
     final itemProvider = context.watch<InventoryItemProvider>();
-
-    // 🔑 CORRECCIÓN CRÍTICA: Lógica de selección de items
-    // Si la pantalla nos pasa una lista vacía pero el provider ya tiene los items cargados,
-    // usamos los del provider para evitar que los contadores parpadeen en 0 al refrescar.
+    
+    // Lógica para evitar el parpadeo de datos al cargar
     final bool isLocalEmpty = inventoryItems == null || inventoryItems!.isEmpty;
     final itemsToCount = (isLocalEmpty && itemProvider.inventoryItems.isNotEmpty)
         ? itemProvider.inventoryItems
@@ -35,94 +34,135 @@ class AssetCountersRow extends StatelessWidget {
 
     final bool isLoading = itemProvider.isLoading;
 
-    // --- LÓGICA DE CONTEO ---
+    // Conteos rápidos
     int possessionCount = _countField(itemsToCount, assetType.possessionFieldId);
     int desiredCount = _countField(itemsToCount, assetType.desiredFieldId);
 
     return Wrap(
-      spacing: 10.0,
-      runSpacing: 10.0,
+      spacing: 12.0,
+      runSpacing: 12.0,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         // 1. TOTAL ÍTEMS
-        Chip(
-          avatar: isLoading && itemProvider.totalItems == 0
-              ? const SizedBox(
-                  width: 12,
-                  height: 12,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.inventory, size: 18),
-          label: Text('TOTAL ÍTEMS: ${itemProvider.totalItems}'),
-          backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+        _buildCustomHeightChip(
+          context,
+          label: 'TOTAL ÍTEMS: ${itemProvider.totalItems}',
+          icon: Icons.inventory,
+          color: Theme.of(context).colorScheme.primary,
+          isLoading: isLoading && itemProvider.totalItems == 0,
         ),
 
         // 2. EN POSESIÓN
         if (assetType.possessionFieldId != null)
-          _buildCounterChip(
+          _buildCustomHeightChip(
             context,
-            'EN POSESIÓN: $possessionCount',
-            Icons.check_circle_outline,
-            Colors.green,
+            label: 'EN POSESIÓN: $possessionCount',
+            icon: Icons.check_circle_outline,
+            color: Colors.green,
           ),
 
         // 3. DESEADOS
         if (assetType.desiredFieldId != null)
-          _buildCounterChip(
+          _buildCustomHeightChip(
             context,
-            'DESEADOS: $desiredCount',
-            Icons.favorite_outline,
-            Colors.pink,
+            label: 'DESEADOS: $desiredCount',
+            icon: Icons.favorite_outline,
+            color: Colors.pink,
           ),
 
         // 4. SUMATORIOS DINÁMICOS
-        // 🔑 CORRECCIÓN: Iteramos sobre las definiciones del provider
         ...itemProvider.aggregationDefinitions.where((def) {
           final isSum = def['isSummable'];
           return isSum == true || isSum.toString() == 'true' || isSum == 1;
         }).map((def) {
           final fieldId = def['id'].toString();
           final fieldName = def['name'] as String? ?? 'Suma';
+          final fieldType = def['type'];
           final sumKey = 'sum_$fieldId';
-
           final dynamic rawValue = itemProvider.aggregationResults[sumKey];
 
-          String sumDisplay = itemProvider.isLoading ? "..." : "0.00";
-          if (rawValue != null) {
-            double? parsed = double.tryParse(rawValue.toString());
-            if (parsed != null) sumDisplay = parsed.toStringAsFixed(2);
-          }
-
-          return Chip(
-            avatar: const Icon(Icons.calculate, size: 18),
-            label: Text('SUMA $fieldName: $sumDisplay'),
-            backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          );
+          return _buildAggregationChip(context, fieldName, fieldType, rawValue, isLoading);
         }),
 
-        // 5. INDICADOR DE CARGA DE CÁLCULOS
+        // 5. INDICADOR DE CARGA
         if (isLoading && itemProvider.aggregationDefinitions.isEmpty)
-          Chip(
-            avatar: const SizedBox(
-              width: 12,
-              height: 12,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            label: const Text('Cargando cálculos...'),
-            backgroundColor: Colors.grey.withOpacity(0.1),
+          _buildCustomHeightChip(
+            context,
+            label: 'Cargando cálculos...',
+            icon: Icons.refresh,
+            color: Colors.grey,
+            isLoading: true,
           ),
       ],
     );
   }
 
-  // --- MÉTODOS AUXILIARES ---
+  /// Constructor de Chips con altura aumentada para los sumatorios dinámicos
+  Widget _buildAggregationChip(BuildContext context, String name, dynamic type, dynamic value, bool loading) {
+    final bool isPrice = type == 'price' || type == CustomFieldType.price.name;
 
-  Widget _buildCounterChip(BuildContext context, String label, IconData icon, Color color) {
     return Chip(
-      avatar: Icon(icon, size: 18, color: color.withOpacity(0.8)),
-      label: Text(label),
+      elevation: 2,
+      shadowColor: Colors.black26,
+      avatar: Icon(
+        isPrice ? Icons.monetization_on : Icons.calculate,
+        size: 20,
+        color: Theme.of(context).colorScheme.secondary,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), // 🔑 Más alto
+      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      label: Container(
+        constraints: const BoxConstraints(minHeight: 25),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('$name: ', style: const TextStyle(fontWeight: FontWeight.w500)),
+            if (loading)
+              const Text("...")
+            else if (isPrice)
+              PriceDisplayWidget(value: value, fontSize: 14, color: Colors.black,) // 🔑 Reutilización
+            else
+              Text(
+                (double.tryParse(value?.toString() ?? '0') ?? 0.0).toStringAsFixed(2),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Constructor base para Chips con altura aumentada (Total, Posesión, etc.)
+  Widget _buildCustomHeightChip(
+    BuildContext context, {
+    required String label,
+    required IconData icon,
+    required Color color,
+    bool isLoading = false,
+  }) {
+    return Chip(
+      elevation: 2,
+      shadowColor: Colors.black26,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), // 🔑 Más alto
+      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
       backgroundColor: color.withOpacity(0.1),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      avatar: isLoading
+          ? const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            )
+          : Icon(icon, size: 20, color: color.withOpacity(0.8)),
+      label: Container(
+        constraints: const BoxConstraints(minHeight: 25),
+        child: Text(
+          label,
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+      ),
     );
   }
 

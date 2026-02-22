@@ -1,7 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/price_history_point.dart'; // Asegúrate de importar tu modelo
+import 'package:provider/provider.dart'; // Importante para acceder al provider
+import '../models/price_history_point.dart';
+import '../providers/preferences_provider.dart'; // Asegúrate de que la ruta es correcta
 
 class PriceHistoryChart extends StatelessWidget {
   final List<PriceHistoryPoint> history;
@@ -10,6 +12,10 @@ class PriceHistoryChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 🔑 Accedemos a las preferencias para convertir los precios
+    final preferencesProvider = context.watch<PreferencesProvider>();
+    final theme = Theme.of(context);
+
     if (history.isEmpty) {
       return const SizedBox(
         height: 200,
@@ -17,25 +23,32 @@ class PriceHistoryChart extends StatelessWidget {
       );
     }
 
-    final theme = Theme.of(context);
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            "Evolución del precio",
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            "Evolución del precio (${preferencesProvider.selectedCurrency})",
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         AspectRatio(
           aspectRatio: 6,
           child: Padding(
-            padding: const EdgeInsets.only(right: 20, left: 10, top: 10, bottom: 10),
+            padding: const EdgeInsets.only(
+              right: 20,
+              left: 10,
+              top: 10,
+              bottom: 10,
+            ),
             child: LineChart(
               LineChartData(
-                backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+                backgroundColor: theme.colorScheme.primaryContainer.withOpacity(
+                  0.2,
+                ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,
@@ -46,20 +59,29 @@ class PriceHistoryChart extends StatelessWidget {
                 ),
                 titlesData: FlTitlesData(
                   show: true,
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  topTitles: const AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
                       reservedSize: 40,
                       interval: _calculateInterval(),
                       getTitlesWidget: (value, meta) {
-                        final date = DateTime.fromMillisecondsSinceEpoch(value.toInt());
+                        final date = DateTime.fromMillisecondsSinceEpoch(
+                          value.toInt(),
+                        );
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
                             DateFormat('dd/MM').format(date),
-                            style: const TextStyle(fontSize: 10, color: Colors.grey),
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
                           ),
                         );
                       },
@@ -68,13 +90,18 @@ class PriceHistoryChart extends StatelessWidget {
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 42,
+                      reservedSize:
+                          50, // Aumentado un poco para que quepan símbolos como USD
                       getTitlesWidget: (value, meta) {
                         return SideTitleWidget(
                           meta: meta,
                           child: Text(
-                            '€${value.toInt()}',
-                            style: const TextStyle(fontSize: 10, color: Colors.grey),
+                            // 🔑 Usamos el símbolo del provider en el eje Y
+                            '${preferencesProvider.getSymbolForCurrency(preferencesProvider.selectedCurrency)}${value.toInt()}',
+                            style: const TextStyle(
+                              fontSize: 10,
+                              color: Colors.grey,
+                            ),
                           ),
                         );
                       },
@@ -87,27 +114,31 @@ class PriceHistoryChart extends StatelessWidget {
                     spots: history.map((point) {
                       return FlSpot(
                         point.createdAt.millisecondsSinceEpoch.toDouble(),
-                        point.price,
+                        // 🔑 CONVERSIÓN CRÍTICA: Convertimos el precio del punto
+                        preferencesProvider.convertPrice(point.price),
                       );
                     }).toList(),
-                    isCurved: true, // Líneas curvas para suavizar
+                    isCurved: true,
                     gradient: LinearGradient(
-                      colors: [theme.colorScheme.primary, theme.colorScheme.secondary],
+                      colors: [
+                        theme.colorScheme.primary,
+                        theme.colorScheme.secondary,
+                      ],
                     ),
                     barWidth: 3,
                     isStrokeCapRound: true,
                     dotData: FlDotData(
-                      show: true, // Muestra los puntos
+                      show: true,
                       getDotPainter: (spot, percent, barData, index) =>
                           FlDotCirclePainter(
-                        radius: 4,
-                        color: theme.colorScheme.primary,
-                        strokeWidth: 2,
-                        strokeColor: Colors.white,
-                      ),
+                            radius: 4,
+                            color: theme.colorScheme.primary,
+                            strokeWidth: 2,
+                            strokeColor: Colors.white,
+                          ),
                     ),
                     belowBarData: BarAreaData(
-                      show: true, // Sombreado debajo de la línea
+                      show: true,
                       gradient: LinearGradient(
                         colors: [
                           theme.colorScheme.primary.withOpacity(0.3),
@@ -124,13 +155,17 @@ class PriceHistoryChart extends StatelessWidget {
                     getTooltipColor: (spot) => theme.colorScheme.surfaceVariant,
                     getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                       return touchedBarSpots.map((barSpot) {
-                        final date = DateTime.fromMillisecondsSinceEpoch(barSpot.x.toInt());
+                        final date = DateTime.fromMillisecondsSinceEpoch(
+                          barSpot.x.toInt(),
+                        );
                         return LineTooltipItem(
                           '${DateFormat('dd MMM').format(date)}\n',
                           const TextStyle(fontWeight: FontWeight.bold),
                           children: [
                             TextSpan(
-                              text: '€${barSpot.y.toStringAsFixed(2)}',
+                              // 🔑 Tooltip con la moneda seleccionada
+                              text:
+                                  '${preferencesProvider.getSymbolForCurrency(preferencesProvider.selectedCurrency)}${barSpot.y.toStringAsFixed(2)}',
                               style: TextStyle(
                                 color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.w900,
@@ -154,6 +189,6 @@ class PriceHistoryChart extends StatelessWidget {
     if (history.length < 2) return 1;
     final first = history.first.createdAt.millisecondsSinceEpoch;
     final last = history.last.createdAt.millisecondsSinceEpoch;
-    return (last - first) / 4; // Divide el eje X en 4 partes
+    return (last - first) / 4;
   }
 }

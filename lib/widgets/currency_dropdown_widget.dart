@@ -6,8 +6,6 @@ import 'package:provider/provider.dart';
 
 class CurrencyDropdownWidget extends StatelessWidget {
   final VoidCallback? onCurrencyChanged;
-
-  // Tamaño para el símbolo o icono de la moneda
   static const double _iconSize = 22.0;
 
   const CurrencyDropdownWidget({
@@ -17,9 +15,10 @@ class CurrencyDropdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Obtenemos la moneda actual desde tu PreferencesProvider
-    final preferences = context.watch<PreferencesProvider>();
-    final currentCurrency = preferences.selectedCurrency; // Asegúrate de tener este getter
+    // Escuchamos el provider. Al usar .watch(), el widget se reconstruye
+    // automáticamente cuando llames a notifyListeners() en el provider.
+    final preferencesProvider = context.watch<PreferencesProvider>();
+    final currentCurrency = preferencesProvider.selectedCurrency;
 
     return PopupMenuButton<String>(
       onSelected: (String currencyCode) async {
@@ -31,34 +30,39 @@ class CurrencyDropdownWidget extends StatelessWidget {
         _buildMenuItem(context, 'USD', '\$', 'Dollar'),
         _buildMenuItem(context, 'GBP', '£', 'Pound'),
         _buildMenuItem(context, 'JPY', '¥', 'Yen'),
-        _buildMenuItem(context, 'MXN', 'Mex\$', 'Peso Mexicano'),
+        _buildMenuItem(context, 'MXN', '\$', 'Peso Mexicano'),
       ],
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Círculo visual con el símbolo de la moneda actual
             Container(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primaryContainer,
                 shape: BoxShape.circle,
               ),
               child: Text(
-                _getSymbolForCurrency(currentCurrency),
+                preferencesProvider.getSymbolForCurrency(currentCurrency),
                 style: TextStyle(
-                  fontSize: 14, 
+                  fontSize: 12, 
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onPrimaryContainer
                 ),
               ),
             ),
             const SizedBox(width: 8),
+            // Texto del código de moneda (EUR, USD, etc.)
             Text(
               currentCurrency,
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
             ),
-            const Icon(Icons.arrow_drop_down, size: 20),
+            const Icon(Icons.arrow_drop_down, size: 24),
           ],
         ),
       ),
@@ -70,7 +74,6 @@ class CurrencyDropdownWidget extends StatelessWidget {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
           SizedBox(
             width: 30,
@@ -79,38 +82,26 @@ class CurrencyDropdownWidget extends StatelessWidget {
               style: const TextStyle(
                 fontSize: _iconSize, 
                 fontWeight: FontWeight.bold,
-                color: Colors.grey
+                color: Colors.blueGrey
               )
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: 12),
           Text(label),
         ],
       ),
     );
   }
 
-  String _getSymbolForCurrency(String currencyCode) {
-    switch (currencyCode) {
-      case 'EUR': return '€';
-      case 'GBP': return '£';
-      case 'JPY': return '¥';
-      case 'USD':
-      default: return '\$';
-    }
-  }
 
   Future<void> _changeCurrency(BuildContext context, String currencyCode) async {
     try {
-      // Necesitaremos crear este método 'setCurrency' en tu PreferencesProvider
+      // Este método en tu provider ahora actualiza _prefs y notifica al backend
       await context.read<PreferencesProvider>().setCurrency(currencyCode);
       
-      // Asumiendo que añades esta clave a tu l10n
-      final l10n = AppLocalizations.of(context)!;
-      ToastService.success("Moneda cambiada a $currencyCode"); 
+      ToastService.success("Moneda: $currencyCode"); 
     } catch (e) {
-      final l10n = AppLocalizations.of(context)!;
-      ToastService.error("Error al cambiar moneda: ${e.toString()}");
+      ToastService.error("Error: ${e.toString()}");
     }
   }
 }

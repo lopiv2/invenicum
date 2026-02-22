@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/location.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/inventory_item.dart';
@@ -36,17 +37,20 @@ class AssetDataTable extends StatefulWidget {
 class _AssetDataTableState extends State<AssetDataTable> {
   int? _sortColumnIndex = 1;
   bool _sortAscending = true;
-  late InventoryDataSource _dataSource;
+  InventoryDataSource? _dataSource;
 
   @override
-  void initState() {
-    super.initState();
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
 
-    final itemProvider = context.read<InventoryItemProvider>();
+    final itemProvider = context.watch<InventoryItemProvider>();
+    final preferencesProvider = context.watch<PreferencesProvider>();
 
-    // 1. Inicializar el DataSource (sin listener manual, build se encarga)
+    // Inicializamos el DataSource si es la primera vez
     _dataSource = InventoryDataSource(
       itemProvider: itemProvider,
+      preferencesProvider: preferencesProvider, // Pasamos el provider de moneda
       assetType: widget.assetType,
       items: widget.inventoryItems,
       context: context,
@@ -59,8 +63,18 @@ class _AssetDataTableState extends State<AssetDataTable> {
       availableLocations: widget.availableLocations,
       containerId: widget.containerId,
     );
+  }
 
-    // 2. Restaurar el estado de ordenamiento visual desde el Provider
+  @override
+  void initState() {
+    super
+        .didChangeDependencies(); // Error común: en initState se usa super.initState()
+    super.initState();
+
+    // 1. Usamos read porque en initState solo queremos el valor inicial sin suscribirnos
+    final itemProvider = context.read<InventoryItemProvider>();
+
+    // 2. Restaurar el estado de ordenamiento visual
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final currentSortKey = itemProvider.sortKey;
       int index = -1;
@@ -106,9 +120,6 @@ class _AssetDataTableState extends State<AssetDataTable> {
     itemProvider.sortInventoryItems(dataKey: dataKey, ascending: ascending);
     itemProvider.goToPage(1); // Reset a pág 1 al ordenar
   }
-
-  // ... (Métodos _copyAsset, _editAsset, _deleteAsset y _showFilterDialog se mantienen igual)
-  // Asegúrate de que _copyAsset use item.name + " (Copia)" si quieres evitar duplicados visuales inmediatos
 
   void _copyAsset(BuildContext context, InventoryItem item) async {
     final InventoryItem itemCopy = item.copyWith(
@@ -252,15 +263,18 @@ class _AssetDataTableState extends State<AssetDataTable> {
 
   @override
   Widget build(BuildContext context) {
+    if (_dataSource == null) return const SizedBox.shrink();
     // 1. Escuchamos cambios en el provider
     final itemProvider = context.watch<InventoryItemProvider>();
     // 💡 CÁLCULO DINÁMICO DEL ANCHO
     // Base de 800px para campos fijos + 150px por cada campo personalizado
     double dynamicMinWidth =
-        800 + (widget.assetType.fieldDefinitions.length * 150);
+        950 + (widget.assetType.fieldDefinitions.length * 180);
+    final screenWidth = MediaQuery.of(context).size.width;
+    if (dynamicMinWidth < screenWidth) dynamicMinWidth = screenWidth;
 
     // 2. 🔑 ACTUALIZACIÓN CRÍTICA: Sincronizar ítems con el DataSource antes de renderizar
-    _dataSource.updateItems(itemProvider.inventoryItems);
+    _dataSource?.updateItems(itemProvider.inventoryItems);
 
     return PaginatedDataTable2(
       minWidth: dynamicMinWidth,
@@ -285,22 +299,22 @@ class _AssetDataTableState extends State<AssetDataTable> {
       columns: [
         const DataColumn2(
           label: Center(child: Icon(Icons.photo_library_outlined, size: 20)),
-          size: ColumnSize.M,
+          size: ColumnSize.S,
           numeric: true,
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Nombre', 'name'),
-          size: ColumnSize.L,
+          size: ColumnSize.M,
           onSort: (idx, asc) => _sortItems(context, idx, 'name', asc),
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Stock actual', 'quantity'),
-          size: ColumnSize.S,
+          size: ColumnSize.M,
           onSort: (idx, asc) => _sortItems(context, idx, 'quantity', asc),
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Stock minimo', 'minStock'),
-          size: ColumnSize.S,
+          size: ColumnSize.M,
           onSort: (idx, asc) => _sortItems(context, idx, 'minStock', asc),
         ),
         DataColumn2(
@@ -319,7 +333,11 @@ class _AssetDataTableState extends State<AssetDataTable> {
           onSort: (idx, asc) => _sortItems(context, idx, 'barcode', asc),
         ),
         DataColumn2(
-          label: _buildFilterHeader(context, 'Precio de mercado', 'marketValue'),
+          label: _buildFilterHeader(
+            context,
+            'Precio de mercado',
+            'marketValue',
+          ),
           size: ColumnSize.L,
           onSort: (idx, asc) => _sortItems(context, idx, 'marketValue', asc),
         ),
@@ -355,7 +373,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
       onPageChanged: (pageIndex) {
         itemProvider.goToPage(pageIndex + 1);
       },
-      source: _dataSource,
+      source: _dataSource!,
     );
   }
 }

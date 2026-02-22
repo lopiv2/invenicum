@@ -367,8 +367,24 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
         }
       } else {
         final controller = _customControllers[fieldDef.id];
+        final preferences = context.read<PreferencesProvider>();
         if (controller != null && controller.text.isNotEmpty) {
-          customFieldValues[fieldDef.id.toString()] = controller.text;
+          String valueToSave = controller.text;
+
+          // 🔑 NORMALIZACIÓN DE PRECIOS AL CREAR
+          if (fieldDef.type == CustomFieldType.price) {
+            // 1. Limpiamos el texto (comas por puntos)
+            double localValue =
+                double.tryParse(valueToSave.replaceAll(',', '.')) ?? 0.0;
+
+            // 2. Convertimos a la moneda base de la DB (USD)
+            double normalizedValue = preferences.convertToBase(localValue);
+
+            // 3. Guardamos con 2 decimales para evitar decimales infinitos
+            valueToSave = normalizedValue.toStringAsFixed(2);
+          }
+
+          customFieldValues[fieldDef.id.toString()] = valueToSave;
         }
       }
     }
@@ -485,6 +501,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
           }
 
           final controller = _customControllers[fieldDef.id];
+          final preferences = context.read<PreferencesProvider>();
           if (controller == null) return const SizedBox.shrink();
 
           return Padding(
@@ -495,6 +512,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen> {
               inputFormatters: AssetFormUtils.getInputFormatters(fieldDef.type),
               decoration: InputDecoration(
                 labelText: fieldDef.name,
+                prefixText: fieldDef.type == CustomFieldType.price
+                    ? '${preferences.getSymbolForCurrency(preferences.selectedCurrency)} '
+                    : null,
                 hintText: AssetFormUtils.getHintText(fieldDef.type),
                 border: const OutlineInputBorder(),
                 filled: _highlightedFields.contains(fieldDef.name),

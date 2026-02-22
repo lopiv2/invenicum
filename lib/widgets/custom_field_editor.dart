@@ -91,7 +91,8 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
     // 🔑 Lógica para limpiar isSummable si el tipo no es numérico
     final bool finalIsSummable;
-    if (_selectedType == CustomFieldType.number) {
+    if (_selectedType == CustomFieldType.number ||
+        _selectedType == CustomFieldType.price) {
       finalIsSummable = _isSummable;
     } else {
       finalIsSummable = false;
@@ -103,7 +104,6 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
         type: _selectedType,
         isRequired: _isRequired,
         dataListId: finalDataListId,
-        // 🔑 Envío de los nuevos campos
         isSummable: finalIsSummable,
         isCountable: _isCountable,
         isMonetary: _isMonetary,
@@ -112,7 +112,9 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
   }
 
   // 🔑 Función de ayuda para determinar si el campo es de tipo numérico
-  bool get _isNumericType => _selectedType == CustomFieldType.number;
+  bool get _isNumericType =>
+      _selectedType == CustomFieldType.number ||
+      _selectedType == CustomFieldType.price;
 
   @override
   void dispose() {

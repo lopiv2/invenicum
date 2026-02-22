@@ -7,11 +7,14 @@ import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
+import 'package:invenicum/widgets/price_display_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:invenicum/models/location.dart'; // 🔑 Importar Location
 
 class InventoryDataSource extends DataTableSource {
   final InventoryItemProvider itemProvider;
+  final PreferencesProvider preferencesProvider;
   final AssetType assetType;
   List<InventoryItem> _items;
   final BuildContext context;
@@ -24,6 +27,7 @@ class InventoryDataSource extends DataTableSource {
 
   InventoryDataSource({
     required this.itemProvider,
+    required this.preferencesProvider,
     required this.assetType,
     required List<InventoryItem> items,
     required this.context,
@@ -175,6 +179,17 @@ class InventoryDataSource extends DataTableSource {
         ),
       );
     }
+    // 🔑 3. Campo de Precio (Conversión y Formato)
+    if (fieldDef.type == CustomFieldType.price && fieldValue != null) {
+      return DataCell(
+        PriceDisplayWidget(
+          value: fieldValue,
+          fontSize: 14, // Tamaño más adecuado para una tabla
+          // Puedes pasarle un estilo personalizado si quieres mantener el bold
+          style: const TextStyle(fontSize: 14, color: Colors.black),
+        ),
+      );
+    }
 
     // 3. Otros Tipos (Texto, Número, Desplegable, etc.)
     return DataCell(
@@ -321,9 +336,11 @@ class InventoryDataSource extends DataTableSource {
         ),
       ),
       DataCell(
-        Tooltip(
-          message: item.marketValue.toString(),
-          child: Text(item.marketValue.toString(), overflow: TextOverflow.ellipsis),
+        PriceDisplayWidget(
+          value: item.marketValue,
+          fontSize: 14,
+          color:
+              Colors.black87, // Color más neutro para la tabla si se prefiere
         ),
       ),
     ];

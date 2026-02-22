@@ -5,8 +5,10 @@ import 'package:invenicum/models/container_node.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/widgets/asset_image_gallery_widget.dart';
+import 'package:invenicum/widgets/price_display_widget.dart';
 import 'package:invenicum/widgets/price_history_chart_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart'; // Asegúrate de que esta ruta es correcta
@@ -94,7 +96,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.watch<InventoryItemProvider>();
-
+    final preferencesProvider = context.watch<PreferencesProvider>();
     final int itemId = int.tryParse(widget.itemId) ?? 0;
 
     if (itemId == 0) {
@@ -169,7 +171,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Sección de Galería de Imágenes y Detalles Clave
-            _buildHeaderSection(context, item, l10n),
+            _buildHeaderSection(context, item, l10n, preferencesProvider),
             const SizedBox(height: 32),
 
             // Descripción (si existe)
@@ -292,6 +294,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
     BuildContext context,
     InventoryItem item,
     AppLocalizations l10n,
+    PreferencesProvider preferencesProvider,
   ) {
     final integrationProv = context.watch<IntegrationProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
@@ -318,6 +321,11 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
         } else if (change < 0) {
           trendIcon = Icons.trending_down;
           trendColor = Colors.red.shade700;
+        } else {
+          if (change == 0) {
+            trendIcon = Icons.trending_flat;
+            trendColor = Colors.yellow.shade700;
+          }
         }
         // Si change == 0, trendIcon se queda nulo y no se muestra nada
       }
@@ -362,7 +370,8 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "${item.marketValue.toStringAsFixed(2)} ${item.currency}",
+                      // 🔑 CAMBIO AQUÍ: Usamos el preferencesProvider para obtener el precio y símbolo correctos
+                      "${preferencesProvider.convertPrice(item.marketValue).toStringAsFixed(2)} ${preferencesProvider.selectedCurrency}",
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -501,7 +510,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
             crossAxisSpacing: 24,
             mainAxisSpacing: 16,
             childAspectRatio:
-                5, // Ajusta esto según el espacio que necesites para cada campo
+                3, // Ajusta esto según el espacio que necesites para cada campo
           ),
           itemCount: displayedCustomFields.length,
           itemBuilder: (context, index) {
@@ -556,10 +565,16 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
           ),
         ),
       );
+    } else if (fieldDef.type == CustomFieldType.price && fieldValue != null) {
+      valueWidget = PriceDisplayWidget(value: fieldValue);
     } else {
       valueWidget = Tooltip(
         message: displayValue,
-        child: Text(displayValue, overflow: TextOverflow.ellipsis),
+        child: Text(
+          displayValue,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(fontSize: 18),
+        ),
       );
     }
 
@@ -576,7 +591,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
         children: [
           Text(
             fieldDef.name,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
               color: Colors.grey.shade600,
               fontWeight: FontWeight.bold,
             ),
