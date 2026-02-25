@@ -6,8 +6,10 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
+import 'package:invenicum/providers/template_provider.dart';
 import 'package:invenicum/services/integrations_service.dart';
 import 'package:invenicum/services/plugin_service.dart';
+import 'package:invenicum/services/template_service.dart';
 import 'package:invenicum/services/veni_chatbot_service.dart';
 import 'package:provider/provider.dart';
 
@@ -89,6 +91,7 @@ void main() async {
         Provider(create: (c) => VoucherService(c.read<ApiService>())),
         Provider(create: (c) => AlertService(c.read<ApiService>())),
         Provider(create: (c) => IntegrationService(c.read<ApiService>())),
+        Provider(create: (c) => TemplateService(c.read<ApiService>())),
         // --- PROVEEDORES DE ESTADO ---
 
         // Auth es la raíz de la lógica
@@ -135,6 +138,26 @@ void main() async {
               }
             }
             return prev!;
+          },
+        ),
+        // --- Plantillas ---
+        ChangeNotifierProxyProvider<AuthProvider, TemplateProvider>(
+          create: (context) =>
+              TemplateProvider(context.read<TemplateService>()),
+          update: (context, auth, previous) {
+            if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
+              // Si el usuario acaba de loguearse y no hemos cargado nada,
+              // disparamos la carga inicial del market y la biblioteca
+              if (previous != null &&
+                  previous.marketTemplates.isEmpty &&
+                  !previous.isLoading) {
+                Future.microtask(() {
+                  previous.fetchMarketTemplates();
+                  previous.fetchUserLibrary();
+                });
+              }
+            }
+            return previous!;
           },
         ),
         // --- Dashboard ---

@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/models/container_node.dart';
@@ -22,6 +23,7 @@ class ContainerProvider with ChangeNotifier {
   // 1. La variable de estado privada que almacena los datos
   List<ContainerNode> _containers = [];
   bool _isLoading = false;
+  Future<void>? _loadContainersFuture;
 
   // 2. Getters públicos
   List<ContainerNode> get containers => _containers;
@@ -29,51 +31,50 @@ class ContainerProvider with ChangeNotifier {
 
   // --- Lógica de Obtener Contenedores ---
   Future<void> loadContainers() async {
+    // Si ya hay una carga en curso, esperamos a la misma Future en lugar de salir sin más.
+    if (_isLoading) {
+      if (_loadContainersFuture != null) {
+        await _loadContainersFuture;
+      }
+      return;
+    }
+
     _isLoading = true;
+    // Notificamos inicio de carga
     notifyListeners();
 
-    try {
-      final loadedContainers = await _containerService.getContainers();
+    _loadContainersFuture = () async {
+      try {
+        final loadedContainers = await _containerService.getContainers();
 
-      // Prepara una nueva lista para los contenedores actualizados
-      final List<ContainerNode> updatedContainers = [];
+        // Cargamos SIEMPRE ubicaciones y listas personalizadas desde sus endpoints dedicados,
+        // igual que ya hacíamos con ubicaciones, para que los contadores del sidebar
+        // reflejen siempre el estado real después de cualquier F5.
+        final updatedContainers = await Future.wait(
+          loadedContainers.map((apiContainer) async {
+            final locations =
+                await _locationService.getLocations(apiContainer.id);
+            final dataLists =
+                await _containerService.getDataLists(apiContainer.id);
 
-      for (final containerFromApi in loadedContainers) {
-        // Por cada contenedor, carga sus ubicaciones
-        final locations = await _locationService.getLocations(
-          containerFromApi.id,
+            return apiContainer.copyWith(
+              locations: locations,
+              assetTypes: apiContainer.assetTypes,
+              dataLists: dataLists,
+            );
+          }),
         );
 
-        // Busca el contenedor existente en el estado actual para preservar datos
-        final existingContainer = _containers.firstWhere(
-          (c) => c.id == containerFromApi.id,
-          orElse: () => containerFromApi, // Si no existe, usa el de la API
-        );
-
-        // Fusiona los datos: usa los datos de la API como base y preserva
-        // las listas internas si ya existen, pero AÑADE las ubicaciones cargadas.
-        updatedContainers.add(
-          containerFromApi.copyWith(
-            // Usa las listas del contenedor existente si no están vacías
-            assetTypes: existingContainer.assetTypes.isNotEmpty
-                ? existingContainer.assetTypes
-                : containerFromApi.assetTypes,
-            dataLists: existingContainer.dataLists.isNotEmpty
-                ? existingContainer.dataLists
-                : containerFromApi.dataLists,
-            // 🎯 Asigna la lista de ubicaciones recién cargada
-            locations: locations,
-          ),
-        );
+        _containers = updatedContainers;
+      } catch (e) {
+        print('Error al cargar contenedores: $e');
+      } finally {
+        _isLoading = false;
+        notifyListeners(); // 🔑 Notificamos que la carga terminó
       }
+    }();
 
-      _containers = updatedContainers;
-    } catch (e) {
-      print('Error al cargar contenedores: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    await _loadContainersFuture;
   }
 
   // --- Lógica de Crear Contenedor (Mantenido igual) ---
@@ -453,7 +454,8 @@ class ContainerProvider with ChangeNotifier {
 
   // --- Lógica de Listas Personalizadas (Mantenido igual) ---
 
-  Future<void> createDataList({
+  // 🚩 Cambia Future<void> por Future<ListData>
+  Future<ListData> createDataList({
     required int containerId,
     required String name,
     required String description,
@@ -461,10 +463,9 @@ class ContainerProvider with ChangeNotifier {
   }) async {
     try {
       final index = _containers.indexWhere((c) => c.id == containerId);
-      if (index == -1) {
-        throw Exception('Container not found');
-      }
+      if (index == -1) throw Exception('Container not found');
 
+      // 1. Llamada al servicio
       final newList = await _containerService.createDataList(
         containerId: containerId,
         name: name,
@@ -472,18 +473,31 @@ class ContainerProvider with ChangeNotifier {
         items: items,
       );
 
+      // 2. Actualización de estado con inmutabilidad estricta
       final container = _containers[index];
-      // 🎯 CORRECCIÓN: Ya no pasamos locationsCount
+
+      // 🚩 CLAVE: Forzamos la creación de una nueva instancia de lista
+      final List<ListData> updatedDataLists = List<ListData>.from(
+        container.dataLists,
+      )..add(newList);
+
       final updatedContainer = container.copyWith(
-        dataLists: [...container.dataLists, newList],
-        locations: container.locations,
+        dataLists: updatedDataLists,
+        locations: List.from(
+          container.locations,
+        ), // También refrescamos locations por si acaso
       );
 
+      // 3. Reemplazo de la lista principal
       final newContainersList = List<ContainerNode>.from(_containers);
       newContainersList[index] = updatedContainer;
+
       _containers = newContainersList;
 
+      // 4. Notificar a la UI
       notifyListeners();
+
+      return newList;
     } catch (e) {
       print('Error al crear lista personalizada: $e');
       rethrow;

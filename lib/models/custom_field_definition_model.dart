@@ -8,7 +8,7 @@ class CustomFieldDefinition {
   final CustomFieldType type;
   final bool isRequired;
   final int? dataListId;
-
+  final List<String>? options;
   // 🔑 CAMPOS PARA SUMATORIOS, CONTADORES Y VALOR ECONÓMICO
   final bool isSummable;  // Para acumulados físicos (ej: kg, litros)
   final bool isCountable; // Para contar cuántos items tienen este campo
@@ -20,6 +20,7 @@ class CustomFieldDefinition {
     required this.type,
     this.isRequired = false,
     this.dataListId,
+    this.options,
     this.isSummable = false,
     this.isCountable = false,
     this.isMonetary = false, // Por defecto false
@@ -35,6 +36,7 @@ class CustomFieldDefinition {
     CustomFieldType? type,
     bool? isRequired,
     Object? dataListId = const _Sentinel(),
+    final List<String>? options,
     bool? isSummable,
     bool? isCountable,
     bool? isMonetary,
@@ -47,6 +49,7 @@ class CustomFieldDefinition {
       type: type ?? this.type,
       isRequired: isRequired ?? this.isRequired,
       dataListId: isDataListIdSentinel ? this.dataListId : dataListId as int?,
+      options: options ?? this.options,
       isSummable: isSummable ?? this.isSummable,
       isCountable: isCountable ?? this.isCountable,
       isMonetary: isMonetary ?? this.isMonetary,
@@ -58,28 +61,20 @@ class CustomFieldDefinition {
   // ----------------------------------------------------------------
 
   factory CustomFieldDefinition.fromJson(Map<String, dynamic> json) {
-    final id = json['id'];
-    int? parsedId;
-    if (id != null) {
-      parsedId = id is int ? id : int.tryParse(id.toString());
-    }
-
-    final dataListId = json['dataListId'] ?? json['data_list_id'];
-    int? parsedDataListId;
-    if (dataListId != null) {
-      parsedDataListId = dataListId is int
-          ? dataListId
-          : int.tryParse(dataListId.toString());
+    // Lectura de opciones si existen (vienen de la plantilla de GitHub)
+    final optionsRaw = json['options'];
+    List<String>? parsedOptions;
+    if (optionsRaw != null && optionsRaw is List) {
+      parsedOptions = optionsRaw.map((e) => e.toString()).toList();
     }
 
     return CustomFieldDefinition(
-      id: parsedId,
+      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
       name: json['name'] as String,
       type: CustomFieldTypeExtension.fromString(json['type'] as String),
       isRequired: json['isRequired'] as bool? ?? json['is_required'] as bool? ?? false,
-      dataListId: parsedDataListId,
-
-      // DESERIALIZACIÓN (Soporta snake_case de Prisma y camelCase)
+      dataListId: json['dataListId'] ?? json['data_list_id'],
+      options: parsedOptions,
       isSummable: json['isSummable'] as bool? ?? json['is_summable'] as bool? ?? false,
       isCountable: json['isCountable'] as bool? ?? json['is_countable'] as bool? ?? false,
       isMonetary: json['isMonetary'] as bool? ?? json['is_monetary'] as bool? ?? false,
@@ -96,14 +91,11 @@ class CustomFieldDefinition {
       'name': name,
       'type': type.dbName,
       'isRequired': isRequired,
-      
-      // Enviamos como camelCase para tu API, o puedes cambiarlo a 'is_monetary'
-      // si tu backend lo requiere estrictamente en snake_case
       if (isSummable) 'isSummable': true,
       if (isCountable) 'isCountable': true,
       if (isMonetary) 'isMonetary': true,
-
       if (dataListId != null) 'dataListId': dataListId,
+      // No solemos enviar 'options' al crear AssetType porque el back usa dataListId
     };
   }
 }

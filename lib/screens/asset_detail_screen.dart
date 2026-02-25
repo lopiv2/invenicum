@@ -88,6 +88,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
           forceReload:
               false, // Forzamos para evitar ver datos del container anterior
         );
+        itemProvider.loadPriceHistory(int.parse(widget.itemId));
       });
     }
   }

@@ -4,9 +4,14 @@ import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/widgets/container_tree_view.dart';
 import 'package:provider/provider.dart';
 
-class SidebarTreeSection extends StatelessWidget {
+class SidebarTreeSection extends StatefulWidget {
   const SidebarTreeSection({super.key});
 
+  @override
+  State<SidebarTreeSection> createState() => _SidebarTreeSectionState();
+}
+
+class _SidebarTreeSectionState extends State<SidebarTreeSection> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ContainerProvider>(
@@ -28,20 +33,26 @@ class SidebarTreeSection extends StatelessWidget {
             child: provider.containers.isEmpty
                 ? _buildEmptyState(context)
                 : ContainerTreeView(
+                    // 🔑 MEJORA: La key ahora incluye la suma de listas y préstamos
+                    // Si cualquiera de esos números cambia, el TreeView se refresca sí o sí.
                     key: ValueKey(
-                      'tree_v2_${provider.containers.length}_${provider.isLoading}',
+                      'tree_v3_${provider.containers.length}_${_getTotalItemsCount(provider)}'
                     ),
                     onDeleteContainer: provider.deleteContainer,
                     onRenameContainer: provider.renameContainer,
-                    // 🚩 AQUÍ ESTABA EL ERROR: Agregamos el argumento faltante
                     onContainerTap: (container, subSection) {
-                      // Por ahora vacío, o puedes implementar lógica de navegación aquí
+                      // Navegación lógica opcional
                     },
                   ),
           ),
         );
       },
     );
+  }
+
+  // Función auxiliar para forzar el refresco de la Key
+  int _getTotalItemsCount(ContainerProvider provider) {
+    return provider.containers.fold(0, (sum, c) => sum + c.dataLists.length);
   }
 
   Widget _buildEmptyState(BuildContext context) {

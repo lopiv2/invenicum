@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../config/environment.dart'; // 💡 NECESARIO para construir la URL de la imagen
+import '../../config/environment.dart';
 import '../../models/asset_type_model.dart';
 import '../../models/inventory_item.dart';
 import '../../providers/inventory_item_provider.dart';
 import '../../services/toast_service.dart';
 
-// 🔑 CAMBIO: Convertimos a StatefulWidget para manejar el estado del slider
 class AssetGridView extends StatefulWidget {
   final AssetType assetType;
   final List<InventoryItem> items;
@@ -30,10 +29,10 @@ class AssetGridView extends StatefulWidget {
 }
 
 class _AssetGridViewState extends State<AssetGridView> {
-  // 🔑 ESTADO: Número de columnas deseado, inicializado en 4
+  // Configuración inicial más equilibrada para pantallas grandes/medianas
   int _columnsCount = 4;
-  final int minColumns = 3;
-  final int maxColumns = 10;
+  final int minColumns = 2;
+  final int maxColumns = 8;
 
   void _viewAssetDetails(BuildContext context, InventoryItem item) {
     context.go(
@@ -41,28 +40,66 @@ class _AssetGridViewState extends State<AssetGridView> {
     );
   }
 
-  // --- FUNCIONES DE ACCIÓN (Ahora usan widget. para acceder a las propiedades) ---
+  // --- FUNCIÓN PARA VER IMAGEN EN GRANDE ---
+  void _showFullImage(BuildContext context, String url, String title) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(10),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            // Imagen con Hero para una transición suave si lo deseas
+            InteractiveViewer(
+              panEnabled: true,
+              minScale: 0.5,
+              maxScale: 4.0,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(url, fit: BoxFit.contain),
+              ),
+            ),
+            // Botón de cerrar y título
+            Positioned(
+              top: 10,
+              right: 10,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _editAsset(BuildContext context, InventoryItem item) {
     context.go(
       '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}/edit',
       extra: item,
     );
-    ToastService.info('Editando activo: ${item.name} (ID: ${item.id})');
   }
 
   void _deleteAsset(BuildContext context, InventoryItem item) {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Confirmar Eliminación'),
-        content: Text('¿Deseas eliminar el activo "${item.name}"?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Eliminar Activo'),
+        content: Text('¿Confirmas que deseas eliminar "${item.name}"?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancelar'),
           ),
-          TextButton(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red.shade50,
+              foregroundColor: Colors.red,
+              elevation: 0,
+            ),
             onPressed: () {
               Navigator.of(dialogContext).pop();
               context.read<InventoryItemProvider>().deleteInventoryItem(
@@ -70,16 +107,15 @@ class _AssetGridViewState extends State<AssetGridView> {
                 widget.containerId,
                 widget.assetTypeId,
               );
-              ToastService.success('Activo "${item.name}" eliminado.');
+              ToastService.success('Activo eliminado.');
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: const Text('Eliminar'),
           ),
         ],
       ),
     );
   }
 
-  // Función de utilidad para construir la URL completa de la imagen
   String _getFullImageUrl(InventoryItem item) {
     final String? imageUrl = item.images.isNotEmpty
         ? item.images.first.url
@@ -87,238 +123,349 @@ class _AssetGridViewState extends State<AssetGridView> {
     return imageUrl != null ? '${Environment.apiUrl}$imageUrl' : '';
   }
 
-  // Lógica del GridView (separada para mayor claridad)
-  Widget _buildGridView(BuildContext context, double maxCrossAxisExtent) {
-    const double fixedCardHeight = 170.0;
-    return GridView.builder(
-      primary: false,
-      shrinkWrap: true,
-      padding: const EdgeInsets.all(16.0),
-      // 🔑 Usamos el ancho calculado.
-      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-        maxCrossAxisExtent: maxCrossAxisExtent,
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-        // El childAspectRatio puede necesitar un pequeño ajuste si el ancho se reduce mucho
-        mainAxisExtent: fixedCardHeight,
-      ),
-      itemCount: widget.items.length,
-      itemBuilder: (context, index) {
-        final item = widget.items[index];
-        final fullImageUrl = _getFullImageUrl(item);
-        final hasImage = fullImageUrl.isNotEmpty;
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final itemProvider = context.watch<InventoryItemProvider>();
 
-        return InkWell(
-          borderRadius: BorderRadius.circular(12),
-          onTap: () => _viewAssetDetails(context, item),
-          child: Card(
-            elevation: 2,
+    if (widget.items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.inventory_2_outlined,
+              size: 64,
+              color: theme.hintColor.withOpacity(0.3),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              (itemProvider.filters.isEmpty &&
+                      itemProvider.globalSearchTerm == null)
+                  ? 'No hay activos creados aún.'
+                  : 'Sin coincidencias.',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: theme.hintColor,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        // --- CONTROL DE COLUMNAS ESTILIZADO ---
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            decoration: BoxDecoration(
+              color: theme.primaryColor.withOpacity(0.05),
+              borderRadius: BorderRadius.circular(16),
+            ),
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. CONTENEDOR DE IMAGEN (Miniatura)
-                Flexible(
-                  flex: 1,
-                  child: Container(
-                    constraints: BoxConstraints(minWidth: 100, maxWidth: 500),
-                    clipBehavior: Clip.antiAlias,
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(4),
-                        bottomLeft: Radius.circular(4),
-                      ),
-                      color: Colors.grey.shade100,
-                    ),
-                    child: hasImage
-                        ? Image.network(
-                            fullImageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
-                                const Center(
-                                  child: Icon(
-                                    Icons.broken_image,
-                                    size: 30,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              );
-                            },
-                          )
-                        : const Center(
-                            child: Icon(
-                              Icons.inventory,
-                              size: 30,
-                              color: Colors.grey,
-                            ),
-                          ),
+                Icon(
+                  Icons.grid_view_rounded,
+                  size: 18,
+                  color: theme.primaryColor,
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  'Vista: $_columnsCount col.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.primaryColor,
                   ),
                 ),
-
-                // 2. CONTENIDO DEL TEXTO Y ACCIONES
                 Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Fila de Título y Acciones
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                item.name,
-                                style: Theme.of(context).textTheme.titleMedium
-                                    ?.copyWith(fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                // Botones de acción
-                                IconButton(
-                                  icon: const Icon(Icons.edit, size: 20),
-                                  tooltip: 'Editar',
-                                  onPressed: () => _editAsset(context, item),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                                const SizedBox(width: 8),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    size: 20,
-                                    color: Colors.red,
-                                  ),
-                                  tooltip: 'Eliminar',
-                                  onPressed: () => _deleteAsset(context, item),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-
-                        // Descripción
-                        Text(
-                          item.description ?? 'Sin descripción',
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: Colors.grey[700]),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
-                        ),
-
-                        const Divider(height: 12),
-
-                        // Mostrar los dos primeros campos personalizados clave
-                        ...widget.assetType.fieldDefinitions.take(2).map((def) {
-                          final value =
-                              item.customFieldValues?[def.id.toString()] ?? '—';
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2.0),
-                            child: Row(
-                              children: [
-                                Text(
-                                  '${def.name}: ',
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(fontWeight: FontWeight.bold),
-                                ),
-                                Flexible(
-                                  child: Text(
-                                    value.toString(),
-                                    style: Theme.of(
-                                      context,
-                                    ).textTheme.bodySmall,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      ],
+                  child: SliderTheme(
+                    data: SliderTheme.of(context).copyWith(
+                      trackHeight: 2,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 6,
+                      ),
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 14,
+                      ),
+                    ),
+                    child: Slider(
+                      value: _columnsCount.toDouble(),
+                      min: minColumns.toDouble(),
+                      max: maxColumns.toDouble(),
+                      divisions: maxColumns - minColumns,
+                      onChanged: (val) =>
+                          setState(() => _columnsCount = val.round()),
                     ),
                   ),
                 ),
               ],
             ),
           ),
-        );
-      },
+        ),
+
+        // --- GRID DE ACTIVOS ---
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final double spacing = 16.0;
+
+              return GridView.builder(
+                padding: EdgeInsets.fromLTRB(spacing, 0, spacing, spacing),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: _columnsCount,
+                  crossAxisSpacing: spacing,
+                  mainAxisSpacing: spacing,
+                  // Ajuste dinámico de la altura: Si hay muchas columnas, hacemos la tarjeta más alta proporcionalmente
+                  childAspectRatio: _columnsCount > 6 ? 0.5 : 0.8,
+                ),
+                itemCount: widget.items.length,
+                itemBuilder: (context, index) {
+                  final item = widget.items[index];
+                  final fullImageUrl = _getFullImageUrl(item);
+
+                  return _buildModernAssetCard(
+                    context,
+                    item,
+                    fullImageUrl,
+                    theme,
+                  );
+                },
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final itemProvider = context.watch<InventoryItemProvider>();
+  Widget _buildModernAssetCard(
+    BuildContext context,
+    InventoryItem item,
+    String url,
+    ThemeData theme,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Stack(
+          children: [
+            InkWell(
+              onTap: () => _viewAssetDetails(context, item),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // --- IMAGEN SUPERIOR ---
+                  Expanded(
+                    flex: 5,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        url.isNotEmpty
+                            ? Image.network(
+                                url,
+                                fit: BoxFit.cover,
+                                errorBuilder: (_, __, ___) =>
+                                    _buildPlaceholderIcon(theme),
+                              )
+                            : _buildPlaceholderIcon(theme),
+                        // Gradiente sutil inferior para que el nombre destaque
+                        Positioned.fill(
+                          child: DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  Colors.black.withOpacity(0.1),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Menú de acciones rápido (Overlay)
+                        Positioned(
+                          top: 4,
+                          right: 4,
+                          child: _buildQuickActions(context, item),
+                        ),
+                      ],
+                    ),
+                  ),
 
-    if (widget.items.isEmpty) {
-      return Center(
-        child: Text(
-          (itemProvider.filters.isEmpty &&
-                  itemProvider.globalSearchTerm == null)
-              ? 'No hay activos creados aún.'
-              : 'Ningún activo coincide con los criterios de búsqueda/filtro.',
-        ),
-      );
-    }
-
-    // 🔑 La CLAVE: Usamos Column para el Slider + Grid, pero el Grid
-    // debe estar en un Expanded para evitar el overflow.
-    return Column(
-      children: [
-        // --- SLIDER DE CONTROL ---
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-          child: Row(
-            children: [
-              const Icon(Icons.grid_view, color: Colors.grey),
-              const SizedBox(width: 12),
-              Text(
-                'Columnas: $_columnsCount',
-                style: Theme.of(context).textTheme.titleSmall,
+                  // --- INFORMACIÓN ---
+                  Expanded(
+                    flex: 4,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Center(
+                                child: Text(
+                                  item.name,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: _columnsCount > 6 ? 11 : 15,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                item.description ?? 'Sin descripción',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.hintColor,
+                                  fontSize: 10,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                          // Campos personalizados rápidos (solo si hay espacio)
+                          if (_columnsCount < 6)
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 20,
+                                top: 20,
+                              ), // Un solo respiro pequeño antes de los campos
+                              child: Wrap(
+                                // Usamos Wrap en lugar de Column para que si son cortos quepan varios
+                                spacing: 20, // Espacio horizontal entre campos
+                                runSpacing:
+                                    10, // 🎯 CLAVE: Espacio vertical mínimo entre líneas de campos
+                                children: widget.assetType.fieldDefinitions
+                                    .take(6)
+                                    .map((def) {
+                                      final value =
+                                          item.customFieldValues?[def.id
+                                              .toString()] ??
+                                          '—';
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 1,
+                                        ), // Padding interno mínimo
+                                        decoration: BoxDecoration(
+                                          color: theme.primaryColor.withValues(
+                                            alpha: 0.05,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          '${def.name}: $value',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.primaryColor,
+                                            height:
+                                                1.1, // Reduce la altura de la línea del texto
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      );
+                                    })
+                                    .toList(),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Slider(
-                  value: _columnsCount.toDouble(),
-                  min: minColumns.toDouble(),
-                  max: maxColumns.toDouble(),
-                  divisions: maxColumns - minColumns,
-                  label: '$_columnsCount columnas',
-                  onChanged: (double newValue) {
-                    setState(() {
-                      _columnsCount = newValue.round();
-                    });
-                  },
+            ),
+            if (url.isNotEmpty)
+              Positioned(
+                top: 4,
+                left: 8,
+                child: Tooltip(
+                  message: 'Ver Imagen',
+                  child: _miniActionButton(
+                    icon: Icons.zoom_in_rounded,
+                    onPressed: () => _showFullImage(context, url, item.name),
+                    color: Colors.black54,
+                    iconColor: Colors.white,
+                  ),
                 ),
               ),
-            ],
-          ),
+          ],
         ),
-        const Divider(height: 1),
+      ),
 
-        // --- GRID VIEW DENTRO DE EXPANDED ---
-        // 🔑 Envuelve el LayoutBuilder (que contiene el GridView) en Expanded.
-        LayoutBuilder(
-          builder: (context, constraints) {
-            // Cálculo del ancho máximo necesario para forzar 'N' columnas
-            final calculatedExtent = constraints.maxWidth / _columnsCount;
+      // --- BOTÓN DE LUPA (Zoom) ---
+    );
+  }
 
-            // La propiedad 'primary: true' en GridView.builder es importante
-            // para que maneje su propio scroll.
-            return _buildGridView(context, calculatedExtent);
-          },
+  Widget _buildPlaceholderIcon(ThemeData theme) {
+    return Container(
+      color: theme.primaryColor.withOpacity(0.03),
+      child: Icon(
+        Icons.inventory_2_outlined,
+        color: theme.primaryColor.withOpacity(0.1),
+        size: 32,
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context, InventoryItem item) {
+    return Row(
+      children: [
+        _miniActionButton(
+          icon: Icons.edit_rounded,
+          onPressed: () => _editAsset(context, item),
+          color: Colors.white,
+        ),
+        _miniActionButton(
+          icon: Icons.delete_outline_rounded,
+          onPressed: () => _deleteAsset(context, item),
+          color: Colors.white,
+          iconColor: Colors.redAccent,
         ),
       ],
+    );
+  }
+
+  Widget _miniActionButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+    required Color color,
+    Color? iconColor,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: InkWell(
+        onTap: onPressed,
+        child: Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.9),
+            shape: BoxShape.circle,
+            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+          ),
+          child: Icon(icon, size: 14, color: iconColor ?? Colors.black87),
+        ),
+      ),
     );
   }
 }

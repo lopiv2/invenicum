@@ -28,6 +28,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   late AppLinks _appLinks;
   StreamSubscription<Uri>? _linkSubscription;
 
+  final _currentPasswordController = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+  bool _showPasswordFields = false; // Para expandir/contraer la sección
+
   @override
   void initState() {
     super.initState();
@@ -52,7 +57,45 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _usernameController.dispose();
     _githubController.dispose();
     _linkSubscription?.cancel();
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _handleChangePassword() async {
+    // 1. Validaciones básicas de UI
+    if (_currentPasswordController.text.isEmpty ||
+        _newPasswordController.text.isEmpty) {
+      ToastService.error("Por favor, rellena todos los campos");
+      return;
+    }
+
+    if (_newPasswordController.text != _confirmPasswordController.text) {
+      ToastService.error("Las nuevas contraseñas no coinciden");
+      return;
+    }
+
+    try {
+      // 2. Llamada al AuthProvider (el método que pusiste antes)
+      final success = await context.read<AuthProvider>().updatePassword(
+        currentPassword: _currentPasswordController.text,
+        newPassword: _newPasswordController.text,
+      );
+
+      if (success && mounted) {
+        ToastService.success("¡Contraseña actualizada!");
+        // Limpiamos los campos y cerramos la sección
+        _currentPasswordController.clear();
+        _newPasswordController.clear();
+        _confirmPasswordController.clear();
+        setState(() => _showPasswordFields = false);
+      }
+    } catch (e) {
+      // Aquí el error vendrá del backend (ej: "La contraseña actual es incorrecta")
+      if (mounted)
+        ToastService.error(e.toString().replaceAll('Exception: ', ''));
+    }
   }
 
   // NUEVO MÉTODO PARA WEB
@@ -236,14 +279,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
-    final l10n = AppLocalizations.of(context);
     final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // El fondo lo da el MainLayout
+      backgroundColor: Colors.transparent,
       body: Center(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 600),
+          constraints: const BoxConstraints(maxWidth: 1000),
           margin: const EdgeInsets.all(24),
           child: Card(
             elevation: 0,
@@ -257,80 +299,134 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               padding: const EdgeInsets.all(32.0),
               child: Form(
                 key: _formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _buildAvatarPreview(authProvider),
-                    const SizedBox(height: 32),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _buildAvatarPreview(authProvider),
+                      const SizedBox(height: 32),
 
-                    Text(
-                      l10n?.myProfile ?? 'Mi Perfil',
-                      style: Theme.of(context).textTheme.headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 32),
+                      // Layout responsivo para los campos
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          if (constraints.maxWidth > 700) {
+                            return _buildWideContent(authProvider, colorScheme);
+                          }
+                          return _buildMobileContent(authProvider, colorScheme);
+                        },
+                      ),
 
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: l10n?.name ?? 'Name',
-                        prefixIcon: const Icon(Icons.person_rounded),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                      const SizedBox(height: 40),
+                      const Divider(), // Una línea sutil de separación
+                      const SizedBox(height: 24),
+
+                      // EL BOTÓN AHORA ESTÁ CENTRADO Y DESTACADO ABAJO
+                      Center(
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(maxWidth: 400),
+                          child: _buildSaveButton(authProvider),
                         ),
                       ),
-                      validator: (value) =>
-                          value!.isEmpty ? 'El nombre es requerido' : null,
-                    ),
-                    const SizedBox(height: 16),
-
-                    TextFormField(
-                      controller: _usernameController,
-                      readOnly: true,
-                      decoration: InputDecoration(
-                        labelText: 'Username (Comunidad)',
-                        helperText: 'Requerido para publicar plugins.',
-                        prefixIcon: const Icon(Icons.alternate_email_rounded),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    _buildGitHubSection(
-                      authProvider,
-                      authProvider.user,
-                      colorScheme,
-                    ),
-                    const SizedBox(height: 32),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: FilledButton.icon(
-                        onPressed: authProvider.isLoading ? null : _handleSave,
-                        icon: authProvider.isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Icon(Icons.save_rounded),
-                        label: const Text('GUARDAR CAMBIOS'),
-                        style: FilledButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWideContent(AuthProvider authProvider, ColorScheme colorScheme) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            children: [
+              _buildGeneralFields(),
+              const SizedBox(height: 16),
+              _buildGitHubSection(authProvider, authProvider.user, colorScheme),
+            ],
+          ),
+        ),
+        const SizedBox(width: 32),
+        Expanded(child: _buildSecuritySection(authProvider, colorScheme)),
+      ],
+    );
+  }
+
+  Widget _buildMobileContent(
+    AuthProvider authProvider,
+    ColorScheme colorScheme,
+  ) {
+    return Column(
+      children: [
+        _buildGeneralFields(),
+        const SizedBox(height: 16),
+        _buildGitHubSection(authProvider, authProvider.user, colorScheme),
+        const SizedBox(height: 16),
+        _buildSecuritySection(authProvider, colorScheme),
+      ],
+    );
+  }
+
+  // Agrupa los campos de Nombre y Username
+  Widget _buildGeneralFields() {
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      children: [
+        TextFormField(
+          controller: _nameController,
+          decoration: InputDecoration(
+            labelText: l10n?.name ?? 'Name',
+            prefixIcon: const Icon(Icons.person_rounded),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          validator: (value) =>
+              value!.isEmpty ? 'El nombre es requerido' : null,
+        ),
+        const SizedBox(height: 16),
+        TextFormField(
+          controller: _usernameController,
+          readOnly: true,
+          decoration: InputDecoration(
+            labelText: 'Username (Comunidad)',
+            helperText: 'Requerido para publicar plugins.',
+            prefixIcon: const Icon(Icons.alternate_email_rounded),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Botón de guardado extraído
+  Widget _buildSaveButton(AuthProvider authProvider) {
+    return SizedBox(
+      width: double.infinity,
+      height: 54,
+      child: FilledButton.icon(
+        onPressed: authProvider.isLoading ? null : _handleSave,
+        icon: authProvider.isLoading
+            ? const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.white,
+                ),
+              )
+            : const Icon(Icons.save_rounded),
+        label: const Text(
+          'ACTUALIZAR PERFIL',
+          style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1),
+        ),
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 2,
         ),
       ),
     );
@@ -497,6 +593,111 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSecuritySection(
+    AuthProvider authProvider,
+    ColorScheme colorScheme,
+  ) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colorScheme.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colorScheme.outlineVariant, width: 1.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.lock_outline_rounded, size: 28),
+                const SizedBox(width: 12),
+                const Text(
+                  "Seguridad",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+                const Spacer(),
+                TextButton(
+                  onPressed: () => setState(
+                    () => _showPasswordFields = !_showPasswordFields,
+                  ),
+                  child: Text(_showPasswordFields ? "CANCELAR" : "CAMBIAR"),
+                ),
+              ],
+            ),
+            if (_showPasswordFields) ...[
+              const SizedBox(height: 16),
+              _buildPasswordField(
+                _currentPasswordController,
+                'Contraseña Actual',
+                Icons.password,
+              ),
+              const SizedBox(height: 12),
+              _buildPasswordField(
+                _newPasswordController,
+                'Nueva Contraseña',
+                Icons.security,
+              ),
+              const SizedBox(height: 12),
+              _buildPasswordField(
+                _confirmPasswordController,
+                'Confirmar Nueva Contraseña',
+                Icons.verified_user_outlined,
+              ),
+              const SizedBox(height: 16),
+              _buildUpdatePasswordButton(authProvider, colorScheme),
+            ] else ...[
+              const SizedBox(height: 8),
+              Text(
+                "Cambia tu contraseña periódicamente para mantener tu cuenta segura.",
+                style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(
+    TextEditingController controller,
+    String label,
+    IconData icon,
+  ) {
+    return TextFormField(
+      controller: controller,
+      obscureText: true,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        prefixIcon: Icon(icon),
+        isDense: true, // Hace el campo un poco más compacto para Web
+      ),
+    );
+  }
+
+  Widget _buildUpdatePasswordButton(
+    AuthProvider authProvider,
+    ColorScheme colorScheme,
+  ) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton(
+        onPressed: authProvider.isLoading ? null : _handleChangePassword,
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: colorScheme.primary),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+        child: const Text("ACTUALIZAR CONTRASEÑA"),
       ),
     );
   }

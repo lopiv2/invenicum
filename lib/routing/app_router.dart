@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:html' as html;
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/models/asset_template_model.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/asset_detail_screen.dart';
+import 'package:invenicum/screens/asset_template_detail_screen.dart';
+import 'package:invenicum/screens/asset_template_editor_screen.dart';
+import 'package:invenicum/screens/asset_templates_market_screen.dart';
 import 'package:invenicum/screens/integrations_screen.dart';
 import 'package:invenicum/screens/plugins_screen.dart';
 import 'package:invenicum/screens/profile_screen.dart';
@@ -163,6 +167,31 @@ GoRouter createAppRouter(AuthProvider authProvider) {
           GoRoute(
             path: '/integrations',
             builder: (context, state) => IntegrationsScreen(),
+          ),
+          // --- TEMPLATES ---
+          GoRoute(
+            path: '/templates',
+            builder: (context, state) => const AssetTemplatesMarketScreen(),
+            routes: [
+              GoRoute(
+                path: 'create',
+                builder: (context, state) => const AssetTemplateEditorScreen(),
+              ),
+              GoRoute(
+                path: 'details/:templateId',
+                builder: (context, state) {
+                  // Intentamos pillar el objeto del 'extra' por eficiencia
+                  final AssetTemplate? templateFromExtra =
+                      state.extra as AssetTemplate?;
+                  final String templateId = state.pathParameters['templateId']!;
+
+                  return AssetTemplateDetailScreen(
+                    templateId: templateId,
+                    initialTemplate: templateFromExtra,
+                  );
+                },
+              ),
+            ],
           ),
           // --- PLUGINS ---
           GoRoute(

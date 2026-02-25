@@ -35,7 +35,9 @@ class SidebarContainerHeader extends StatelessWidget {
             ),
             ActionIconButton(
               icon: Icons.refresh_rounded,
-              onTap: provider.isLoading ? null : provider.loadContainers,
+              onTap: provider.isLoading
+                  ? null
+                  : () => context.read<ContainerProvider>().loadContainers(),
             ),
           ],
         ),
@@ -47,7 +49,8 @@ class SidebarContainerHeader extends StatelessWidget {
   Future<void> _showNewContainerDialog(BuildContext context) async {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) => const NewContainerDialog(), // Usamos el nuevo widget
+      builder: (context) =>
+          const NewContainerDialog(), // Usamos el nuevo widget
     );
 
     if (result != null) {

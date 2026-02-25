@@ -65,6 +65,14 @@ class SidebarLayout extends StatelessWidget {
                   onTap: () => context.go('/integrations'),
                 ),
                 SidebarNavButton(
+                  icon: Icons.layers, // Icono representativo de integraciones
+                  title: AppLocalizations.of(context)!.templates,
+                  selected:
+                      GoRouterState.of(context).matchedLocation ==
+                      '/templates',
+                  onTap: () => context.go('/templates'),
+                ),
+                SidebarNavButton(
                   icon: Icons
                       .extension_outlined, // Icono representativo de plugins
                   title: AppLocalizations.of(context)!.plugins,

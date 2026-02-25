@@ -59,6 +59,7 @@ dependencies:
   flutter_animate: ^4.5.2
   font_awesome_flutter: ^10.12.0
   app_links: ^6.4.1
+  collection: ^1.19.1
 
 dev_dependencies:
   flutter_test:

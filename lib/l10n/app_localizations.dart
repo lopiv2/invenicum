@@ -1594,6 +1594,12 @@ abstract class AppLocalizations {
   /// **'System Themes'**
   String get systemThemesModal;
 
+  /// No description provided for @templates.
+  ///
+  /// In en, this message translates to:
+  /// **'Templates'**
+  String get templates;
+
   /// No description provided for @themeNameLabel.
   ///
   /// In en, this message translates to:

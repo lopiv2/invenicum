@@ -52,6 +52,49 @@ class ApiService {
   }
 
   // ----------------------------------------------------
+  // MÉTODOS DE SEGURIDAD
+  // ----------------------------------------------------
+
+  /// Cambia la contraseña del usuario actual
+  Future<bool> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      final response = await dio.post(
+        '/auth/change-password', // Ajusta a tu ruta de Node.js/Backend
+        data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+      );
+
+      // Si el backend devuelve success: true o simplemente un 200 OK
+      return response.data['success'] == true || response.statusCode == 200;
+    } on DioException catch (e) {
+      // Capturamos el error del backend (ej: "La contraseña actual no es correcta")
+      final errorMessage =
+          e.response?.data['message'] ??
+          e.response?.data['error'] ??
+          'Error al cambiar la contraseña';
+      throw Exception(errorMessage);
+    } catch (e) {
+      throw Exception('Error de conexión al cambiar contraseña');
+    }
+  }
+
+  /// Solicita un correo de recuperación
+  Future<bool> requestPasswordReset(String email) async {
+    try {
+      final response = await dio.post(
+        '/auth/forgot-password', // Ajusta a tu ruta
+        data: {'email': email},
+      );
+      return response.data['success'] == true || response.statusCode == 200;
+    } catch (e) {
+      print("ApiService: Error en password reset request: $e");
+      return false;
+    }
+  }
+
+  // ----------------------------------------------------
   // MÉTODOS DE USUARIO
   // ----------------------------------------------------
 

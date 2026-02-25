@@ -1,10 +1,13 @@
 // lib/widgets/main_layout.dart
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
+import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/widgets/chatbot_veni_widget.dart';
 import 'package:invenicum/widgets/search_bar_widget.dart';
@@ -26,8 +29,10 @@ class MainLayout extends StatefulWidget {
 
 class _MainLayoutState extends State<MainLayout> {
   bool _isChatOpen = false;
+  bool _isSidebarVisible = true;
   late Offset _veniPosition;
   bool _isInitialized = false;
+  bool _isAnimating = false;
 
   @override
   void didChangeDependencies() {
@@ -38,6 +43,77 @@ class _MainLayoutState extends State<MainLayout> {
       _veniPosition = Offset(size.width - 60, size.height - 20);
       _isInitialized = true;
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Ejecutamos la carga inicial después del primer frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _hydrateStateFromUrl();
+    });
+  }
+
+  Future<void> _hydrateStateFromUrl() async {
+    if (!mounted) return;
+
+    final String location = GoRouterState.of(context).uri.toString();
+    final match = RegExp(r'/container/(\d+)').firstMatch(location);
+
+    if (match != null) {
+      final int containerId = int.parse(match.group(1)!);
+      final containerProvider = context.read<ContainerProvider>();
+      final loanProvider = context.read<LoanProvider>();
+      final itemProvider = context.read<InventoryItemProvider>();
+
+      // 3. 🛡️ Si la lista está vacía, ESPERAMOS a que cargue
+      if (containerProvider.containers.isEmpty) {
+        await containerProvider.loadContainers();
+      }
+
+      if (!mounted) return;
+
+      // 4. Buscamos de forma segura (sin que explote si no existe)
+      final container = containerProvider.containers.firstWhereOrNull(
+        (c) => c.id == containerId,
+      );
+
+      if (container != null) {
+        // Carga de datos para Sidebar (listas personalizadas + préstamos)
+        await Future.wait([
+          containerProvider.loadDataLists(containerId),
+          loanProvider.fetchLoans(containerId),
+        ]);
+
+        // Carga de datos para la cuadrícula de tipos de activos (Grid)
+        if (location.contains('/asset-types')) {
+          for (var assetType in container.assetTypes) {
+            itemProvider.loadInventoryItems(
+              containerId: containerId,
+              assetTypeId: assetType.id,
+            );
+          }
+        }
+      } else {
+        print(
+          "⚠️ Hidratación: El contenedor $containerId no se encontró tras la carga.",
+        );
+      }
+    }
+  }
+
+  void _handleToggleSidebar() {
+    setState(() {
+      _isSidebarVisible = !_isSidebarVisible;
+      _isAnimating = true; // Empieza la animación
+    });
+
+    // Duración coincidente con la del AnimatedContainer (300ms)
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) {
+        setState(() => _isAnimating = false); // Termina la animación
+      }
+    });
   }
 
   @override
@@ -144,11 +220,25 @@ class _MainLayoutState extends State<MainLayout> {
 
     return Column(
       children: [
-        const _Header(),
+        _Header(
+          isSidebarVisible: _isSidebarVisible,
+          onToggleSidebar: () => setState(() => _handleToggleSidebar()),
+        ),
         Expanded(
           child: Row(
             children: [
-              const SidebarLayout(),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+                width: _isSidebarVisible ? 250 : 0,
+                child: OverflowBox(
+                  // Evita que los hijos intenten recalcularse por falta de espacio
+                  minWidth: 250,
+                  maxWidth: 250,
+                  alignment: Alignment.centerLeft,
+                  child: const SidebarLayout(),
+                ),
+              ),
               Expanded(
                 child: Container(
                   decoration: BoxDecoration(
@@ -156,7 +246,9 @@ class _MainLayoutState extends State<MainLayout> {
                         ? colorScheme.surface
                         : colorScheme.surfaceContainerLowest,
                   ),
-                  child: widget.child,
+                  child: _isAnimating
+                      ? const Center(child: CircularProgressIndicator())
+                      : widget.child,
                 ),
               ),
             ],
@@ -168,7 +260,12 @@ class _MainLayoutState extends State<MainLayout> {
 }
 
 class _Header extends StatefulWidget {
-  const _Header();
+  final bool isSidebarVisible;
+  final VoidCallback onToggleSidebar;
+  const _Header({
+    required this.isSidebarVisible,
+    required this.onToggleSidebar,
+  });
 
   @override
   State<_Header> createState() => _HeaderState();
@@ -197,8 +294,6 @@ class _HeaderState extends State<_Header> {
     final colorScheme = theme.colorScheme;
     final l10n = AppLocalizations.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-
-    // FIX: Evitamos el "Unexpected null value" con un fallback seguro
     final String avatarSeed = user?.name ?? l10n?.guest ?? 'Guest';
 
     return Container(
@@ -216,6 +311,20 @@ class _HeaderState extends State<_Header> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
+          IconButton(
+            onPressed: widget.onToggleSidebar,
+            icon: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Icon(
+                widget.isSidebarVisible
+                    ? Icons.menu_open_rounded
+                    : Icons.menu_rounded,
+                key: ValueKey(widget.isSidebarVisible),
+                color: colorScheme.primary,
+              ),
+            ),
+            tooltip: 'Menu',
+          ),
           // Logo Minimalista
           _buildLogo(colorScheme, isDarkMode),
 

@@ -38,6 +38,53 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Solicita un correo de recuperación de contraseña
+  Future<bool> requestPasswordReset(String email) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      return await _apiService.requestPasswordReset(email);
+    } catch (e) {
+      debugPrint("Error solicitando reset: $e");
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  /// Cambia la contraseña del usuario autenticado
+  Future<bool> updatePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // 1. Llamamos al servicio (asegúrate de que el nombre coincida con tu ApiService)
+      final success = await _apiService.changePassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+
+      // 2. Si el servicio no lanzó excepción pero devolvió false
+      if (!success) {
+        throw Exception("No se pudo actualizar la contraseña.");
+      }
+
+      return true; // Todo salió bien
+    } on Exception catch (e) {
+      // 3. Capturamos el error específico (ej: "Contraseña actual incorrecta")
+      debugPrint("Error en updatePassword: $e");
+      rethrow; // Lanzamos para que el ToastService en la UI lo muestre
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Consulta al backend el estado actual de la vinculación con GitHub
   Future<bool> checkGitHubStatus() async {
     try {

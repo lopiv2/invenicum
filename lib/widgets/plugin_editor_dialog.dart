@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/providers/auth_provider.dart';
+import 'package:invenicum/services/toast_service.dart';
 import 'package:invenicum/utils/common_functions.dart';
 import 'package:invenicum/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -100,9 +101,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Error en el JSON")));
+      ToastService.error("Error en el JSON");
     }
   }
 

@@ -30,6 +30,7 @@
     "slotInventoryHeader",
     "slotLeftSidebar",
     "slotUnknown",
+    "templates",
     "updatedAt"
   ],
 
@@ -64,6 +65,7 @@
     "slotInventoryHeader",
     "slotLeftSidebar",
     "slotUnknown",
+    "templates",
     "updatedAt"
   ],
 
@@ -98,6 +100,7 @@
     "slotInventoryHeader",
     "slotLeftSidebar",
     "slotUnknown",
+    "templates",
     "updatedAt"
   ],
 
@@ -132,6 +135,7 @@
     "slotInventoryHeader",
     "slotLeftSidebar",
     "slotUnknown",
+    "templates",
     "updatedAt"
   ]
 }

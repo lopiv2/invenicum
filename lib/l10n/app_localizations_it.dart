@@ -827,6 +827,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get systemThemesModal => 'Temi di sistema';
 
   @override
+  String get templates => 'Templates';
+
+  @override
   String get themeNameLabel => 'Nome tema';
 
   @override

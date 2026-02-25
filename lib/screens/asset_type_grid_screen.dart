@@ -8,61 +8,59 @@ import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/widgets/asset_type_card.dart';
 import '../providers/container_provider.dart';
-import '../models/container_node.dart';
 
 class AssetTypeGridScreen extends StatefulWidget {
   final String containerId;
   const AssetTypeGridScreen({super.key, required this.containerId});
+
   @override
   State<AssetTypeGridScreen> createState() => _AssetTypeGridScreenState();
 }
 
 class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
-  bool _isInit = false;
-
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    if (!_isInit) {
-      // 🎯 CAMBIO CLAVE: Usamos Future.microtask para iniciar la carga asíncrona
-      // Esto se ejecuta inmediatamente después de que las dependencias cambian y el contexto está listo.
-      Future.microtask(() => _loadInitialAssetCounts());
-      _isInit = true;
-    }
+  void initState() {
+    super.initState();
+    // ✅ CLAVE 1: Ejecutar la carga después del renderizado inicial una sola vez.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _loadInitialAssetCounts();
+      }
+    });
   }
 
   Future<void> _loadInitialAssetCounts() async {
-  final containerProvider = context.read<ContainerProvider>();
-  final itemProvider = context.read<InventoryItemProvider>();
-  final cIdInt = int.tryParse(widget.containerId);
+    final containerProvider = context.read<ContainerProvider>();
+    final itemProvider = context.read<InventoryItemProvider>();
+    final cIdInt = int.tryParse(widget.containerId);
 
-  if (cIdInt == null) return;
+    if (cIdInt == null) return;
 
-  // 1. Forzar la carga si no hay contenedores
-  if (containerProvider.containers.isEmpty) {
-    await containerProvider.loadContainers();
-  }
+    // 1. Forzar la carga de la lista maestra si está vacía
+    if (containerProvider.containers.isEmpty) {
+      await containerProvider.loadContainers();
+    }
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  // 2. Buscar el contenedor después de asegurar la carga
-  final container = containerProvider.containers
-      .where((c) => c.id == cIdInt)
-      .firstOrNull;
+    // 2. IMPORTANTE: Buscar el contenedor DESPUÉS de asegurar que la lista existe
+    final container = containerProvider.containers
+        .where((c) => c.id == cIdInt)
+        .firstOrNull;
 
-  // 3. Cargar los contadores
-  if (container != null) {
-    for (var assetType in container.assetTypes) {
-      // Importante: No esperes (await) aquí para que carguen en paralelo,
-      // pero asegúrate de que el provider sepa gestionar llamadas múltiples.
-      itemProvider.loadInventoryItems(
-        containerId: cIdInt,
-        assetTypeId: assetType.id,
+    if (container != null) {
+      // 3. Cargar los items para cada tipo de activo
+      // Usamos Future.wait para que las cargas sean paralelas
+      await Future.wait(
+        container.assetTypes.map(
+          (assetType) => itemProvider.loadInventoryItems(
+            containerId: cIdInt,
+            assetTypeId: assetType.id,
+          ),
+        ),
       );
     }
   }
-}
 
   void _goToCreateAssetType(BuildContext context) {
     context.go('/container/${widget.containerId}/asset-types/new');
@@ -82,37 +80,32 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // 🎨 Tu tema personalizado
+    final theme = Theme.of(context);
+    // ✅ watch() aquí es correcto para reaccionar a cambios de datos,
+    // siempre que no disparemos lógica de carga aquí dentro.
     final containerProvider = context.watch<ContainerProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
 
     final containerIdInt = int.tryParse(widget.containerId);
-
     if (containerIdInt == null) {
       return const Center(child: Text('Error: ID de contenedor inválido.'));
     }
 
-    // Buscar el contenedor
-    final ContainerNode? container = containerProvider.containers
-        .cast<ContainerNode?>()
-        .firstWhere((c) => c?.id == containerIdInt, orElse: () => null);
+    // Buscar el contenedor de forma segura
+    final container = containerProvider.containers
+        .where((c) => c.id == containerIdInt)
+        .firstOrNull;
 
     if (container == null) {
-      // 🎯 Mostrar indicador de carga si los contenedores aún no están listos
       if (containerProvider.isLoading) {
         return Center(
-          child: CircularProgressIndicator(
-            color:
-                theme.primaryColor, // 👈 Usa tu color (Esmeralda, Cereza, etc.)
-          ),
+          child: CircularProgressIndicator(color: theme.primaryColor),
         );
       }
       return Center(
         child: Text(
           'Contenedor con ID ${widget.containerId} no encontrado.',
-          style: TextStyle(
-            color: theme.colorScheme.error,
-          ), // Texto en color de error del tema
+          style: TextStyle(color: theme.colorScheme.error),
         ),
       );
     }
@@ -131,9 +124,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 'Tipos de Activo en "${container.name}"',
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: theme
-                      .colorScheme
-                      .onSurface, // Se adapta a fondo claro/oscuro
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               ElevatedButton.icon(
@@ -141,16 +132,13 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 icon: const Icon(Icons.add_circle_outline),
                 label: const Text('Crear Nuevo Tipo'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.surfaceContainer, // 👈 Color del tema
-                  foregroundColor: theme
-                      .colorScheme
-                      .onSurface, // Texto legible sobre el color
+                  backgroundColor: theme.colorScheme.surfaceContainer,
+                  foregroundColor: theme.colorScheme.onSurface,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-
           if (assetTypes.isEmpty)
             Expanded(
               child: Center(
@@ -169,14 +157,13 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                   maxCrossAxisExtent: 400,
                   crossAxisSpacing: 20,
                   mainAxisSpacing: 20,
-                  mainAxisExtent: 160, // Altura fija para las tarjetas
+                  mainAxisExtent: 160,
                 ),
                 itemCount: assetTypes.length,
                 itemBuilder: (context, index) {
                   final assetType = assetTypes[index];
-
                   final assetCount = itemProvider.getItemCountForAssetType(
-                    containerIdInt, // O widget.containerId
+                    containerIdInt,
                     assetType.id,
                   );
 

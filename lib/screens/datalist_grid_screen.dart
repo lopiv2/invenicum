@@ -9,10 +9,7 @@ import 'package:invenicum/services/toast_service.dart';
 class DataListGridScreen extends StatefulWidget {
   final String containerId;
 
-  const DataListGridScreen({
-    super.key,
-    required this.containerId,
-  });
+  const DataListGridScreen({super.key, required this.containerId});
 
   @override
   State<DataListGridScreen> createState() => _DataListGridScreenState();
@@ -40,7 +37,10 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
     });
   }
 
-  Future<void> _showDeleteConfirmation(BuildContext context, ListData dataList) async {
+  Future<void> _showDeleteConfirmation(
+    BuildContext context,
+    ListData dataList,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -57,7 +57,10 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Eliminar',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );
@@ -82,7 +85,9 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
   @override
   Widget build(BuildContext context) {
     final containerProvider = context.watch<ContainerProvider>();
-    final container = containerProvider.containers.cast<ContainerNode?>().firstWhere(
+    final container = containerProvider.containers
+        .cast<ContainerNode?>()
+        .firstWhere(
           (c) => c?.id == int.parse(widget.containerId),
           orElse: () => null,
         );
@@ -92,131 +97,176 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(32.0),
+      padding: EdgeInsets.all(
+        MediaQuery.of(context).size.width < 600 ? 16.0 : 32.0,
+      ),
       child: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-          // --- CABECERA ---
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // --- CABECERA ---
+                // --- CABECERA ADAPTATIVA (WRAP) ---
+                Wrap(
+                  spacing: 16, // Espacio horizontal entre elementos
+                  runSpacing: 16, // Espacio vertical cuando salta de línea
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    Text(
+                      'Listas Personalizadas - ${container.name}',
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        // Tamaño de fuente dinámico para que no rompa en pantallas muy pequeñas
+                        fontSize: MediaQuery.of(context).size.width < 400
+                            ? 20
+                            : null,
+                      ),
+                    ),
+                    FilledButton.icon(
+                      onPressed: () {
+                        context.go(
+                          '/container/${widget.containerId}/datalists/new',
+                        );
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Nueva Lista'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
+
+                // --- GRID DE LISTAS ---
+                if (container.dataLists.isEmpty)
+                  const Center(
+                    child: Text(
+                      'No hay listas personalizadas. ¡Crea una nueva!',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent:
+                            400, // Un poco más ancho para que en móvil ocupe casi todo
+                        mainAxisSpacing: 16,
+                        crossAxisSpacing: 16,
+                        // Ajustamos la altura de la tarjeta según el dispositivo
+                        childAspectRatio:
+                            MediaQuery.of(context).size.width < 600 ? 2 : 2.5,
+                      ),
+                      itemCount: container.dataLists.length,
+                      itemBuilder: (context, index) {
+                        final dataList = container.dataLists[index];
+                        return _buildDataListCard(context, dataList);
+                      },
+                    ),
+                  ),
+              ],
+            ),
+    );
+  }
+
+  // Extraemos la tarjeta a un método para limpiar el build
+  Widget _buildDataListCard(BuildContext context, ListData dataList) {
+    return Card(
+      elevation: 2,
+      child: InkWell(
+        onTap: () {
+          context.push(
+            '/container/${widget.containerId}/datalists/${dataList.id}/edit',
+            extra: dataList,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Listas Personalizadas - ${container.name}',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineMedium
-                    ?.copyWith(fontWeight: FontWeight.bold),
+              Row(
+                children: [
+                  Icon(Icons.list_alt, color: Theme.of(context).primaryColor),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      dataList.name,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  // Agrupamos botones para que no se amontonen en tarjetas pequeñas
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        constraints:
+                            const BoxConstraints(), // Quita padding extra
+                        padding: const EdgeInsets.all(4),
+                        icon: Icon(
+                          Icons.edit_outlined,
+                          color: Theme.of(context).primaryColor,
+                          size: 20,
+                        ),
+                        onPressed: () => context.go(
+                          '/container/${widget.containerId}/datalists/${dataList.id}/edit',
+                          extra: dataList,
+                        ),
+                      ),
+                      IconButton(
+                        constraints: const BoxConstraints(),
+                        padding: const EdgeInsets.all(4),
+                        icon: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                          size: 20,
+                        ),
+                        onPressed: () =>
+                            _showDeleteConfirmation(context, dataList),
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              FilledButton.icon(
-                onPressed: () {
-                  context.go('/container/${widget.containerId}/datalists/new');
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Nueva Lista'),
+              const SizedBox(height: 8),
+              Expanded(
+                child: Text(
+                  dataList.description ?? 'Sin descripción',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      '${dataList.items.length} elementos',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 32),
-
-          // --- GRID DE LISTAS ---
-          if (container.dataLists.isEmpty)
-            const Center(
-              child: Text(
-                'No hay listas personalizadas. ¡Crea una nueva!',
-                style: TextStyle(fontSize: 16),
-              ),
-            )
-          else
-            Expanded(
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 300,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.2,
-                ),
-                itemCount: container.dataLists.length,
-                itemBuilder: (context, index) {
-                  final dataList = container.dataLists[index];
-                  return Card(
-                    elevation: 2,
-                    child: InkWell(
-                      onTap: () {
-                        context.push('/container/${widget.containerId}/datalists/${dataList.id}/edit', extra: dataList);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.list_alt,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    dataList.name,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: Icon(
-                                    Icons.edit_outlined,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    context.go('/container/${widget.containerId}/datalists/${dataList.id}/edit', extra: dataList);
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete_outline,
-                                    color: Colors.red,
-                                  ),
-                                  onPressed: () => _showDeleteConfirmation(context, dataList),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              dataList.description ?? 'Sin descripción',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            const Spacer(),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  '${dataList.items.length} elementos',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-        ],
+        ),
       ),
     );
   }

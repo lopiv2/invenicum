@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/screens/asset_search_bar.dart';
+import 'package:invenicum/widgets/asset_cylinder_gallery.dart';
 import 'package:invenicum/widgets/assets_counters_row.dart';
 import 'package:invenicum/widgets/possession_progress_bar.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +16,22 @@ import '../providers/inventory_item_provider.dart';
 import '../widgets/asset_data_table.dart';
 import '../widgets/asset_grid_view.dart';
 import '../widgets/asset_list_header.dart';
+
+class _PageStateData {
+  final List<InventoryItem> items;
+  final bool loading;
+  _PageStateData({required this.items, required this.loading});
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is _PageStateData &&
+          loading == other.loading &&
+          items.length == other.items.length;
+
+  @override
+  int get hashCode => items.length.hashCode ^ loading.hashCode;
+}
 
 class AssetListScreen extends StatefulWidget {
   final String containerId;
@@ -30,15 +47,19 @@ class AssetListScreen extends StatefulWidget {
   State<AssetListScreen> createState() => _AssetListScreenState();
 }
 
-class _AssetListScreenState extends State<AssetListScreen> {
+class _AssetListScreenState extends State<AssetListScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final TextEditingController _searchController = TextEditingController();
   bool _isListView = true;
+  bool _isGalleryMode = false;
   late InventoryItemProvider _itemProvider;
   String? _selectedCountFieldId;
   String? _selectedCountValue;
   int? _selectedLocationId;
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -213,110 +234,141 @@ class _AssetListScreenState extends State<AssetListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); // Mantiene el estado vivo
+
     final l10n = AppLocalizations.of(context)!;
-    final containerProvider = context.watch<ContainerProvider>();
-    final itemProvider = context.watch<InventoryItemProvider>();
-
-    // 2. Detectar si esta es la pantalla activa
-    final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
-
     final cIdInt = int.tryParse(widget.containerId) ?? 0;
     final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
 
-    if (itemProvider.isLoading && itemProvider.aggregationDefinitions.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => _goBack(context),
+    // 1. El Selector observa los datos mínimos necesarios para que la pantalla funcione
+    return Selector<InventoryItemProvider, _PageStateData>(
+      selector: (_, prov) =>
+          _PageStateData(items: prov.inventoryItems, loading: prov.isLoading),
+      builder: (context, data, child) {
+        // Obtenemos los providers con 'read' para evitar que el movimiento del sidebar los dispare
+        final containerProvider = context.read<ContainerProvider>();
+
+        final container = containerProvider.containers
+            .cast<ContainerNode?>()
+            .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
+
+        final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
+          (at) => at?.id == atIdInt,
+          orElse: () => null,
+        );
+
+        // Pantallas de error/carga inicial
+        if (data.loading && data.items.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(),
+            body: const Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (container == null || assetType == null) {
+          return Scaffold(body: Center(child: Text(l10n.invalidNavigationIds)));
+        }
+
+        // Calculamos los items filtrados
+        final viewItems = _getFilteredItems(data.items).cast<InventoryItem>();
+        final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
+
+        return Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => _goBack(context),
+              tooltip: l10n.backToAssetTypes,
+            ),
           ),
-        ),
-        body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (cIdInt == 0 || atIdInt == 0) {
-      return Center(child: Text(l10n.invalidNavigationIds));
-    }
-
-    final container = containerProvider.containers
-        .cast<ContainerNode?>()
-        .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
-    final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
-      (at) => at?.id == atIdInt,
-      orElse: () => null,
-    );
-
-    if (container == null || assetType == null) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    final viewItems = _getFilteredItems(
-      itemProvider.inventoryItems,
-    ).cast<InventoryItem>();
-
-    return Scaffold(
-      appBar: AppBar(
-        //title: Text('${l10n.assetsIn} "${assetType.name}"'),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => _goBack(context),
-          tooltip: l10n.backToAssetTypes,
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          children: [
-            AssetListHeader(
-              assetType: assetType,
-              onGoToCreateAsset: () => context.go(
-                '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/new',
-              ),
-              onImportCSV: () => context.go(
-                '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/import-csv',
-              ),
-              onShowCountFilterDialog: () =>
-                  _showCountFilterDialog(context, assetType),
-              selectedCountFieldId: _selectedCountFieldId,
-            ),
-            const SizedBox(height: 20),
-            AssetCountersRow(
-              key: ValueKey('counters_${widget.assetTypeId}'),
-              assetType: assetType,
-              totalCountLocal: viewItems.length,
-              selectedCountFieldId: _selectedCountFieldId,
-              inventoryItems: viewItems,
-            ),
-            const SizedBox(height: 10),
-            if (assetType.possessionFieldId != null)
-              PossessionProgressBar(
-                assetType: assetType,
-                inventoryItems: viewItems,
-              ),
-            const SizedBox(height: 20),
-            AssetSearchBar(
-              searchController: _searchController,
-              isListView: _isListView,
-              onToggleView: () => setState(() => _isListView = !_isListView),
-            ),
-            const SizedBox(height: 10),
-            if (itemProvider.isLoading)
-              const Center(child: CircularProgressIndicator())
-            else
-              Expanded(
-                child: Card(
-                  // 4. USAMOS UNA FUNCIÓN PARA ENCAPSULAR LA LÓGICA DE LA TABLA
-                  child: _buildMainContent(
-                    isCurrentRoute: isCurrentRoute,
-                    assetType: assetType,
-                    cIdInt: cIdInt,
-                    atIdInt: atIdInt,
-                    viewItems: viewItems,
-                    locations: container.locations,
+          body: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              children: [
+                // --- ELEMENTOS RESTAURADOS ---
+                AssetListHeader(
+                  assetType: assetType,
+                  onGoToCreateAsset: () => context.go(
+                    '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/new',
                   ),
+                  onImportCSV: () => context.go(
+                    '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/import-csv',
+                  ),
+                  onShowCountFilterDialog: () =>
+                      _showCountFilterDialog(context, assetType),
+                  selectedCountFieldId: _selectedCountFieldId,
                 ),
+                const SizedBox(height: 20),
+
+                AssetCountersRow(
+                  key: ValueKey('counters_${widget.assetTypeId}'),
+                  assetType: assetType,
+                  totalCountLocal: viewItems.length,
+                  selectedCountFieldId: _selectedCountFieldId,
+                  inventoryItems: viewItems,
+                ),
+                const SizedBox(height: 10),
+
+                // Barra de posesión (Solo si el campo existe)
+                if (assetType.possessionFieldId != null)
+                  PossessionProgressBar(
+                    assetType: assetType,
+                    inventoryItems: viewItems,
+                  ),
+
+                const SizedBox(height: 20),
+
+                AssetSearchBar(
+                  searchController: _searchController,
+                  isListView: _isListView,
+                  onToggleView: () =>
+                      setState(() => _isListView = !_isListView),
+                  onToggleGallery: () => _openGallery(
+                    context,
+                    viewItems,
+                  ), // He extraído esto a un método
+                ),
+
+                const SizedBox(height: 10),
+
+                // --- ÁREA DE LA TABLA CON PROTECCIÓN DE RE-PINTADO ---
+                Expanded(
+                  child: data.loading
+                      ? const Center(child: CircularProgressIndicator())
+                      : _buildMainContent(
+                          isCurrentRoute: isCurrentRoute,
+                          assetType: assetType,
+                          cIdInt: cIdInt,
+                          atIdInt: atIdInt,
+                          viewItems: viewItems,
+                          locations: container.locations,
+                          isGalleryMode: _isGalleryMode,
+                        ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _openGallery(BuildContext context, List<InventoryItem> items) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog.fullscreen(
+        backgroundColor: Colors.black.withOpacity(0.9),
+        child: Stack(
+          children: [
+            AssetCylinderGallery(items: items),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.pop(context),
               ),
+            ),
           ],
         ),
       ),
@@ -330,36 +382,31 @@ class _AssetListScreenState extends State<AssetListScreen> {
     required int atIdInt,
     required List<InventoryItem> viewItems,
     required dynamic locations,
+    required bool isGalleryMode,
   }) {
-    // Si no estamos en esta pantalla (estamos en Details), devolvemos un widget
-    // que no cambie. Al ser 'const' o un widget simple, Flutter no bajará al DataTable2.
     if (!isCurrentRoute) {
-      // Retornamos un placeholder o simplemente mantenemos el estado anterior
-      // RepaintBoundary ayuda a que no se intente repintar la capa de la tabla.
-      return const RepaintBoundary(
-        child: SizedBox.expand(
-          child: Center(child: CircularProgressIndicator.adaptive()),
-        ),
-      );
+      return const SizedBox.shrink(); // Placeholder más ligero
+    }
+    if (isGalleryMode) {
+      return AssetCylinderGallery(items: viewItems);
     }
 
-    if (_isListView) {
-      return AssetDataTable(
-        // Usamos una ValueKey para que Flutter identifique la tabla correctamente
-        key: ValueKey('table_${atIdInt}'),
-        assetType: assetType,
-        containerId: cIdInt,
-        assetTypeId: atIdInt,
-        inventoryItems: viewItems,
-        availableLocations: locations,
-      );
-    } else {
-      return AssetGridView(
-        assetType: assetType,
-        items: viewItems,
-        containerId: cIdInt,
-        assetTypeId: atIdInt,
-      );
-    }
+    return RepaintBoundary(
+      child: _isListView
+          ? AssetDataTable(
+              key: ValueKey('table_${atIdInt}'),
+              assetType: assetType,
+              containerId: cIdInt,
+              assetTypeId: atIdInt,
+              inventoryItems: viewItems,
+              availableLocations: locations,
+            )
+          : AssetGridView(
+              assetType: assetType,
+              items: viewItems,
+              containerId: cIdInt,
+              assetTypeId: atIdInt,
+            ),
+    );
   }
 }
