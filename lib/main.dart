@@ -4,9 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/providers/achievement_provider.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/providers/template_provider.dart';
+import 'package:invenicum/services/achievements_service.dart';
 import 'package:invenicum/services/integrations_service.dart';
 import 'package:invenicum/services/plugin_service.dart';
 import 'package:invenicum/services/template_service.dart';
@@ -92,6 +94,7 @@ void main() async {
         Provider(create: (c) => AlertService(c.read<ApiService>())),
         Provider(create: (c) => IntegrationService(c.read<ApiService>())),
         Provider(create: (c) => TemplateService(c.read<ApiService>())),
+        Provider(create: (c) => AchievementService(c.read<ApiService>())),
         // --- PROVEEDORES DE ESTADO ---
 
         // Auth es la raíz de la lógica
@@ -249,6 +252,21 @@ void main() async {
         ChangeNotifierProxyProvider<AuthProvider, AlertProvider>(
           create: (c) => AlertProvider(c.read<AlertService>()),
           update: (_, auth, prev) => prev!,
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, AchievementProvider>(
+          create: (c) => AchievementProvider(c.read<AchievementService>()),
+          update: (context, auth, prev) {
+            // Si el usuario está autenticado y no hemos cargado los logros aún
+            if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
+              if (prev != null &&
+                  prev.achievements.isEmpty &&
+                  !prev.isLoading) {
+                // Disparamos la carga inicial pasando el context para las traducciones
+                Future.microtask(() => prev.fetchAchievements(context));
+              }
+            }
+            return prev!;
+          },
         ),
       ],
       child: const MyApp(),

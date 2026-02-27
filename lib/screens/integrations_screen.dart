@@ -79,6 +79,15 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             isLinked: integrationProv.isLinked(AppIntegrations.telegram),
             onTap: () => _openConfig(context, AppIntegrations.telegram),
           ),
+          _buildIntegrationCard(
+            context,
+            title: "E-Mail (A través de Resend)",
+            subtitle: "Envío de reportes y alertas profesionales.",
+            icon: Icons.mail_outline_rounded,
+            iconColor: const Color(0xFF3CE426), // Tu color verde
+            isLinked: integrationProv.isLinked(AppIntegrations.email),
+            onTap: () => _openConfig(context, AppIntegrations.email),
+          ),
           const SizedBox(height: 24),
 
           // --- E-COMMERCE ---

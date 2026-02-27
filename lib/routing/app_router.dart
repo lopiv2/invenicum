@@ -11,6 +11,7 @@ import 'package:invenicum/screens/integrations_screen.dart';
 import 'package:invenicum/screens/plugins_screen.dart';
 import 'package:invenicum/screens/profile_screen.dart';
 import 'package:invenicum/services/toast_service.dart';
+import 'package:invenicum/screens/achievements_screen.dart';
 import 'package:provider/provider.dart';
 // Models
 import 'package:invenicum/models/inventory_item.dart';
@@ -162,6 +163,16 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                 ),
               ),
             ],
+          ),
+          GoRoute(
+            path: '/achievements',
+            builder: (context, state) => const Scaffold(
+              // Si quieres que tenga scroll propio y padding
+              body: SingleChildScrollView(
+                padding: EdgeInsets.all(40.0),
+                child: AchievementsCardWidget(),
+              ),
+            ),
           ),
           // --- INTEGRACIONES ---
           GoRoute(

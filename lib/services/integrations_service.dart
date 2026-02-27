@@ -7,20 +7,27 @@ class IntegrationService {
 
   IntegrationService(this._apiService);
 
-  Future<Map<String, dynamic>> testIntegration(String type, Map<String, dynamic> config) async {
-  try {
-    final response = await _dio.post('/integrations/test', data: {
-      'type': type,
-      'config': config,
-    });
-    return response.data;
-  } on DioException catch (e) {
-    return {
-      'success': false,
-      'message': e.response?.data['message'] ?? 'Error de conexión'
-    };
+  Future<Map<String, dynamic>> testIntegration(
+    String type,
+    Map<String, dynamic> config,
+  ) async {
+    try {
+      final response = await _dio.post(
+        '/integrations/test',
+        data: {'type': type, 'config': config},
+      );
+      return response.data;
+    } on DioException catch (e) {
+      print("Status Code: ${e.response?.statusCode}");
+      print(
+        "Data del Error: ${e.response?.data}",
+      ); // <--- ESTO te dirá el error real del backend
+      return {
+        'success': false,
+        'message': e.response?.data['message'] ?? 'Error de conexión',
+      };
+    }
   }
-}
 
   // Nuevo método para eliminar una integración
   Future<void> deleteIntegration(String type) async {

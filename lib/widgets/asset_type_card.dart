@@ -31,9 +31,15 @@ class AssetTypeCard extends StatelessWidget {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24),
+              ),
               title: Text(AppLocalizations.of(context)!.confirmDeletion),
-              content: Text(AppLocalizations.of(context)!.confirmDeleteAssetType(assetType.name)),
+              content: Text(
+                AppLocalizations.of(
+                  context,
+                )!.confirmDeleteAssetType(assetType.name),
+              ),
               actions: <Widget>[
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
@@ -44,7 +50,9 @@ class AssetTypeCard extends StatelessWidget {
                     backgroundColor: Colors.red.shade50,
                     foregroundColor: Colors.red,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
                   onPressed: () => Navigator.of(context).pop(true),
                   child: Text(AppLocalizations.of(context)!.delete),
@@ -70,7 +78,9 @@ class AssetTypeCard extends StatelessWidget {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           title: Text(AppLocalizations.of(context)!.configureCollectionFields),
           content: SingleChildScrollView(
             child: Column(
@@ -79,10 +89,15 @@ class AssetTypeCard extends StatelessWidget {
               children: [
                 Text(
                   AppLocalizations.of(context)!.selectBooleanFields,
-                  style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 const SizedBox(height: 16),
-                _buildDropdownLabel(AppLocalizations.of(context)!.possessionFieldDef),
+                _buildDropdownLabel(
+                  AppLocalizations.of(context)!.possessionFieldDef,
+                ),
                 _buildDropdown(
                   context,
                   value: possessionFieldId,
@@ -107,7 +122,9 @@ class AssetTypeCard extends StatelessWidget {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () => Navigator.pop(context, {
                 'possession': possessionFieldId,
@@ -126,11 +143,11 @@ class AssetTypeCard extends StatelessWidget {
         if (containerIdInt == null) return;
 
         await context.read<ContainerProvider>().updateAssetTypeCollectionFields(
-              containerId: containerIdInt,
-              assetTypeId: assetType.id,
-              possessionFieldId: result['possession'],
-              desiredFieldId: result['desired'],
-            );
+          containerId: containerIdInt,
+          assetTypeId: assetType.id,
+          possessionFieldId: result['possession'],
+          desiredFieldId: result['desired'],
+        );
 
         if (context.mounted) {
           ToastService.success('Configuración guardada correctamente.');
@@ -146,9 +163,9 @@ class AssetTypeCard extends StatelessWidget {
     if (confirmed) {
       try {
         await context.read<ContainerProvider>().deleteAssetType(
-              int.parse(containerId),
-              assetType.id,
-            );
+          int.parse(containerId),
+          assetType.id,
+        );
         if (context.mounted) {
           ToastService.success('"${assetType.name}" eliminado.');
         }
@@ -163,8 +180,12 @@ class AssetTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final String? imageUrl = assetType.images.isNotEmpty ? assetType.images.first.url : null;
-    final fullImageUrl = imageUrl != null ? '${Environment.apiUrl}$imageUrl' : '';
+    final String? imageUrl = assetType.images.isNotEmpty
+        ? assetType.images.first.url
+        : null;
+    final fullImageUrl = imageUrl != null
+        ? '${Environment.apiUrl}$imageUrl'
+        : '';
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -185,7 +206,8 @@ class AssetTypeCard extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: SizedBox(
-              height: 125, // Un poco más de altura para acomodar el nombre arriba
+              height:
+                  125, // Un poco más de altura para acomodar el nombre arriba
               child: Row(
                 children: [
                   // Imagen lateral
@@ -210,13 +232,25 @@ class AssetTypeCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                           const Spacer(), // Empuja el resto hacia abajo
-                          
                           // 2. FILA INFERIOR: Badge + Botones
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildAssetBadge(context, theme),
-                              _buildActionRow(context, theme),
+                              Flexible(
+                                flex: 2,
+                                child: _buildAssetBadge(context, theme),
+                              ),
+                              const SizedBox(width: 4),
+                              // Botones envueltos en Flexible para que no desborden
+                              Flexible(
+                                flex: 3,
+                                child: FittedBox(
+                                  // Asegura que los botones se escalen si no caben
+                                  fit: BoxFit.scaleDown,
+                                  alignment: Alignment.centerRight,
+                                  child: _buildActionRow(context, theme),
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -262,7 +296,11 @@ class AssetTypeCard extends StatelessWidget {
   }
 
   Widget _buildPlaceholder(ThemeData theme) {
-    return Icon(Icons.category_outlined, color: theme.primaryColor.withOpacity(0.2), size: 35);
+    return Icon(
+      Icons.category_outlined,
+      color: theme.primaryColor.withOpacity(0.2),
+      size: 35,
+    );
   }
 
   Widget _buildAssetBadge(BuildContext context, ThemeData theme) {
@@ -314,7 +352,10 @@ class AssetTypeCard extends StatelessWidget {
   Widget _buildDropdownLabel(String label) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(label + ':', style: const TextStyle(fontWeight: FontWeight.w500)),
+      child: Text(
+        label + ':',
+        style: const TextStyle(fontWeight: FontWeight.w500),
+      ),
     );
   }
 
@@ -340,11 +381,16 @@ class AssetTypeCard extends StatelessWidget {
       ),
       hint: Text(AppLocalizations.of(context)!.selectField),
       items: [
-        DropdownMenuItem(value: null, child: Text(AppLocalizations.of(context)!.none)),
-        ...fields.map((field) => DropdownMenuItem(
-              value: field.id.toString(),
-              child: Text(field.name),
-            )),
+        DropdownMenuItem(
+          value: null,
+          child: Text(AppLocalizations.of(context)!.none),
+        ),
+        ...fields.map(
+          (field) => DropdownMenuItem(
+            value: field.id.toString(),
+            child: Text(field.name),
+          ),
+        ),
       ],
       onChanged: onChanged,
     );
@@ -374,7 +420,9 @@ class _CircleIconButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            padding: const EdgeInsets.all(8), // Un poco más pequeño para dar aire al nombre
+            padding: const EdgeInsets.all(
+              8,
+            ), // Un poco más pequeño para dar aire al nombre
             decoration: BoxDecoration(
               color: color.withOpacity(0.05),
               borderRadius: BorderRadius.circular(12),

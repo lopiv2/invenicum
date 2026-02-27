@@ -54,7 +54,16 @@ class SidebarLayout extends StatelessWidget {
             SliverList(
               delegate: SliverChildListDelegate([
                 const Divider(indent: 16, endIndent: 16), // Separador visual
-                const StacSlot(slotName: 'left_sidebar'), // Slot para plugins en la barra lateral
+                const StacSlot(
+                  slotName: 'left_sidebar',
+                ), // Slot para plugins en la barra lateral
+                SidebarNavButton(
+                  icon: Icons.emoji_events_outlined,
+                  title:
+                      "Mis Logros", // O usa AppLocalizations.of(context)!.achievements si ya tienes el string
+                  selected: location == '/achievements',
+                  onTap: () => context.go('/achievements'),
+                ),
                 SidebarNavButton(
                   icon: Icons
                       .integration_instructions_outlined, // Icono representativo de integraciones
@@ -68,8 +77,7 @@ class SidebarLayout extends StatelessWidget {
                   icon: Icons.layers, // Icono representativo de integraciones
                   title: AppLocalizations.of(context)!.templates,
                   selected:
-                      GoRouterState.of(context).matchedLocation ==
-                      '/templates',
+                      GoRouterState.of(context).matchedLocation == '/templates',
                   onTap: () => context.go('/templates'),
                 ),
                 SidebarNavButton(

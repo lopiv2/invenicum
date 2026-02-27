@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:invenicum/models/notifications_preferences_model.dart';
 import 'package:invenicum/services/api_service.dart';
 
 class PreferencesService {
@@ -41,6 +42,18 @@ class PreferencesService {
   Future<void> updateLanguage(String languageCode) async {
     try {
       await _dio.put('/preferences/language', data: {'language': languageCode});
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updateNotificationSettings(NotificationSettings settings) async {
+    try {
+      await _dio.patch(
+        '/preferences/notifications',
+        data: settings
+            .toJson(), // Enviamos { channelOrder: [...], alertStockLow: true, ... }
+      );
     } catch (e) {
       rethrow;
     }

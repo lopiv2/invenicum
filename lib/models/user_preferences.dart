@@ -1,3 +1,5 @@
+import 'package:invenicum/models/notifications_preferences_model.dart';
+
 class UserPreferences {
   final int? id;
   final String language;
@@ -6,6 +8,7 @@ class UserPreferences {
   final int? userId;
   final DateTime? updatedAt;
   final Map<String, double>? exchangeRates;
+  final NotificationSettings notifications;
 
   UserPreferences({
     this.id,
@@ -14,8 +17,10 @@ class UserPreferences {
     this.aiEnabled = true,
     this.userId,
     this.updatedAt,
-    this.exchangeRates, // Nuevo
-  });
+    this.exchangeRates,
+    NotificationSettings? notifications,
+  }) : this.notifications = notifications ?? NotificationSettings();
+
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) {
     // Procesamos los rates asegurándonos de convertirlos a double
@@ -36,6 +41,7 @@ class UserPreferences {
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       exchangeRates: parsedRates, // Asignamos los rates
+      notifications: NotificationSettings.fromJson(json['notifications'] ?? {}),
     );
   }
 
@@ -46,6 +52,7 @@ class UserPreferences {
       'currency': currency, // 🔑 Añadido
       'aiEnabled': aiEnabled,
       'userId': userId,
+      'notifications': notifications.toJson(),
     };
   }
 
@@ -63,18 +70,16 @@ class UserPreferences {
     String? language,
     String? currency,
     bool? aiEnabled,
-    int? userId,
-    DateTime? updatedAt,
-    Map<String, double>? exchangeRates, // Añadido al copyWith
+    Map<String, double>? exchangeRates,
+    NotificationSettings? notifications, // <-- Esta es la línea que falta
   }) {
     return UserPreferences(
       id: id ?? this.id,
       language: language ?? this.language,
       currency: currency ?? this.currency,
       aiEnabled: aiEnabled ?? this.aiEnabled,
-      userId: userId ?? this.userId,
-      updatedAt: updatedAt ?? this.updatedAt,
       exchangeRates: exchangeRates ?? this.exchangeRates,
+      notifications: notifications ?? this.notifications, // <-- Y esta
     );
   }
 

@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:invenicum/models/notifications_preferences_model.dart';
 import 'package:invenicum/models/user_preferences.dart';
 import 'package:invenicum/services/preferences_service.dart';
 
@@ -23,6 +24,8 @@ class PreferencesProvider with ChangeNotifier {
 
   PreferencesProvider(this._preferencesService);
 
+  NotificationSettings get notificationSettings => _prefs.notifications;
+
   /// Carga las preferencias completas y actualiza el estado
   Future<void> loadPreferences() async {
     try {
@@ -34,6 +37,66 @@ class PreferencesProvider with ChangeNotifier {
       debugPrint('Error cargando preferencias: $e');
       _isInitialized = true;
       notifyListeners();
+    }
+  }
+
+  // En preferences_provider.dart
+
+  // Lógica para el Drag and Drop
+  // Lógica para el Drag and Drop (Reordenar canales)
+  void reorderChannels(int oldIndex, int newIndex) {
+    if (newIndex > oldIndex) newIndex -= 1;
+
+    // 1. Accedemos a la lista dentro de la clase anidada
+    final List<String> items = List.from(_prefs.notifications.channelOrder);
+    final String item = items.removeAt(oldIndex);
+    items.insert(newIndex, item);
+
+    // 2. Actualizamos usando el copyWith anidado
+    _prefs = _prefs.copyWith(
+      notifications: _prefs.notifications.copyWith(channelOrder: items),
+    );
+    notifyListeners();
+
+    // 3. Sincronizar con backend (enviamos el objeto completo o solo la lista)
+    _preferencesService.updateNotificationSettings(_prefs.notifications);
+  }
+
+  // Lógica para los switches
+  Future<void> setNotificationAlert(String type, bool enabled) async {
+    final previousPrefs = _prefs;
+
+    // 1. Creamos una copia de la configuración de notificaciones actual
+    NotificationSettings currentNotifs = _prefs.notifications;
+    NotificationSettings updatedNotifs;
+
+    // 2. Identificamos qué switch se ha pulsado
+    switch (type) {
+      case 'stock':
+        updatedNotifs = currentNotifs.copyWith(alertStockLow: enabled);
+        break;
+      case 'preorder':
+        updatedNotifs = currentNotifs.copyWith(alertNewPreorder: enabled);
+        break;
+      case 'loan':
+        updatedNotifs = currentNotifs.copyWith(alertLoanReminder: enabled);
+        break;
+      default:
+        return;
+    }
+
+    // 3. Actualización optimista del estado principal
+    _prefs = _prefs.copyWith(notifications: updatedNotifs);
+    notifyListeners();
+
+    try {
+      // 4. Persistencia en el backend
+      await _preferencesService.updateNotificationSettings(updatedNotifs);
+    } catch (e) {
+      // 5. Rollback si falla
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error actualizando alertas: $e');
     }
   }
 
