@@ -50,10 +50,10 @@ class InventoryItemProvider with ChangeNotifier {
   bool get loadingHistory => _loadingHistory;
 
   double _totalMarketValue = 0.0;
-bool _isMarketValueLoading = false;
+  bool _isMarketValueLoading = false;
 
-double get totalMarketValue => _totalMarketValue;
-bool get isMarketValueLoading => _isMarketValueLoading;
+  double get totalMarketValue => _totalMarketValue;
+  bool get isMarketValueLoading => _isMarketValueLoading;
 
   // --- Gestión de Caché ---
   final Map<String, InventoryResponse> _itemsCache = {};
@@ -96,18 +96,18 @@ bool get isMarketValueLoading => _isMarketValueLoading;
   }
 
   Future<void> loadTotalMarketValue() async {
-  _isMarketValueLoading = true;
-  notifyListeners(); // Notificamos para mostrar el estado de carga en el widget
+    _isMarketValueLoading = true;
+    notifyListeners(); // Notificamos para mostrar el estado de carga en el widget
 
-  try {
-    _totalMarketValue = await _itemService.fetchTotalMarketValue();
-  } catch (e) {
-    debugPrint("Error cargando valor de mercado en Provider: $e");
-  } finally {
-    _isMarketValueLoading = false;
-    notifyListeners(); // Notificamos para mostrar el valor final
+    try {
+      _totalMarketValue = await _itemService.fetchTotalMarketValue();
+    } catch (e) {
+      debugPrint("Error cargando valor de mercado en Provider: $e");
+    } finally {
+      _isMarketValueLoading = false;
+      notifyListeners(); // Notificamos para mostrar el valor final
+    }
   }
-}
 
   Future<void> loadPriceHistory(int itemId) async {
     _loadingHistory = true;
@@ -128,40 +128,40 @@ bool get isMarketValueLoading => _isMarketValueLoading;
   }
 
   Future<void> syncWithUPC(int itemId) async {
-  _isSyncing = true;
-  notifyListeners();
+    _isSyncing = true;
+    notifyListeners();
 
-  try {
-    // 1. Llamada al servicio
-    final updatedItem = await _itemService.syncItemWithUPC(itemId);
+    try {
+      // 1. Llamada al servicio
+      final updatedItem = await _itemService.syncItemWithUPC(itemId);
 
-    // 2. 🔑 CLAVE: Actualizamos el historial que el Consumer está escuchando
-    // Como el backend devuelve el item con el historial actualizado:
-    if (updatedItem.priceHistory != null) {
-      _itemHistory = updatedItem.priceHistory!;
-    }
-
-    // 3. Actualizamos el ítem en la caché (tu lógica actual)
-    bool updated = false;
-    _itemsCache.forEach((key, response) {
-      final index = response.items.indexWhere((item) => item.id == itemId);
-      if (index != -1) {
-        response.items[index] = updatedItem;
-        updated = true;
+      // 2. 🔑 CLAVE: Actualizamos el historial que el Consumer está escuchando
+      // Como el backend devuelve el item con el historial actualizado:
+      if (updatedItem.priceHistory != null) {
+        _itemHistory = updatedItem.priceHistory!;
       }
-    });
 
-    if (updated) {
-      _recalculateTotalsAndNotify(); // Esto ya llama a notifyListeners()
+      // 3. Actualizamos el ítem en la caché (tu lógica actual)
+      bool updated = false;
+      _itemsCache.forEach((key, response) {
+        final index = response.items.indexWhere((item) => item.id == itemId);
+        if (index != -1) {
+          response.items[index] = updatedItem;
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        _recalculateTotalsAndNotify(); // Esto ya llama a notifyListeners()
+      }
+    } catch (e) {
+      debugPrint("Error en Provider syncWithUPC: $e");
+      rethrow;
+    } finally {
+      _isSyncing = false;
+      notifyListeners(); // Notifica el fin de la carga para que el gráfico se repinte
     }
-  } catch (e) {
-    debugPrint("Error en Provider syncWithUPC: $e");
-    rethrow;
-  } finally {
-    _isSyncing = false;
-    notifyListeners(); // Notifica el fin de la carga para que el gráfico se repinte
   }
-}
 
   // 🚩 RESTAURADA: Función para los contadores de las tarjetas de categorías
   int getItemCountForAssetType(int containerId, int assetTypeId) {
@@ -224,6 +224,8 @@ bool get isMarketValueLoading => _isMarketValueLoading;
     _currentPage = 1;
     _filters.clear();
     _globalSearchTerm = null;
+    _aggregationDefinitions = []; // Vaciamos las definiciones
+    _aggregationResults = {}; // Vaciamos los resultados
     _isLoading = true; // Forzamos el estado de carga inmediatamente
 
     notifyListeners();
@@ -520,6 +522,12 @@ bool get isMarketValueLoading => _isMarketValueLoading;
           if (e.key == 'location') {
             return (item.location?.name ?? '').toLowerCase().contains(val);
           }
+          if (e.key == 'barcode') {
+            return (item.barcode ?? '').toLowerCase().contains(val);
+          }
+          if (e.key == 'marketValue') {
+            return _compareNumeric(item.marketValue, val);
+          }
           return (item.customFieldValues?[e.key]?.toString() ?? '')
               .toLowerCase()
               .contains(val);
@@ -582,6 +590,14 @@ bool get isMarketValueLoading => _isMarketValueLoading;
           aVal = (a.location?.name ?? '').toLowerCase();
           bVal = (b.location?.name ?? '').toLowerCase();
           break;
+        case 'barcode':
+          aVal = (a.barcode ?? '').toLowerCase();
+          bVal = (b.barcode ?? '').toLowerCase();
+          break;
+        case 'marketValue':
+          aVal = a.marketValue;
+          bVal = b.marketValue;
+          break;
         case 'createdAt':
           aVal = a.createdAt ?? DateTime(0);
           bVal = b.createdAt ?? DateTime(0);
@@ -607,21 +623,28 @@ bool get isMarketValueLoading => _isMarketValueLoading;
   void _recalculateTotalsAndNotify() {
     final cId = _currentContainerId;
     final atId = _currentAssetTypeId;
-
-    //if (cId == 0 || atId == 0) return;
-
     final key = _getCacheKey(cId, atId);
     final response = _itemsCache[key];
 
     if (response != null) {
-      // 🚩 SOLO actualizamos si la respuesta de esta llave tiene datos.
-      // No tocamos _aggregationDefinitions si ya fueron asignadas en loadInventoryItems.
       _totalFilteredItems = _applyFilters(response.items).length;
 
-      // Solo sincronizamos resultados si vienen en este objeto
+      // 🚩 CRUCIAL: Recuperar las definiciones de la caché.
+      // Tras un F5, si el widget pide un redibujado, necesitamos asegurar que
+      // las definiciones estén presentes.
+      if (response.aggregationDefinitions.isNotEmpty) {
+        _aggregationDefinitions = List<dynamic>.from(
+          response.aggregationDefinitions,
+        );
+      }
+
       if (response.aggregationResults.isNotEmpty) {
         _aggregationResults = Map.from(response.aggregationResults);
       }
+    } else {
+      // Si no hay respuesta (está cargando), reseteamos totales para evitar
+      // mostrar datos de la categoría anterior
+      _totalFilteredItems = 0;
     }
     notifyListeners();
   }

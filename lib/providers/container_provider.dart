@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invenicum/models/asset_type_model.dart';
 import 'package:invenicum/models/container_node.dart';

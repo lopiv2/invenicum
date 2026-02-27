@@ -31,6 +31,21 @@ class TemplateService {
   }
 
   // ------------------------------------------------------------------
+  // --- DOWNLOAD: Incrementar contador en el repositorio ---
+  // ------------------------------------------------------------------
+  Future<void> trackDownload(String templateId) async {
+    try {
+      final url = '/templates/$templateId/download';
+      // No necesitamos esperar la respuesta ni validar el código de estado
+      // de forma crítica, ya que es una métrica analítica.
+      await _dio.post(url);
+    } on DioException catch (e) {
+      // Logueamos el error pero no interrumpimos al usuario
+      print("❌ Error al trackear descarga en GitHub: ${e.message}");
+    }
+  }
+
+  // ------------------------------------------------------------------
   // --- DETAIL: Obtener detalle completo (Hidratado) ---
   // ------------------------------------------------------------------
   Future<AssetTemplate> getTemplateById(String id) async {
@@ -60,7 +75,7 @@ class TemplateService {
         data: template.toJson(), // Envía snake_case gracias a tu nuevo modelo
       );
 
-      // 🚩 REVISIÓN IMPORTANTE: 
+      // 🚩 REVISIÓN IMPORTANTE:
       // Tu router de Express devuelve res.status(201).json({ success: true, data: result })
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data']; // Extraemos el campo 'data'
@@ -92,26 +107,9 @@ class TemplateService {
     }
   }
 
-  // ------------------------------------------------------------------
-  // --- SAVE: Guardar/Instalar plantilla ---
-  // ------------------------------------------------------------------
-  Future<void> saveTemplateToUser(AssetTemplate template) async {
-    try {
-      const url = '/templates/save';
-      // Pasamos el objeto a JSON. El DTO del backend lo recibirá y normalizará.
-      final response = await _dio.post(url, data: template.toJson());
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception('No se pudo guardar la plantilla');
-      }
-    } on DioException catch (e) {
-      throw _handleError(e);
-    }
-  }
-
   // Helper centralizado para errores
   Exception _handleError(DioException e) {
-    final message = e.response?.data is Map 
+    final message = e.response?.data is Map
         ? (e.response?.data['message'] ?? e.message)
         : e.message;
     return Exception(message);

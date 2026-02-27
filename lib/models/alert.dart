@@ -7,6 +7,9 @@ class Alert {
   final String type; // 'info', 'warning', 'critical'
   final DateTime createdAt;
   bool isRead;
+  final bool isEvent;
+  final DateTime? scheduledAt;
+  final DateTime? notifyAt;
 
   Alert({
     required this.id,
@@ -15,6 +18,9 @@ class Alert {
     required this.type,
     required this.createdAt,
     this.isRead = false,
+    this.isEvent = false,
+    this.scheduledAt,
+    this.notifyAt,
   });
 
   factory Alert.fromJson(Map<String, dynamic> json) {
@@ -25,6 +31,13 @@ class Alert {
       type: json['type'] as String? ?? 'info',
       createdAt: DateTime.parse(json['createdAt'] as String),
       isRead: json['isRead'] as bool? ?? false,
+      isEvent: json['isEvent'] as bool? ?? false,
+      scheduledAt: json['scheduledAt'] != null
+          ? DateTime.parse(json['scheduledAt'] as String)
+          : null,
+      notifyAt: json['notifyAt'] != null
+          ? DateTime.parse(json['notifyAt'] as String)
+          : null,
     );
   }
 
@@ -34,6 +47,9 @@ class Alert {
       'message': message,
       'type': type,
       'isRead': isRead,
+      'isEvent': isEvent,
+      'scheduledAt': scheduledAt?.toIso8601String(),
+      'notifyAt': notifyAt?.toIso8601String(),
     };
   }
 }

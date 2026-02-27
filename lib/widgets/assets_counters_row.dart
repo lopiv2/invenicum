@@ -85,7 +85,7 @@ class AssetCountersRow extends StatelessWidget {
         }),
 
         // 5. INDICADOR DE CARGA
-        if (isLoading && itemProvider.aggregationDefinitions.isEmpty)
+        if (isLoading)
           _buildCustomHeightChip(
             context,
             label: 'Cargando cálculos...',

@@ -216,13 +216,15 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
           return Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
             child: CustomFieldEditor(
+              key: ValueKey(entry.value.id),
               field: entry.value,
-              availableDataLists:
-                  const [], // Plantillas globales no usan listas locales
+              availableDataLists: const [],
               onDelete: () =>
                   setState(() => _fieldDefinitions.removeAt(entry.key)),
-              onUpdate: (updated) =>
-                  setState(() => _fieldDefinitions[entry.key] = updated),
+              onUpdate: (updated) {
+                // Actualizamos sin reconstruir agresivamente si es posible
+                _fieldDefinitions[entry.key] = updated;
+              },
             ),
           );
         }),

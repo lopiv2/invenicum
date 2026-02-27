@@ -55,9 +55,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.dashboard,
-            style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          Center(
+            child: Text(
+              l10n.dashboard,
+              style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+            ),
           ),
           const SizedBox(height: 24),
           const StacSlot(slotName: 'dashboard_top'),

@@ -75,17 +75,9 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             subtitle: "Configura alertas y bots de chat.",
             icon: FontAwesomeIcons.telegram,
             iconColor: const Color(0xFF26A5E4),
-            isLinked: false,
+            // CAMBIO AQUÍ: Ahora lee el estado real del Provider
+            isLinked: integrationProv.isLinked(AppIntegrations.telegram),
             onTap: () => _openConfig(context, AppIntegrations.telegram),
-          ),
-          _buildIntegrationCard(
-            context,
-            title: "WhatsApp Business",
-            subtitle: "Notificaciones oficiales de stock.",
-            icon: FontAwesomeIcons.whatsapp,
-            iconColor: const Color(0xFF25D366),
-            isLinked: false,
-            onTap: () => _openConfig(context, AppIntegrations.whatsapp),
           ),
           const SizedBox(height: 24),
 

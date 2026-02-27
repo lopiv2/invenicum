@@ -25,11 +25,32 @@ class AlertProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createAlert(String title, String message, String type) async {
+  Future<void> updateAlert(int id, Map<String, dynamic> data) async {
+    try {
+      await _alertService.updateAlert(id, data);
+      await loadAlerts(); // Recargamos para ver los cambios
+    } catch (e) {
+      print("Error al editar: $e");
+      rethrow;
+    }
+  }
+
+  Future<void> createAlert(
+    String title,
+    String message,
+    String type, {
+    bool isEvent = false,
+    DateTime? scheduledAt,
+    DateTime? notifyAt,
+  }) async {
     await _alertService.createAlert({
       'title': title,
       'message': message,
       'type': type,
+      'isEvent': isEvent,
+      'isRead': false,
+      'scheduledAt': scheduledAt?.toIso8601String(),
+      'notifyAt': notifyAt?.toIso8601String(),
     });
     await loadAlerts();
   }

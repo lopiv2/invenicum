@@ -300,7 +300,10 @@ class _AssetListScreenState extends State<AssetListScreen>
                 const SizedBox(height: 20),
 
                 AssetCountersRow(
-                  key: ValueKey('counters_${widget.assetTypeId}'),
+                  // 🚩 Usa tanto el ID como el tamaño de la lista para forzar el refresco
+                  key: ValueKey(
+                    'counters_${widget.assetTypeId}_${viewItems.length}',
+                  ),
                   assetType: assetType,
                   totalCountLocal: viewItems.length,
                   selectedCountFieldId: _selectedCountFieldId,

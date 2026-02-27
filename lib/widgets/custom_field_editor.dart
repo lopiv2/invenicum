@@ -148,12 +148,20 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             Row(
               children: [
                 Expanded(
-                  child: Text(
-                    'Campo: "${_nameController.text.isEmpty ? 'Sin nombre' : _nameController.text}"',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
+                  child: ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _nameController,
+                    builder: (context, value, child) {
+                      final displayName = value.text.isEmpty
+                          ? 'Sin nombre'
+                          : value.text;
+                      return Text(
+                        'Campo: "$displayName"',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      );
+                    },
                   ),
                 ),
                 IconButton(
@@ -174,7 +182,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 isDense: true,
               ),
               onChanged: (value) {
-                setState(() {});
+                //setState(() {});
                 _debounce(() {
                   if (mounted) {
                     _notifyUpdate();

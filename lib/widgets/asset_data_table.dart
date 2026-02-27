@@ -79,16 +79,20 @@ class _AssetDataTableState extends State<AssetDataTable> {
       final currentSortKey = itemProvider.sortKey;
       int index = -1;
 
-      if (currentSortKey == 'name')
-        index = 1;
-      else if (currentSortKey == 'quantity')
-        index = 2;
-      else if (currentSortKey == 'minStock')
-        index = 3;
-      else if (currentSortKey == 'location')
-        index = 4;
-      else if (currentSortKey == 'description')
-        index = 5;
+      if (currentSortKey == 'name'){
+        index = 1;}
+      else if (currentSortKey == 'quantity'){
+        index = 2;}
+      else if (currentSortKey == 'minStock'){
+        index = 3;}
+      else if (currentSortKey == 'location'){
+        index = 4;}
+      else if (currentSortKey == 'description'){
+        index = 5;}
+      else if (currentSortKey == 'barcode'){
+        index = 6;}
+      else if (currentSortKey == 'marketValue'){
+        index = 7;}
       else {
         final customIndex = widget.assetType.fieldDefinitions.indexWhere(
           (def) => def.id.toString() == currentSortKey,

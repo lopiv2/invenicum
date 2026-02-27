@@ -3,6 +3,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/providers/alert_provider.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
@@ -10,6 +11,8 @@ import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/widgets/chatbot_veni_widget.dart';
+import 'package:invenicum/widgets/pulsing_avatar_widget.dart';
+import 'package:invenicum/widgets/ringing_bell_widget.dart';
 import 'package:invenicum/widgets/search_bar_widget.dart';
 import 'package:invenicum/widgets/sidebar_layout.dart';
 import 'package:invenicum/widgets/stac_slot.dart';
@@ -51,6 +54,7 @@ class _MainLayoutState extends State<MainLayout> {
     // Ejecutamos la carga inicial después del primer frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _hydrateStateFromUrl();
+      context.read<AlertProvider>().loadAlerts();
     });
   }
 
@@ -337,62 +341,100 @@ class _HeaderState extends State<_Header> {
           const Spacer(),
 
           // Perfil de Usuario
-          PopupMenuButton<String>(
-            offset: const Offset(0, 48),
-            borderRadius: BorderRadius.circular(16),
-            elevation: 8,
-            onSelected: (value) async {
-              if (value == 'logout') {
-                context.read<InventoryItemProvider>().resetState();
-                await context.read<AuthProvider>().logout();
-                if (context.mounted) context.go('/login');
-              } else if (value == 'settings') {
-                context.go('/preferences');
-              } else if (value == 'profile') {
-                context.go('/myprofile');
-              }
-            },
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: colorScheme.primary.withOpacity(0.2),
-                  width: 2,
+          Consumer<AlertProvider>(
+            // 🚩 Escuchamos el AlertProvider
+            builder: (context, alertProvider, child) {
+              final int unread = alertProvider.unreadCount;
+              return PulsingAvatar(
+                isActive: unread > 0,
+                child: Badge.count(
+                  count: unread,
+                  isLabelVisible: unread > 0,
+                  offset: const Offset(
+                    -35,
+                    0,
+                  ), // Ajusta la posición sobre el avatar
+                  backgroundColor: Colors.redAccent,
+                  child: PopupMenuButton<String>(
+                    offset: const Offset(0, 48),
+                    borderRadius: BorderRadius.circular(16),
+                    elevation: 8,
+                    onSelected: (value) async {
+                      if (value == 'alerts') {
+                        context.go('/alerts');
+                      }
+                      if (value == 'logout') {
+                        context.read<InventoryItemProvider>().resetState();
+                        await context.read<AuthProvider>().logout();
+                        if (context.mounted) context.go('/login');
+                      } else if (value == 'settings') {
+                        context.go('/preferences');
+                      } else if (value == 'profile') {
+                        context.go('/myprofile');
+                      }
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: colorScheme.primary.withOpacity(0.2),
+                          width: 2,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child:
+                            user?.avatarUrl != null &&
+                                user!.avatarUrl!.isNotEmpty
+                            ? Image.network(
+                                user.avatarUrl!,
+                                width: 38,
+                                height: 38,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    RandomAvatar(
+                                      avatarSeed,
+                                      width: 38,
+                                      height: 38,
+                                    ),
+                              )
+                            : RandomAvatar(avatarSeed, width: 38, height: 38),
+                      ),
+                    ),
+                    itemBuilder: (context) => [
+                      if (unread > 0) ...[
+                        _buildPopupItem(
+                          'alerts',
+                          // En lugar de pasar solo un IconData, personalizamos el icono con animación
+                          Icons.notifications_active_outlined,
+                          '${l10n?.alerts ?? 'Alertas'} ($unread)',
+                          isHighlight: true,
+                          leadingWidget: RingingBell(isActive: unread > 0),
+                        ),
+                        const PopupMenuDivider(),
+                      ],
+                      _buildPopupItem(
+                        'profile',
+                        Icons.person_outline_rounded,
+                        l10n?.myProfile ?? 'Profile',
+                      ),
+                      _buildPopupItem(
+                        'settings',
+                        Icons.settings_outlined,
+                        l10n?.settings ?? 'Settings',
+                      ),
+                      const PopupMenuDivider(),
+                      _buildPopupItem(
+                        'logout',
+                        Icons.logout_rounded,
+                        l10n?.logout ?? 'Logout',
+                        isDestructive: true,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              child: ClipOval(
-                child: user?.avatarUrl != null && user!.avatarUrl!.isNotEmpty
-                    ? Image.network(
-                        user.avatarUrl!,
-                        width: 38,
-                        height: 38,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) =>
-                            RandomAvatar(avatarSeed, width: 38, height: 38),
-                      )
-                    : RandomAvatar(avatarSeed, width: 38, height: 38),
-              ),
-            ),
-            itemBuilder: (context) => [
-              _buildPopupItem(
-                'profile',
-                Icons.person_outline_rounded,
-                l10n?.myProfile ?? 'Profile',
-              ),
-              _buildPopupItem(
-                'settings',
-                Icons.settings_outlined,
-                l10n?.settings ?? 'Settings',
-              ),
-              const PopupMenuDivider(),
-              _buildPopupItem(
-                'logout',
-                Icons.logout_rounded,
-                l10n?.logout ?? 'Logout',
-                isDestructive: true,
-              ),
-            ],
+              );
+            },
           ),
         ],
       ),
@@ -437,12 +479,21 @@ class _HeaderState extends State<_Header> {
     IconData icon,
     String text, {
     bool isDestructive = false,
+    bool isHighlight = false,
+    Widget? leadingWidget,
   }) {
     return PopupMenuItem<String>(
       value: value,
       child: Row(
         children: [
-          Icon(icon, size: 20, color: isDestructive ? Colors.redAccent : null),
+          leadingWidget ??
+              Icon(
+                icon,
+                size: 20,
+                color: isDestructive
+                    ? Colors.redAccent
+                    : (isHighlight ? Colors.orange.shade700 : null),
+              ),
           const SizedBox(width: 12),
           Text(
             text,

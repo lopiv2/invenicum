@@ -143,14 +143,25 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
         CircleAvatar(
           radius: 28,
           backgroundColor: Colors.indigo.shade100,
-          child: Text(
-            _template!.author[0].toUpperCase(),
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.indigo,
-            ),
-          ),
+          // 🚩 backgroundImage maneja la imagen si existe
+          backgroundImage:
+              _template!.authorAvatarUrl != null &&
+                  _template!.authorAvatarUrl!.isNotEmpty
+              ? NetworkImage(_template!.authorAvatarUrl!)
+              : null,
+          // 🚩 child solo se muestra si la imagen falla o no existe
+          child:
+              (_template!.authorAvatarUrl == null ||
+                  _template!.authorAvatarUrl!.isEmpty)
+              ? Text(
+                  _template!.author[0].toUpperCase(),
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.indigo,
+                  ),
+                )
+              : null,
         ),
         const SizedBox(width: 16),
         Expanded(

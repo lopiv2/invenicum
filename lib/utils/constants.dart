@@ -14,7 +14,6 @@ class AppIntegrations {
   static const String priceCharting = 'price_charting';
   static const String upcitemdb = 'upcitemdb';
 
-
   /// Retorna la lista de modelos completa para la UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -50,38 +49,19 @@ class AppIntegrations {
         description: l10n.integrationTelegramDesc,
         fields: [
           IntegrationField(
-            id: 'bot_token',
+            id: 'botToken', // Antes 'bot_token'
             label: 'Bot Token',
             type: IntegrationFieldType.text,
             helperText: 'De @BotFather',
           ),
           IntegrationField(
-            id: 'chat_id',
+            id: 'chatId', // Antes 'chat_id'
             label: 'Chat ID',
             type: IntegrationFieldType.text,
+            helperText: 'Usa @userinfobot para obtener tu ID',
           ),
         ],
       ),
-      IntegrationModel(
-        id: whatsapp,
-        name: 'WhatsApp Business',
-        icon: FontAwesomeIcons.whatsapp,
-        description: 'Envía alertas y estados de inventario por WhatsApp.',
-        fields: [
-          IntegrationField(
-            id: 'phone_number_id',
-            label: 'Phone Number ID',
-            type: IntegrationFieldType.text,
-          ),
-          IntegrationField(
-            id: 'access_token',
-            label: 'Permanent Access Token',
-            type: IntegrationFieldType.text,
-            helperText: 'Configurado en Meta for Developers',
-          ),
-        ],
-      ),
-
       // --- E-COMMERCE ---
       IntegrationModel(
         id: ebay,
@@ -149,7 +129,7 @@ class AppIntegrations {
           IntegrationField(
             id: 'apiKey',
             label: 'API Key (user_key)',
-            type: IntegrationFieldType.text
+            type: IntegrationFieldType.text,
           ),
         ],
       ),

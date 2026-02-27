@@ -57,12 +57,8 @@ class TemplateProvider with ChangeNotifier {
     _setLoading(true);
     try {
       // El backend ahora devuelve el objeto creado procesado por el DTO
-      final AssetTemplate newTemplate = await _service.publishTemplate(template);
+      await _service.publishTemplate(template);
 
-      // En lugar de recargar todo el market, podemos insertarlo localmente
-      // para dar una sensación de velocidad (Optimistic Update)
-      _marketTemplates.insert(0, newTemplate);
-      
       _errorMessage = null;
       notifyListeners();
       return true;
@@ -90,13 +86,25 @@ class TemplateProvider with ChangeNotifier {
   // 5. Guardar/Instalar plantilla del market
   Future<bool> saveTemplateToLibrary(AssetTemplate template) async {
     try {
-      // Enviamos el objeto. El backend hará el upsert en la DB y el vínculo UserTemplate
-      await _service.saveTemplateToUser(template);
-      
-      // Refrescamos la biblioteca para que aparezca la nueva
-      await fetchUserLibrary(); 
+      // 1. Disparamos ambos procesos.
+      // trackDownload no lleva 'await' para que no bloquee la UI ni dependa del éxito de Prisma
+      _service.trackDownload(template.id);
+
+      // 3. Actualizamos la UI local de inmediato (Optimistic Update)
+      final index = _marketTemplates.indexWhere((t) => t.id == template.id);
+      if (index != -1) {
+        _marketTemplates[index].downloadCount++;
+      }
+
+      // 4. Refrescamos biblioteca
+      await fetchUserLibrary();
+
+      notifyListeners();
       return true;
     } catch (e) {
+      debugPrint("Error en saveTemplateToLibrary: $e");
+      // Aunque Prisma falle (ej: ya existía la plantilla),
+      // podrías querer devolver true si la intención del usuario se cumplió
       _errorMessage = e.toString();
       notifyListeners();
       return false;

@@ -12,7 +12,7 @@ class AssetTemplate {
   final List<CustomFieldDefinition> fields;
   final bool isOfficial;
   final bool isPublic;
-
+  int downloadCount;
   // 🕒 Nuevos campos de tiempo
   final DateTime? createdAt;
   final DateTime? updatedAt;
@@ -29,6 +29,7 @@ class AssetTemplate {
     required this.fields,
     this.isOfficial = false,
     this.isPublic = false,
+    this.downloadCount = 0,
     this.createdAt,
     this.updatedAt,
   });
@@ -39,44 +40,45 @@ class AssetTemplate {
       id: json['id']?.toString() ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
-      category: json['category'] ?? '',
-      tags: json['tags'] != null ? List<String>.from(json['tags']) : [],
-      author: json['author_name'] ?? json['author'] ?? 'Invenicum User',
-      authorAvatarUrl: json['author_avatar_url'],
-      downloadUrl: json['download_url'],
-      // El DTO garantiza que 'fields' sea una List, evitando el error de _JsonMap
+      downloadUrl: json['downloadUrl'], // 🚩 Antes era download_url
+      category: json['category'] ?? 'General',
+      tags: List<String>.from(json['tags'] ?? []),
+      author: json['author'] ?? 'Invenicum User',
+      authorAvatarUrl: json['authorAvatarUrl'], // 🚩 Coincide con el debugger
       fields: (json['fields'] as List? ?? [])
           .map((f) => CustomFieldDefinition.fromJson(f))
           .toList(),
-      isOfficial: json['is_official'] ?? false,
-      isPublic: json['is_public'] ?? false,
-      // 🕒 Parseo seguro de fechas ISO8601
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
-          : null,
-      updatedAt: json['updated_at'] != null 
-          ? DateTime.parse(json['updated_at']) 
-          : null,
+      downloadCount: json['downloadCount'] ?? 0,
+      isOfficial: json['isOfficial'] ?? false, // 🚩 Cambiado de 'is_official'
+      isPublic: json['isPublic'] ?? false, // 🚩 Cambiado de 'is_public'
+      // Parseo de fechas corregido para camelCase
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+      updatedAt: json['updatedAt'] != null
+          ? DateTime.parse(json['updatedAt'])
+          : DateTime.now(),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'category': category,
-      'tags': tags,
-      'author_name': author,
-      'author_avatar_url': authorAvatarUrl,
-      'download_url': downloadUrl,
-      'fields': fields.map((f) => f.toJson()).toList(),
-      'is_official': isOfficial,
-      'is_public': isPublic,
-      'created_at': createdAt?.toIso8601String(),
-      'updated_at': updatedAt?.toIso8601String(),
-    };
-  }
+  return {
+    'id': id,
+    'name': name,
+    'description': description,
+    'category': category,
+    'tags': tags,
+    'author': author, // 🚩 Antes era author_name
+    'authorAvatarUrl': authorAvatarUrl, // 🚩 Antes era author_avatar_url
+    'downloadUrl': downloadUrl, // 🚩 Antes era download_url
+    'fields': fields.map((f) => f.toJson()).toList(),
+    'isOfficial': isOfficial, // 🚩 Antes era is_official
+    'isPublic': isPublic,
+    'downloadCount': downloadCount,
+    'createdAt': createdAt?.toIso8601String(),
+    'updatedAt': updatedAt?.toIso8601String(),
+  };
+}
 
   Map<String, dynamic> toAssetTypeJson(int containerId) {
     return {
