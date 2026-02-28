@@ -48,14 +48,17 @@ class PreferencesService {
   }
 
   Future<void> updateNotificationSettings(NotificationSettings settings) async {
-    try {
-      await _dio.patch(
-        '/preferences/notifications',
-        data: settings
-            .toJson(), // Enviamos { channelOrder: [...], alertStockLow: true, ... }
-      );
-    } catch (e) {
-      rethrow;
-    }
+  try {
+    await _dio.put(
+      '/preferences/notifications',
+      // 🚀 CAMBIO AQUÍ: Envolvemos el mapa en la llave 'notifications'
+      data: {
+        'notifications': settings.toJson(),
+      },
+    );
+  } catch (e) {
+    print("Error en updateNotificationSettings: $e");
+    rethrow;
   }
+}
 }

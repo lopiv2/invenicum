@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/models/custom_field_definition.dart';
+import 'package:invenicum/providers/alert_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/services/ai_service.dart';
 import 'package:invenicum/services/api_service.dart';
@@ -291,64 +292,67 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   }
 
   void _initializeDynamicFields(InventoryItem item) {
-  final containerProvider = context.read<ContainerProvider>();
-  // 🔑 Necesitamos el PreferencesProvider para convertir el precio al mostrarlo
-  final preferences = context.read<PreferencesProvider>(); 
-  
-  final cIdInt = int.tryParse(widget.containerId);
-  final atIdInt = int.tryParse(widget.assetTypeId);
+    final containerProvider = context.read<ContainerProvider>();
+    // 🔑 Necesitamos el PreferencesProvider para convertir el precio al mostrarlo
+    final preferences = context.read<PreferencesProvider>();
 
-  if (cIdInt == null || atIdInt == null) return;
+    final cIdInt = int.tryParse(widget.containerId);
+    final atIdInt = int.tryParse(widget.assetTypeId);
 
-  final container = containerProvider.containers
-      .cast<ContainerNode?>()
-      .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
+    if (cIdInt == null || atIdInt == null) return;
 
-  final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
-    (at) => at?.id == atIdInt,
-    orElse: () => null,
-  );
+    final container = containerProvider.containers
+        .cast<ContainerNode?>()
+        .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
 
-  if (assetType != null && container != null) {
-    setState(() {
-      _assetType = assetType;
-      _availableLocations = container.locations;
+    final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
+      (at) => at?.id == atIdInt,
+      orElse: () => null,
+    );
 
-      for (var fieldDef in assetType.fieldDefinitions) {
-        final fieldId = fieldDef.id ?? 0;
-        final initialValue = item.customFieldValues?[fieldId.toString()];
+    if (assetType != null && container != null) {
+      setState(() {
+        _assetType = assetType;
+        _availableLocations = container.locations;
 
-        if (fieldDef.type == CustomFieldType.dropdown) {
-          _selectedListValues[fieldId] = initialValue;
-          if (fieldDef.dataListId != null) {
-            _loadListValues(fieldDef.dataListId!, fieldId);
+        for (var fieldDef in assetType.fieldDefinitions) {
+          final fieldId = fieldDef.id ?? 0;
+          final initialValue = item.customFieldValues?[fieldId.toString()];
+
+          if (fieldDef.type == CustomFieldType.dropdown) {
+            _selectedListValues[fieldId] = initialValue;
+            if (fieldDef.dataListId != null) {
+              _loadListValues(fieldDef.dataListId!, fieldId);
+            }
+          } else if (fieldDef.type == CustomFieldType.boolean) {
+            _booleanValues[fieldId] = AssetFormUtils.toBoolean(initialValue);
+          } else {
+            // ---------------------------------------------------------
+            // 🔑 LÓGICA DE CARGA PARA PRECIOS
+            // ---------------------------------------------------------
+            String textToShow = initialValue?.toString() ?? '';
+
+            if (fieldDef.type == CustomFieldType.price &&
+                initialValue != null) {
+              // 1. Leemos el valor "universal" de la BBDD (ej: 17.66)
+              double dbValue = double.tryParse(initialValue.toString()) ?? 0.0;
+
+              // 2. Lo convertimos a la moneda actual del usuario (ej: de USD a EUR)
+              double localValue = preferences.convertPrice(dbValue);
+
+              // 3. Formateamos para que el usuario vea "15.00"
+              textToShow = localValue.toStringAsFixed(2);
+            }
+
+            _dynamicControllers[fieldId] = TextEditingController(
+              text: textToShow,
+            );
+            // ---------------------------------------------------------
           }
-        } else if (fieldDef.type == CustomFieldType.boolean) {
-          _booleanValues[fieldId] = AssetFormUtils.toBoolean(initialValue);
-        } else {
-          // ---------------------------------------------------------
-          // 🔑 LÓGICA DE CARGA PARA PRECIOS
-          // ---------------------------------------------------------
-          String textToShow = initialValue?.toString() ?? '';
-
-          if (fieldDef.type == CustomFieldType.price && initialValue != null) {
-            // 1. Leemos el valor "universal" de la BBDD (ej: 17.66)
-            double dbValue = double.tryParse(initialValue.toString()) ?? 0.0;
-            
-            // 2. Lo convertimos a la moneda actual del usuario (ej: de USD a EUR)
-            double localValue = preferences.convertPrice(dbValue);
-            
-            // 3. Formateamos para que el usuario vea "15.00"
-            textToShow = localValue.toStringAsFixed(2);
-          }
-
-          _dynamicControllers[fieldId] = TextEditingController(text: textToShow);
-          // ---------------------------------------------------------
         }
-      }
-    });
+      });
+    }
   }
-}
 
   @override
   void dispose() {
@@ -457,131 +461,97 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     if (!AssetFormUtils.validateForm(_formKey) ||
         widget.initialItem == null ||
         _assetType == null ||
-        _selectedLocationId ==
-            null // 🔑 NUEVO: Validar ubicación
-            ) {
-      if (_selectedLocationId == null) {
-        if (mounted) {
-          ToastService.error(
-            AppLocalizations.of(context)!.selectLocationRequired,
-          );
-        }
+        _selectedLocationId == null) {
+      if (_selectedLocationId == null && mounted) {
+        ToastService.error(
+          AppLocalizations.of(context)!.selectLocationRequired,
+        );
       }
       return;
     }
 
     final itemProvider = context.read<InventoryItemProvider>();
     final preferences = context.read<PreferencesProvider>();
+    final alertProvider = context.read<AlertProvider>();
     final cIdInt = int.tryParse(widget.containerId);
     final atIdInt = int.tryParse(widget.assetTypeId);
     final assetItemIdInt = int.tryParse(widget.assetItemId);
 
     if (cIdInt == null || atIdInt == null || assetItemIdInt == null) {
-      if (mounted) {
+      if (mounted)
         ToastService.error(AppLocalizations.of(context)!.invalidNavigationIds);
-      }
       return;
     }
 
-    // 1. Recoger los valores custom ACTUALIZADOS (Lógica sin cambios)
+    // 1. Recoger los valores custom y procesar Precios
     final Map<String, dynamic> updatedCustomValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       final fieldId = fieldDef.id!;
+      final controller = _dynamicControllers[fieldId];
 
       if (fieldDef.type == CustomFieldType.dropdown) {
         final selectedValue = _selectedListValues[fieldId];
         if (selectedValue != null) {
           updatedCustomValues[fieldId.toString()] = selectedValue;
-        } else if (fieldDef.isRequired) {
-          if (mounted) {
-            ToastService.error(
-              AppLocalizations.of(
-                context,
-              )!.fieldRequiredWithName(fieldDef.name),
-            );
-          }
+        } else if (fieldDef.isRequired && mounted) {
+          ToastService.error(
+            AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name),
+          );
           return;
         }
       } else if (fieldDef.type == CustomFieldType.boolean) {
         final boolValue = _booleanValues[fieldId];
-
-        if (fieldDef.isRequired && boolValue == null) {
-          if (mounted) {
-            ToastService.error(
-              AppLocalizations.of(
-                context,
-              )!.fieldRequiredWithName(fieldDef.name),
-            );
-          }
+        if (fieldDef.isRequired && boolValue == null && mounted) {
+          ToastService.error(
+            AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name),
+          );
           return;
         }
-
-        if (boolValue != null) {
+        if (boolValue != null)
           updatedCustomValues[fieldId.toString()] = boolValue;
+      } else if (controller != null && controller.text.isNotEmpty) {
+        var valueToSave = controller.text;
+
+        // Conversión de Moneda Local -> USD (Base)
+        if (fieldDef.type == CustomFieldType.price) {
+          double localValue =
+              double.tryParse(valueToSave.replaceAll(',', '.')) ?? 0;
+          double baseValue = preferences.convertToBase(localValue);
+          valueToSave = baseValue.toStringAsFixed(2);
         }
-      } else {
-        final controller = _dynamicControllers[fieldId];
-        if (controller != null && controller.text.isNotEmpty) {
-          var valueToSave = controller.text;
-
-          // 🔑 Lógica para el campo de tipo precio
-          if (fieldDef.type == CustomFieldType.price) {
-            // 1. Limpiamos el texto por si el usuario usó comas para los decimales
-            double localValue =
-                double.tryParse(valueToSave.replaceAll(',', '.')) ?? 0;
-
-            // 2. Convertimos a la moneda base (USD) usando tu método del provider
-            double baseValue = preferences.convertToBase(localValue);
-
-            // 3. 🚀 CRÍTICO: Redondeamos a 2 decimales para evitar el 17.662893...
-            // Esto hará que en la base de datos se guarde "17.66"
-            valueToSave = baseValue.toStringAsFixed(2);
-          }
-
-          updatedCustomValues[fieldId.toString()] = valueToSave;
-        } else if (fieldDef.isRequired) {
-          // Mantén tu validación de campos obligatorios aquí
-          if (mounted) {
-            ToastService.error(
-              AppLocalizations.of(
-                context,
-              )!.fieldRequiredWithName(fieldDef.name),
-            );
-          }
-          return;
-        }
+        updatedCustomValues[fieldId.toString()] = valueToSave;
+      } else if (fieldDef.isRequired && mounted) {
+        ToastService.error(
+          AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name),
+        );
+        return;
       }
     }
 
-    // 2. Preparar los datos de los archivos NUEVOS
+    // 2. Preparar archivos
     final List<Map<String, dynamic>> filesData = [];
     for (int i = 0; i < _newImagePreviewUrls.length; i++) {
       filesData.add(_dataUrlToFileData(_newImagePreviewUrls[i], i));
     }
 
-    // 3. Crear el objeto InventoryItem actualizado
+    // 3. Crear objeto InventoryItem actualizado
     final updatedItem = InventoryItem(
       id: assetItemIdInt,
       containerId: cIdInt,
       assetTypeId: atIdInt,
-      // 🔑 MODIFICADO: Añadir la ubicación seleccionada
       locationId: _selectedLocationId!,
       barcode: _barcodeController.text.trim().isEmpty
           ? null
           : _barcodeController.text.trim(),
-      quantity:
-          int.tryParse(_quantityController.text) ??
-          1, // 🔑 NUEVA: Obtener cantidad del controlador
-      minStock:
-          int.tryParse(_minStockController.text) ??
-          1, // 🔑 NUEVA: Obtener minStock del controlador
+      quantity: int.tryParse(_quantityController.text) ?? 1,
+      minStock: int.tryParse(_minStockController.text) ?? 1,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       customFieldValues: updatedCustomValues,
       images: _currentImages,
     );
 
-    // 4. Llamar al proveedor para actualizar el activo con archivos/eliminaciones
+    // 4. Actualizar en Base de Datos
     try {
       await itemProvider.updateAssetWithFiles(
         updatedItem,
@@ -589,10 +559,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         imageIdsToDelete: _imageIdsToDelete,
       );
 
-      // 5. Navegar de vuelta (al listado)
+      await alertProvider.loadAlerts();
+
+      // 5. Gestión de Notificaciones y Salida
       if (mounted) {
         ToastService.success(
-          'Activo "${updatedItem.name}" actualizado correctamente.',
+          AppLocalizations.of(context)!.assetUpdated(updatedItem.name),
         );
 
         context.go(
@@ -600,10 +572,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         );
       }
     } catch (e) {
-      // 6. Manejo de errores
-      if (mounted) {
-        ToastService.error('Error al actualizar activo: ${e.toString()}');
-      }
+      if (mounted) ToastService.error('Error: ${e.toString()}');
     }
   }
 

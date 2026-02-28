@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/inventory_item_response.dart';
@@ -393,30 +394,37 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateAssetWithFiles(
-    InventoryItem updatedItem, {
-    FileData filesToUpload = const [],
-    List<int> imageIdsToDelete = const [],
-  }) async {
-    _isLoading = true;
+  // lib/providers/inventory_item_provider.dart
+
+Future<InventoryItem> updateAssetWithFiles( // Cambiamos void por Future<InventoryItem>
+  InventoryItem updatedItem, {
+  FileData filesToUpload = const [],
+  List<int> imageIdsToDelete = const [],
+}) async {
+  _isLoading = true;
+  notifyListeners();
+  try {
+    // 1. Actualizamos
+    final result = await _itemService.updateInventoryItem(
+      updatedItem,
+      filesToUpload: filesToUpload,
+      imageIdsToDelete: imageIdsToDelete,
+    );
+
+    // 2. Recargamos localmente
+    await loadInventoryItems(
+      containerId: updatedItem.containerId,
+      assetTypeId: updatedItem.assetTypeId,
+      forceReload: true,
+    );
+    
+    return result; // Devolvemos el item fresco del servidor
+  } catch (e) {
+    _isLoading = false;
     notifyListeners();
-    try {
-      await _itemService.updateInventoryItem(
-        updatedItem,
-        filesToUpload: filesToUpload,
-        imageIdsToDelete: imageIdsToDelete,
-      );
-      await loadInventoryItems(
-        containerId: updatedItem.containerId,
-        assetTypeId: updatedItem.assetTypeId,
-        forceReload: true,
-      );
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      rethrow;
-    }
+    rethrow;
   }
+}
 
   Future<void> deleteInventoryItem(
     int itemId,

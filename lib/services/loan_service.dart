@@ -47,22 +47,22 @@ class LoanService {
 
   /// Crea un nuevo préstamo
   /// Nota: Ya no pasamos el userId en el body, el backend lo pone del Token
-  Future<Loan> createLoan(int containerId, Loan loan) async {
-    try {
-      final response = await _dio.post(
-        '/containers/$containerId/loans',
-        data: loan.toJson(), // El backend ignora campos que no necesita
-      );
+  Future<Loan> createLoan(int containerId, Loan loan) async { // 👈 Quita el context
+  try {
+    final response = await _dio.post(
+      '/containers/$containerId/loans',
+      data: loan.toJson(),
+    );
 
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        return Loan.fromJson(response.data as Map<String, dynamic>);
-      } else {
-        throw Exception('Error al crear el préstamo');
-      }
-    } on DioException catch (e) {
-      throw Exception(e.response?.data['error'] ?? 'Error al crear préstamo');
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return Loan.fromJson(response.data as Map<String, dynamic>);
+    } else {
+      throw Exception('Error al crear el préstamo');
     }
+  } on DioException catch (e) {
+    throw Exception(e.response?.data['error'] ?? 'Error al crear préstamo');
   }
+}
 
   /// Marca un préstamo como devuelto
   /// El backend ya incrementa el stock automáticamente

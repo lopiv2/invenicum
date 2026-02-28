@@ -42,8 +42,11 @@ class AlertProvider with ChangeNotifier {
     bool isEvent = false,
     DateTime? scheduledAt,
     DateTime? notifyAt,
+    List<String>?
+    priorityChannels, // 👈 Añadimos esto para el orden de Telegram/Email
   }) async {
-    await _alertService.createAlert({
+    // 1. Llamamos al servicio pasando TODO lo que ya tenías + los canales
+    final newAlert = await _alertService.createAlert({
       'title': title,
       'message': message,
       'type': type,
@@ -51,8 +54,14 @@ class AlertProvider with ChangeNotifier {
       'isRead': false,
       'scheduledAt': scheduledAt?.toIso8601String(),
       'notifyAt': notifyAt?.toIso8601String(),
+      'priority_channels':
+          priorityChannels, // 🚀 El Back usará esto para notificar
     });
-    await loadAlerts();
+
+    // 2. En lugar de hacer un loadAlerts() completo (que gasta red),
+    // insertamos directamente la alerta que nos devuelve el servidor.
+    _alerts.insert(0, newAlert);
+    notifyListeners();
   }
 
   Future<void> deleteAlert(int id) async {

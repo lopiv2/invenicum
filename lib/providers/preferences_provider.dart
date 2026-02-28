@@ -65,24 +65,18 @@ class PreferencesProvider with ChangeNotifier {
   // Lógica para los switches
   Future<void> setNotificationAlert(String type, bool enabled) async {
     final previousPrefs = _prefs;
-
-    // 1. Creamos una copia de la configuración de notificaciones actual
     NotificationSettings currentNotifs = _prefs.notifications;
     NotificationSettings updatedNotifs;
 
-    // 2. Identificamos qué switch se ha pulsado
+    // 🔑 Mapeamos los tipos de la UI a los nuevos campos del modelo
     switch (type) {
-      case 'stock':
-        updatedNotifs = currentNotifs.copyWith(alertStockLow: enabled);
-        break;
-      case 'preorder':
-        updatedNotifs = currentNotifs.copyWith(alertNewPreorder: enabled);
-        break;
-      case 'loan':
-        updatedNotifs = currentNotifs.copyWith(alertLoanReminder: enabled);
-        break;
-      default:
-        return;
+      case 'stock': updatedNotifs = currentNotifs.copyWith(alertStockLow: enabled); break;
+      case 'preorder': updatedNotifs = currentNotifs.copyWith(alertPreSales: enabled); break;
+      case 'loan': updatedNotifs = currentNotifs.copyWith(alertLoanReminders: enabled); break;
+      case 'overdue': updatedNotifs = currentNotifs.copyWith(alertOverdueLoans: enabled); break;
+      case 'maintenance': updatedNotifs = currentNotifs.copyWith(alertMaintenance: enabled); break;
+      case 'price': updatedNotifs = currentNotifs.copyWith(alertPriceChange: enabled); break;
+      default: return;
     }
 
     // 3. Actualización optimista del estado principal
@@ -90,10 +84,11 @@ class PreferencesProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      // 4. Persistencia en el backend
+      // 🚀 Persistencia: enviamos el objeto que ahora genera las llaves
+      // correctas para el backend (alertPreSales, alertLoanReminders, etc.)
       await _preferencesService.updateNotificationSettings(updatedNotifs);
     } catch (e) {
-      // 5. Rollback si falla
+      // Rollback
       _prefs = previousPrefs;
       notifyListeners();
       debugPrint('Error actualizando alertas: $e');

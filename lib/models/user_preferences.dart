@@ -3,7 +3,7 @@ import 'package:invenicum/models/notifications_preferences_model.dart';
 class UserPreferences {
   final int? id;
   final String language;
-  final String currency; // 🔑 Cambiado a String no-nulo con valor por defecto
+  final String currency;
   final bool aiEnabled;
   final int? userId;
   final DateTime? updatedAt;
@@ -13,7 +13,7 @@ class UserPreferences {
   UserPreferences({
     this.id,
     this.language = 'es',
-    this.currency = 'EUR',
+    this.currency = 'USD',
     this.aiEnabled = true,
     this.userId,
     this.updatedAt,
@@ -21,9 +21,7 @@ class UserPreferences {
     NotificationSettings? notifications,
   }) : this.notifications = notifications ?? NotificationSettings();
 
-
   factory UserPreferences.fromJson(Map<String, dynamic> json) {
-    // Procesamos los rates asegurándonos de convertirlos a double
     Map<String, double>? parsedRates;
     if (json['exchangeRates'] != null) {
       parsedRates = (json['exchangeRates'] as Map<String, dynamic>).map(
@@ -34,14 +32,18 @@ class UserPreferences {
     return UserPreferences(
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'es',
-      currency: json['currency'] as String? ?? 'EUR',
+      currency: json['currency'] as String? ?? 'USD',
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       userId: json['userId'] as int?,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
-      exchangeRates: parsedRates, // Asignamos los rates
-      notifications: NotificationSettings.fromJson(json['notifications'] ?? {}),
+      exchangeRates: parsedRates,
+      // 🚀 CLAVE: Pasamos el JSON completo. NotificationSettings.fromJson
+      // ahora buscará 'alertStockLow', etc., directamente en la raíz.
+      notifications: json['notifications'] != null
+          ? NotificationSettings.fromJson(json['notifications'])
+          : NotificationSettings(),
     );
   }
 
@@ -49,19 +51,22 @@ class UserPreferences {
     return {
       'id': id,
       'language': language,
-      'currency': currency, // 🔑 Añadido
+      'currency': currency,
       'aiEnabled': aiEnabled,
       'userId': userId,
+      // 🚀 Aplanamos las notificaciones para que el Backend las reciba
+      // como espera su DTO (UserPreferencesDTO.fromRequest).
       'notifications': notifications.toJson(),
     };
   }
 
-  // Útil para tu PreferencesService.updateCurrency
   Map<String, dynamic> toJsonForUpdate() {
     return {
       'language': language,
-      'currency': currency, // 🔑 Añadido
+      'currency': currency,
       'aiEnabled': aiEnabled,
+      // 🚀 Incluimos las alertas en cada actualización de preferencias.
+      ...notifications.toJson(),
     };
   }
 
@@ -71,7 +76,7 @@ class UserPreferences {
     String? currency,
     bool? aiEnabled,
     Map<String, double>? exchangeRates,
-    NotificationSettings? notifications, // <-- Esta es la línea que falta
+    NotificationSettings? notifications,
   }) {
     return UserPreferences(
       id: id ?? this.id,
@@ -79,16 +84,17 @@ class UserPreferences {
       currency: currency ?? this.currency,
       aiEnabled: aiEnabled ?? this.aiEnabled,
       exchangeRates: exchangeRates ?? this.exchangeRates,
-      notifications: notifications ?? this.notifications, // <-- Y esta
+      notifications: notifications ?? this.notifications,
     );
   }
 
   factory UserPreferences.empty() {
     return UserPreferences(
       language: 'es',
-      currency: 'EUR',
+      currency: 'USD',
       aiEnabled: true,
       exchangeRates: {},
+      notifications: NotificationSettings(),
     );
   }
 }

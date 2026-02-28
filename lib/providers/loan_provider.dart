@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/models/loan.dart';
+import 'package:invenicum/providers/alert_provider.dart';
 import 'package:invenicum/services/loan_service.dart';
 
 class LoanProvider extends ChangeNotifier {
@@ -8,7 +9,7 @@ class LoanProvider extends ChangeNotifier {
   List<Loan> _loans = [];
   bool _isLoading = false;
   String? _errorMessage;
-  
+
   // Nuevo: para guardar estadísticas por contenedor si fuera necesario
   Map<String, dynamic>? _currentStats;
 
@@ -23,13 +24,12 @@ class LoanProvider extends ChangeNotifier {
   // Filtros inteligentes usando las propiedades del DTO
   List<Loan> get activeLoans =>
       _loans.where((l) => l.status == 'active').toList();
-  
+
   List<Loan> get returnedLoans =>
       _loans.where((l) => l.status == 'returned').toList();
 
   // 🚩 Ahora usamos la propiedad que viene calculada del Backend
-  List<Loan> get overdueLoans => 
-      _loans.where((l) => l.isOverdue).toList();
+  List<Loan> get overdueLoans => _loans.where((l) => l.isOverdue).toList();
 
   /// Obtiene préstamos de forma global (Dashboard)
   Future<void> fetchAllLoans() async {
@@ -59,16 +59,35 @@ class LoanProvider extends ChangeNotifier {
   }
 
   /// Crea un nuevo préstamo
-  Future<Loan> createLoan(int containerId, Loan loan) async {
+  Future<Loan> createLoan(
+    int containerId,
+    Loan loan, {
+    AlertProvider? alertProvider,
+  }) async {
+    _setLoading(true);
     try {
-      final newLoan = await _loanService.createLoan(containerId, loan);
-      _loans.insert(0, newLoan); // Insertar al principio para que se vea primero
+      // 1. Llamamos al servicio (solo red)
+      final createdLoan = await _loanService.createLoan(containerId, loan);
+
+      // 2. Actualizamos la lista local
+      _loans.insert(0, createdLoan);
+
+      // 🚀 REFRESCAR ALERTAS:
+      // Como el back creó una alerta de stock, le pedimos al AlertProvider que recargue
+      if (alertProvider != null) {
+        // loadAlerts() traerá la alerta que el backend acaba de crear
+        await alertProvider.loadAlerts();
+      }
+
+      _errorMessage = null;
       notifyListeners();
-      return newLoan;
+      return createdLoan;
     } catch (e) {
       _errorMessage = e.toString();
       notifyListeners();
       rethrow;
+    } finally {
+      _setLoading(false);
     }
   }
 

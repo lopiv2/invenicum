@@ -322,12 +322,14 @@ class _LoansScreenState extends State<LoansScreen> {
                         columnSpacing: 16,
                         horizontalMargin: 12,
                         minWidth: 800,
+                        dataRowHeight: 80,
                         columns: [
                           DataColumn(label: Text(l10n.loanObject)),
                           DataColumn(label: Text(l10n.borrowerName)),
                           DataColumn(
                             label: Text(l10n.alertInfo),
                           ), // "Contacto" o info
+                          DataColumn(label: Text(l10n.quantity)),
                           DataColumn(label: Text(l10n.loanDate)),
                           DataColumn(label: Text(l10n.dueDate)),
                           DataColumn(label: Text(l10n.status)),
@@ -351,6 +353,7 @@ class _LoansScreenState extends State<LoansScreen> {
                               DataCell(Text(loan.itemName)),
                               DataCell(Text(loan.borrowerName ?? '-')),
                               DataCell(Text(loan.borrowerEmail ?? loan.borrowerPhone ?? '-')),
+                              DataCell(Text(loan.quantity.toString())),
                               DataCell(
                                 Text(DateFormat.yMd().format(loan.loanDate)),
                               ),

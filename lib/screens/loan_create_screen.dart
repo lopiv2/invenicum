@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/models/inventory_item.dart';
 import 'package:invenicum/models/loan.dart';
+import 'package:invenicum/providers/alert_provider.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
@@ -29,7 +30,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   late TextEditingController _borrowerPhoneController;
   late TextEditingController _notesController;
   late TextEditingController _quantityController;
-  
+
   int _currentStock = 0;
   InventoryItem? _selectedItem;
   DateTime? _expectedReturnDate;
@@ -45,7 +46,8 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   }
 
   Future<void> _selectReturnDate() async {
-    final initialDate = _expectedReturnDate ?? DateTime.now().add(const Duration(days: 7));
+    final initialDate =
+        _expectedReturnDate ?? DateTime.now().add(const Duration(days: 7));
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
@@ -105,7 +107,9 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                             setState(() {
                               _selectedItem = item;
                               _currentStock = item.quantity;
-                              _quantityController.text = _currentStock > 0 ? '1' : '0';
+                              _quantityController.text = _currentStock > 0
+                                  ? '1'
+                                  : '0';
                             });
                             Navigator.of(ctx).pop();
                           },
@@ -153,11 +157,20 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           status: 'active',
           userId: userId,
         );
+        final alertProvider = Provider.of<AlertProvider>(
+          context,
+          listen: false,
+        );
+        // 1. Registramos el préstamo (el backend descuenta stock)
+        await loanProvider.createLoan(
+          containerIdInt,
+          loan,
+          alertProvider: alertProvider,
+        );
 
-        await loanProvider.createLoan(containerIdInt, loan);
-        
         if (mounted) {
           ToastService.success('Préstamo registrado exitosamente');
+
           context.go('/container/${widget.containerId}/loans');
         }
       } catch (e) {
@@ -189,11 +202,16 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           children: [
             Text(
               'Registrar Nuevo Préstamo',
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 30),
 
-            Text('Objeto a Prestar', style: Theme.of(context).textTheme.titleLarge),
+            Text(
+              'Objeto a Prestar',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
@@ -209,7 +227,9 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                       _selectedItem?.name ?? 'Selecciona un objeto',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _selectedItem != null ? Colors.black : Colors.grey,
+                        color: _selectedItem != null
+                            ? Colors.black
+                            : Colors.grey,
                       ),
                     ),
                   ),
@@ -229,7 +249,9 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 hintText: 'Ej: Juan Pérez',
                 border: OutlineInputBorder(),
               ),
-              validator: (value) => (value == null || value.isEmpty) ? 'El nombre es obligatorio' : null,
+              validator: (value) => (value == null || value.isEmpty)
+                  ? 'El nombre es obligatorio'
+                  : null,
             ),
             const SizedBox(height: 20),
 
@@ -242,7 +264,8 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               ),
               keyboardType: TextInputType.number,
               validator: (value) {
-                if (value == null || value.isEmpty) return 'Ingresa una cantidad';
+                if (value == null || value.isEmpty)
+                  return 'Ingresa una cantidad';
                 final n = int.tryParse(value);
                 if (n == null || n <= 0) return 'Cantidad no válida';
                 if (n > _currentStock) return 'No hay suficiente stock';
@@ -294,7 +317,9 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                           : 'Selecciona fecha de devolución',
                       style: TextStyle(
                         fontSize: 16,
-                        color: _expectedReturnDate != null ? Colors.black : Colors.grey,
+                        color: _expectedReturnDate != null
+                            ? Colors.black
+                            : Colors.grey,
                       ),
                     ),
                     const Icon(Icons.calendar_today),
@@ -319,9 +344,15 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 ElevatedButton.icon(
                   onPressed: _saveLoan,
                   icon: const Icon(Icons.save),
-                  label: const Text('Registrar Préstamo', style: TextStyle(fontSize: 16)),
+                  label: const Text(
+                    'Registrar Préstamo',
+                    style: TextStyle(fontSize: 16),
+                  ),
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -330,7 +361,10 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                   icon: const Icon(Icons.cancel),
                   label: const Text('Cancelar', style: TextStyle(fontSize: 16)),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 15,
+                    ),
                   ),
                 ),
               ],
