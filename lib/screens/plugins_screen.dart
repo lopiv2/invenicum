@@ -409,7 +409,13 @@ class _PluginListView extends StatelessWidget {
   Widget _buildStacContent(BuildContext context, dynamic localUi, String? url) {
     // Caso A: Ya tenemos la UI (Plugins instalados)
     if (localUi != null) {
-      return Stac.fromJson(localUi, context) ?? const Icon(Icons.broken_image);
+      // 🚩 Verificamos si es un mapa y si contiene la llave 'ui'
+      final uiToRender = (localUi is Map && localUi.containsKey('ui'))
+          ? localUi['ui']
+          : localUi;
+
+      return Stac.fromJson(uiToRender, context) ??
+          const Icon(Icons.broken_image);
     }
 
     // Caso B: Es de la comunidad y hay que descargar la previa
@@ -422,7 +428,13 @@ class _PluginListView extends StatelessWidget {
             return const CircularProgressIndicator(strokeWidth: 2);
           }
           if (snapshot.hasData) {
-            return Stac.fromJson(snapshot.data, context) ??
+            final Map<String, dynamic> data =
+                snapshot.data as Map<String, dynamic>;
+
+            // Si el JSON viene con la nueva estructura, la UI está en la llave 'ui'
+            // Si no, asumimos que el JSON entero es la UI (compatibilidad)
+            final uiJson = data.containsKey('ui') ? data['ui'] : data;
+            return Stac.fromJson(uiJson, context) ??
                 const Icon(Icons.broken_image);
           }
           return const Icon(Icons.cloud_off, color: Colors.grey);

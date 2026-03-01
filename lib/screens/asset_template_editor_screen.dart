@@ -11,7 +11,8 @@ import 'package:invenicum/widgets/custom_field_editor.dart';
 import 'package:provider/provider.dart';
 
 class AssetTemplateEditorScreen extends StatefulWidget {
-  const AssetTemplateEditorScreen({super.key});
+  final AssetTemplate? initialDraft;
+  const AssetTemplateEditorScreen({super.key, this.initialDraft});
 
   @override
   State<AssetTemplateEditorScreen> createState() =>
@@ -32,6 +33,14 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
   @override
   void initState() {
     super.initState();
+    // 🚩 RELLENO DINÁMICO DESDE LA IA O VACÍO
+    if (widget.initialDraft != null) {
+      _nameController.text = widget.initialDraft!.name;
+      _descController.text = widget.initialDraft!.description;
+      _categoryController.text = widget.initialDraft!.category;
+      // Cargamos los campos que generó Veni
+      _fieldDefinitions = List.from(widget.initialDraft!.fields);
+    }
     // 🚩 AUTO-RELLENO DE GITHUB AL INICIAR
     final authProvider = context.read<AuthProvider>();
     if (authProvider.isGitHubLinked) {
@@ -127,6 +136,32 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
         child: ListView(
           padding: const EdgeInsets.all(24),
           children: [
+            // 🚀 BANNER DE IA: Solo aparece si venimos del Chatbot
+            if (widget.initialDraft != null)
+              Container(
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.auto_awesome, color: Colors.blue),
+                    const SizedBox(width: 16),
+                    const Expanded(
+                      child: Text(
+                        "Veni ha diseñado esta estructura basándose en tu solicitud. Revísala y ajústala antes de publicar.",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             _buildMainInfoSection(isLinked),
             const Divider(height: 48),
             _buildFieldsSection(),

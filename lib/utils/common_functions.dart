@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:invenicum/models/custom_field_definition.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
@@ -41,5 +42,17 @@ class AppUtils {
   /// 🎨 Genera un color a partir de un String (útil para Avatares)
   static Color stringToColor(String name) {
     return Color((name.hashCode & 0xFFFFFF) | 0xFF000000);
+  }
+
+    static CustomFieldType parseType(String? type) {
+    switch (type?.toLowerCase()) {
+      case 'number': return CustomFieldType.number;
+      case 'date': return CustomFieldType.date;
+      case 'boolean': return CustomFieldType.boolean;
+      case 'dropdown': return CustomFieldType.dropdown;
+      case 'url': return CustomFieldType.url;
+      case 'price': return CustomFieldType.price;
+      default: return CustomFieldType.text;
+    }
   }
 }

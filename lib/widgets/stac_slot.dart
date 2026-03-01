@@ -12,8 +12,6 @@ class StacSlot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<PluginProvider>(
       builder: (context, provider, child) {
-        // 1. Obtenemos TODOS los plugins de este slot (activos e inactivos)
-        // para que Flutter pueda animar la salida de los que se apagan.
         final slotPlugins = provider.installed
             .where((plugin) => plugin['slot'] == slotName)
             .toList();
@@ -23,25 +21,30 @@ class StacSlot extends StatelessWidget {
         return Column(
           children: slotPlugins.map((plugin) {
             final bool isActive = plugin['isActive'] ?? true;
+            
+            // 🚩 EXTRACCIÓN SEGURA DE LA UI
+            // Buscamos la propiedad 'ui' dentro del mapa. 
+            // Si 'plugin['ui']' es a su vez un mapa que contiene otra llave 'ui', la extraemos.
+            final dynamic rawUi = plugin['ui'];
+            final Map<String, dynamic>? uiToRender = (rawUi is Map<String, dynamic> && rawUi.containsKey('ui'))
+                ? rawUi['ui'] as Map<String, dynamic>
+                : (rawUi is Map<String, dynamic> ? rawUi : null);
 
-            // 2. Usamos AnimatedOpacity para el efecto de desvanecimiento
             return AnimatedOpacity(
               opacity: isActive ? 1.0 : 0.0,
               duration: const Duration(milliseconds: 500),
               curve: Curves.easeInOut,
-              // 3. Usamos AnimatedSize para que el hueco se cierre suavemente
               child: AnimatedSize(
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
                 child: IgnorePointer(
-                  ignoring: !isActive, // Si no está activo, no recibe clics
+                  ignoring: !isActive,
                   child: Container(
-                    // Si está inactivo, forzamos la altura a 0 para que el slot se cierre
                     height: isActive ? null : 0,
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child:
-                        Stac.fromJson(plugin['ui'], context) ??
-                        const Text("Error de renderizado"),
+                    child: uiToRender != null 
+                        ? (Stac.fromJson(uiToRender, context) ?? const Text("Error de renderizado"))
+                        : const Text("Formato de UI no válido"),
                   ),
                 ),
               ),

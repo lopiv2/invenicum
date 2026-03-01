@@ -121,7 +121,7 @@ class PluginProvider extends ChangeNotifier {
       final nuevosComunidad = await _service.getCommunityPlugins();
 
       // 1. Actualizamos instalados (contiene tanto comunidad como propios)
-      _installed = nuevosInstalados;
+      _installed = nuevosInstalados.map((p) => _normalize(p)).toList();
 
       // 2. 🚩 FILTRO DE UNICIDAD PARA COMUNIDAD
       // Esto permite presencia dual: si el plugin está en instalados,
@@ -141,6 +141,18 @@ class PluginProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Map<String, dynamic> _normalize(Map<String, dynamic> plugin) {
+    if (plugin['ui'] != null &&
+        plugin['ui'] is Map &&
+        plugin['ui'].containsKey('ui')) {
+      return {
+        ...plugin,
+        'ui': plugin['ui']['ui'], // Extraemos el nivel interno
+      };
+    }
+    return plugin;
   }
 
   // --- CRUD PARA AUTORES ---

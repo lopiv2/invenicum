@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/models/asset_template_model.dart';
+import 'package:invenicum/models/custom_field_definition_model.dart';
 import 'package:invenicum/services/veni_chatbot_service.dart';
+import 'package:invenicum/utils/common_functions.dart';
 import 'package:invenicum/widgets/typing_bubbles_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -74,7 +77,46 @@ class _VeniChatbotState extends State<VeniChatbot> {
         context.go(safePath); // Navega en el fondo sin cerrar el chat
       }
     }
-    // Añadir más acciones aquí...
+    if (action == 'CREATE_TEMPLATE') {
+      try {
+        // 🚀 Convertimos los datos crudos de Gemini al modelo que entiende el Editor
+        final draft = _mapAiDataToTemplate(data);
+
+        // Usamos push para que si el usuario cancela, vuelva a donde estaba
+        // o 'go' si prefieres sustituir la ruta de fondo
+        context.go('/templates/create', extra: draft);
+
+        // Opcional: Cerrar el chat automáticamente al navegar al editor
+        if (widget.onClose != null) widget.onClose!();
+      } catch (e) {
+        debugPrint("❌ Error parseando plantilla de IA: $e");
+      }
+    }
+  }
+
+  AssetTemplate _mapAiDataToTemplate(Map<String, dynamic> data) {
+    return AssetTemplate(
+      id: '', 
+      name: data['name'] ?? 'Nueva Plantilla Sugerida',
+      description: data['description'] ?? '',
+      category: data['category'] ?? '',
+      author: '', 
+      fields: (data['fields'] as List? ?? []).asMap().entries.map((entry) {
+        final f = entry.value;
+        final index = entry.key;
+        
+        return CustomFieldDefinition(
+          // 🚀 CRÍTICO: Asigna un ID temporal único. 
+          // Si el ID está vacío, el CustomFieldEditor no se dibujará bien.
+          id: DateTime.now().millisecondsSinceEpoch + index,
+          name: f['name'] ?? 'Campo',
+          type: AppUtils.parseType(f['type']),
+        );
+      }).toList(),
+      tags: [],
+      isPublic: true,
+      isOfficial: false,
+    );
   }
 
   void _scrollToBottom() {

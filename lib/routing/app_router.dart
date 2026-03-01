@@ -186,7 +186,17 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             routes: [
               GoRoute(
                 path: 'create',
-                builder: (context, state) => const AssetTemplateEditorScreen(),
+                builder: (context, state) {
+                  // 🛡️ Verificación robusta del objeto extra
+                  final Object? extra = state.extra;
+                  AssetTemplate? draft;
+
+                  if (extra is AssetTemplate) {
+                    draft = extra;
+                  }
+
+                  return AssetTemplateEditorScreen(initialDraft: draft);
+                },
               ),
               GoRoute(
                 path: 'details/:templateId',
