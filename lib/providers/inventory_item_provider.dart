@@ -1,15 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:invenicum/models/custom_field_definition_model.dart';
-import 'package:invenicum/models/inventory_item.dart';
-import 'package:invenicum/models/inventory_item_response.dart';
-import 'package:invenicum/models/price_history_point.dart';
-import 'package:invenicum/services/inventory_item_service.dart';
+import 'package:invenicum/data/models/custom_field_definition_model.dart';
+import 'package:invenicum/data/models/inventory_item.dart';
+import 'package:invenicum/data/models/inventory_item_response.dart';
+import 'package:invenicum/data/models/price_history_point.dart';
+import 'package:invenicum/data/services/asset_print_service.dart';
+import 'package:invenicum/data/services/inventory_item_service.dart';
 
 typedef FileData = List<Map<String, dynamic>>;
 
 class InventoryItemProvider with ChangeNotifier {
   final InventoryItemService _itemService;
+  final AssetPrintService _printService;
   bool _isDisposed = false;
 
   // --- Estado de Filtrado y Ordenamiento ---
@@ -25,6 +27,8 @@ class InventoryItemProvider with ChangeNotifier {
 
   String sortKey = 'name';
   bool sortAscending = true;
+  bool _isPrinting = false;
+  bool get isPrinting => _isPrinting;
 
   // --- Estado de Paginación ---
   int _currentPage = 1;
@@ -66,7 +70,7 @@ class InventoryItemProvider with ChangeNotifier {
   int _totalFilteredItems = 0;
   int get totalItems => _totalFilteredItems;
 
-  InventoryItemProvider(this._itemService);
+    InventoryItemProvider(this._itemService, this._printService);
 
   @override
   void dispose() {
@@ -396,35 +400,36 @@ class InventoryItemProvider with ChangeNotifier {
 
   // lib/providers/inventory_item_provider.dart
 
-Future<InventoryItem> updateAssetWithFiles( // Cambiamos void por Future<InventoryItem>
-  InventoryItem updatedItem, {
-  FileData filesToUpload = const [],
-  List<int> imageIdsToDelete = const [],
-}) async {
-  _isLoading = true;
-  notifyListeners();
-  try {
-    // 1. Actualizamos
-    final result = await _itemService.updateInventoryItem(
-      updatedItem,
-      filesToUpload: filesToUpload,
-      imageIdsToDelete: imageIdsToDelete,
-    );
-
-    // 2. Recargamos localmente
-    await loadInventoryItems(
-      containerId: updatedItem.containerId,
-      assetTypeId: updatedItem.assetTypeId,
-      forceReload: true,
-    );
-    
-    return result; // Devolvemos el item fresco del servidor
-  } catch (e) {
-    _isLoading = false;
+  Future<InventoryItem> updateAssetWithFiles(
+    // Cambiamos void por Future<InventoryItem>
+    InventoryItem updatedItem, {
+    FileData filesToUpload = const [],
+    List<int> imageIdsToDelete = const [],
+  }) async {
+    _isLoading = true;
     notifyListeners();
-    rethrow;
+    try {
+      // 1. Actualizamos
+      final result = await _itemService.updateInventoryItem(
+        updatedItem,
+        filesToUpload: filesToUpload,
+        imageIdsToDelete: imageIdsToDelete,
+      );
+
+      // 2. Recargamos localmente
+      await loadInventoryItems(
+        containerId: updatedItem.containerId,
+        assetTypeId: updatedItem.assetTypeId,
+        forceReload: true,
+      );
+
+      return result; // Devolvemos el item fresco del servidor
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
-}
 
   Future<void> deleteInventoryItem(
     int itemId,
@@ -488,6 +493,20 @@ Future<InventoryItem> updateAssetWithFiles( // Cambiamos void por Future<Invento
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> printLabel(String assetId) async {
+    _isPrinting = true;
+    notifyListeners();
+
+    final success = await _printService.printAssetLabel(assetId);
+
+    _isPrinting = false;
+    notifyListeners();
+
+    if (!success) {
+      // Aquí podrías disparar un mensaje de error
     }
   }
 

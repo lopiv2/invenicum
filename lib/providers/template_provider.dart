@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/models/asset_template_model.dart';
-import '../services/template_service.dart';
+import 'package:invenicum/data/models/asset_template_model.dart';
+import '../data/services/template_service.dart';
 
 class TemplateProvider with ChangeNotifier {
   final TemplateService _service;

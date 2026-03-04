@@ -4,21 +4,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/data/services/asset_print_service.dart';
 import 'package:invenicum/providers/achievement_provider.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/providers/template_provider.dart';
-import 'package:invenicum/services/achievements_service.dart';
-import 'package:invenicum/services/integrations_service.dart';
-import 'package:invenicum/services/plugin_service.dart';
-import 'package:invenicum/services/template_service.dart';
-import 'package:invenicum/services/veni_chatbot_service.dart';
+import 'package:invenicum/data/services/achievements_service.dart';
+import 'package:invenicum/data/services/integrations_service.dart';
+import 'package:invenicum/data/services/plugin_service.dart';
+import 'package:invenicum/data/services/template_service.dart';
+import 'package:invenicum/data/services/veni_chatbot_service.dart';
 import 'package:provider/provider.dart';
 
 // Localizations & Routing
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:toastification/toastification.dart';
-import 'routing/app_router.dart';
+import 'core/routing/app_router.dart';
 
 // Providers
 import 'package:invenicum/providers/alert_provider.dart';
@@ -32,17 +33,18 @@ import 'package:invenicum/providers/dashboard_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 
 // Services
-import 'package:invenicum/services/api_service.dart';
-import 'package:invenicum/services/alert_service.dart';
-import 'package:invenicum/services/asset_type_service.dart';
-import 'package:invenicum/services/container_service.dart';
-import 'package:invenicum/services/inventory_item_service.dart';
-import 'package:invenicum/services/loan_service.dart';
-import 'package:invenicum/services/location_service.dart';
-import 'package:invenicum/services/theme_service.dart';
-import 'package:invenicum/services/voucher_service.dart';
-import 'package:invenicum/services/dashboard_service.dart';
-import 'package:invenicum/services/preferences_service.dart';
+import 'package:invenicum/data/services/api_service.dart';
+import 'package:invenicum/data/services/alert_service.dart';
+import 'package:invenicum/data/services/asset_type_service.dart';
+import 'package:invenicum/data/services/container_service.dart';
+import 'package:invenicum/data/services/inventory_item_service.dart';
+import 'package:invenicum/data/services/loan_service.dart';
+import 'package:invenicum/data/services/location_service.dart';
+import 'package:invenicum/data/services/theme_service.dart';
+import 'package:invenicum/data/services/voucher_service.dart';
+import 'package:invenicum/data/services/dashboard_service.dart';
+import 'package:invenicum/data/services/preferences_service.dart';
+import 'package:invenicum/data/services/report_service.dart';
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -95,6 +97,10 @@ void main() async {
         Provider(create: (c) => IntegrationService(c.read<ApiService>())),
         Provider(create: (c) => TemplateService(c.read<ApiService>())),
         Provider(create: (c) => AchievementService(c.read<ApiService>())),
+        Provider(create: (c) => ReportService(c.read<ApiService>())),
+        Provider(create: (c) => AssetPrintService(c.read<ApiService>())),
+
+
         // --- PROVEEDORES DE ESTADO ---
 
         // Auth es la raíz de la lógica
@@ -182,7 +188,7 @@ void main() async {
 
         // --- Items ---
         ChangeNotifierProxyProvider<AuthProvider, InventoryItemProvider>(
-          create: (c) => InventoryItemProvider(c.read<InventoryItemService>()),
+          create: (c) => InventoryItemProvider(c.read<InventoryItemService>(), c.read<AssetPrintService>()),
           update: (context, auth, prev) {
             if (!auth.isLoading && auth.isAuthenticated && auth.token != null) {
               // 🚩 Añadimos la misma lógica: solo si está vacío

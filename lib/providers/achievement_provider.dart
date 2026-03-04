@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/models/achievements_model.dart';
-import 'package:invenicum/services/achievements_service.dart';
-import 'package:invenicum/utils/constants.dart';
+import 'package:invenicum/data/models/achievements_model.dart';
+import 'package:invenicum/data/services/achievements_service.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:intl/intl.dart';
 
 class AchievementProvider with ChangeNotifier {

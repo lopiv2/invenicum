@@ -700,6 +700,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get renameContainer => 'Rename Container';
 
   @override
+  String get reports => 'Reports';
+
+  @override
   String get returned => 'Returned';
 
   @override

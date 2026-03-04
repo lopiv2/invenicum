@@ -1360,6 +1360,12 @@ abstract class AppLocalizations {
   /// **'Rename Container'**
   String get renameContainer;
 
+  /// No description provided for @reports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get reports;
+
   /// No description provided for @returned.
   ///
   /// In en, this message translates to:

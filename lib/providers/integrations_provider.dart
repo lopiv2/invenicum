@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/services/integrations_service.dart';
+import 'package:invenicum/data/services/integrations_service.dart';
 
 class IntegrationProvider with ChangeNotifier {
   final IntegrationService _service;

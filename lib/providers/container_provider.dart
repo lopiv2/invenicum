@@ -1,11 +1,11 @@
 import 'package:flutter/foundation.dart';
-import 'package:invenicum/models/asset_type_model.dart';
-import 'package:invenicum/models/container_node.dart';
-import 'package:invenicum/models/custom_field_definition_model.dart';
-import 'package:invenicum/models/list_data.dart';
-import 'package:invenicum/services/asset_type_service.dart';
-import 'package:invenicum/services/container_service.dart';
-import 'package:invenicum/services/location_service.dart';
+import 'package:invenicum/data/models/asset_type_model.dart';
+import 'package:invenicum/data/models/container_node.dart';
+import 'package:invenicum/data/models/custom_field_definition_model.dart';
+import 'package:invenicum/data/models/list_data.dart';
+import 'package:invenicum/data/services/asset_type_service.dart';
+import 'package:invenicum/data/services/container_service.dart';
+import 'package:invenicum/data/services/location_service.dart';
 import 'package:flutter/material.dart';
 
 class ContainerProvider with ChangeNotifier {

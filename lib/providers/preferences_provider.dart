@@ -1,9 +1,9 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:invenicum/models/notifications_preferences_model.dart';
-import 'package:invenicum/models/user_preferences.dart';
-import 'package:invenicum/services/preferences_service.dart';
+import 'package:invenicum/data/models/notifications_preferences_model.dart';
+import 'package:invenicum/data/models/user_preferences.dart';
+import 'package:invenicum/data/services/preferences_service.dart';
 
 class PreferencesProvider with ChangeNotifier {
   final PreferencesService _preferencesService;

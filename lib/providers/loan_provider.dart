@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/models/loan.dart';
+import 'package:invenicum/data/models/loan.dart';
 import 'package:invenicum/providers/alert_provider.dart';
-import 'package:invenicum/services/loan_service.dart';
+import 'package:invenicum/data/services/loan_service.dart';
 
 class LoanProvider extends ChangeNotifier {
   final LoanService _loanService;

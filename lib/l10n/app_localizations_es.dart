@@ -705,6 +705,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get renameContainer => 'Renombrar Contenedor';
 
   @override
+  String get reports => 'Informes';
+
+  @override
   String get returned => 'Devuelto';
 
   @override

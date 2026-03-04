@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/services/theme_service.dart';
-import '../models/custom_theme_model.dart';
+import 'package:invenicum/data/services/theme_service.dart';
+import '../data/models/custom_theme_model.dart';
 
 class ThemeProvider with ChangeNotifier {
   final ThemeService _themeService;

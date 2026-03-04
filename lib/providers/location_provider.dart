@@ -2,9 +2,9 @@
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
-import 'package:invenicum/models/location.dart';
+import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/providers/container_provider.dart';
-import 'package:invenicum/services/location_service.dart';
+import 'package:invenicum/data/services/location_service.dart';
 import 'package:provider/provider.dart';
 
 /// Un Provider (ChangeNotifier) para manejar el estado de las Ubicaciones.

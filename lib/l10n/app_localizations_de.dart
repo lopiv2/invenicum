@@ -705,6 +705,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get renameContainer => 'Behälter umbenennen';
 
   @override
+  String get reports => 'Berichte';
+
+  @override
   String get returned => 'Zurückgegeben';
 
   @override

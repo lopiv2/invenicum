@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/models/dashboard_stats.dart';
-import '../services/dashboard_service.dart';
+import 'package:invenicum/data/models/dashboard_stats.dart';
+import '../data/services/dashboard_service.dart';
 
 class DashboardProvider with ChangeNotifier {
   final DashboardService _service;

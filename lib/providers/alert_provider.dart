@@ -1,7 +1,7 @@
 // lib/providers/alert_provider.dart
 import 'package:flutter/material.dart';
-import '../models/alert.dart';
-import '../services/alert_service.dart';
+import '../data/models/alert.dart';
+import '../data/services/alert_service.dart';
 
 class AlertProvider with ChangeNotifier {
   final AlertService _alertService;

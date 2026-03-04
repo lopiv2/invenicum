@@ -705,6 +705,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get renameContainer => 'Renomear recipiente';
 
   @override
+  String get reports => 'Relatórios';
+
+  @override
   String get returned => 'Retornado';
 
   @override
