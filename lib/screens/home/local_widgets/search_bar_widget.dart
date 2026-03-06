@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart'; // <--- ESTA LÍNEA CORRIGE EL ERROR
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/providers/container_provider.dart';
@@ -124,13 +125,14 @@ class _InvenicumSearchBarState extends State<InvenicumSearchBar> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return CompositedTransformTarget(
       link: _layerLink,
       child: TextField(
         controller: _controller,
         onChanged: _onSearchChanged,
         decoration: InputDecoration(
-          hintText: 'Buscar contenedores o activos...',
+          hintText: l10n.lookForContainersOrAssets, // 👈 Traducción: Buscar contenedores o activos...
           suffixIcon: _isSearching
               ? const Padding(
                   padding: EdgeInsets.all(12.0),

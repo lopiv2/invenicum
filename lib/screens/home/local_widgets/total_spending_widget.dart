@@ -125,7 +125,7 @@ class TotalSpendingWidget extends StatelessWidget {
           Icon(Icons.history_edu_rounded, color: Colors.greenAccent, size: 14),
           SizedBox(width: 6),
           Text(
-            l10.adquisition,
+            l10.adquisition.toUpperCase(),
             style: TextStyle(
               color: Colors.white,
               fontSize: 10,

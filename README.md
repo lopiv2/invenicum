@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logos/invenicum_logo_no_font.png" width="150" alt="Invenicum Logo">
+  <img src="assets/images/invenicum_logo.png" width="150" alt="Invenicum Logo">
 </p>
 
 <h1 align="center">INVENICUM</h1>

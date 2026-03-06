@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Active'**
   String get active;
 
+  /// No description provided for @actives.
+  ///
+  /// In en, this message translates to:
+  /// **'Actives'**
+  String get actives;
+
   /// No description provided for @activeInsight.
   ///
   /// In en, this message translates to:
@@ -249,6 +255,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get all;
+
+  /// No description provided for @allUpToDateStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'All up to date'**
+  String get allUpToDateStatus;
 
   /// No description provided for @appTitle.
   ///
@@ -838,6 +850,12 @@ abstract class AppLocalizations {
   /// **'Formats: PNG, JPG'**
   String get formatsPNG;
 
+  /// No description provided for @forToday.
+  ///
+  /// In en, this message translates to:
+  /// **'For today'**
+  String get forToday;
+
   /// No description provided for @geminiLabelModel.
   ///
   /// In en, this message translates to:
@@ -933,6 +951,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error: Invalid navigation IDs.'**
   String get invalidNavigationIds;
+
+  /// No description provided for @inventoryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory'**
+  String get inventoryLabel;
 
   /// No description provided for @january.
   ///
@@ -1054,6 +1078,18 @@ abstract class AppLocalizations {
   /// **'Logout'**
   String get logout;
 
+  /// No description provided for @lookForContainersOrAssets.
+  ///
+  /// In en, this message translates to:
+  /// **'Look for containers or assets...'**
+  String get lookForContainersOrAssets;
+
+  /// No description provided for @lowStockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Low Stock'**
+  String get lowStockTitle;
+
   /// No description provided for @magicAssistant.
   ///
   /// In en, this message translates to:
@@ -1077,6 +1113,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Min stock'**
   String get minStock;
+
+  /// No description provided for @myAchievements.
+  ///
+  /// In en, this message translates to:
+  /// **'My Achievements'**
+  String get myAchievements;
 
   /// No description provided for @myCustomTheme.
   ///
@@ -1234,6 +1276,12 @@ abstract class AppLocalizations {
   /// **'October'**
   String get october;
 
+  /// No description provided for @optimalStockStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Stock at optimal levels'**
+  String get optimalStockStatus;
+
   /// No description provided for @optional.
   ///
   /// In en, this message translates to:
@@ -1378,6 +1426,12 @@ abstract class AppLocalizations {
   /// **'Rename Container'**
   String get renameContainer;
 
+  /// No description provided for @responsibleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Responsible'**
+  String get responsibleLabel;
+
   /// No description provided for @reports.
   ///
   /// In en, this message translates to:
@@ -1389,6 +1443,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Returned'**
   String get returned;
+
+  /// No description provided for @returnsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Returns'**
+  String get returnsLabel;
 
   /// No description provided for @rowsPerPageTitle.
   ///
@@ -1635,6 +1695,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This field is required.'**
   String get thisFieldIsRequired;
+
+  /// No description provided for @topDemanded.
+  ///
+  /// In en, this message translates to:
+  /// **'Top Demanded'**
+  String get topDemanded;
 
   /// No description provided for @topLoanedItems.
   ///

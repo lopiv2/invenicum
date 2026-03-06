@@ -27,17 +27,39 @@ class _VeniChatbotState extends State<VeniChatbot> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final chatService = Provider.of<ChatService>(context, listen: false);
-      await chatService.loadRemoteHistory();
-      if (chatService.messages.isEmpty) {
-        chatService.addMessage(
-          AppLocalizations.of(context)!.veniChatWelcome,
-          false,
+    _initializeChat();
+  }
+
+  Future<void> _initializeChat() async {
+    // 1. Obtenemos el service
+    final chatService = Provider.of<ChatService>(context, listen: false);
+
+    // 2. Cargamos el historial de la base de datos
+    await chatService.loadRemoteHistory();
+
+    // 3. Verificamos si realmente está vacío
+    if (chatService.messages.isEmpty && mounted) {
+      // Pequeño delay de seguridad para asegurar que la UI está lista
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      final String currentLocale = Localizations.localeOf(context).languageCode;
+
+      if (mounted) setState(() => _isLoading = true);
+
+      try {
+        await chatService.sendMessageToVeni(
+          message:
+              "SAY_HELLO_INITIAL", // 👈 Este comando dispara la lógica en el back
+          locale: currentLocale,
+          contextData: {'currentPath': widget.initialPath ?? '/dashboard'},
         );
+      } catch (e) {
+        debugPrint("Error en saludo inicial: $e");
+      } finally {
+        if (mounted) setState(() => _isLoading = false);
       }
-      _scrollToBottom();
-    });
+    }
+    _scrollToBottom();
   }
 
   void _sendMessage() async {
@@ -45,6 +67,7 @@ class _VeniChatbotState extends State<VeniChatbot> {
     if (text.isEmpty || _isLoading) return;
 
     final chatService = Provider.of<ChatService>(context, listen: false);
+    final String currentLocale = Localizations.localeOf(context).languageCode;
     setState(() {
       _isLoading = true;
       _controller.clear();
@@ -55,6 +78,7 @@ class _VeniChatbotState extends State<VeniChatbot> {
       final String currentFullLocation = widget.initialPath ?? '/dashboard';
       final response = await chatService.sendMessageToVeni(
         message: text,
+        locale: currentLocale,
         contextData: {'currentPath': currentFullLocation},
       );
 
@@ -96,17 +120,17 @@ class _VeniChatbotState extends State<VeniChatbot> {
 
   AssetTemplate _mapAiDataToTemplate(Map<String, dynamic> data) {
     return AssetTemplate(
-      id: '', 
+      id: '',
       name: data['name'] ?? 'Nueva Plantilla Sugerida',
       description: data['description'] ?? '',
       category: data['category'] ?? '',
-      author: '', 
+      author: '',
       fields: (data['fields'] as List? ?? []).asMap().entries.map((entry) {
         final f = entry.value;
         final index = entry.key;
-        
+
         return CustomFieldDefinition(
-          // 🚀 CRÍTICO: Asigna un ID temporal único. 
+          // 🚀 CRÍTICO: Asigna un ID temporal único.
           // Si el ID está vacío, el CustomFieldEditor no se dibujará bien.
           id: DateTime.now().millisecondsSinceEpoch + index,
           name: f['name'] ?? 'Campo',

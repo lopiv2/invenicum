@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/models/top_loaned_items.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class TopDemandedItemsWidget extends StatelessWidget {
   final List<TopLoanedItem> items;
@@ -14,43 +15,47 @@ class TopDemandedItemsWidget extends StatelessWidget {
 
     final int maxLoans = items.first.count;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.05),
-            blurRadius: 30,
-            offset: const Offset(0, 10),
+            // Sombra más marcada para dar profundidad
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
+            blurRadius: 40,
+            offset: const Offset(0, 15),
           ),
         ],
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15), // Blur ligeramente superior
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Colors.white.withOpacity(0.15),
+                // Borde más definido
+                color: (isDark ? Colors.white : Colors.blue.shade900).withValues(alpha: 0.12),
                 width: 1.5,
               ),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  (isDark ? Colors.black : Colors.white).withOpacity(0.7),
-                  (isDark ? Colors.blueGrey.shade900 : Colors.blue.shade50).withOpacity(0.4),
+                  // Colores más opacos (0.85 y 0.6) para que no sea tan transparente
+                  (isDark ? Colors.grey.shade900 : Colors.white).withValues(alpha: 0.85),
+                  (isDark ? Colors.black : Colors.blue.shade50).withValues(alpha: 0.6),
                 ],
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Cabecera Estilo Dashboard
+                // Cabecera
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -58,22 +63,22 @@ class TopDemandedItemsWidget extends StatelessWidget {
                       children: [
                         _buildIconBadge(),
                         const SizedBox(width: 12),
-                        const Text(
-                          "TOP DEMANDADOS",
+                        Text(
+                          l10n.topDemanded.toUpperCase(),
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
-                            letterSpacing: 1.5,
+                            letterSpacing: 1.2,
+                            color: isDark ? Colors.white : Colors.blueGrey.shade800,
                           ),
                         ),
                       ],
                     ),
-                    _buildLiveBadge(),
                   ],
                 ),
                 const SizedBox(height: 24),
                 
-                // Lista de Items con Barras de Diseño
+                // Lista de Items
                 ListView.separated(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -96,7 +101,7 @@ class TopDemandedItemsWidget extends StatelessWidget {
                               Text(
                                 "#${index + 1}",
                                 style: TextStyle(
-                                  color: Colors.blue.withOpacity(0.6),
+                                  color: Colors.blue.shade600,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 12,
                                 ),
@@ -119,9 +124,9 @@ class TopDemandedItemsWidget extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 4),
-                              const Text(
-                                "préstamos",
-                                style: TextStyle(fontSize: 10, color: Colors.grey),
+                              Text(
+                                l10n.loans.toLowerCase(),
+                                style: const TextStyle(fontSize: 10, color: Colors.grey),
                               ),
                             ],
                           ),
@@ -140,71 +145,54 @@ class TopDemandedItemsWidget extends StatelessWidget {
     );
   }
 
-  // Badge del Icono Principal
+  // Badge de Icono Principal
   Widget _buildIconBadge() {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: Colors.blue.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(10),
       ),
       child: const Icon(Icons.auto_graph_rounded, color: Colors.blue, size: 20),
     );
   }
 
-  // Badge de "En Vivo" o Status
-  Widget _buildLiveBadge() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.greenAccent.withOpacity(0.5)),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: const Row(
-        children: [
-          CircleAvatar(radius: 3, backgroundColor: Colors.greenAccent),
-          SizedBox(width: 6),
-          Text(
-            "LIVE",
-            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.greenAccent),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Barra de progreso estilo Neón / Glass
+  // Barra de progreso con visibilidad mejorada
   Widget _buildModernProgressBar(double progress) {
-    return Stack(
-      children: [
-        Container(
-          height: 6,
-          width: double.infinity,
-          decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        AnimatedContainer(
-          duration: const Duration(seconds: 1),
-          curve: Curves.easeOutCubic,
-          height: 6,
-          width: 300 * progress, // La animación se vería mejor con LayoutBuilder, simplificado aquí
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            gradient: const LinearGradient(
-              colors: [Colors.blue, Colors.cyanAccent],
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.withOpacity(0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Stack(
+          children: [
+            Container(
+              height: 8, // Ligeramente más gruesa
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.blueGrey.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
               ),
-            ],
-          ),
-        ),
-      ],
+            ),
+            AnimatedContainer(
+              duration: const Duration(seconds: 1),
+              curve: Curves.easeOutCubic,
+              height: 8,
+              width: constraints.maxWidth * progress,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                gradient: const LinearGradient(
+                  colors: [Colors.blue, Colors.cyan],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withValues(alpha: 0.3),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

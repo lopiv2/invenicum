@@ -111,7 +111,7 @@ class TotalMarketValueWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      l10n.totalMarketValue,
+                      l10n.totalMarketValue.toUpperCase(),
                       style: TextStyle(
                         color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 14,

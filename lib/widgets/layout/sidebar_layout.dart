@@ -14,7 +14,7 @@ class SidebarLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final String location = GoRouterState.of(context).uri.toString();
-
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       width: 260,
       decoration: BoxDecoration(
@@ -60,7 +60,7 @@ class SidebarLayout extends StatelessWidget {
                 SidebarNavButton(
                   icon: Icons.emoji_events_outlined,
                   title:
-                      "Mis Logros", // O usa AppLocalizations.of(context)!.achievements si ya tienes el string
+                      l10n.myAchievements, // O usa AppLocalizations.of(context)!.achievements si ya tienes el string
                   selected: location == '/achievements',
                   onTap: () => context.go('/achievements'),
                 ),

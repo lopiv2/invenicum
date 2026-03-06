@@ -15,6 +15,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get active => 'Activo';
 
   @override
+  String get actives => 'Activos';
+
+  @override
   String get activeInsight => 'INFORMACION DE ACTIVOS VIGENTES';
 
   @override
@@ -82,6 +85,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get all => 'Todos';
+
+  @override
+  String get allUpToDateStatus => 'Todo al día';
 
   @override
   String get appTitle => 'Invenicum Inventario';
@@ -430,6 +436,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formatsPNG => 'Formatos: PNG, JPG';
 
   @override
+  String get forToday => 'Para hoy';
+
+  @override
   String get geminiLabelModel =>
       'Modelo Gemini recomendado: gemini-3-flash-preview';
 
@@ -482,6 +491,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get invalidNavigationIds => 'Error: IDs de navegación no válidos.';
+
+  @override
+  String get inventoryLabel => 'Inventario';
 
   @override
   String get january => 'Enero';
@@ -548,6 +560,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get logout => 'Cerrar sesión';
 
   @override
+  String get lookForContainersOrAssets => 'Buscar contenedores o activos...';
+
+  @override
+  String get lowStockTitle => 'Stock Bajo';
+
+  @override
   String get magicAssistant => 'Asistente Mágico IA';
 
   @override
@@ -558,6 +576,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get minStock => 'Stock mínimo';
+
+  @override
+  String get myAchievements => 'Mis Logros';
 
   @override
   String get myCustomTheme => 'Mi Tema';
@@ -642,6 +663,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get october => 'Octubre';
 
   @override
+  String get optimalStockStatus => 'Stock en niveles óptimos';
+
+  @override
   String get optional => 'Opcional';
 
   @override
@@ -715,10 +739,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get renameContainer => 'Renombrar Contenedor';
 
   @override
+  String get responsibleLabel => 'Responsable';
+
+  @override
   String get reports => 'Informes';
 
   @override
   String get returned => 'Devuelto';
+
+  @override
+  String get returnsLabel => 'Devoluciones';
 
   @override
   String get rowsPerPageTitle => 'Activos por página:';
@@ -848,6 +878,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get thisFieldIsRequired => 'Este campo es obligatorio.';
+
+  @override
+  String get topDemanded => 'Top Demandados';
 
   @override
   String get topLoanedItems => 'Productos más prestados por meses';

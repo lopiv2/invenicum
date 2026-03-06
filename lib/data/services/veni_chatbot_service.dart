@@ -44,29 +44,37 @@ class ChatService extends ChangeNotifier {
 
   Future<VeniResponse?> sendMessageToVeni({
     required String message,
+    required String locale, // 👈 Nuevo parámetro obligatorio
     Map<String, dynamic>? contextData,
   }) async {
     // 1. Añadimos localmente para feedback instantáneo
-    _messages.add({'text': message, 'isUser': true});
-    notifyListeners();
+    // Evitamos duplicar si es el comando de saludo inicial
+    if (message != "SAY_HELLO_INITIAL") {
+      _messages.add({'text': message, 'isUser': true});
+      notifyListeners();
+    }
 
     try {
+      // 2. Combinamos el contexto existente con el locale
+      final Map<String, dynamic> finalContext = {
+        ...?contextData,
+        'locale': locale, // 👈 Enviamos 'es', 'en', etc.
+      };
+
       final response = await _apiService.dio.post(
         '/ai/chat/veni',
-        data: {'message': message, 'context': contextData},
+        data: {'message': message, 'context': finalContext},
       );
 
       if (response.statusCode == 200) {
         final veniRes = VeniResponse.fromJson(response.data);
 
-        // La lista se actualizará porque el backend guardó ambos mensajes
-        // y nosotros los añadimos aquí para la UI
         _messages.add({'text': veniRes.answer, 'isUser': false});
         notifyListeners();
         return veniRes;
       }
     } catch (e) {
-      debugPrint("Error: $e");
+      debugPrint("Error en ChatService: $e");
     }
     return null;
   }

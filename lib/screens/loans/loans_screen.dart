@@ -274,7 +274,7 @@ class _LoansScreenState extends State<LoansScreen> {
         children: [
           if (isLoading) const LinearProgressIndicator(),
           if (loanProvider.currentStats != null)
-            _buildQuickStats(loanProvider.currentStats!),
+            _buildQuickStats(loanProvider.currentStats!, l10n),
           // Filtros
           Padding(
             padding: const EdgeInsets.all(16.0),
@@ -427,15 +427,15 @@ class _LoansScreenState extends State<LoansScreen> {
     );
   }
 
-  Widget _buildQuickStats(Map<String, dynamic> stats) {
+  Widget _buildQuickStats(Map<String, dynamic> stats, AppLocalizations l10n) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           _statItem("Total", stats['totalLoans']),
-          _statItem("Activos", stats['activeLoans'], color: Colors.orange),
-          _statItem("Vencidos", stats['overdueLoans'], color: Colors.red),
+          _statItem(l10n.actives, stats['activeLoans'], color: Colors.orange),
+          _statItem(l10n.overdue, stats['overdueLoans'], color: Colors.red),
         ],
       ),
     );

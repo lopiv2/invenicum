@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:invenicum/data/models/user_data_model.dart';
+import 'package:invenicum/data/services/veni_chatbot_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/environment.dart';
 import '../models/login_response.dart';
@@ -255,5 +256,8 @@ class ApiService {
     _cachedToken = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(Environment.authTokenKey);
+    ChatService veniChatbotService = ChatService(this);
+    veniChatbotService
+        .clearHistory(); // Limpiamos el historial del chatbot al cerrar sesión
   }
 }
