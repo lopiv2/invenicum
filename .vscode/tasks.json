@@ -1,0 +1,10 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Flutter Web LAN",
+      "type": "shell",
+      "command": "flutter run -d web-server --web-hostname 0.0.0.0 --web-port 5555 --dart-define=API_URL=http://192.168.1.43:3000"
+    }
+  ]
+}

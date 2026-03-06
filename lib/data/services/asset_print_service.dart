@@ -9,12 +9,18 @@ class AssetPrintService {
   AssetPrintService(this._apiService);
 
   /// Llama al backend (Node.js) para obtener el PDF y lanzarlo a la impresora
-  Future<bool> printAssetLabel(String assetId) async {
+  Future<bool> printAssetLabel(
+    String assetId, {
+    double width = 50.0,
+    double height = 30.0,
+  }) async {
     try {
       // 1. Pedimos el PDF al backend
       // Usamos responseType: ResponseType.bytes porque recibimos un archivo, no un JSON
       final response = await _dio.get(
         '/items/$assetId/print-label',
+        // 💡 Enviamos las dimensiones al Backend
+        queryParameters: {'width': width, 'height': height},
         options: Options(responseType: ResponseType.bytes),
       );
 

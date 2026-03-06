@@ -8,6 +8,8 @@ class BentoPrintTile extends StatelessWidget {
   final VoidCallback? onPrint;
   final bool isPrinting;
   final bool showButton;
+  final double widthMm;
+  final double heightMm;
 
   const BentoPrintTile({
     super.key,
@@ -15,40 +17,48 @@ class BentoPrintTile extends StatelessWidget {
     this.onPrint,
     this.isPrinting = false,
     this.showButton = true,
+    this.widthMm = 50, // Valores por defecto
+    this.heightMm = 30,
   });
 
   @override
   Widget build(BuildContext context) {
-    // 1. Definimos la tarjeta con un diseño que NO dependa de Expanded
+    // 2. Ajustamos el diseño visual basándonos en si es una etiqueta pequeña o grande
+    final isSmall = widthMm < 40;
+
     final labelContent = Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(
+          8,
+        ), // Bordes más rectos para simular papel
+        border: Border.all(
+          color: Colors.grey.shade300,
+          width: 0.5,
+        ), // Guía de corte
       ),
       child: Row(
-        // Usamos crossAxisAlignment para que no intente medir alturas infinitas
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           QrImageView(
             data: 'invenicum://asset/${item.id}',
             version: QrVersions.auto,
-            size: 80.0,
+            size: isSmall
+                ? 50.0
+                : 80.0, // El QR se encoge en etiquetas pequeñas
           ),
           const SizedBox(width: 12),
-          // IMPORTANTE: En lugar de Flexible/Expanded puro, usamos un SizedBox 
-          // o limitamos el ancho del texto para ayudar al motor de renderizado
           SizedBox(
-            width: 180, // Ancho fijo para el área de texto
+            width: 180,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   item.name,
-                  style: const TextStyle(
-                    fontSize: 12,
+                  style: TextStyle(
+                    fontSize: isSmall ? 10 : 12,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -57,7 +67,10 @@ class BentoPrintTile extends StatelessWidget {
                 ),
                 Text(
                   "ID: #${item.id}",
-                  style: TextStyle(fontSize: 10, color: Colors.grey.shade700),
+                  style: TextStyle(
+                    fontSize: isSmall ? 8 : 10,
+                    color: Colors.grey.shade700,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 _buildSizeBadge(),
@@ -86,14 +99,19 @@ class BentoPrintTile extends StatelessWidget {
 
   Widget _buildSizeBadge() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: Colors.grey.shade100,
         borderRadius: BorderRadius.circular(4),
       ),
-      child: const Text(
-        "50x30mm Standard",
-        style: TextStyle(fontSize: 8, fontWeight: FontWeight.w600),
+      child: Text(
+        // 3. Texto dinámico basado en los mm seleccionados
+        "${widthMm.toInt()}x${heightMm.toInt()}mm ${widthMm > 60 ? 'Large' : 'Standard'}",
+        style: const TextStyle(
+          fontSize: 8,
+          fontWeight: FontWeight.w600,
+          color: Colors.blueGrey,
+        ),
       ),
     );
   }
@@ -107,10 +125,16 @@ class BentoPrintTile extends StatelessWidget {
           elevation: 0,
           backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
           foregroundColor: Theme.of(context).primaryColor,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
         ),
         child: isPrinting
-            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2))
+            ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
             : const Text("IMPRIMIR AHORA"),
       ),
     );

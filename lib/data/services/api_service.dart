@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:invenicum/data/models/user_data_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../config/environment.dart';
 import '../models/login_response.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
   final Dio dio = Dio();
-  final _storage = const FlutterSecureStorage();
 
   // 🚀 MEMORIA SÍNCRONA: El secreto para ganar la carrera de milisegundos.
   String? _cachedToken;
@@ -37,10 +36,11 @@ class ApiService {
           }
           return handler.next(options);
         },
-        onError: (e, handler) {
+        onError: (e, handler) async {
           if (e.response?.statusCode == 401) {
             _cachedToken = null;
-            _storage.delete(key: Environment.authTokenKey);
+            final prefs = await SharedPreferences.getInstance();
+            await prefs.remove(Environment.authTokenKey);
             if (onUnauthorized != null) {
               onUnauthorized!();
             }
@@ -208,10 +208,9 @@ class ApiService {
       final loginResponse = LoginResponse.fromJson(responseData);
 
       if (loginResponse.success && loginResponse.token != null) {
-        // 🔑 PRIMERO en memoria (instantáneo para las siguientes peticiones)
         _cachedToken = loginResponse.token;
-        // 🔑 SEGUNDO en disco (asíncrono, no bloquea el flujo)
-        _storage.write(key: Environment.authTokenKey, value: _cachedToken!);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(Environment.authTokenKey, _cachedToken!);
       }
       return loginResponse;
     } on DioException catch (e) {
@@ -224,14 +223,18 @@ class ApiService {
 
   // 🚩 REEMPLAZO: Este método se llama UNA SOLA VEZ al arrancar la app (en main.dart)
   Future<void> initializeToken() async {
-    _cachedToken = await _storage.read(key: Environment.authTokenKey);
+    final prefs = await SharedPreferences.getInstance();
+    _cachedToken = prefs.getString(Environment.authTokenKey);
   }
 
   // Getter síncrono para los Providers
   String? get currentToken => _cachedToken;
 
-  Future<String?> getToken() async =>
-      _cachedToken ?? await _storage.read(key: Environment.authTokenKey);
+  Future<String?> getToken() async {
+    if (_cachedToken != null) return _cachedToken;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(Environment.authTokenKey);
+  }
 
   Future<UserData?> getMe() async {
     try {
@@ -242,12 +245,15 @@ class ApiService {
     }
   }
 
-  Future<bool> isAuthenticated() async =>
-      _cachedToken != null ||
-      (await _storage.read(key: Environment.authTokenKey)) != null;
+  Future<bool> isAuthenticated() async {
+    if (_cachedToken != null) return true;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(Environment.authTokenKey) != null;
+  }
 
   Future<void> logout() async {
     _cachedToken = null;
-    await _storage.delete(key: Environment.authTokenKey);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(Environment.authTokenKey);
   }
 }

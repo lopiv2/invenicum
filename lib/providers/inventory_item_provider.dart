@@ -70,7 +70,7 @@ class InventoryItemProvider with ChangeNotifier {
   int _totalFilteredItems = 0;
   int get totalItems => _totalFilteredItems;
 
-    InventoryItemProvider(this._itemService, this._printService);
+  InventoryItemProvider(this._itemService, this._printService);
 
   @override
   void dispose() {
@@ -496,17 +496,27 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
-  Future<void> printLabel(String assetId) async {
+  // Añadimos parámetros opcionales con valores por defecto (50x30)
+  Future<void> printLabel(
+    String assetId, {
+    double width = 50.0,
+    double height = 30.0,
+  }) async {
     _isPrinting = true;
     notifyListeners();
 
-    final success = await _printService.printAssetLabel(assetId);
+    // Pasamos las dimensiones al servicio
+    final success = await _printService.printAssetLabel(
+      assetId,
+      width: width,
+      height: height,
+    );
 
     _isPrinting = false;
     notifyListeners();
 
     if (!success) {
-      // Aquí podrías disparar un mensaje de error
+      // ToastService.error("No se pudo generar la etiqueta");
     }
   }
 

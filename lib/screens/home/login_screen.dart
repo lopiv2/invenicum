@@ -40,8 +40,18 @@ class _LoginScreenState extends State<LoginScreen> {
           // Pequeña pausa para mostrar el mensaje de éxito
           await Future.delayed(const Duration(seconds: 1));
 
+          // 🚩 LEER LA RUTA DE REDIRECCIÓN
+          final state = GoRouterState.of(context);
+          final redirectTo = state.uri.queryParameters['redirectTo'];
+
           if (mounted) {
-            context.go('/dashboard');
+            if (redirectTo != null && redirectTo.isNotEmpty) {
+              // 🚀 ¡Vamos al ítem del QR!
+              context.go(redirectTo);
+            } else {
+              // Flujo normal
+              context.go('/dashboard');
+            }
           }
         } else {
           ToastService.error(result.message);
@@ -65,7 +75,22 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    
+    final auth = context.watch<AuthProvider>();
+
+    // 👇 Banner de Carga de app
+    if (auth.isLoading) {
+      return Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -73,14 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: isDarkMode
-                ? [
-                    const Color(0xFF0A0E27),
-                    const Color(0xFF1a1f3a),
-                  ]
-                : [
-                    const Color(0xFF667eea),
-                    const Color(0xFF764ba2),
-                  ],
+                ? [const Color(0xFF0A0E27), const Color(0xFF1a1f3a)]
+                : [const Color(0xFF667eea), const Color(0xFF764ba2)],
           ),
         ),
         child: Stack(
@@ -169,9 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       Container(
                         constraints: const BoxConstraints(maxWidth: 380),
                         decoration: BoxDecoration(
-                          color: isDarkMode
-                              ? Colors.grey[900]
-                              : Colors.white,
+                          color: isDarkMode ? Colors.grey[900] : Colors.white,
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
@@ -199,7 +216,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       : Colors.black87,
                                 ),
                                 decoration: InputDecoration(
-                                  labelText: AppLocalizations.of(context)!.username,
+                                  labelText: AppLocalizations.of(
+                                    context,
+                                  )!.username,
                                   labelStyle: TextStyle(
                                     color: isDarkMode
                                         ? Colors.grey[400]
@@ -245,8 +264,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!
-                                        .pleaseEnterUsername;
+                                    return AppLocalizations.of(
+                                      context,
+                                    )!.pleaseEnterUsername;
                                   }
                                   return null;
                                 },
@@ -264,7 +284,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       : Colors.black87,
                                 ),
                                 decoration: InputDecoration(
-                                  labelText: AppLocalizations.of(context)!.password,
+                                  labelText: AppLocalizations.of(
+                                    context,
+                                  )!.password,
                                   labelStyle: TextStyle(
                                     color: isDarkMode
                                         ? Colors.grey[400]
@@ -327,8 +349,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     _isLoading ? null : _login(),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return AppLocalizations.of(context)!
-                                        .pleaseEnterPassword;
+                                    return AppLocalizations.of(
+                                      context,
+                                    )!.pleaseEnterPassword;
                                   }
                                   return null;
                                 },
@@ -342,9 +365,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onPressed: _isLoading ? null : _login,
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF667eea),
-                                    disabledBackgroundColor:
-                                        const Color(0xFF667eea)
-                                            .withValues(alpha: 0.5),
+                                    disabledBackgroundColor: const Color(
+                                      0xFF667eea,
+                                    ).withValues(alpha: 0.5),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                     ),
@@ -358,8 +381,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                             strokeWidth: 2.5,
                                             valueColor:
                                                 AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
+                                                  Colors.white,
+                                                ),
                                           ),
                                         )
                                       : Text(

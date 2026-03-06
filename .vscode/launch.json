@@ -1,31 +1,34 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-        
-        {
-            "name": "Flutter Development",
-            "request": "launch",
-            "type": "dart",
-            "args": [
-                "--dart-define=API_URL=http://localhost:3000",
-                "--web-port", "5555",
-            ]
-        },
-        {
-            "name": "Flutter Staging",
-            "request": "launch",
-            "type": "dart",
-            "args": [
-                "--dart-define=API_URL=https://staging-api.tudominio.com"
-            ]
-        },
-        {
-            "name": "Flutter Production",
-            "request": "launch",
-            "type": "dart",
-            "args": [
-                "--dart-define=API_URL=https://api.tudominio.com"
-            ]
-        }
-    ]
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter Web LAN",
+      "type": "node",
+      "request": "launch",
+      "preLaunchTask": "Flutter Web LAN",
+      "program": "${workspaceFolder}/lib/main.dart"
+    },
+    {
+      "name": "Flutter Development",
+      "request": "launch",
+      "type": "dart",
+      "args": [
+        "--dart-define=API_URL=http://localhost:3000",
+        "--web-port",
+        "5555"
+      ]
+    },
+    {
+      "name": "Flutter Staging",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--dart-define=API_URL=https://staging-api.tudominio.com"]
+    },
+    {
+      "name": "Flutter Production",
+      "request": "launch",
+      "type": "dart",
+      "args": ["--dart-define=API_URL=https://api.tudominio.com"]
+    }
+  ]
 }

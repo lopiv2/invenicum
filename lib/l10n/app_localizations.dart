@@ -118,6 +118,12 @@ abstract class AppLocalizations {
   /// **'Active'**
   String get active;
 
+  /// No description provided for @activeInsight.
+  ///
+  /// In en, this message translates to:
+  /// **'ACTIVE ASSETS INSIGHTS'**
+  String get activeInsight;
+
   /// No description provided for @activeLoans.
   ///
   /// In en, this message translates to:
@@ -165,6 +171,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Additional Thumbnails'**
   String get additionalThumbnails;
+
+  /// No description provided for @adquisition.
+  ///
+  /// In en, this message translates to:
+  /// **'ADQUISITION'**
+  String get adquisition;
 
   /// No description provided for @aiExtractionError.
   ///
@@ -345,6 +357,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Barcode (UPC)'**
   String get barCode;
+
+  /// No description provided for @baseCostAccumulatedWithoutInflation.
+  ///
+  /// In en, this message translates to:
+  /// **'Base cost accumulated without inflation'**
+  String get baseCostAccumulatedWithoutInflation;
 
   /// No description provided for @borrowerEmail.
   ///
@@ -1641,6 +1659,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Totals'**
   String get totals;
+
+  /// No description provided for @totalSpending.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Economic Investment'**
+  String get totalSpending;
+
+  /// No description provided for @totalMarketValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Market Value'**
+  String get totalMarketValue;
 
   /// No description provided for @updatedAt.
   ///

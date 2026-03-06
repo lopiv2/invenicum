@@ -58,31 +58,13 @@ void main() async {
 
   // 1. Inicialización previa de Auth
   final authProvider = AuthProvider();
-  await authProvider.checkAuthStatus();
+  //await authProvider.checkAuthStatus();
 
   runApp(
     MultiProvider(
       providers: [
         // --- SERVICIOS (Singletons) ---
-        Provider<ApiService>(
-          create: (c) {
-            final api = ApiService();
-            // 🚩 CONEXIÓN: Le decimos a la API que cuando haya un 401,
-            // ejecute el logout del authProvider que inicializaste arriba.
-            api.onUnauthorized = () {
-              authProvider.logout();
-
-              // Opcional: Mostrar un aviso global
-              toastification.show(
-                type: ToastificationType.error,
-                title: const Text('Sesión expirada'),
-                description: const Text('Por favor, ingresa de nuevo.'),
-                autoCloseDuration: const Duration(seconds: 5),
-              );
-            };
-            return api;
-          },
-        ),
+        Provider<ApiService>(create: (c) => ApiService()),
         Provider(create: (c) => PluginService(c.read<ApiService>())),
         Provider(create: (c) => DashboardService(c.read<ApiService>())),
         Provider(create: (c) => ThemeService(c.read<ApiService>())),
@@ -99,7 +81,6 @@ void main() async {
         Provider(create: (c) => AchievementService(c.read<ApiService>())),
         Provider(create: (c) => ReportService(c.read<ApiService>())),
         Provider(create: (c) => AssetPrintService(c.read<ApiService>())),
-
 
         // --- PROVEEDORES DE ESTADO ---
 
@@ -188,7 +169,10 @@ void main() async {
 
         // --- Items ---
         ChangeNotifierProxyProvider<AuthProvider, InventoryItemProvider>(
-          create: (c) => InventoryItemProvider(c.read<InventoryItemService>(), c.read<AssetPrintService>()),
+          create: (c) => InventoryItemProvider(
+            c.read<InventoryItemService>(),
+            c.read<AssetPrintService>(),
+          ),
           update: (context, auth, prev) {
             if (!auth.isLoading && auth.isAuthenticated && auth.token != null) {
               // 🚩 Añadimos la misma lógica: solo si está vacío

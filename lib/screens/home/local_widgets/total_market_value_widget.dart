@@ -1,8 +1,8 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/widgets/ui/price_display_widget.dart';
-import 'package:provider/provider.dart';
-// 🔑 Ya no necesitas importar intl aquí, PriceDisplayWidget se encarga
+
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class TotalMarketValueWidget extends StatelessWidget {
   final double marketValue;
@@ -16,77 +16,156 @@ class TotalMarketValueWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final prefsProvider = context.watch<PreferencesProvider>();
-
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [Colors.indigo.shade800, Colors.blue.shade600],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        // Sutil sombra de color para dar profundidad sin ensuciar
+        boxShadow: [
+          BoxShadow(
+            color: Colors.indigo.withValues(alpha:0.15),
+            blurRadius: 30,
+            offset: const Offset(0, 10),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Row(
-              children: [
-                Icon(Icons.trending_up, color: Colors.white70, size: 20),
-                SizedBox(width: 8),
-                Text(
-                  'Valor de Mercado Total',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 500),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: Colors.white.withValues(alpha:0.1),
+                width: 1.5,
+              ),
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.primary.withValues(alpha:0.9),
+                  theme.colorScheme.primaryContainer.withValues(alpha:0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
-            const SizedBox(height: 12),
-            if (isLoading)
-              const SizedBox(
-                height: 34,
-                child: Center(
-                  child: SizedBox(
-                    height: 20,
-                    width: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
+            child: Stack(
+              children: [
+                // Círculo decorativo de fondo (Aura cool)
+                Positioned(
+                  right: -20,
+                  top: -20,
+                  child: Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha:0.05),
                     ),
                   ),
                 ),
-              )
-            else
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                child: PriceDisplayWidget(
-                  value: marketValue,
-                  // 🔑 Personalizamos el estilo para que se vea grande y blanco
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha:0.1),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(
+                                Icons.auto_graph_rounded,
+                                color: Colors.white,
+                                size: 14,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                l10n.activeInsight,
+                                style: TextStyle(
+                                  color: Colors.white.withValues(alpha:0.9),
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        // Badge de porcentaje o estatus (Opcional)
+                        Icon(
+                          Icons.more_horiz,
+                          color: Colors.white.withValues(alpha:0.5),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      l10n.totalMarketValue,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontSize: 14,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    if (isLoading)
+                      _buildLoader()
+                    else
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: PriceDisplayWidget(
+                          value: marketValue,
+                          style: const TextStyle(
+                            fontSize: 36, // Más grande, más impacto
+                            fontWeight: FontWeight.w900,
+                            color: Colors.white,
+                            letterSpacing: -1,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    Divider(color: Colors.white.withValues(alpha:0.1), height: 1),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.greenAccent,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              ),
-            const SizedBox(height: 4),
-            Text(
-              'Convertido a ${prefsProvider.selectedCurrency} (Precios actuales)',
-              style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
-                fontSize: 11,
-              ),
+              ],
             ),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildLoader() {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 8),
+      child: LinearProgressIndicator(
+        backgroundColor: Colors.white10,
+        color: Colors.white30,
+        minHeight: 2,
       ),
     );
   }

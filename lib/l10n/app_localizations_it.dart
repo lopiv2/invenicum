@@ -15,6 +15,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get active => 'Attivo';
 
   @override
+  String get activeInsight => 'ACTIVE ASSETS INSIGHTS';
+
+  @override
   String get activeLoans => 'Prestiti attivi';
 
   @override
@@ -37,6 +40,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get additionalThumbnails => 'Miniature aggiuntive';
+
+  @override
+  String get adquisition => 'ADQUISITION';
 
   @override
   String aiExtractionError(String error) {
@@ -134,6 +140,10 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get barCode => 'Barcode (UPC)';
+
+  @override
+  String get baseCostAccumulatedWithoutInflation =>
+      'Base cost accumulated without inflation';
 
   @override
   String get borrowerEmail => 'Email mutuatario';
@@ -849,6 +859,12 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get totals => 'Totali';
+
+  @override
+  String get totalSpending => 'Total Economic Investment';
+
+  @override
+  String get totalMarketValue => 'Total Market Value';
 
   @override
   String get updatedAt => 'Last Update';

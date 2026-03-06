@@ -62,27 +62,38 @@ GoRouter createAppRouter(AuthProvider authProvider) {
     initialLocation: '/dashboard',
     redirect: (context, state) {
       final authProvider = context.read<AuthProvider>();
-      final loggingIn = state.matchedLocation == '/login';
+      // 🚩 ESTO ES VITAL: Si está leyendo el token del disco,
+      // no redirigimos a ningún lado todavía.
+      if (authProvider.isLoading) return null;
 
-      // 1. 🚩 CAPTURA DE CÓDIGO GITHUB (Nivel Global)
-      // Buscamos el código tanto en GoRouter como en la URL de la ventana (antes del #)
+      final isAuthenticated = authProvider.isAuthenticated;
+      final isLoggingIn = state.matchedLocation == '/login';
+
+      // --- LÓGICA GITHUB (Mantenla como la tienes) ---
       final uri = Uri.parse(html.window.location.href);
       final String? githubCode =
           state.uri.queryParameters['code'] ?? uri.queryParameters['code'];
-
-      // Si detectamos un código y estamos logueados, forzamos ir a perfil para procesarlo
       if (githubCode != null &&
-          authProvider.isAuthenticated &&
+          isAuthenticated &&
           state.matchedLocation != '/myprofile') {
         return '/myprofile?code=$githubCode';
       }
 
-      if (!authProvider.isAuthenticated && !loggingIn) {
-        return '/login';
+      // --- LÓGICA DE PERSISTENCIA Y QR ---
+
+      // Si NO está logueado y NO va a login (ej: viene del QR)
+      if (!isAuthenticated && !isLoggingIn) {
+        // Guardamos la ruta del QR (ej: /container/1/asset-types/5...)
+        final fromLocation = state.uri.toString();
+        // Lo mandamos al login pero con el destino guardado
+        return '/login?redirectTo=${Uri.encodeComponent(fromLocation)}';
       }
 
-      if (authProvider.isAuthenticated && loggingIn) {
-        return '/dashboard';
+      // Si se acaba de loguear y está en la pantalla de login
+      if (isAuthenticated && isLoggingIn) {
+        // ¿Teníamos un destino pendiente del QR?
+        final redirectTo = state.uri.queryParameters['redirectTo'];
+        return redirectTo ?? '/dashboard';
       }
 
       return null;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:toastification/toastification.dart';
 import '../data/models/user_data_model.dart';
 import '../data/models/login_response.dart';
 import '../data/services/api_service.dart';
@@ -8,7 +9,7 @@ class AuthProvider with ChangeNotifier {
 
   UserData? _user;
   String? _token;
-  bool _isLoading = false;
+  bool _isLoading = true;
 
   // Getters
   UserData? get user => _user;
@@ -28,7 +29,55 @@ class AuthProvider with ChangeNotifier {
     _apiService.onUnauthorized = () {
       // Si la API detecta un 401, ejecutamos la limpieza local
       _handleSessionExpired();
+      // ✅ El toast aquí también
+      toastification.show(
+        type: ToastificationType.error,
+        title: const Text('Sesión expirada'),
+        description: const Text('Por favor, ingresa de nuevo.'),
+        autoCloseDuration: const Duration(seconds: 5),
+      );
     };
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    notifyListeners();
+    try {
+      notifyListeners();
+
+      await _apiService.initializeToken();
+
+      // Ver todo el contenido del storage
+      notifyListeners();
+
+      if (_apiService.currentToken != null) {
+        notifyListeners();
+
+        final userData = await _apiService.getMe().timeout(
+          const Duration(seconds: 5),
+          onTimeout: () {
+            notifyListeners();
+            return null;
+          },
+        );
+
+        notifyListeners();
+
+        if (userData != null) {
+          _user = userData;
+          _token = _apiService.currentToken;
+        } else {
+          await _apiService.logout();
+        }
+      }
+    } catch (e) {
+      debugPrint("❌ Error: $e");
+      notifyListeners();
+    } finally {
+      debugPrint("5️⃣ _initialize terminó");
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void _handleSessionExpired() {

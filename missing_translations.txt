@@ -1,10 +1,13 @@
 {
   "de": [
+    "activeInsight",
     "additionalInformation",
+    "adquisition",
     "assetDetail",
     "assetNotFound",
     "averageMarketValue",
     "barCode",
+    "baseCostAccumulatedWithoutInflation",
     "createdAt",
     "currency",
     "geminiLabelModel",
@@ -31,15 +34,20 @@
     "slotLeftSidebar",
     "slotUnknown",
     "templates",
+    "totalSpending",
+    "totalMarketValue",
     "updatedAt"
   ],
 
   "fr": [
+    "activeInsight",
     "additionalInformation",
+    "adquisition",
     "assetDetail",
     "assetNotFound",
     "averageMarketValue",
     "barCode",
+    "baseCostAccumulatedWithoutInflation",
     "createdAt",
     "currency",
     "geminiLabelModel",
@@ -66,15 +74,20 @@
     "slotLeftSidebar",
     "slotUnknown",
     "templates",
+    "totalSpending",
+    "totalMarketValue",
     "updatedAt"
   ],
 
   "it": [
+    "activeInsight",
     "additionalInformation",
+    "adquisition",
     "assetDetail",
     "assetNotFound",
     "averageMarketValue",
     "barCode",
+    "baseCostAccumulatedWithoutInflation",
     "createdAt",
     "currency",
     "geminiLabelModel",
@@ -101,15 +114,20 @@
     "slotLeftSidebar",
     "slotUnknown",
     "templates",
+    "totalSpending",
+    "totalMarketValue",
     "updatedAt"
   ],
 
   "pt": [
+    "activeInsight",
     "additionalInformation",
+    "adquisition",
     "assetDetail",
     "assetNotFound",
     "averageMarketValue",
     "barCode",
+    "baseCostAccumulatedWithoutInflation",
     "createdAt",
     "currency",
     "geminiLabelModel",
@@ -136,6 +154,8 @@
     "slotLeftSidebar",
     "slotUnknown",
     "templates",
+    "totalSpending",
+    "totalMarketValue",
     "updatedAt"
   ]
 }

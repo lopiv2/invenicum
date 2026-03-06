@@ -86,26 +86,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
               return Column(
                 children: [
                   // 1. Widget de Inversión
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TotalSpendingWidget(
-                          amount: stats.totalValue,
-                          isLoading: false,
+                  IntrinsicHeight(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TotalSpendingWidget(
+                            amount: stats.totalValue,
+                            isLoading: false,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Consumer<InventoryItemProvider>(
-                          builder: (context, itemProvider, child) {
-                            return TotalMarketValueWidget(
-                              marketValue: itemProvider.totalMarketValue,
-                              isLoading: itemProvider.isMarketValueLoading,
-                            );
-                          },
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Consumer<InventoryItemProvider>(
+                            builder: (context, itemProvider, child) {
+                              return TotalMarketValueWidget(
+                                marketValue: itemProvider.totalMarketValue,
+                                isLoading: itemProvider.isMarketValueLoading,
+                              );
+                            },
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
 

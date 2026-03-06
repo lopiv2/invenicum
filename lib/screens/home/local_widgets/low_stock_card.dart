@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:provider/provider.dart';
@@ -14,155 +15,201 @@ class _LowStockCardState extends State<LowStockCard> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final provider = Provider.of<InventoryItemProvider>(
-        context,
-        listen: false,
-      );
-      // Llamamos al método que acabamos de arreglar
-      provider.loadAllItemsGlobal();
+      Provider.of<InventoryItemProvider>(context, listen: false).loadAllItemsGlobal();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Consumer<InventoryItemProvider>(
       builder: (context, itemProvider, child) {
-        if (itemProvider.isLoading) {
-          return const Card(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Center(child: CircularProgressIndicator()),
-            ),
-          );
-        }
+        if (itemProvider.isLoading) return _buildLoadingState(isDark);
 
         final items = itemProvider.inventoryItems;
+        final lowStockItems = items.where((item) => item.quantity < item.minStock).toList();
 
-        if (items.isEmpty) {
-          return const Card(child: Text("No se encontraron artículos"));
-        }
-
-        final lowStockItems = items
-            .where((item) => item.quantity < (item.minStock))
-            .toList();
-
-        return Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.orange.withOpacity(0.08),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize:
-                  MainAxisSize.min, // Importante para evitar errores de scroll
-              children: [
-                Row(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(
+                    color: Colors.orange.withOpacity(0.2),
+                    width: 1.5,
+                  ),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      (isDark ? Colors.black : Colors.white).withOpacity(0.8),
+                      Colors.orange.withOpacity(0.05),
+                    ],
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: Colors.orange.shade600,
-                      size: 28,
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      'Stock Bajo (${lowStockItems.length})',
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    _buildHeader(lowStockItems.length),
+                    const SizedBox(height: 24),
+                    if (lowStockItems.isEmpty)
+                      _buildEmptyState()
+                    else
+                      ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: lowStockItems.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          final item = lowStockItems[index];
+                          return _buildStockItem(item, isDark);
+                        },
                       ),
-                    ),
                   ],
                 ),
-                const SizedBox(height: 16),
-
-                if (lowStockItems.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    child: Center(
-                      child: Text(
-                        '✅ Todo el stock está en niveles óptimos',
-                        style: TextStyle(
-                          color: Colors.green.shade600,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  // 3. Limitamos el tamaño del ListView para que no rompa el Dashboard
-                  ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: lowStockItems.length,
-                    separatorBuilder: (context, index) =>
-                        Divider(height: 1, color: Colors.grey.shade300),
-                    itemBuilder: (context, index) {
-                      final item = lowStockItems[index];
-                      final double minStock = item.minStock.toDouble();
-                      final double quantity = item.quantity.toDouble();
-
-                      // Evitar división por cero
-                      final stockPercentage = minStock > 0
-                          ? (quantity / minStock * 100).clamp(0.0, 100.0)
-                          : 0.0;
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    item.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w600,
-                                      fontSize: 14,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Text(
-                                  '${item.quantity}/$minStock',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: stockPercentage < 50
-                                        ? Colors.red.shade600
-                                        : Colors.orange.shade600,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: stockPercentage / 100,
-                                minHeight: 6,
-                                backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  stockPercentage < 50
-                                      ? Colors.red.shade600
-                                      : Colors.orange.shade600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-              ],
+              ),
             ),
           ),
         );
       },
+    );
+  }
+
+  Widget _buildHeader(int count) {
+    return Row(
+      children: [
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: Colors.orange.withOpacity(0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                "INVENTARIO",
+                style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 1.5, color: Colors.grey),
+              ),
+              Text(
+                "Stock Bajo ($count)",
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStockItem(dynamic item, bool isDark) {
+    final double minStock = item.minStock.toDouble();
+    final double quantity = item.quantity.toDouble();
+    final double percentage = minStock > 0 ? (quantity / minStock).clamp(0.0, 1.0) : 0.0;
+    final Color itemColor = percentage < 0.5 ? Colors.redAccent : Colors.orangeAccent;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                item.name,
+                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${item.quantity}',
+                    style: TextStyle(color: itemColor, fontWeight: FontWeight.w900, fontSize: 15),
+                  ),
+                  TextSpan(
+                    text: ' / $minStock',
+                    style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        _buildProgressBar(percentage, itemColor, isDark),
+      ],
+    );
+  }
+
+  Widget _buildProgressBar(double value, Color color, bool isDark) {
+    return Stack(
+      children: [
+        Container(
+          height: 6,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        FractionallySizedBox(
+          widthFactor: value,
+          child: Container(
+            height: 6,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              gradient: LinearGradient(colors: [color, color.withOpacity(0.6)]),
+              boxShadow: [BoxShadow(color: color.withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 2))],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.check_circle_outline, color: Colors.greenAccent, size: 18),
+            const SizedBox(width: 8),
+            Text("Stock en niveles óptimos", style: TextStyle(color: Colors.green.withOpacity(0.8), fontWeight: FontWeight.w600)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingState(bool isDark) {
+    return Container(
+      height: 150,
+      decoration: BoxDecoration(color: isDark ? Colors.white : Colors.black, borderRadius: BorderRadius.circular(24)),
+      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
     );
   }
 }
