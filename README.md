@@ -2,8 +2,6 @@
   <img src="assets/images/invenicum_logo.png" width="150" alt="Invenicum Logo">
 </p>
 
-<h1 align="center">INVENICUM</h1>
-
 <p align="center">
   <strong>The intelligent open-source core for your personal collections.</strong><br>
   Manage, track, and organize with AI power, keeping your data strictly private.
