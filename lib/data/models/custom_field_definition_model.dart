@@ -10,9 +10,9 @@ class CustomFieldDefinition {
   final int? dataListId;
   final List<String>? options;
   // 🔑 CAMPOS PARA SUMATORIOS, CONTADORES Y VALOR ECONÓMICO
-  final bool isSummable;  // Para acumulados físicos (ej: kg, litros)
+  final bool isSummable; // Para acumulados físicos (ej: kg, litros)
   final bool isCountable; // Para contar cuántos items tienen este campo
-  final bool isMonetary;  // 💰 NUEVO: Para valor económico real (Precio, Costo)
+  final bool isMonetary; // 💰 NUEVO: Para valor económico real (Precio, Costo)
 
   const CustomFieldDefinition({
     this.id,
@@ -69,15 +69,23 @@ class CustomFieldDefinition {
     }
 
     return CustomFieldDefinition(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id']?.toString() ?? ''),
+      id: json['id'] is int
+          ? json['id']
+          : int.tryParse(json['id']?.toString() ?? ''),
       name: json['name'] as String,
       type: CustomFieldTypeExtension.fromString(json['type'] as String),
-      isRequired: json['isRequired'] as bool? ?? json['is_required'] as bool? ?? false,
+      isRequired:
+          json['isRequired'] as bool? ?? json['is_required'] as bool? ?? false,
       dataListId: json['dataListId'] ?? json['data_list_id'],
       options: parsedOptions,
-      isSummable: json['isSummable'] as bool? ?? json['is_summable'] as bool? ?? false,
-      isCountable: json['isCountable'] as bool? ?? json['is_countable'] as bool? ?? false,
-      isMonetary: json['isMonetary'] as bool? ?? json['is_monetary'] as bool? ?? false,
+      isSummable:
+          json['isSummable'] as bool? ?? json['is_summable'] as bool? ?? false,
+      isCountable:
+          json['isCountable'] as bool? ??
+          json['is_countable'] as bool? ??
+          false,
+      isMonetary:
+          json['isMonetary'] as bool? ?? json['is_monetary'] as bool? ?? false,
     );
   }
 
@@ -95,7 +103,23 @@ class CustomFieldDefinition {
       if (isCountable) 'isCountable': true,
       if (isMonetary) 'isMonetary': true,
       if (dataListId != null) 'dataListId': dataListId,
+      if (options != null && options!.isNotEmpty) 'options': options,
       // No solemos enviar 'options' al crear AssetType porque el back usa dataListId
+    };
+  }
+
+  Map<String, dynamic> toMarketplaceJson() {
+    return {
+      'name': name,
+      'type': type.dbName,
+      'isRequired': isRequired,
+      'isSummable': isSummable,
+      'isMonetary': isMonetary,
+      'isCountable': isCountable,
+      // Enviamos las opciones solo si es dropdown
+      'options': (type == CustomFieldType.dropdown) ? (options ?? []) : null,
+      // 🚩 IMPORTANTE: Aquí NO mandamos 'id' ni 'dataListId'
+      // porque en otro contenedor esos IDs no existirán.
     };
   }
 }

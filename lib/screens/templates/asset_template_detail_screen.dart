@@ -235,6 +235,12 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
           separatorBuilder: (_, __) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final field = _template!.fields[index];
+            String optionsText = "";
+            if (field.type == CustomFieldType.dropdown &&
+                field.options != null &&
+                field.options!.isNotEmpty) {
+              optionsText = " (${field.options!.join(', ')})";
+            }
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
@@ -254,9 +260,29 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          field.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        // 🚩 Nombre del campo + opciones (si existen)
+                        RichText(
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: [
+                              TextSpan(
+                                text: field.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              if (optionsText.isNotEmpty)
+                                TextSpan(
+                                  text: optionsText,
+                                  style: TextStyle(
+                                    color: Colors.indigo.shade400,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w400,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                            ],
+                          ),
                         ),
                         Text(
                           field.type.name.toUpperCase(),

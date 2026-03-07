@@ -60,23 +60,24 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
   @override
   void didUpdateWidget(covariant CustomFieldEditor oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.field != oldWidget.field) {
+  super.didUpdateWidget(oldWidget);
+  
+  if (widget.field != oldWidget.field) {
+    
+    if (_nameController.text != widget.field.name) {
       _nameController.removeListener(_onNameChanged);
-
-      // Sincronización de todos los estados locales
       _nameController.text = widget.field.name;
-      _selectedType = widget.field.type;
-      _isRequired = widget.field.isRequired;
-      _selectedListDataId = widget.field.dataListId;
-      // 🔑 Sincronización de los nuevos estados
-      _isSummable = widget.field.isSummable;
-      _isCountable = widget.field.isCountable;
-      _isMonetary = widget.field.isMonetary;
-
       _nameController.addListener(_onNameChanged);
     }
+
+    _selectedType = widget.field.type;
+    _isRequired = widget.field.isRequired;
+    _selectedListDataId = widget.field.dataListId;
+    _isSummable = widget.field.isSummable;
+    _isCountable = widget.field.isCountable;
+    _isMonetary = widget.field.isMonetary;
   }
+}
 
   void _onNameChanged() {
     setState(() {}); // Solo actualiza la cabecera del campo

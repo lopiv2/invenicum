@@ -51,7 +51,13 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
   void _addNewField() {
     setState(() {
       _fieldDefinitions.add(
-        CustomFieldDefinition(name: 'Nuevo Campo', type: CustomFieldType.text),
+        CustomFieldDefinition(
+          // Generamos un ID temporal para que ValueKey funcione correctamente
+          id: DateTime.now().millisecondsSinceEpoch,
+          name: '',
+          type: CustomFieldType.text,
+          options: [], // Inicializamos la lista vacía
+        ),
       );
     });
   }
@@ -248,23 +254,147 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
             child: Text("Haz clic en 'Añadir Campo' para empezar a diseñar."),
           ),
         ..._fieldDefinitions.asMap().entries.map((entry) {
+          final index = entry.key;
+          final field = entry.value;
           return Padding(
             padding: const EdgeInsets.only(bottom: 12.0),
-            child: CustomFieldEditor(
-              key: ValueKey(entry.value.id),
-              field: entry.value,
-              availableDataLists: const [],
-              onDelete: () =>
-                  setState(() => _fieldDefinitions.removeAt(entry.key)),
-              onUpdate: (updated) {
-                // Actualizamos sin reconstruir agresivamente si es posible
-                _fieldDefinitions[entry.key] = updated;
-              },
+            child: Column(
+              children: [
+                CustomFieldEditor(
+                  key: ValueKey(field.id ?? index),
+                  field: field,
+                  availableDataLists: const [],
+                  onDelete: () =>
+                      setState(() => _fieldDefinitions.removeAt(entry.key)),
+                  onUpdate: (updated) {
+                    // 1. Actualizamos el dato en la lista (esto mantiene la lógica)
+                    _fieldDefinitions[index] = updated;
+
+                    if (field.type != updated.type) {
+                      setState(() {});
+                    }
+                  },
+                ),
+                if (field.type == CustomFieldType.dropdown)
+                  _buildOptionsEditor(index, field),
+              ],
             ),
           );
         }),
       ],
     );
+  }
+
+  Widget _buildOptionsEditor(int fieldIndex, CustomFieldDefinition field) {
+    final TextEditingController _optionController = TextEditingController();
+
+    return Container(
+      margin: const EdgeInsets.only(top: 4, left: 8, right: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.withOpacity(0.05),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
+        border: Border.all(color: Colors.blueGrey.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.list, size: 16, color: Colors.blueGrey),
+              SizedBox(width: 8),
+              Text(
+                "CONFIGURAR OPCIONES",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 11,
+                  color: Colors.blueGrey,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          if (field.options != null && field.options!.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 4,
+                children: field.options!.asMap().entries.map((optEntry) {
+                  return InputChip(
+                    label: Text(
+                      optEntry.value,
+                      style: const TextStyle(fontSize: 12),
+                    ),
+                    onDeleted: () {
+                      final newOptions = List<String>.from(field.options!);
+                      newOptions.removeAt(optEntry.key);
+                      setState(() {
+                        _fieldDefinitions[fieldIndex] = field.copyWith(
+                          options: newOptions,
+                        );
+                      });
+                    },
+                    backgroundColor: Colors.white,
+                    deleteIconColor: Colors.redAccent,
+                  );
+                }).toList(),
+              ),
+            ),
+          Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 40,
+                  child: TextField(
+                    controller: _optionController,
+                    style: const TextStyle(fontSize: 14),
+                    decoration: const InputDecoration(
+                      hintText: "Escribe una opción y pulsa Intro",
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                      border: OutlineInputBorder(),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                    onSubmitted: (val) =>
+                        _addOption(fieldIndex, field, val, _optionController),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              IconButton.filledTonal(
+                onPressed: () => _addOption(
+                  fieldIndex,
+                  field,
+                  _optionController.text,
+                  _optionController,
+                ),
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addOption(
+    int index,
+    CustomFieldDefinition field,
+    String value,
+    TextEditingController controller,
+  ) {
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return;
+
+    final newOptions = List<String>.from(field.options ?? []);
+    if (!newOptions.contains(trimmed)) {
+      newOptions.add(trimmed);
+      setState(() {
+        _fieldDefinitions[index] = field.copyWith(options: newOptions);
+      });
+    }
+    controller.clear();
   }
 
   Widget _buildSaveButtons(bool isLinked) {

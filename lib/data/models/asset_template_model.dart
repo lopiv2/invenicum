@@ -62,30 +62,35 @@ class AssetTemplate {
   }
 
   Map<String, dynamic> toJson() {
-  return {
-    'id': id,
-    'name': name,
-    'description': description,
-    'category': category,
-    'tags': tags,
-    'author': author, // 🚩 Antes era author_name
-    'authorAvatarUrl': authorAvatarUrl, // 🚩 Antes era author_avatar_url
-    'downloadUrl': downloadUrl, // 🚩 Antes era download_url
-    'fields': fields.map((f) => f.toJson()).toList(),
-    'isOfficial': isOfficial, // 🚩 Antes era is_official
-    'isPublic': isPublic,
-    'downloadCount': downloadCount,
-    'createdAt': createdAt?.toIso8601String(),
-    'updatedAt': updatedAt?.toIso8601String(),
-  };
-}
-
-  Map<String, dynamic> toAssetTypeJson(int containerId) {
     return {
-      'container_id': containerId,
+      'id': id,
       'name': name,
       'description': description,
+      'category': category,
+      'tags': tags,
+      'author': author, // 🚩 Antes era author_name
+      'authorAvatarUrl': authorAvatarUrl, // 🚩 Antes era author_avatar_url
+      'downloadUrl': downloadUrl, // 🚩 Antes era download_url
       'fields': fields.map((f) => f.toJson()).toList(),
+      'isOfficial': isOfficial, // 🚩 Antes era is_official
+      'isPublic': isPublic,
+      'downloadCount': downloadCount,
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+    };
+  }
+
+  Map<String, dynamic> toMarketplacePayload() {
+    return {
+      'name': name,
+      'description': description,
+      'category': category,
+      'tags': tags,
+      'author': author,
+      'fields': fields
+          .map((f) => f.toMarketplaceJson())
+          .toList(), // Campos limpios
+      'isPublic': true,
     };
   }
 }
