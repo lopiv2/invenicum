@@ -13,6 +13,7 @@ class InventorySectionWidget extends StatelessWidget {
   final TextEditingController minStockController;
   final AssetType? assetType;
   final Set<String> highlightedFields;
+  final VoidCallback? onScanPressed;
 
   const InventorySectionWidget({
     super.key,
@@ -21,6 +22,7 @@ class InventorySectionWidget extends StatelessWidget {
     required this.minStockController,
     required this.assetType,
     this.highlightedFields = const {},
+    this.onScanPressed,
   });
 
   @override
@@ -36,6 +38,7 @@ class InventorySectionWidget extends StatelessWidget {
           BarcodeFieldWidget(
             controller: barcodeController,
             highlighted: highlightedFields.contains('barcode'),
+            onScanPressed: onScanPressed,
           ),
           const SizedBox(height: 16),
           if (assetType != null && !assetType!.isSerialized) ...[

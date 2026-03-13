@@ -15,6 +15,8 @@ class CommonFormField extends StatelessWidget {
   final List<TextInputFormatter> inputFormatters;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
+  // 🚩 Añadimos el parámetro suffixIcon
+  final Widget? suffixIcon;
 
   const CommonFormField({
     super.key,
@@ -30,12 +32,12 @@ class CommonFormField extends StatelessWidget {
     this.inputFormatters = const [],
     this.validator,
     this.onChanged,
+    this.suffixIcon, // 🚩 Lo añadimos al constructor
   });
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
     final isHighlighted = highlighted;
 
     final decoration = InputDecoration(
@@ -43,6 +45,8 @@ class CommonFormField extends StatelessWidget {
       hintText: hint,
       prefixText: prefix,
       prefixIcon: Icon(icon, size: 20),
+      // 🚩 Conectamos el parámetro con la decoración de Flutter
+      suffixIcon: suffixIcon, 
       helperText: helper,
       helperMaxLines: 2,
       filled: true,

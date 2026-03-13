@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:provider/provider.dart';
 
 // Modelos y Datos
@@ -156,6 +157,58 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
   }
 
+  Future<void> _scanBarcode() async {
+    // Mostramos un diálogo o pantalla completa con el scanner
+    final String? code = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: Column(
+          children: [
+            AppBar(
+              title: const Text("Escaneando código"),
+              leading: IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+            Expanded(
+              child: MobileScanner(
+                onDetect: (capture) {
+                  final List<Barcode> barcodes = capture.barcodes;
+                  if (barcodes.isNotEmpty) {
+                    final String? code = barcodes.first.rawValue;
+                    if (code != null) {
+                      Navigator.pop(context, code);
+                    }
+                  }
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (code != null && mounted) {
+      setState(() {
+        _barcodeController.text = code;
+        _highlightedFields.add('barcode');
+      });
+
+      // Opcional: Si quieres que al escanear busque automáticamente con la IA
+      // _runMagicAI("https://www.google.com/search?q=$code");
+
+      ToastService.success("Código detectado: $code");
+
+      // Quitamos el resaltado después de unos segundos
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) setState(() => _highlightedFields.remove('barcode'));
+      });
+    }
+  }
+
   Future<void> _runMagicAI(String url) async {
     if (_assetType == null) return;
     setState(() => _isMagicLoading = true);
@@ -164,7 +217,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       final List<String> fieldsToExtract = _assetType!.fieldDefinitions
           .map((f) => f.name)
           .toList();
-      if (!fieldsToExtract.any((f) => f.toLowerCase() == 'barcode')){
+      if (!fieldsToExtract.any((f) => f.toLowerCase() == 'barcode')) {
         fieldsToExtract.add('barcode');
       }
 
@@ -419,6 +472,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                                 minStockController: _minStockController,
                                 assetType: _assetType,
                                 highlightedFields: _highlightedFields,
+                                onScanPressed: _scanBarcode,
                               ),
                             ),
                             BentoBoxWidget(

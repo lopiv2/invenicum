@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
-import 'common_form_field.dart';
+import 'package:invenicum/screens/assets/local_widgets/common_form_field.dart';
 
-/// Widget para el campo de código de barras
 class BarcodeFieldWidget extends StatelessWidget {
   final TextEditingController controller;
   final bool highlighted;
+  final VoidCallback? onScanPressed; // 🚩 Nuevo parámetro
 
   const BarcodeFieldWidget({
     super.key,
     required this.controller,
     this.highlighted = false,
+    this.onScanPressed, // 🚩 Lo recibimos
   });
 
   @override
@@ -24,6 +25,13 @@ class BarcodeFieldWidget extends StatelessWidget {
       helper: 'Escanee o introduzca el código del producto',
       keyboardType: TextInputType.text,
       highlighted: highlighted,
+      // 🚩 Asumiendo que CommonFormField acepta un suffixIcon o similar
+      suffixIcon: onScanPressed != null 
+        ? IconButton(
+            icon: const Icon(Icons.camera_alt_rounded, color: Colors.indigo),
+            onPressed: onScanPressed,
+          ) 
+        : null,
     );
   }
 }
