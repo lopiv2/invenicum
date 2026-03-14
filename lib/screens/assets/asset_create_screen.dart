@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 // Modelos y Datos
@@ -62,7 +64,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
   List<Location> _availableLocations = [];
   int? _selectedLocationId;
-  final List<String> _imagePreviewUrls = [];
+  List<String> _imagePreviewUrls = [];
 
   AssetType? _assetType;
   int? _containerId;
@@ -157,57 +159,68 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
   }
 
-  Future<void> _scanBarcode() async {
-    // Mostramos un diálogo o pantalla completa con el scanner
-    final String? code = await showModalBottomSheet<String>(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        child: Column(
-          children: [
-            AppBar(
-              title: const Text("Escaneando código"),
-              leading: IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-            Expanded(
-              child: MobileScanner(
-                onDetect: (capture) {
-                  final List<Barcode> barcodes = capture.barcodes;
-                  if (barcodes.isNotEmpty) {
-                    final String? code = barcodes.first.rawValue;
-                    if (code != null) {
-                      Navigator.pop(context, code);
-                    }
-                  }
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-
-    if (code != null && mounted) {
-      setState(() {
-        _barcodeController.text = code;
-        _highlightedFields.add('barcode');
-      });
-
-      // Opcional: Si quieres que al escanear busque automáticamente con la IA
-      // _runMagicAI("https://www.google.com/search?q=$code");
-
-      ToastService.success("Código detectado: $code");
-
-      // Quitamos el resaltado después de unos segundos
-      Future.delayed(const Duration(seconds: 3), () {
-        if (mounted) setState(() => _highlightedFields.remove('barcode'));
-      });
-    }
+  // En tu AssetCreateScreen, antes de llamar al modal
+Future<void> _startScan() async {
+  var status = await Permission.camera.status;
+  if (status.isDenied) {
+    status = await Permission.camera.request();
   }
+
+  if (status.isGranted) {
+    _handleBarcodeScan(); // Tu función que abre el BarcodeScannerWidget
+  } else {
+    ToastService.error("Se requiere permiso de cámara para escanear");
+  }
+}
+
+  Future<void> _handleBarcodeScan() async {
+  // 1. Abrimos el scanner (tu widget Stateful que ya definimos)
+  final String? scannedCode = await showModalBottomSheet<String>(
+    context: context,
+    isScrollControlled: true,
+    builder: (context) => const BarcodeScannerWidget(),
+  );
+
+  if (scannedCode == null || !mounted) return;
+
+  // 2. Iniciamos carga y ponemos el código en el campo
+  setState(() {
+    _barcodeController.text = scannedCode;
+    _isMagicLoading = true; // Si tienes un overlay de carga
+  });
+
+  try {
+    final integrationService = IntegrationService(context.read<ApiService>());
+    final InventoryItem? suggestedItem = await integrationService.lookupBarcode(scannedCode);
+
+    if (suggestedItem != null && mounted) {
+      setState(() {
+        // Rellenamos controladores
+        _nameController.text = suggestedItem.name;
+        _descriptionController.text = suggestedItem.description ?? '';
+
+        // 🖼️ Gestión de Imágenes
+        // Si el DTO trajo imágenes de la API externa (como UPCItemDB)
+        if (suggestedItem.images.isNotEmpty) {
+          _imagePreviewUrls = suggestedItem.images.map((img) => img.url).toList();
+        }
+
+        // Resaltamos los campos para que el usuario vea qué ha cambiado
+        _highlightedFields.addAll(['name', 'description', 'barcode', 'marketValue']);
+      });
+
+      ToastService.success("¡Datos encontrados en la nube!");
+    }
+  } catch (e) {
+    debugPrint("Error procesando sugerencia: $e");
+  } finally {
+    if (mounted) setState(() => _isMagicLoading = false);
+    // Limpiamos el resaltado después de un tiempo
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _highlightedFields.clear());
+    });
+  }
+}
 
   Future<void> _runMagicAI(String url) async {
     if (_assetType == null) return;
@@ -472,7 +485,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                                 minStockController: _minStockController,
                                 assetType: _assetType,
                                 highlightedFields: _highlightedFields,
-                                onScanPressed: _scanBarcode,
+                                onScanPressed: _startScan,
                               ),
                             ),
                             BentoBoxWidget(

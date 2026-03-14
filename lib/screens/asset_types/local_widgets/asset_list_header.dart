@@ -21,60 +21,90 @@ class AssetListHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    // Detectamos si el ancho es de móvil
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
+
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Título
-        Expanded(
-          child: Text(
-            'Listado de Activos: "${assetType.name}"',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
+        // Título con estilo Bento
+        Text(
+          'Listado de Activos: "${assetType.name}"',
+          style: Theme.of(
+            context,
+          ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(width: 20),
-        // Botones de Acción
-        Row(
-          mainAxisSize: MainAxisSize.min,
+        const SizedBox(height: 16),
+
+        // Usamos Wrap en lugar de Row para que los botones "salten" de línea si no caben
+        Wrap(
+          spacing: 8, // Espacio horizontal entre botones
+          runSpacing: 8, // Espacio vertical entre líneas si hay salto
           children: [
-            // Botón para Abrir Filtro de Conteo
-            ElevatedButton.icon(
+            // Botón Filtro (con ancho adaptativo)
+            _buildActionButton(
+              context,
               onPressed: onShowCountFilterDialog,
-              icon: const Icon(Icons.pin_drop),
-              label: Text(
-                selectedCountFieldId == null
-                    ? 'Filtro Contador'
-                    : 'Filtro Activo',
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: selectedCountFieldId != null
-                    ? Theme.of(context).colorScheme.inversePrimary
-                    : null,
-              ),
+              icon: Icons.pin_drop,
+              label: selectedCountFieldId == null
+                  ? 'Filtro Contador'
+                  : 'Filtro Activo',
+              color: selectedCountFieldId != null
+                  ? Theme.of(context).colorScheme.inversePrimary
+                  : Theme.of(context).colorScheme.surfaceVariant,
+              isMobile: isMobile,
             ),
-            const SizedBox(width: 10),
-            ElevatedButton.icon(
+
+            // Botón Importar
+            _buildActionButton(
+              context,
               onPressed: onImportCSV,
-              icon: const Icon(Icons.file_upload),
-              label: const Text('Importar CSV'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.surfaceVariant,
-              ),
+              icon: Icons.file_upload,
+              label: 'Importar CSV',
+              color: Theme.of(context).colorScheme.surfaceVariant,
+              isMobile: isMobile,
             ),
-            const SizedBox(width: 10),
-            // Botón de Añadir Activo
-            ElevatedButton.icon(
+
+            // Botón Añadir (Botón de acción principal)
+            _buildActionButton(
+              context,
               onPressed: onGoToCreateAsset,
-              icon: const Icon(Icons.add),
-              label: const Text('Añadir Activo'),
+              icon: Icons.add,
+              label: 'Añadir Activo',
+              color: Theme.of(context).colorScheme.primary,
+              textColor: Theme.of(context).colorScheme.onPrimary,
+              isMobile: isMobile,
+              isPrimary: true,
             ),
           ],
         ),
       ],
+    );
+  }
+
+  // Helper para crear botones consistentes y responsivos
+  Widget _buildActionButton(
+    BuildContext context, {
+    required VoidCallback onPressed,
+    required IconData icon,
+    required String label,
+    required Color color,
+    Color? textColor,
+    required bool isMobile,
+    bool isPrimary = false,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 18, color: textColor),
+      label: Text(label, style: TextStyle(color: textColor, fontSize: 13)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        elevation: isPrimary ? 2 : 0,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
     );
   }
 }

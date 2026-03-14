@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:invenicum/data/models/inventory_item.dart';
 import 'api_service.dart';
 
 class IntegrationService {
@@ -61,4 +63,19 @@ class IntegrationService {
       throw Exception('Error al guardar la integración $type: $e');
     }
   }
+
+  Future<InventoryItem?> lookupBarcode(String barcode) async {
+  try {
+    final response = await _dio.get('/integrations/barcode/lookup/$barcode');
+    
+    if (response.data['data'] != null) {
+      // Usamos tu factory blindado para convertir el JSON en objeto
+      return InventoryItem.fromJson(response.data['data']);
+    }
+    return null;
+  } on DioException catch (e) {
+    debugPrint("Error en lookup de barcode: ${e.response?.data}");
+    return null;
+  }
+}
 }

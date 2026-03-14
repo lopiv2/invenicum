@@ -2,6 +2,7 @@ class Environment {
   static const String apiUrl = String.fromEnvironment(
     'API_URL',
     defaultValue: 'http://192.168.1.43:3000', // URL por defecto para desarrollo
+    //defaultValue: 'http://192.168.1.173:3000', // URL por defecto para desarrollo
   );
 
   static const String appVersion = '1.0.0'; // Versión por defecto
