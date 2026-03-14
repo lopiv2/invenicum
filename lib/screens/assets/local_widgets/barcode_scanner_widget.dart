@@ -108,15 +108,16 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
                     onDetect: (capture) {
                       final barcode = capture.barcodes.firstOrNull?.rawValue;
                       if (barcode != null) {
-                        // 1. Sonido (audioplayers)
                         _playScanSound();
+                        HapticFeedback.mediumImpact();
 
-                        // 2. Vibración ligera (Nativa de Flutter)
-                        // Esto hace que el móvil dé un pequeño "toque" físico
-                        HapticFeedback.lightImpact();
-
-                        // 3. Devolver resultado
-                        Navigator.pop(context, barcode);
+                        // Damos un pequeño margen de 100ms para que el audio arranque
+                        // antes de cerrar la pantalla y destruir el controlador.
+                        Future.delayed(const Duration(milliseconds: 100), () {
+                          if (mounted) {
+                            Navigator.pop(context, barcode);
+                          }
+                        });
                       }
                     },
                   ),
