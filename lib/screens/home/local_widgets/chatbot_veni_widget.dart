@@ -279,22 +279,129 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final bubbleColor = isUser
+        ? theme.primaryColor
+        : theme.colorScheme.surfaceContainerHighest;
+    final textColor = isUser ? Colors.white : null;
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: isUser
-              ? theme.primaryColor
-              : theme.colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16),
+        margin: EdgeInsets.only(
+          top: 4,
+          bottom: 14, // espacio para el piquito que sobresale abajo
+          left: isUser ? 40 : 4,
+          right: isUser ? 4 : 40,
         ),
-        child: Text(
-          text,
-          style: TextStyle(color: isUser ? Colors.white : null),
+        child: CustomPaint(
+          painter: _BubbleShapePainter(isUser: isUser, color: bubbleColor),
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 14,
+              right: 14,
+              top: 10,
+              bottom: 10,
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 240),
+              child: Text(
+                text,
+                style: TextStyle(color: textColor),
+              ),
+            ),
+          ),
         ),
       ),
     );
   }
+}
+
+class _BubbleShapePainter extends CustomPainter {
+  final bool isUser;
+  final Color color;
+
+  const _BubbleShapePainter({required this.isUser, required this.color});
+
+  // Medidas del piquito y radio de esquinas
+  static const double _r = 14;   // radio esquinas
+  static const double _tw = 9;   // ancho base piquito
+  static const double _th = 9;   // alto piquito
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.fill;
+
+    final w = size.width;
+    final h = size.height - _th; // altura del rectángulo sin el piquito
+    final path = Path();
+
+    if (isUser) {
+      // Empezamos arriba-izquierda, sentido horario
+      // Esquina superior-izquierda
+      path.moveTo(_r, 0);
+      // Borde superior
+      path.lineTo(w - _r, 0);
+      // Esquina superior-derecha
+      path.arcToPoint(Offset(w, _r),
+          radius: const Radius.circular(_r), clockwise: true);
+      // Borde derecho
+      path.lineTo(w, h - _r);
+      // Esquina inferior-derecha → piquito sale aquí
+      path.arcToPoint(Offset(w - _r, h),
+          radius: const Radius.circular(_r), clockwise: true);
+      // Piquito abajo-derecha: base → punta → regreso
+      path.lineTo(w - _r, h);
+      path.lineTo(w - _r + _tw * 0.4, h + _th * 0.4);
+      path.lineTo(w - _r + _tw, h + _th);   // punta del piquito
+      path.lineTo(w - _r - _tw * 0.8, h);   // regreso a la base
+      // Borde inferior hacia la izquierda
+      path.lineTo(_r, h);
+      // Esquina inferior-izquierda
+      path.arcToPoint(Offset(0, h - _r),
+          radius: const Radius.circular(_r), clockwise: true);
+      // Borde izquierdo
+      path.lineTo(0, _r);
+      // Esquina superior-izquierda (cierre)
+      path.arcToPoint(Offset(_r, 0),
+          radius: const Radius.circular(_r), clockwise: true);
+    } else {
+      // Empezamos arriba-izquierda, sentido horario
+      // Esquina superior-izquierda
+      path.moveTo(_r, 0);
+      // Borde superior
+      path.lineTo(w - _r, 0);
+      // Esquina superior-derecha
+      path.arcToPoint(Offset(w, _r),
+          radius: const Radius.circular(_r), clockwise: true);
+      // Borde derecho
+      path.lineTo(w, h - _r);
+      // Esquina inferior-derecha
+      path.arcToPoint(Offset(w - _r, h),
+          radius: const Radius.circular(_r), clockwise: true);
+      // Borde inferior hacia la izquierda
+      path.lineTo(_r + _tw * 0.2, h);
+      // Piquito abajo-izquierda: base → punta → regreso
+      path.lineTo(_r - _tw + _tw * 0.8, h + _th * 0.4);
+      path.lineTo(_r - _tw, h + _th);         // punta del piquito
+      path.lineTo(_r - _tw * 0.4, h);         // regreso a la base
+      path.lineTo(_r, h);
+      // Esquina inferior-izquierda
+      path.arcToPoint(Offset(0, h - _r),
+          radius: const Radius.circular(_r), clockwise: true);
+      // Borde izquierdo
+      path.lineTo(0, _r);
+      // Esquina superior-izquierda (cierre)
+      path.arcToPoint(Offset(_r, 0),
+          radius: const Radius.circular(_r), clockwise: true);
+    }
+
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_BubbleShapePainter old) =>
+      old.isUser != isUser || old.color != color;
 }

@@ -25,11 +25,13 @@ class AuthProvider with ChangeNotifier {
   bool get isGitHubLinked =>
       _user?.githubHandle != null && _user!.githubHandle!.isNotEmpty;
 
-  AuthProvider() {
+  /// [tokenAlreadyInitialized] — pasar true desde main.dart cuando ya se ha
+  /// llamado a ApiService().initializeToken() antes del runApp.
+  /// Evita la doble inicialización y los notifyListeners() intermedios
+  /// que pueden disparar el redirect del router con estado inconsistente.
+  AuthProvider({bool tokenAlreadyInitialized = false}) {
     _apiService.onUnauthorized = () {
-      // Si la API detecta un 401, ejecutamos la limpieza local
       _handleSessionExpired();
-      // ✅ El toast aquí también
       toastification.show(
         type: ToastificationType.error,
         title: const Text('Sesión expirada'),
@@ -37,31 +39,23 @@ class AuthProvider with ChangeNotifier {
         autoCloseDuration: const Duration(seconds: 5),
       );
     };
-    _initialize();
+    _initialize(skipTokenInit: tokenAlreadyInitialized);
   }
 
-  Future<void> _initialize() async {
-    notifyListeners();
+  Future<void> _initialize({bool skipTokenInit = false}) async {
+    // Si el token ya fue inicializado en main.dart antes del runApp,
+    // nos saltamos initializeToken() y los notifyListeners() intermedios
+    // que provocan evaluaciones del redirect con estado inconsistente.
     try {
-      notifyListeners();
-
-      await _apiService.initializeToken();
-
-      // Ver todo el contenido del storage
-      notifyListeners();
+      if (!skipTokenInit) {
+        await _apiService.initializeToken();
+      }
 
       if (_apiService.currentToken != null) {
-        notifyListeners();
-
         final userData = await _apiService.getMe().timeout(
           const Duration(seconds: 5),
-          onTimeout: () {
-            notifyListeners();
-            return null;
-          },
+          onTimeout: () => null,
         );
-
-        notifyListeners();
 
         if (userData != null) {
           _user = userData;
@@ -71,12 +65,10 @@ class AuthProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      debugPrint("❌ Error: $e");
-      notifyListeners();
+      debugPrint("❌ AuthProvider._initialize error: $e");
     } finally {
-      debugPrint("5️⃣ _initialize terminó");
       _isLoading = false;
-      notifyListeners();
+      notifyListeners(); // Una sola notificación al terminar — limpia y predecible.
     }
   }
 

@@ -57,6 +57,20 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
     });
   }
 
+  /// Construye la URL completa de imagen de forma segura.
+  /// Mismo comportamiento que en AssetTypeCard — fuente de verdad única.
+  static String _buildImageUrl(String rawUrl) {
+    if (rawUrl.isEmpty) return '';
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+      return rawUrl;
+    }
+    final host = Environment.apiUrl.endsWith('/')
+        ? Environment.apiUrl.substring(0, Environment.apiUrl.length - 1)
+        : Environment.apiUrl;
+    if (rawUrl.startsWith('/')) return '$host$rawUrl';
+    return '$host/images/$rawUrl'; // registros viejos sin barra inicial
+  }
+
   /// 🔑 CARGA INICIAL: Busca el AssetType y carga sus datos para edición.
   void _loadInitialData() {
     final containerProvider = context.read<ContainerProvider>();
@@ -87,10 +101,11 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
       _availableDataLists = container.dataLists;
       _currentAssetType = assetType;
 
-      // Cargar la imagen existente si la hay
+      // Cargar la imagen existente si la hay.
+      // Usamos _buildImageUrl para manejar de forma segura cualquier formato
+      // de URL que pueda venir de la DB (absoluta, relativa con /, sin /).
       if (assetType.images.isNotEmpty) {
-        // Usamos la URL completa. La bandera _isNewImageBase64 permanece en false.
-        _imagePreviewUrl = '${Environment.apiUrl}${assetType.images.first.url}';
+        _imagePreviewUrl = _buildImageUrl(assetType.images.first.url);
       }
 
       setState(() {

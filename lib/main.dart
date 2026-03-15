@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/services/asset_print_service.dart';
 import 'package:invenicum/providers/achievement_provider.dart';
+import 'package:invenicum/providers/first_run_provider.dart'; // 🆕
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/providers/template_provider.dart';
@@ -56,15 +57,29 @@ void main() async {
     BrowserContextMenu.disableContextMenu();
   }
 
-  // 1. Inicialización previa de Auth
-  final authProvider = AuthProvider();
-  //await authProvider.checkAuthStatus();
+  // ── 1. Servicios base que deben estar listos antes del primer frame ────────
+  final apiService = ApiService();
+  await apiService.initializeToken(); // carga el JWT del disco a memoria
+
+  // ── 2. Comprobación de primer uso (una sola petición al backend) ───────────
+  // Se hace ANTES del runApp para que el router ya tenga el resultado
+  // en su primer redirect y no haya ningún flash de pantalla incorrecta.
+  final firstRunProvider = FirstRunProvider(apiService);
+  await firstRunProvider.check();
+
+  // ── 3. AuthProvider (sin cambios respecto a tu código original) ───────────
+  // tokenAlreadyInitialized: true porque ya llamamos apiService.initializeToken()
+  // arriba. Así AuthProvider no lo repite y _initialize() solo emite
+  // un notifyListeners() al terminar, evitando evaluaciones del redirect
+  // con estado a medias que causaban el loop setup→login→setup.
+  final authProvider = AuthProvider(tokenAlreadyInitialized: true);
 
   runApp(
     MultiProvider(
       providers: [
         // --- SERVICIOS (Singletons) ---
-        Provider<ApiService>(create: (c) => ApiService()),
+        // 🆕 Usamos .value para exponer la instancia ya creada arriba
+        Provider<ApiService>.value(value: apiService),
         Provider(create: (c) => PluginService(c.read<ApiService>())),
         Provider(create: (c) => DashboardService(c.read<ApiService>())),
         Provider(create: (c) => ThemeService(c.read<ApiService>())),
@@ -84,13 +99,16 @@ void main() async {
 
         // --- PROVEEDORES DE ESTADO ---
 
-        // Auth es la raíz de la lógica
+        // 🆕 FirstRunProvider: expuesto para que el router y la pantalla de
+        // setup puedan llamar a .check() de nuevo tras crear el primer usuario.
+        ChangeNotifierProvider<FirstRunProvider>.value(value: firstRunProvider),
+
+        // Auth es la raíz de la lógica de sesión
         ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
 
         ChangeNotifierProxyProvider<ApiService, ChatService>(
           create: (context) => ChatService(context.read<ApiService>()),
           update: (context, api, previous) {
-            // Si ya existe una instancia, simplemente la devolvemos para que no se resetee el historial
             if (previous != null) return previous;
             return ChatService(api);
           },
@@ -99,17 +117,11 @@ void main() async {
           create: (c) => PluginProvider(c.read<PluginService>()),
           update: (context, auth, prev) {
             if (auth.isAuthenticated && auth.user != null && !auth.isLoading) {
-              // 1. Inyectamos el usuario actual en el Provider para el reemplazo de {{userName}}
               prev?.updateCurrentUser(auth.user!);
-
-              // 2. Inicializamos el SDK de Stac con el nombre del usuario para el Parser
               if (prev != null && !prev.isLoading && prev.installed.isEmpty) {
                 Future.microtask(() async {
                   final pluginService = context.read<PluginService>();
-
-                  // Pasamos el nombre al initSdk para que el InvenicumSdkParser lo tenga
                   await pluginService.initSdk(userName: auth.user!.name);
-
                   await prev.refresh();
                 });
               }
@@ -117,12 +129,10 @@ void main() async {
             return prev!;
           },
         ),
-        // --- Integraciones ---
         ChangeNotifierProxyProvider<AuthProvider, IntegrationProvider>(
           create: (c) => IntegrationProvider(c.read<IntegrationService>()),
           update: (context, auth, prev) {
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
-              // Cargamos los estados de los "checks" (isLinked) solo si están vacíos
               if (prev != null && prev.statuses.isEmpty && !prev.isLoading) {
                 Future.microtask(() => prev.loadStatuses());
               }
@@ -130,33 +140,27 @@ void main() async {
             return prev!;
           },
         ),
-        // --- Plantillas ---
         ChangeNotifierProxyProvider<AuthProvider, TemplateProvider>(
           create: (context) =>
               TemplateProvider(context.read<TemplateService>()),
           update: (context, auth, previous) {
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
-              // Si el usuario acaba de loguearse y no hemos cargado nada,
-              // disparamos la carga inicial del market y la biblioteca
               if (previous != null &&
                   previous.marketTemplates.isEmpty &&
                   !previous.isLoading) {
                 Future.microtask(() {
                   previous.fetchMarketTemplates();
-                  //previous.fetchUserLibrary();
                 });
               }
             }
             return previous!;
           },
         ),
-        // --- Dashboard ---
         ChangeNotifierProxyProvider<AuthProvider, DashboardProvider>(
           create: (context) =>
               DashboardProvider(context.read<DashboardService>()),
           update: (context, auth, previous) {
             if (!auth.isLoading && auth.isAuthenticated) {
-              // 🚩 Solo disparamos si no tenemos estadísticas aún
               if (previous != null &&
                   previous.stats == null &&
                   !previous.isLoading) {
@@ -166,8 +170,6 @@ void main() async {
             return previous!;
           },
         ),
-
-        // --- Items ---
         ChangeNotifierProxyProvider<AuthProvider, InventoryItemProvider>(
           create: (c) => InventoryItemProvider(
             c.read<InventoryItemService>(),
@@ -175,7 +177,6 @@ void main() async {
           ),
           update: (context, auth, prev) {
             if (!auth.isLoading && auth.isAuthenticated && auth.token != null) {
-              // 🚩 Añadimos la misma lógica: solo si está vacío
               if (prev != null && !prev.isLoading) {
                 Future.microtask(() => prev.loadAllItemsGlobal());
               }
@@ -183,8 +184,6 @@ void main() async {
             return prev!;
           },
         ),
-
-        // Theme: Sincronización con perfil de usuario
         ChangeNotifierProxyProvider<AuthProvider, ThemeProvider>(
           create: (c) => ThemeProvider(c.read<ThemeService>()),
           update: (context, auth, prev) {
@@ -201,8 +200,6 @@ void main() async {
             return prev!;
           },
         ),
-
-        // Preferences: Carga de idioma y preferencias del usuario
         ChangeNotifierProxyProvider<AuthProvider, PreferencesProvider>(
           create: (c) => PreferencesProvider(c.read<PreferencesService>()),
           update: (context, auth, prev) {
@@ -214,8 +211,6 @@ void main() async {
             return prev!;
           },
         ),
-
-        // Contenedores: Carga inicial
         ChangeNotifierProxyProvider<AuthProvider, ContainerProvider>(
           create: (c) => ContainerProvider(
             c.read<ContainerService>(),
@@ -229,8 +224,6 @@ void main() async {
             return prev!;
           },
         ),
-
-        // Location, Loan, Alert (Siguiendo el mismo patrón si es necesario)
         ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
           create: (c) => LocationProvider(c.read<LocationService>()),
           update: (_, auth, prev) => prev!,
@@ -246,12 +239,10 @@ void main() async {
         ChangeNotifierProxyProvider<AuthProvider, AchievementProvider>(
           create: (c) => AchievementProvider(c.read<AchievementService>()),
           update: (context, auth, prev) {
-            // Si el usuario está autenticado y no hemos cargado los logros aún
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
               if (prev != null &&
                   prev.achievements.isEmpty &&
                   !prev.isLoading) {
-                // Disparamos la carga inicial pasando el context para las traducciones
                 Future.microtask(() => prev.fetchAchievements(context));
               }
             }
@@ -259,35 +250,40 @@ void main() async {
           },
         ),
       ],
-      child: const MyApp(),
+      child: MyApp(
+        authProvider: authProvider,
+        firstRunProvider: firstRunProvider,
+      ),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  // 🚩 Cambiado a StatefulWidget
-  const MyApp({super.key});
+  final AuthProvider authProvider;
+  final FirstRunProvider firstRunProvider; // 🆕
+
+  const MyApp({
+    super.key,
+    required this.authProvider,
+    required this.firstRunProvider,
+  });
 
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
-  late GoRouter _router; // 🚩 Guardamos la instancia aquí
+  late GoRouter _router;
 
   @override
   void initState() {
     super.initState();
-    // Lo creamos una sola vez al iniciar la App
-    // Necesitamos el AuthProvider inicial
-    final authProvider = context.read<AuthProvider>();
-    _router = createAppRouter(authProvider);
+    // 🆕 Pasamos ambos providers al router
+    _router = createAppRouter(widget.authProvider, widget.firstRunProvider);
   }
 
   @override
   Widget build(BuildContext context) {
-    // Escuchamos Auth y Theme
-    //final authProvider = Provider.of<AuthProvider>(context);
     final themeProvider = context.watch<ThemeProvider>();
     final preferencesProvider = context.watch<PreferencesProvider>();
 
@@ -307,7 +303,6 @@ class _MyAppState extends State<MyApp> {
         theme: themeProvider.themeData,
         routerConfig: _router,
         builder: (context, child) {
-          // Esto asegura que FToast tenga acceso al Overlay desde la raíz
           return FToastBuilder()(context, child);
         },
       ),

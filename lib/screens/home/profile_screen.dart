@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:go_router/go_router.dart';
 import 'package:web/web.dart' as web;
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
@@ -44,10 +43,32 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     _initDeepLinks();
 
     if (kIsWeb) {
-      // Esto le dice a Flutter: "Espera a terminar de dibujar y luego ejecuta esto"
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _checkWebQueryParams();
       });
+    }
+  }
+
+  /// Se llama cada vez que un InheritedWidget del que dependemos cambia.
+  /// Usamos esto para sincronizar los controllers cuando AuthProvider
+  /// notifica tras vincular GitHub — evita tener que salir y volver
+  /// a entrar a la pantalla para ver los datos actualizados.
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final user = context.read<AuthProvider>().user;
+    if (user == null) return;
+
+    // Solo actualizamos si el valor del provider difiere del controller,
+    // para no interrumpir ediciones manuales del usuario en curso.
+    if (_usernameController.text != (user.username ?? '')) {
+      _usernameController.text = user.username ?? '';
+    }
+    if (_githubController.text != (user.githubHandle ?? '')) {
+      _githubController.text = user.githubHandle ?? '';
+    }
+    if (_nameController.text != (user.name)) {
+      _nameController.text = user.name;
     }
   }
 
@@ -187,32 +208,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       final success = await authProvider.linkGitHubAccount(code);
 
       if (success && mounted) {
-        // 🚩 EL CAMBIO: No dependas solo del updatedUser del provider aquí
-        // porque a veces el notifyListeners() y el context.go chocan.
-
-        final newUser = authProvider.user;
-        if (newUser != null) {
-          // Actualizamos los controladores ANTES de cualquier navegación
-          _usernameController.text = newUser.username ?? '';
-          _githubController.text = newUser.githubHandle ?? '';
-
-          // Forzamos un refresco visual
-          setState(() {});
-        }
-
+        // authProvider.linkGitHubAccount ya llama notifyListeners() internamente,
+        // lo que dispara didChangeDependencies() y sincroniza los controllers
+        // automáticamente. No necesitamos hacer nada más aquí.
+        //
+        // ❌ ELIMINADO: context.go('/myprofile') — ese go() destruía el widget
+        // y lo recreaba, ejecutando initState() ANTES de que notifyListeners()
+        // hubiera actualizado el provider, por lo que los controllers leían
+        // los datos viejos. Al salir y volver a entrar manualmente ya estaban
+        // actualizados porque entonces sí había terminado el ciclo completo.
         ToastService.success("¡GitHub vinculado correctamente!");
-
-        // Usar pushReplacement o simplemente esperar un frame antes de irnos
-        // para que la UI no se limpie antes de tiempo
-        Future.delayed(Duration.zero, () {
-          if (mounted) context.go('/myprofile');
-        });
       }
     } catch (e) {
       if (mounted) {
         ToastService.error("Error al procesar la vinculación: $e");
-        // Incluso si falla, limpiamos la URL para que el código usado no se quede ahí
-        context.go('/myprofile');
       }
     }
   }

@@ -177,14 +177,43 @@ class AssetTypeCard extends StatelessWidget {
 
   // --- DISEÑO ACTUALIZADO CON NOMBRE ARRIBA ---
 
+  /// Construye la URL pública completa de una imagen de forma segura.
+  ///
+  /// Maneja los tres casos posibles que pueden venir de la DB:
+  ///   1. URL ya absoluta: "http://server/images/asset-types/file.jpg" → la devuelve tal cual
+  ///   2. URL relativa con barra: "/images/asset-types/file.jpg"       → añade el host
+  ///   3. URL relativa sin barra: "asset-types/file.jpg" (registros viejos) → añade host + /images/
+  static String _buildImageUrl(String rawUrl) {
+    if (rawUrl.isEmpty) return '';
+
+    // Caso 1: ya es absoluta
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+      return rawUrl;
+    }
+
+    // Host sin trailing slash
+    final host = Environment.apiUrl.endsWith('/')
+        ? Environment.apiUrl.substring(0, Environment.apiUrl.length - 1)
+        : Environment.apiUrl;
+
+    // Caso 2: relativa correcta ("/images/...")
+    if (rawUrl.startsWith('/')) {
+      return '$host$rawUrl';
+    }
+
+    // Caso 3: relativa sin barra inicial (registros guardados antes del fix)
+    // Añadimos el prefijo /images/ que debería tener
+    final staticPrefix = '/images';
+    return '$host$staticPrefix/$rawUrl';
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final String? imageUrl = assetType.images.isNotEmpty
-        ? assetType.images.first.url
-        : null;
-    final fullImageUrl = imageUrl != null
-        ? '${Environment.apiUrl}$imageUrl'
+    // buildImageUrl() garantiza que nunca haya doble barra aunque apiUrl
+    // tenga trailing slash, y maneja URLs ya absolutas (http://...) sin duplicar el host.
+    final fullImageUrl = assetType.images.isNotEmpty
+        ? _buildImageUrl(assetType.images.first.url)
         : '';
 
     return Container(

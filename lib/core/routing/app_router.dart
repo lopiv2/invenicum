@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/screens/home/first_run_screen.dart';
 import 'package:web/web.dart' as html;
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/models/asset_template_model.dart';
@@ -21,6 +22,7 @@ import 'package:invenicum/data/models/location.dart';
 
 // Providers
 import 'package:invenicum/providers/auth_provider.dart';
+import 'package:invenicum/providers/first_run_provider.dart'; // 🆕
 import 'package:invenicum/providers/location_provider.dart';
 
 // Screens
@@ -55,21 +57,42 @@ import 'package:stac/stac.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
-GoRouter createAppRouter(AuthProvider authProvider) {
+/// Ahora recibe también [firstRunProvider] para que el router pueda
+/// escucharlo y reaccionar cuando la comprobación termine.
+GoRouter createAppRouter(
+  AuthProvider authProvider,
+  FirstRunProvider firstRunProvider, // 🆕
+) {
   return GoRouter(
-    refreshListenable: authProvider,
+    // 🆕 Escuchamos ambos providers: cuando cualquiera notifique un cambio
+    // GoRouter vuelve a evaluar el redirect automáticamente.
+    refreshListenable: Listenable.merge([authProvider, firstRunProvider]),
     navigatorKey: rootNavigatorKey,
     initialLocation: '/dashboard',
     redirect: (context, state) {
       final authProvider = context.read<AuthProvider>();
-      // 🚩 ESTO ES VITAL: Si está leyendo el token del disco,
-      // no redirigimos a ningún lado todavía.
-      if (authProvider.isLoading) return null;
+      final firstRunProvider = context.read<FirstRunProvider>(); // 🆕
+
+      // ── 1. ESPERAR A QUE AMBAS COMPROBACIONES TERMINEN ───────────────────
+      // Mientras AuthProvider está cargando el token del disco O
+      // FirstRunProvider aún no sabe si hay usuarios, no movemos nada.
+      if (authProvider.isLoading || firstRunProvider.isChecking) return null;
+
+      // ── 2. PRIMER USO: redirigir al setup antes que cualquier otra cosa ──
+      // Si el backend dice que no hay usuarios, mandamos al setup
+      // independientemente de si hay token o no.
+      final isSetupRoute = state.matchedLocation == '/setup';
+      if (firstRunProvider.isFirstRun) {
+        // Evitamos el bucle: si ya estamos en /setup, no redirigimos.
+        return isSetupRoute ? null : '/setup';
+      }
+
+      // A partir de aquí el backend tiene usuarios → flujo normal.
 
       final isAuthenticated = authProvider.isAuthenticated;
       final isLoggingIn = state.matchedLocation == '/login';
 
-      // --- LÓGICA GITHUB (Mantenla como la tienes) ---
+      // ── 3. LÓGICA GITHUB ─────────────────────────────────────────────────
       final uri = Uri.parse(html.window.location.href);
       final String? githubCode =
           state.uri.queryParameters['code'] ?? uri.queryParameters['code'];
@@ -79,19 +102,21 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         return '/myprofile?code=$githubCode';
       }
 
-      // --- LÓGICA DE PERSISTENCIA Y QR ---
+      // ── 4. PROTECCIÓN DE RUTAS ───────────────────────────────────────────
+      // Rutas públicas que nunca deben guardarse como destino de redirectTo.
+      // /setup se incluye porque tras markAsComplete() el router re-evalúa
+      // con matchedLocation='/setup' e isAuthenticated=false — sin esta
+      // guarda generaría redirectTo=/setup y mandaría al usuario de vuelta
+      // al wizard justo después de loguearse.
+      final isPublicRoute = isLoggingIn || isSetupRoute;
 
-      // Si NO está logueado y NO va a login (ej: viene del QR)
-      if (!isAuthenticated && !isLoggingIn) {
-        // Guardamos la ruta del QR (ej: /container/1/asset-types/5...)
+      if (!isAuthenticated && !isPublicRoute) {
         final fromLocation = state.uri.toString();
-        // Lo mandamos al login pero con el destino guardado
         return '/login?redirectTo=${Uri.encodeComponent(fromLocation)}';
       }
 
-      // Si se acaba de loguear y está en la pantalla de login
+      // Si ya está logueado y va al login, lo mandamos al dashboard (o al QR)
       if (isAuthenticated && isLoggingIn) {
-        // ¿Teníamos un destino pendiente del QR?
         final redirectTo = state.uri.queryParameters['redirectTo'];
         return redirectTo ?? '/dashboard';
       }
@@ -99,20 +124,23 @@ GoRouter createAppRouter(AuthProvider authProvider) {
       return null;
     },
     routes: [
-      // Ruta de Login fuera del Shell
+      // ── Rutas públicas (fuera del Shell) ────────────────────────────────
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
 
-      // Rutas Protegidas dentro del MainLayout
+      // 🆕 Pantalla de configuración de primer uso
+      GoRoute(
+        path: '/setup',
+        builder: (context, state) => const FirstRunSetupScreen(),
+      ),
+
+      // ── Rutas protegidas dentro del MainLayout ───────────────────────────
       ShellRoute(
         builder: (context, state, child) => MainLayout(child: child),
         routes: [
           GoRoute(
             path: '/myprofile',
             builder: (context, state) {
-              // 1. Intentamos obtener el código de GoRouter (por si acaso viniera después del #)
               String? code = state.uri.queryParameters['code'];
-
-              // 2. 🚩 SI NO ESTÁ AHÍ, lo buscamos en la URL real del navegador (antes del #)
               if (code == null) {
                 final Uri uri = Uri.parse(html.window.location.href);
                 code = uri.queryParameters['code'];
@@ -122,11 +150,8 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                 WidgetsBinding.instance.addPostFrameCallback((_) async {
                   final authProvider = context.read<AuthProvider>();
                   final success = await authProvider.linkGitHubAccount(code!);
-
                   if (success) {
-                    // 3. Limpieza total: Esto eliminará el ?code= de la barra de direcciones
                     html.window.history.replaceState(null, '', '/#/myprofile');
-
                     ToastService.success("GitHub vinculado correctamente");
                   }
                 });
@@ -184,19 +209,16 @@ GoRouter createAppRouter(AuthProvider authProvider) {
           GoRoute(
             path: '/achievements',
             builder: (context, state) => const Scaffold(
-              // Si quieres que tenga scroll propio y padding
               body: SingleChildScrollView(
                 padding: EdgeInsets.all(40.0),
                 child: AchievementsCardWidget(),
               ),
             ),
           ),
-          // --- INTEGRACIONES ---
           GoRoute(
             path: '/integrations',
             builder: (context, state) => IntegrationsScreen(),
           ),
-          // --- TEMPLATES ---
           GoRoute(
             path: '/templates',
             builder: (context, state) => const AssetTemplatesMarketScreen(),
@@ -204,25 +226,21 @@ GoRouter createAppRouter(AuthProvider authProvider) {
               GoRoute(
                 path: 'create',
                 builder: (context, state) {
-                  // 🛡️ Verificación robusta del objeto extra
                   final Object? extra = state.extra;
                   AssetTemplate? draft;
-
                   if (extra is AssetTemplate) {
                     draft = extra;
                   }
-
                   return AssetTemplateEditorScreen(initialDraft: draft);
                 },
               ),
               GoRoute(
                 path: 'details/:templateId',
                 builder: (context, state) {
-                  // Intentamos pillar el objeto del 'extra' por eficiencia
                   final AssetTemplate? templateFromExtra =
                       state.extra as AssetTemplate?;
-                  final String templateId = state.pathParameters['templateId']!;
-
+                  final String templateId =
+                      state.pathParameters['templateId']!;
                   return AssetTemplateDetailScreen(
                     templateId: templateId,
                     initialTemplate: templateFromExtra,
@@ -231,7 +249,6 @@ GoRouter createAppRouter(AuthProvider authProvider) {
               ),
             ],
           ),
-          // --- PLUGINS ---
           GoRoute(
             path: '/plugins-admin',
             builder: (context, state) => const PluginAdminScreen(),
@@ -241,11 +258,8 @@ GoRouter createAppRouter(AuthProvider authProvider) {
             builder: (context, state) {
               final pluginId = state.pathParameters['pluginId']!;
               final provider = context.watch<PluginProvider>();
-
-              // Buscamos el plugin en la lista de instalados del provider
               final plugin = provider.installed.firstWhere(
                 (p) => p.id == pluginId,
-                // Asegúrate de tener implementado StorePlugin.empty() o usa este fallback:
                 orElse: () => StorePlugin(
                   id: '',
                   name: '',
@@ -256,14 +270,11 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                 ),
               );
               final processedUi = provider.getProcessedUi(plugin.ui!);
-
               return Scaffold(
                 appBar: AppBar(title: Text(plugin.name)),
-                body:
-                    Stac.fromJson(processedUi, context) ??
+                body: Stac.fromJson(processedUi, context) ??
                     const Center(
-                      child: Text("Error al cargar la interfaz del plugin"),
-                    ),
+                        child: Text("Error al cargar la interfaz del plugin")),
               );
             },
           ),
@@ -333,8 +344,7 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                   return DataListEditScreen(
                     containerId: state.pathParameters['containerId']!,
                     dataListId: state.pathParameters['dataListId']!,
-                    initialData:
-                        listData!, // La pantalla debe manejar si esto es null
+                    initialData: listData!,
                   );
                 },
               ),
@@ -361,26 +371,17 @@ GoRouter createAppRouter(AuthProvider authProvider) {
                   final locationId = int.tryParse(
                     state.pathParameters['locationId'] ?? '',
                   );
-
-                  // Intentar obtener del extra
                   Location? location = state.extra as Location?;
-
-                  // Fallback: Si no hay extra (ej. refresh), buscar en el provider
                   if (location == null && locationId != null) {
                     final provider = context.read<LocationProvider>();
                     try {
-                      location = provider.locations.firstWhere(
-                        (l) => l.id == locationId,
-                      );
-                    } catch (_) {
-                      // Si no está, la pantalla de edición deberá cargarla por ID o mostrar error
-                    }
+                      location =
+                          provider.locations.firstWhere((l) => l.id == locationId);
+                    } catch (_) {}
                   }
-
                   return LocationEditScreen(
                     containerId: containerId,
-                    location:
-                        location!, // Puede ser null, la pantalla debe validarlo
+                    location: location!,
                   );
                 },
               ),
@@ -390,8 +391,9 @@ GoRouter createAppRouter(AuthProvider authProvider) {
           // --- LOANS ---
           GoRoute(
             path: '/container/:containerId/loans',
-            builder: (context, state) =>
-                LoansScreen(containerId: state.pathParameters['containerId']!),
+            builder: (context, state) => LoansScreen(
+              containerId: state.pathParameters['containerId']!,
+            ),
             routes: [
               GoRoute(
                 path: 'new',
@@ -404,7 +406,6 @@ GoRouter createAppRouter(AuthProvider authProvider) {
         ],
       ),
     ],
-    // Manejo de errores de ruta no encontrada
     errorBuilder: (context, state) => Scaffold(
       body: Center(child: Text('Página no encontrada: ${state.uri}')),
     ),

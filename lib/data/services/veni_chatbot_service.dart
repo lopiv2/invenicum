@@ -47,9 +47,10 @@ class ChatService extends ChangeNotifier {
     required String locale, // 👈 Nuevo parámetro obligatorio
     Map<String, dynamic>? contextData,
   }) async {
-    // 1. Añadimos localmente para feedback instantáneo
-    // Evitamos duplicar si es el comando de saludo inicial
-    if (message != "SAY_HELLO_INITIAL") {
+    // Solo mostramos el mensaje del usuario si no es el comando interno de saludo.
+    // SAY_HELLO_INITIAL se procesa en el backend pero nunca aparece en el chat.
+    final bool isInternalCommand = message == "SAY_HELLO_INITIAL";
+    if (!isInternalCommand) {
       _messages.add({'text': message, 'isUser': true});
       notifyListeners();
     }

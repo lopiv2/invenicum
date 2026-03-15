@@ -28,10 +28,6 @@ class ApiService {
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
-          // 🚩 CAMBIO CRÍTICO: Eliminamos el 'await' de aquí.
-          // Si el token no está en _cachedToken, no lo buscamos en el disco dentro del interceptor
-          // porque el disco es demasiado lento para peticiones en ráfaga.
-
           if (_cachedToken != null) {
             options.headers['Authorization'] = 'Bearer $_cachedToken';
           }
@@ -53,6 +49,55 @@ class ApiService {
   }
 
   // ----------------------------------------------------
+  // 🆕 PRIMER USO / SETUP
+  // ----------------------------------------------------
+
+  /// Consulta al backend si la app necesita configuración inicial.
+  /// Devuelve [true] si es el primer arranque (tabla users vacía o no existe),
+  /// [false] si ya hay al menos un usuario registrado.
+  /// En caso de error de red se devuelve [false] para no bloquear el arranque.
+  Future<bool> checkFirstRun() async {
+    try {
+      final response = await dio.get('/auth/first-run');
+      // Se espera: { "firstRun": true } o { "firstRun": false }
+      return response.data['firstRun'] == true;
+    } on DioException catch (e) {
+      // 404 → endpoint no implementado aún → no bloqueamos
+      // 5xx → error del servidor → no bloqueamos
+      print('ApiService: checkFirstRun error ${e.response?.statusCode}: $e');
+      return false;
+    } catch (e) {
+      print('ApiService: checkFirstRun unexpected error: $e');
+      return false;
+    }
+  }
+
+  /// Crea el primer usuario administrador de la plataforma.
+  /// Solo debe poder llamarse cuando [checkFirstRun()] devuelve [true].
+  /// Lanza [Exception] con el mensaje del backend si falla.
+  Future<void> createFirstAdmin({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await dio.post(
+        '/auth/setup',
+        data: {'name': name, 'email': email, 'password': password},
+      );
+      // El backend simplemente devuelve 201. No necesitamos el cuerpo.
+    } on DioException catch (e) {
+      final message =
+          e.response?.data['message'] ??
+          e.response?.data['error'] ??
+          'Error al crear el administrador';
+      throw Exception(message);
+    } catch (e) {
+      throw Exception('Error de conexión: $e');
+    }
+  }
+
+  // ----------------------------------------------------
   // MÉTODOS DE SEGURIDAD
   // ----------------------------------------------------
 
@@ -63,14 +108,11 @@ class ApiService {
   }) async {
     try {
       final response = await dio.post(
-        '/auth/change-password', // Ajusta a tu ruta de Node.js/Backend
+        '/auth/change-password',
         data: {'currentPassword': currentPassword, 'newPassword': newPassword},
       );
-
-      // Si el backend devuelve success: true o simplemente un 200 OK
       return response.data['success'] == true || response.statusCode == 200;
     } on DioException catch (e) {
-      // Capturamos el error del backend (ej: "La contraseña actual no es correcta")
       final errorMessage =
           e.response?.data['message'] ??
           e.response?.data['error'] ??
@@ -85,7 +127,7 @@ class ApiService {
   Future<bool> requestPasswordReset(String email) async {
     try {
       final response = await dio.post(
-        '/auth/forgot-password', // Ajusta a tu ruta
+        '/auth/forgot-password',
         data: {'email': email},
       );
       return response.data['success'] == true || response.statusCode == 200;
@@ -106,23 +148,19 @@ class ApiService {
   }) async {
     try {
       final response = await dio.put(
-        '/users/profile', // Ajusta esta ruta según tu backend
+        '/users/profile',
         data: {
           'name': name,
           'username': username,
           'githubHandle': githubHandle,
         },
       );
-
-      // Tu backend devuelve { message: "...", user: {...} }
       final responseData = response.data;
-
       if (responseData['user'] != null) {
         return UserData.fromJson(responseData['user']);
       }
       return null;
     } on DioException catch (e) {
-      // Manejo de errores específico para saber si el username está duplicado
       final errorMessage =
           e.response?.data['error'] ?? 'Error al actualizar perfil';
       throw Exception(errorMessage);
@@ -131,12 +169,8 @@ class ApiService {
     }
   }
 
-  // lib/services/api_service.dart
-
   Future<Map<String, dynamic>?> getGitHubConfig() async {
     try {
-      // Recuerda que esta ruta en Node.js debe ser pública (sin verifyToken)
-      // para que la app pueda consultarla antes de iniciar el flujo
       final response = await dio.get('/auth/github/config');
       return response.data;
     } catch (e) {
@@ -145,11 +179,9 @@ class ApiService {
     }
   }
 
-  // Método específico para desconectar GitHub
   Future<bool> disconnectGitHub() async {
     try {
       final response = await dio.post('/auth/github/disconnect');
-
       return response.data['success'] == true;
     } catch (e) {
       print("ApiService: Error al desconectar GitHub: $e");
@@ -159,13 +191,10 @@ class ApiService {
 
   Future<Map<String, dynamic>?> completeGitHubOAuth(String code) async {
     try {
-      // Enviamos el código al backend.
-      // Es el backend quien tiene el CLIENT_SECRET y hará el intercambio real.
       final response = await dio.post(
         '/auth/github/complete',
         data: {'code': code},
       );
-
       return response.data;
     } catch (e) {
       rethrow;
@@ -178,9 +207,7 @@ class ApiService {
         '/users/verify-github',
         data: {'handle': handle},
       );
-
       if (response.statusCode == 200) {
-        // Retornamos la data que nos da nuestro server (avatarUrl, etc)
         return response.data['data'];
       }
       return null;
@@ -200,7 +227,6 @@ class ApiService {
         data: {'username': username, 'password': password},
       );
 
-      // Normalización de la respuesta (por si viene envuelta en 'data')
       Map<String, dynamic> responseData = response.data;
       if (responseData['data'] is Map) {
         responseData = responseData['data'] as Map<String, dynamic>;
@@ -222,13 +248,12 @@ class ApiService {
     }
   }
 
-  // 🚩 REEMPLAZO: Este método se llama UNA SOLA VEZ al arrancar la app (en main.dart)
+  /// Se llama UNA SOLA VEZ al arrancar la app (en main.dart)
   Future<void> initializeToken() async {
     final prefs = await SharedPreferences.getInstance();
     _cachedToken = prefs.getString(Environment.authTokenKey);
   }
 
-  // Getter síncrono para los Providers
   String? get currentToken => _cachedToken;
 
   Future<String?> getToken() async {
@@ -257,7 +282,6 @@ class ApiService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(Environment.authTokenKey);
     ChatService veniChatbotService = ChatService(this);
-    veniChatbotService
-        .clearHistory(); // Limpiamos el historial del chatbot al cerrar sesión
+    veniChatbotService.clearHistory();
   }
 }
