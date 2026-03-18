@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
@@ -57,6 +59,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   final _barcodeController = TextEditingController();
   final _quantityController = TextEditingController(text: '1');
   final _minStockController = TextEditingController(text: '1');
+  final _aiSearchController = TextEditingController();
+  bool _isEnrichLoading = false;
   final ScrollController _scrollController = ScrollController();
 
   bool _isMagicLoading = false;
@@ -74,10 +78,21 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   final Map<int, List<String>> _listFieldValues = {};
   final Map<int, String?> _selectedListValues = {};
   final Map<int, bool> _booleanFieldValues = {};
-
+  List<IntegrationModel> _availableDataSources = [];
+  String? _selectedSource;
   late AIService _aiService;
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
+  late IntegrationService _integrationService;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Este es el lugar seguro para inicializar cosas que usan context.read o context.watch
+    final apiService = context.read<ApiService>();
+    _integrationService = IntegrationService(apiService);
+  }
 
   @override
   void initState() {
@@ -85,7 +100,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _containerId = int.tryParse(widget.containerId);
     _assetTypeId = int.tryParse(widget.assetTypeId);
     _aiService = AIService(context.read<ApiService>());
-
+    _availableDataSources = AppIntegrations.getAvailableIntegrations(
+      context,
+    ).where((i) => i.isDataSource).toList();
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -94,7 +111,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       parent: _fadeController,
       curve: Curves.easeOut,
     );
-
+    if (_availableDataSources.isNotEmpty) {
+      _selectedSource = _availableDataSources.first.id;
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeForm());
   }
 
@@ -160,67 +179,147 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   // En tu AssetCreateScreen, antes de llamar al modal
-Future<void> _startScan() async {
-  var status = await Permission.camera.status;
-  if (status.isDenied) {
-    status = await Permission.camera.request();
-  }
+  Future<void> _startScan() async {
+    var status = await Permission.camera.status;
+    if (status.isDenied) {
+      status = await Permission.camera.request();
+    }
 
-  if (status.isGranted) {
-    _handleBarcodeScan(); // Tu función que abre el BarcodeScannerWidget
-  } else {
-    ToastService.error("Se requiere permiso de cámara para escanear");
+    if (status.isGranted) {
+      _handleBarcodeScan(); // Tu función que abre el BarcodeScannerWidget
+    } else {
+      ToastService.error("Se requiere permiso de cámara para escanear");
+    }
   }
-}
 
   Future<void> _handleBarcodeScan() async {
-  // 1. Abrimos el scanner (tu widget Stateful que ya definimos)
-  final String? scannedCode = await showModalBottomSheet<String>(
-    context: context,
-    isScrollControlled: true,
-    builder: (context) => const BarcodeScannerWidget(),
-  );
+    // 1. Abrimos el scanner (tu widget Stateful que ya definimos)
+    final String? scannedCode = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => const BarcodeScannerWidget(),
+    );
 
-  if (scannedCode == null || !mounted) return;
+    if (scannedCode == null || !mounted) return;
 
-  // 2. Iniciamos carga y ponemos el código en el campo
-  setState(() {
-    _barcodeController.text = scannedCode;
-    _isMagicLoading = true; // Si tienes un overlay de carga
-  });
-
-  try {
-    final integrationService = IntegrationService(context.read<ApiService>());
-    final InventoryItem? suggestedItem = await integrationService.lookupBarcode(scannedCode);
-
-    if (suggestedItem != null && mounted) {
-      setState(() {
-        // Rellenamos controladores
-        _nameController.text = suggestedItem.name;
-        _descriptionController.text = suggestedItem.description ?? '';
-
-        // 🖼️ Gestión de Imágenes
-        // Si el DTO trajo imágenes de la API externa (como UPCItemDB)
-        if (suggestedItem.images.isNotEmpty) {
-          _imagePreviewUrls = suggestedItem.images.map((img) => img.url).toList();
-        }
-
-        // Resaltamos los campos para que el usuario vea qué ha cambiado
-        _highlightedFields.addAll(['name', 'description', 'barcode', 'marketValue']);
-      });
-
-      ToastService.success("¡Datos encontrados en la nube!");
-    }
-  } catch (e) {
-    debugPrint("Error procesando sugerencia: $e");
-  } finally {
-    if (mounted) setState(() => _isMagicLoading = false);
-    // Limpiamos el resaltado después de un tiempo
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) setState(() => _highlightedFields.clear());
+    // 2. Iniciamos carga y ponemos el código en el campo
+    setState(() {
+      _barcodeController.text = scannedCode;
+      _isMagicLoading = true; // Si tienes un overlay de carga
     });
+
+    try {
+      final integrationService = IntegrationService(context.read<ApiService>());
+      final InventoryItem? suggestedItem = await integrationService
+          .lookupBarcode(scannedCode);
+
+      if (suggestedItem != null && mounted) {
+        setState(() {
+          // Rellenamos controladores
+          _nameController.text = suggestedItem.name;
+          _descriptionController.text = suggestedItem.description ?? '';
+
+          // 🖼️ Gestión de Imágenes
+          // Si el DTO trajo imágenes de la API externa (como UPCItemDB)
+          if (suggestedItem.images.isNotEmpty) {
+            _imagePreviewUrls = suggestedItem.images
+                .map((img) => img.url)
+                .toList();
+          }
+
+          // Resaltamos los campos para que el usuario vea qué ha cambiado
+          _highlightedFields.addAll([
+            'name',
+            'description',
+            'barcode',
+            'marketValue',
+          ]);
+        });
+
+        ToastService.success("¡Datos encontrados en la nube!");
+      }
+    } catch (e) {
+      debugPrint("Error procesando sugerencia: $e");
+    } finally {
+      if (mounted) setState(() => _isMagicLoading = false);
+      // Limpiamos el resaltado después de un tiempo
+      Future.delayed(const Duration(seconds: 4), () {
+        if (mounted) setState(() => _highlightedFields.clear());
+      });
+    }
   }
-}
+
+  Future<void> _handleEnrichSearch() async {
+    final query = _aiSearchController.text.trim();
+    if (query.isEmpty) {
+      ToastService.error("Escribe algo para buscar");
+      return;
+    }
+
+    setState(() => _isEnrichLoading = true);
+
+    try {
+      final Map<String, dynamic>? enrichedData = await _integrationService
+          .enrichItem(query: query, source: _selectedSource!);
+
+      if (enrichedData != null && mounted) {
+        setState(() {
+          // 1. Datos básicos
+          _nameController.text = enrichedData['name'] ?? '';
+          _descriptionController.text = enrichedData['description'] ?? '';
+
+          // 2. Imagen (Base64 que viene del DTO del back)
+          if (enrichedData['imageUrl'] != null) {
+            _imagePreviewUrls.insert(0, enrichedData['imageUrl']);
+          }
+
+          // 3. Campos dinámicos (customFieldValues)
+          final Map<String, dynamic> aiFields =
+              enrichedData['customFieldValues'] ?? {};
+
+          for (var fieldDef in _assetType!.fieldDefinitions) {
+            // Buscamos si la IA trajo un valor para este campo (insensible a mayúsculas)
+            final aiValue = aiFields.entries
+                .firstWhere(
+                  (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
+                  orElse: () => const MapEntry('', null),
+                )
+                .value;
+
+            if (aiValue == null) continue;
+
+            // Asignamos según el tipo de campo
+            if (fieldDef.type == CustomFieldType.boolean) {
+              _booleanFieldValues[fieldDef.id!] =
+                  aiValue.toString().toLowerCase() == 'true';
+            } else if (fieldDef.type == CustomFieldType.dropdown) {
+              final options = _listFieldValues[fieldDef.id] ?? [];
+              final match = options.firstWhere(
+                (o) => o.toLowerCase() == aiValue.toString().toLowerCase(),
+                orElse: () => '',
+              );
+              if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
+            } else {
+              _customControllers[fieldDef.id]?.text = aiValue.toString();
+            }
+
+            _highlightedFields.add(fieldDef.name);
+          }
+
+          _highlightedFields.addAll(['name', 'description']);
+        });
+
+        ToastService.success("¡Datos importados desde $_selectedSource!");
+      }
+    } catch (e) {
+      ToastService.error("Error al enriquecer: $e");
+    } finally {
+      if (mounted) setState(() => _isEnrichLoading = false);
+      Future.delayed(const Duration(seconds: 4), () {
+        if (mounted) setState(() => _highlightedFields.clear());
+      });
+    }
+  }
 
   Future<void> _runMagicAI(String url) async {
     if (_assetType == null) return;
@@ -449,6 +548,74 @@ Future<void> _startScan() async {
                           spacing: 24,
                           runSpacing: 24,
                           children: [
+                            BentoBoxWidget(
+                              width:
+                                  1044, // Ancho completo (aprox) para destacar sobre el resto
+                              title: "Importar desde Fuente Externa",
+                              icon: Icons.auto_awesome,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  // 1. Selector de Fuente (Basado en tus constantes)
+                                  SizedBox(
+                                    width: 250,
+                                    child: DropdownButtonFormField<String>(
+                                      value: _selectedSource,
+                                      decoration: const InputDecoration(
+                                        labelText: "Fuente de datos",
+                                        prefixIcon: Icon(Icons.api),
+                                      ),
+                                      items: _availableDataSources
+                                          .map(
+                                            (source) => DropdownMenuItem(
+                                              value: source.id,
+                                              child: Row(
+                                                children: [
+                                                  SizedBox(
+                                                    width: 20,
+                                                    child: source.icon,
+                                                  ),
+                                                  const SizedBox(width: 10),
+                                                  Text(source.name),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                          .toList(),
+                                      onChanged: (val) =>
+                                          setState(() => _selectedSource = val),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  // 2. Campo de búsqueda y botón de acción
+                                  Expanded(
+                                    child: TextFormField(
+                                      controller: _aiSearchController,
+                                      decoration: InputDecoration(
+                                        labelText: "Buscar por nombre",
+                                        hintText:
+                                            "Ej: Pikachu, Catan, El Quijote...",
+                                        suffixIcon: _isEnrichLoading
+                                            ? const Padding(
+                                                padding: EdgeInsets.all(12.0),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              )
+                                            : IconButton(
+                                                icon: const Icon(Icons.search),
+                                                onPressed:
+                                                    _handleEnrichSearch, // La función que creamos antes
+                                              ),
+                                      ),
+                                      onFieldSubmitted: (_) =>
+                                          _handleEnrichSearch(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                             BentoBoxWidget(
                               width: 650,
                               title: "Datos Principales",

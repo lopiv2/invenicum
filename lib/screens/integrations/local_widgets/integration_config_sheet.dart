@@ -30,7 +30,9 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
     // 1. Creamos los controladores para cada campo definido en el modelo
     for (var field in widget.integration.fields) {
       _controllers[field.id] = TextEditingController();
-      _obscureTextMap[field.id] = true;
+      if (field.type == IntegrationFieldType.password) {
+        _obscureTextMap[field.id] = true;
+      }
     }
 
     // 2. Cargamos los datos guardados del backend mediante el Provider
@@ -85,7 +87,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
           // --- Cabecera ---
           Row(
             children: [
-              Icon(widget.integration.icon, size: 32, color: Colors.blue),
+              SizedBox(width: 32, height: 32, child: widget.integration.icon),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -115,63 +117,54 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
             )
           else
             ...widget.integration.fields.map((field) {
-              if (field.type == IntegrationFieldType.text) {
-                const sensitiveIds = [
-                  'apiKey',
-                  'api_key',
-                  'token',
-                  'secret',
-                  'password',
-                ];
-                final bool isSensitive = sensitiveIds.contains(field.id);
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: Column(
-                    children: [
-                      TextFormField(
-                        controller: _controllers[field.id],
-                        obscureText: isSensitive
-                            ? (_obscureTextMap[field.id] ?? true)
-                            : false,
-                        decoration: InputDecoration(
-                          labelText: field.label,
-                          helperText: field.helperText,
-                          border: const OutlineInputBorder(),
-                          suffixIcon: isSensitive
-                              ? IconButton(
-                                  icon: Icon(
-                                    _obscureTextMap[field.id] == true
-                                        ? Icons.visibility_off_outlined
-                                        : Icons.visibility_outlined,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscureTextMap[field.id] =
-                                          !(_obscureTextMap[field.id] ?? true);
-                                    });
-                                  },
-                                )
-                              : null, // Si no es sensible, no hay icono
-                        ),
+              final bool isPassword =
+                  field.type == IntegrationFieldType.password;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _controllers[field.id],
+                      obscureText: isPassword
+                          ? (_obscureTextMap[field.id] ?? true)
+                          : false,
+                      decoration: InputDecoration(
+                        labelText: field.label,
+                        helperText: field.helperText,
+                        border: const OutlineInputBorder(),
+                        suffixIcon: isPassword
+                            ? IconButton(
+                                icon: Icon(
+                                  _obscureTextMap[field.id] == true
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _obscureTextMap[field.id] =
+                                        !(_obscureTextMap[field.id] ?? true);
+                                  });
+                                },
+                              )
+                            : null,
                       ),
-                      if (widget.integration.id == 'upcitemdb' &&
-                          field.id == 'apiKey')
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8, left: 4),
-                          child: Text(
-                            "Deja este campo vacío para usar el modo Gratuito (Limitado).",
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.blueGrey[400],
-                              fontStyle: FontStyle.italic,
-                            ),
+                    ),
+                    if (widget.integration.id == 'upcitemdb' &&
+                        field.id == 'apiKey')
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8, left: 4),
+                        child: Text(
+                          "Deja este campo vacío para usar el modo Gratuito (Limitado).",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.blueGrey[400],
+                            fontStyle: FontStyle.italic,
                           ),
                         ),
-                    ],
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
+                      ),
+                  ],
+                ),
+              );
             }),
           if (!_isIdLoading)
             Padding(

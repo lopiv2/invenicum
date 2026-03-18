@@ -160,7 +160,8 @@ void main() async {
           create: (context) =>
               DashboardProvider(context.read<DashboardService>()),
           update: (context, auth, previous) {
-            if (!auth.isLoading && auth.isAuthenticated) {
+            // 🚩 Añadida comprobación de token y estado de carga
+            if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
               if (previous != null &&
                   previous.stats == null &&
                   !previous.isLoading) {
@@ -218,8 +219,11 @@ void main() async {
             c.read<LocationService>(),
           ),
           update: (context, auth, prev) {
+            // 🚩 Ahora solo pide contenedores si el token es válido
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
-              Future.microtask(() => prev?.loadContainers());
+              if (prev != null && !prev.isLoading && prev.containers.isEmpty) {
+                Future.microtask(() => prev.loadContainers());
+              }
             }
             return prev!;
           },
@@ -239,6 +243,7 @@ void main() async {
         ChangeNotifierProxyProvider<AuthProvider, AchievementProvider>(
           create: (c) => AchievementProvider(c.read<AchievementService>()),
           update: (context, auth, prev) {
+            // 🚩 Protección añadida
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
               if (prev != null &&
                   prev.achievements.isEmpty &&

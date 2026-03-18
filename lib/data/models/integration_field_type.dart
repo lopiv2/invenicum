@@ -1,6 +1,7 @@
-import 'package:flutter/widgets.dart';
 
-enum IntegrationFieldType { text, boolean, number }
+import 'package:flutter/material.dart';
+
+enum IntegrationFieldType { text, boolean, number, password }
 
 class IntegrationField {
   final String id;
@@ -19,15 +20,17 @@ class IntegrationField {
 class IntegrationModel {
   final String id;
   final String name;
-  final IconData icon;
+  final Widget icon;
   final String description;
   final List<IntegrationField> fields;
+  final bool isDataSource;
 
-  IntegrationModel({
+  const IntegrationModel({
     required this.id,
     required this.name,
     required this.icon,
     required this.description,
     required this.fields,
+    this.isDataSource = false,
   });
 }

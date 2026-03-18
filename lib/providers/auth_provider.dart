@@ -30,17 +30,21 @@ class AuthProvider with ChangeNotifier {
   /// Evita la doble inicialización y los notifyListeners() intermedios
   /// que pueden disparar el redirect del router con estado inconsistente.
   AuthProvider({bool tokenAlreadyInitialized = false}) {
-    _apiService.onUnauthorized = () {
-      _handleSessionExpired();
+  _apiService.onUnauthorized = () {
+    // 🚩 CLAVE: Solo actuar si todavía no hemos procesado la expiración
+    if (isAuthenticated) { 
+      _handleSessionExpired(); // Esto pone _user y _token a null inmediatamente
+
       toastification.show(
         type: ToastificationType.error,
         title: const Text('Sesión expirada'),
         description: const Text('Por favor, ingresa de nuevo.'),
         autoCloseDuration: const Duration(seconds: 5),
       );
-    };
-    _initialize(skipTokenInit: tokenAlreadyInitialized);
-  }
+    }
+  };
+  _initialize(skipTokenInit: tokenAlreadyInitialized);
+}
 
   Future<void> _initialize({bool skipTokenInit = false}) async {
     // Si el token ya fue inicializado en main.dart antes del runApp,

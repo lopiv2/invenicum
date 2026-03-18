@@ -57,7 +57,7 @@ dependencies:
   fluttertoast: ^9.0.0
   toastification: ^3.0.3
   flutter_animate: ^4.5.2
-  font_awesome_flutter: ^10.12.0
+  font_awesome_flutter: ^11.0.0
   app_links: ^6.4.1
   collection: ^1.19.1
   table_calendar: ^3.2.0

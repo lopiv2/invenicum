@@ -10,10 +10,12 @@ class AppIntegrations {
   static const String gemini = 'gemini';
   static const String telegram = 'telegram';
   static const String email = 'email'; // Nuevo
-  static const String ebay = 'ebay'; // Nuevo
   static const String qrLabels = 'qr_labels';
   static const String priceCharting = 'price_charting';
   static const String upcitemdb = 'upcitemdb';
+  static const String bgg = 'bgg';
+  static const String pokemon = 'pokemon';
+
 
   /// Retorna la lista de modelos completa para la UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {
@@ -24,13 +26,14 @@ class AppIntegrations {
       IntegrationModel(
         id: gemini,
         name: 'Google Gemini AI',
-        icon: Icons.auto_awesome,
+        isDataSource: false,
+        icon: Icon(Icons.auto_awesome),
         description: l10n.integrationGeminiDesc,
         fields: [
           IntegrationField(
             id: 'apiKey',
             label: 'API Key',
-            type: IntegrationFieldType.text,
+            type: IntegrationFieldType.password,
             helperText: l10n.helperGeminiKey,
           ),
           IntegrationField(
@@ -46,13 +49,14 @@ class AppIntegrations {
       IntegrationModel(
         id: telegram,
         name: 'Telegram Bot',
-        icon: FontAwesomeIcons.telegram,
+        isDataSource: false,
+        icon: FaIcon(FontAwesomeIcons.telegram),
         description: l10n.integrationTelegramDesc,
         fields: [
           IntegrationField(
             id: 'botToken', // Antes 'bot_token'
             label: 'Bot Token',
-            type: IntegrationFieldType.text,
+            type: IntegrationFieldType.password,
             helperText: 'De @BotFather',
           ),
           IntegrationField(
@@ -66,14 +70,15 @@ class AppIntegrations {
       IntegrationModel(
         id: 'email',
         name: 'Resend Email',
-        icon: Icons.alternate_email_rounded,
+        isDataSource: false,
+        icon: Icon(Icons.email_outlined),
         description:
             'Envío de correos ultra-confiable. Ideal para reportes y alertas críticas.',
         fields: [
           IntegrationField(
             id: 'apiKey', // sensitiveIds lo ocultará automáticamente
             label: 'Resend API Key',
-            type: IntegrationFieldType.text,
+            type: IntegrationFieldType.password,
             helperText: 'Obtenida en resend.com/api-keys',
           ),
           IntegrationField(
@@ -84,36 +89,39 @@ class AppIntegrations {
           ),
         ],
       ),
-      // --- E-COMMERCE ---
+      // --- MISCELLANEOUS ---
       IntegrationModel(
-        id: ebay,
-        name: 'eBay Marketplace',
-        icon: FontAwesomeIcons.ebay,
-        description: 'Sincroniza stock y publica anuncios automáticamente.',
+        id: 'bgg',
+        name: 'BoardGameGeek',
+        isDataSource: true,
+        icon: const FaIcon(FontAwesomeIcons.boardGameGeek, color: Colors.red),
+        description:
+            'Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.',
         fields: [
           IntegrationField(
-            id: 'client_id',
-            label: 'App ID (Client ID)',
+            id: 'bgg_username',
+            label: 'BGG Username',
             type: IntegrationFieldType.text,
-          ),
-          IntegrationField(
-            id: 'client_secret',
-            label: 'Cert ID (Client Secret)',
-            type: IntegrationFieldType.text,
-          ),
-          IntegrationField(
-            id: 'ru_name',
-            label: 'RuName (Redirect URL Name)',
-            type: IntegrationFieldType.text,
+            // Esto es lo único que necesitamos del usuario para identificar su colección
           ),
         ],
+      ),
+      IntegrationModel(
+        id: 'pokemon',
+        name: 'PokeApi',
+        isDataSource: true,
+        icon: const Icon(Icons.catching_pokemon, color: Colors.red),
+        description:
+            'Conectate a la Api de Pokemon para sincronizar tu colección y enriquecer tus datos automáticamente.',
+        fields: [],
       ),
 
       // --- HERRAMIENTAS ---
       IntegrationModel(
         id: qrLabels,
         name: 'Generador QR',
-        icon: Icons.qr_code,
+        isDataSource: false,
+        icon: FaIcon(FontAwesomeIcons.qrcode),
         description: 'Configura el formato de tus etiquetas imprimibles.',
         fields: [
           IntegrationField(
@@ -131,27 +139,29 @@ class AppIntegrations {
       IntegrationModel(
         id: priceCharting,
         name: 'PriceCharting',
-        icon: Icons.show_chart_rounded,
+        isDataSource: false,
+        icon: FaIcon(FontAwesomeIcons.chartArea),
         description: 'Configura tu API Key para obtener precios actualizados.',
         fields: [
           IntegrationField(
             id: 'api_key',
             label: 'API Key',
-            type: IntegrationFieldType.text,
+            type: IntegrationFieldType.password,
           ),
         ],
       ),
       IntegrationModel(
         id: upcitemdb,
         name: 'UPCitemdb',
-        icon: FontAwesomeIcons.barcode,
+        isDataSource: false,
+        icon: FaIcon(FontAwesomeIcons.barcode),
         description: 'Búsqueda global de precios por código de barras.',
         fields: [
           // Campo para que el usuario pegue su API Key de UPCitemdb
           IntegrationField(
             id: 'apiKey',
             label: 'API Key (user_key)',
-            type: IntegrationFieldType.text,
+            type: IntegrationFieldType.password,
           ),
         ],
       ),

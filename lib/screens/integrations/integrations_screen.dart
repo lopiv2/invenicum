@@ -60,8 +60,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             context,
             title: "Google Gemini",
             subtitle: "Habilita el asistente inteligente y análisis Pro.",
-            icon: Icons.auto_awesome,
-            iconColor: Colors.deepPurpleAccent,
+            icon: Icon(Icons.auto_awesome, color: Colors.deepPurpleAccent),
             isLinked: integrationProv.isLinked(AppIntegrations.gemini),
             onTap: () => _openConfig(context, AppIntegrations.gemini),
           ),
@@ -73,8 +72,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             context,
             title: "Telegram Bot",
             subtitle: "Configura alertas y bots de chat.",
-            icon: FontAwesomeIcons.telegram,
-            iconColor: const Color(0xFF26A5E4),
+            icon: FaIcon(FontAwesomeIcons.telegram, color: Color(0xFF26A5E4)),
             // CAMBIO AQUÍ: Ahora lee el estado real del Provider
             isLinked: integrationProv.isLinked(AppIntegrations.telegram),
             onTap: () => _openConfig(context, AppIntegrations.telegram),
@@ -83,43 +81,47 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             context,
             title: "E-Mail (A través de Resend)",
             subtitle: "Envío de reportes y alertas profesionales.",
-            icon: Icons.mail_outline_rounded,
-            iconColor: const Color(0xFF3CE426), // Tu color verde
+            icon: Icon(Icons.mail_outline_rounded, color: Color(0xFF3CE426)),
             isLinked: integrationProv.isLinked(AppIntegrations.email),
             onTap: () => _openConfig(context, AppIntegrations.email),
           ),
           const SizedBox(height: 24),
 
-          // --- E-COMMERCE ---
-          _buildSectionHeader("E-Commerce & Marketplaces"),
+          // --- Data APIs ---
+          _buildSectionHeader("Miscellaneous Data APIs"),
           _buildIntegrationCard(
             context,
-            title: "eBay Connector",
-            subtitle: "Sincroniza stock y publica anuncios.",
-            icon: FontAwesomeIcons.ebay,
-            iconColor: const Color(0xFFE53238),
-            isLinked: false,
-            onTap: () => _openConfig(context, AppIntegrations.ebay),
+            title: "BoardGameGeek",
+            subtitle: "Obtain data from BoardGameGeek.com",
+            icon: FaIcon(FontAwesomeIcons.boardGameGeek, color: Colors.red),
+            isLinked: integrationProv.isLinked(AppIntegrations.bgg),
+            onTap: () => _openConfig(context, AppIntegrations.bgg),
           ),
           const SizedBox(height: 24),
-
+          _buildIntegrationCard(
+            context,
+            title: "PokeApi",
+            subtitle: "Obtain data from PokeApi.co",
+            icon: Icon(Icons.catching_pokemon, color: Colors.red),
+            isLinked: integrationProv.isLinked(AppIntegrations.pokemon),
+            onTap: () => _openConfig(context, AppIntegrations.pokemon),
+          ),
+          const SizedBox(height: 24),
           // --- HERRAMIENTAS ---
           _buildSectionHeader("Herramientas de Valoración"),
           _buildIntegrationCard(
             context,
             title: "PriceCharting",
             subtitle: "Historial de precios de videojuegos.",
-            icon: Icons.show_chart_rounded,
-            iconColor: Colors.orange,
-            isLinked: false,
+            icon: FaIcon(FontAwesomeIcons.chartArea, color: Colors.orange),
+            isLinked: integrationProv.isLinked(AppIntegrations.priceCharting),
             onTap: () => _openConfig(context, AppIntegrations.priceCharting),
           ),
           _buildIntegrationCard(
             context,
             title: "UPCitemdb",
             subtitle: "Valoración por código de barras y EAN.",
-            icon: FontAwesomeIcons.barcode, // Icono de escáner muy intuitivo
-            iconColor: Colors.blueAccent,
+            icon: FaIcon(FontAwesomeIcons.barcode, color: Colors.blueAccent),
             isLinked: integrationProv.isLinked(AppIntegrations.upcitemdb),
             onTap: () => _openConfig(context, AppIntegrations.upcitemdb),
           ),
@@ -131,8 +133,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             context,
             title: "Generador de QR",
             subtitle: "Configura el formato de impresión.",
-            icon: Icons.qr_code,
-            iconColor: Colors.blueGrey,
+            icon: FaIcon(FontAwesomeIcons.qrcode, color: Colors.blueGrey),
             isLinked: false,
             onTap: () => _openConfig(context, AppIntegrations.qrLabels),
           ),
@@ -160,8 +161,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
     BuildContext context, {
     required String title,
     required String subtitle,
-    required IconData icon,
-    required Color iconColor,
+    required Widget icon,
     required bool isLinked,
     required VoidCallback onTap,
   }) {
@@ -183,11 +183,8 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
           ),
           leading: Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: iconColor.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: FaIcon(icon, color: iconColor, size: 24),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
+            child: SizedBox(child: icon),
           ),
           title: Text(
             title,

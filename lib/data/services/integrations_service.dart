@@ -64,18 +64,52 @@ class IntegrationService {
     }
   }
 
-  Future<InventoryItem?> lookupBarcode(String barcode) async {
-  try {
-    final response = await _dio.get('/integrations/barcode/lookup/$barcode');
-    
-    if (response.data['data'] != null) {
-      // Usamos tu factory blindado para convertir el JSON en objeto
-      return InventoryItem.fromJson(response.data['data']);
+  /// Llama al endpoint de enriquecimiento con IA (Gemini + API Externa)
+  /// Devuelve un mapa con [name, description, imageUrl, customFieldValues, etc.]
+  Future<Map<String, dynamic>?> enrichItem({
+    required String query,
+    required String source,
+    String locale = "es",
+  }) async {
+    try {
+      // Llamada al endpoint: /api/integrations/enrich?query=...&source=...&locale=...
+      final response = await _dio.get(
+        '/integrations/enrich',
+        queryParameters: {'query': query, 'source': source, 'locale': locale},
+      );
+
+      // Verificamos la estructura de tu backend { success: true, data: { ... } }
+      if (response.data['success'] == true && response.data['data'] != null) {
+        return response.data['data'] as Map<String, dynamic>;
+      }
+
+      return null;
+    } on DioException catch (e) {
+      // Capturamos errores específicos (404 no encontrado, 412 sin API Key, etc.)
+      final errorMessage =
+          e.response?.data['error'] ?? 'Error al enriquecer el objeto';
+      debugPrint("[ENRICH-SERVICE-ERROR]: $errorMessage");
+
+      // Lanzamos la excepción para que el UI (ToastService) pueda mostrar el mensaje real
+      throw Exception(errorMessage);
+    } catch (e) {
+      debugPrint("[ENRICH-SERVICE-FATAL]: $e");
+      return null;
     }
-    return null;
-  } on DioException catch (e) {
-    debugPrint("Error en lookup de barcode: ${e.response?.data}");
-    return null;
   }
-}
+
+  Future<InventoryItem?> lookupBarcode(String barcode) async {
+    try {
+      final response = await _dio.get('/integrations/barcode/lookup/$barcode');
+
+      if (response.data['data'] != null) {
+        // Usamos tu factory blindado para convertir el JSON en objeto
+        return InventoryItem.fromJson(response.data['data']);
+      }
+      return null;
+    } on DioException catch (e) {
+      debugPrint("Error en lookup de barcode: ${e.response?.data}");
+      return null;
+    }
+  }
 }
