@@ -18,25 +18,32 @@ import '../asset_types/local_widgets/asset_list_header.dart';
 class _PageStateData {
   final List<InventoryItem> items;
   final bool loading;
-  _PageStateData({required this.items, required this.loading});
+  final int totalItems;
+
+  _PageStateData({
+    required this.items,
+    required this.loading,
+    required this.totalItems,
+  });
 
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
     if (other is! _PageStateData) return false;
-    
+
+    if (totalItems != other.totalItems) return false;
     // 🔑 Comparar loading
     if (loading != other.loading) return false;
-    
+
     // 🔑 Comparar longitud de items
     if (items.length != other.items.length) return false;
-    
+
     // 🔑 CRÍTICO: Comparar contenido de items, no solo IDs
     // Esto detecta cambios cuando editas un item y vuelves
     for (int i = 0; i < items.length && i < 20; i++) {
       final itemA = items[i];
       final itemB = other.items[i];
-      
+
       // Comparar campos clave que pueden cambiar
       if (itemA.id != itemB.id ||
           itemA.name != itemB.name ||
@@ -49,23 +56,14 @@ class _PageStateData {
         return false;
       }
     }
-    
+
     return true;
   }
 
   @override
   int get hashCode {
-    // 🔑 Hash incluye contenido, no solo IDs
-    int hash = loading.hashCode;
-    hash ^= items.length.hashCode;
-    for (int i = 0; i < items.length && i < 5; i++) {
-      final item = items[i];
-      hash ^= item.id.hashCode;
-      hash ^= item.name.hashCode;
-      hash ^= item.quantity.hashCode;
-      hash ^= (item.description?.hashCode ?? 0);
-    }
-    return hash;
+    // Usamos Object.hash para mayor seguridad y limpieza
+    return Object.hash(loading, items.length);
   }
 }
 
@@ -179,20 +177,23 @@ class _AssetListScreenState extends State<AssetListScreen>
   ) {
     // 🔑 Calcular hash de los items incluyendo CONTENIDO (no solo IDs)
     // Esto detecta cambios cuando editas campos y también cuando hay valores vacíos
-    int itemsHash = allItems.length;
+    int itemsHash = itemProvider.totalItems ^ allItems.length;
     for (int i = 0; i < allItems.length && i < 10; i++) {
       final item = allItems[i];
       itemsHash = ((itemsHash * 31) ^ item.id.hashCode) & 0x7FFFFFFF;
       itemsHash = ((itemsHash * 31) ^ item.name.hashCode) & 0x7FFFFFFF;
       itemsHash = ((itemsHash * 31) ^ item.quantity.hashCode) & 0x7FFFFFFF;
-      itemsHash = ((itemsHash * 31) ^ (item.description?.hashCode ?? 0)) & 0x7FFFFFFF;
-      itemsHash = ((itemsHash * 31) ^ (item.barcode?.hashCode ?? 0)) & 0x7FFFFFFF;
+      itemsHash =
+          ((itemsHash * 31) ^ (item.description?.hashCode ?? 0)) & 0x7FFFFFFF;
+      itemsHash =
+          ((itemsHash * 31) ^ (item.barcode?.hashCode ?? 0)) & 0x7FFFFFFF;
     }
-    
+
     final searchTerm = _searchController.text.toLowerCase().trim();
-    
+
     // También incluir el sortKey del provider para detectar cambios de ordenamiento
-    final sortKeyHash = '${itemProvider.sortKey}_${itemProvider.sortAscending}'.hashCode;
+    final sortKeyHash =
+        '${itemProvider.sortKey}_${itemProvider.sortAscending}'.hashCode;
 
     // Crear hash de los filtros del provider
     final filtersHash = itemProvider.filters.entries
@@ -442,8 +443,11 @@ class _AssetListScreenState extends State<AssetListScreen>
 
     // 🚀 Selector OPTIMIZADO: Solo escucha items y loading
     return Selector<InventoryItemProvider, _PageStateData>(
-      selector: (_, prov) =>
-          _PageStateData(items: prov.inventoryItems, loading: prov.isLoading),
+      selector: (_, prov) => _PageStateData(
+        items: prov.inventoryItems,
+        loading: prov.isLoading,
+        totalItems: prov.totalItems,
+      ),
       builder: (context, data, child) {
         // Obtenemos los providers con 'read' para evitar que el movimiento del sidebar los dispare
         final containerProvider = context.read<ContainerProvider>();
@@ -469,7 +473,10 @@ class _AssetListScreenState extends State<AssetListScreen>
         }
 
         // 🚀 Usar CACHÉ: Items filtrados solo se recalculan si cambió algo
-        final viewItems = _getFilteredItems(data.items, context.read<InventoryItemProvider>()).cast<InventoryItem>();
+        final viewItems = _getFilteredItems(
+          data.items,
+          context.read<InventoryItemProvider>(),
+        ).cast<InventoryItem>();
         final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
 
         return Scaffold(

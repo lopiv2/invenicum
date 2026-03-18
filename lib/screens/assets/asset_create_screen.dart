@@ -89,9 +89,23 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Este es el lugar seguro para inicializar cosas que usan context.read o context.watch
     final apiService = context.read<ApiService>();
     _integrationService = IntegrationService(apiService);
+
+    // getAvailableIntegrations usa AppLocalizations.of(context) internamente,
+    // por eso DEBE estar aquí y no en initState — en initState las
+    // localizaciones aún no están disponibles y lanza una excepción.
+    final sources = AppIntegrations.getAvailableIntegrations(
+      context,
+    ).where((i) => i.isDataSource).toList();
+
+    // Solo actualizamos si la lista cambió para no perder la selección actual
+    if (sources.length != _availableDataSources.length) {
+      _availableDataSources = sources;
+      if (_selectedSource == null && sources.isNotEmpty) {
+        _selectedSource = sources.first.id;
+      }
+    }
   }
 
   @override
@@ -100,9 +114,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _containerId = int.tryParse(widget.containerId);
     _assetTypeId = int.tryParse(widget.assetTypeId);
     _aiService = AIService(context.read<ApiService>());
-    _availableDataSources = AppIntegrations.getAvailableIntegrations(
-      context,
-    ).where((i) => i.isDataSource).toList();
+    // _availableDataSources se inicializa en didChangeDependencies
+    // porque AppLocalizations.of(context) requiere el árbol de widgets completo.
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -111,9 +124,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       parent: _fadeController,
       curve: Curves.easeOut,
     );
-    if (_availableDataSources.isNotEmpty) {
-      _selectedSource = _availableDataSources.first.id;
-    }
     WidgetsBinding.instance.addPostFrameCallback((_) => _initializeForm());
   }
 
@@ -250,76 +260,106 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   Future<void> _handleEnrichSearch() async {
-    final query = _aiSearchController.text.trim();
-    if (query.isEmpty) {
-      ToastService.error("Escribe algo para buscar");
-      return;
-    }
+  final query = _aiSearchController.text.trim();
+  if (query.isEmpty) {
+    ToastService.error("Escribe algo para buscar");
+    return;
+  }
 
-    setState(() => _isEnrichLoading = true);
+  setState(() => _isEnrichLoading = true);
 
-    try {
-      final Map<String, dynamic>? enrichedData = await _integrationService
-          .enrichItem(query: query, source: _selectedSource!);
+  try {
+    // 1. Llamada al servicio
+    final Map<String, dynamic>? enrichedData = await _integrationService.enrichItem(
+      query: query,
+      source: _selectedSource!,
+    );
 
-      if (enrichedData != null && mounted) {
-        setState(() {
-          // 1. Datos básicos
-          _nameController.text = enrichedData['name'] ?? '';
-          _descriptionController.text = enrichedData['description'] ?? '';
+    // 2. Si hay datos, procesamos el JSON que me mostraste
+    if (enrichedData != null && mounted) {
+      setState(() {
+        // --- A. DATOS BÁSICOS ---
+        _nameController.text = enrichedData['name'] ?? _nameController.text;
+        
+        // Guardamos descripción base
+        String baseDescription = enrichedData['description'] ?? '';
 
-          // 2. Imagen (Base64 que viene del DTO del back)
-          if (enrichedData['imageUrl'] != null) {
-            _imagePreviewUrls.insert(0, enrichedData['imageUrl']);
+        // --- B. TRATAMIENTO DE IMAGEN ---
+        // El JSON de Voltorb trae "images": [{"url": "..."}]
+        if (enrichedData['images'] != null && (enrichedData['images'] as List).isNotEmpty) {
+          final imageUrl = enrichedData['images'][0]['url'];
+          if (imageUrl != null) {
+            _imagePreviewUrls.insert(0, imageUrl);
           }
+        } else if (enrichedData['imageUrl'] != null) { 
+          // Por si el DTO cambia a formato simple
+          _imagePreviewUrls.insert(0, enrichedData['imageUrl']);
+        }
 
-          // 3. Campos dinámicos (customFieldValues)
-          final Map<String, dynamic> aiFields =
-              enrichedData['customFieldValues'] ?? {};
+        // --- C. MAPEADO DE CAMPOS DINÁMICOS ---
+        final Map<String, dynamic> aiFields = enrichedData['customFieldValues'] ?? {};
+        final Set<String> usedAiKeys = {}; 
+        final List<String> unusedDataLines = [];
 
-          for (var fieldDef in _assetType!.fieldDefinitions) {
-            // Buscamos si la IA trajo un valor para este campo (insensible a mayúsculas)
-            final aiValue = aiFields.entries
-                .firstWhere(
-                  (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
-                  orElse: () => const MapEntry('', null),
-                )
-                .value;
+        // Buscamos coincidencias en los campos de tu AssetType
+        for (var fieldDef in _assetType!.fieldDefinitions) {
+          final entry = aiFields.entries.firstWhere(
+            (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
+            orElse: () => const MapEntry('', null),
+          );
 
-            if (aiValue == null) continue;
+          if (entry.value != null) {
+            usedAiKeys.add(entry.key);
+            final val = entry.value.toString();
 
-            // Asignamos según el tipo de campo
             if (fieldDef.type == CustomFieldType.boolean) {
-              _booleanFieldValues[fieldDef.id!] =
-                  aiValue.toString().toLowerCase() == 'true';
+              _booleanFieldValues[fieldDef.id!] = val.toLowerCase() == 'true';
             } else if (fieldDef.type == CustomFieldType.dropdown) {
               final options = _listFieldValues[fieldDef.id] ?? [];
               final match = options.firstWhere(
-                (o) => o.toLowerCase() == aiValue.toString().toLowerCase(),
+                (o) => o.toLowerCase() == val.toLowerCase(),
                 orElse: () => '',
               );
               if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
             } else {
-              _customControllers[fieldDef.id]?.text = aiValue.toString();
+              _customControllers[fieldDef.id]?.text = val;
             }
-
             _highlightedFields.add(fieldDef.name);
           }
+        }
 
-          _highlightedFields.addAll(['name', 'description']);
+        // --- D. RECOGER DATOS HUÉRFANOS (Voltorb tiene muchos: Ataque_Especial, etc.) ---
+        aiFields.forEach((key, value) {
+          if (!usedAiKeys.contains(key) && key.toLowerCase() != 'external_id') {
+            unusedDataLines.add("$key: $value");
+          }
         });
 
-        ToastService.success("¡Datos importados desde $_selectedSource!");
-      }
-    } catch (e) {
-      ToastService.error("Error al enriquecer: $e");
-    } finally {
-      if (mounted) setState(() => _isEnrichLoading = false);
+        // Combinamos descripción con datos no mapeados
+        if (unusedDataLines.isNotEmpty) {
+          final String extraInfo = "\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}";
+          _descriptionController.text = baseDescription + extraInfo;
+        } else {
+          _descriptionController.text = baseDescription;
+        }
+
+        _highlightedFields.addAll(['name', 'description']);
+      });
+
+      ToastService.success("¡${enrichedData['name']} importado con éxito!");
+    }
+  } catch (e) {
+    debugPrint("Error en enriquecimiento: $e");
+    ToastService.error("No se pudo completar la importación");
+  } finally {
+    if (mounted) {
+      setState(() => _isEnrichLoading = false);
       Future.delayed(const Duration(seconds: 4), () {
         if (mounted) setState(() => _highlightedFields.clear());
       });
     }
   }
+}
 
   Future<void> _runMagicAI(String url) async {
     if (_assetType == null) return;
@@ -404,6 +444,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   Future<void> _saveAsset() async {
+    final itemProvider = context.read<InventoryItemProvider>();
     if (!AssetFormUtils.validateForm(_formKey) ||
         _assetType == null ||
         _selectedLocationId == null) {
@@ -461,6 +502,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       );
       if (mounted) {
         ToastService.success('Activo creado!');
+        await itemProvider.loadInventoryItems(
+        containerId: _containerId!,
+        assetTypeId: _assetTypeId!,
+      );
         context.go(
           '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
         );
