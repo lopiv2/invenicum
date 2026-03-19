@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
 import 'package:invenicum/widgets/ui/print_label_button_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
@@ -62,6 +63,8 @@ class AssetMarketStatusWidget extends StatelessWidget {
           Icons.location_on_outlined,
           theme,
         ),
+        ConditionBadgeWidget(condition: item.condition),
+
         _buildInfoRow(
           l10n.minStock,
           item.minStock.toString(),

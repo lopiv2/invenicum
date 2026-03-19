@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:toastification/toastification.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import '../data/models/user_data_model.dart';
 import '../data/models/login_response.dart';
 import '../data/services/api_service.dart';
@@ -30,21 +30,16 @@ class AuthProvider with ChangeNotifier {
   /// Evita la doble inicialización y los notifyListeners() intermedios
   /// que pueden disparar el redirect del router con estado inconsistente.
   AuthProvider({bool tokenAlreadyInitialized = false}) {
-  _apiService.onUnauthorized = () {
-    // 🚩 CLAVE: Solo actuar si todavía no hemos procesado la expiración
-    if (isAuthenticated) { 
-      _handleSessionExpired(); // Esto pone _user y _token a null inmediatamente
+    _apiService.onUnauthorized = () {
+      // 🚩 CLAVE: Solo actuar si todavía no hemos procesado la expiración
+      if (isAuthenticated) {
+        _handleSessionExpired(); // Esto pone _user y _token a null inmediatamente
 
-      toastification.show(
-        type: ToastificationType.error,
-        title: const Text('Sesión expirada'),
-        description: const Text('Por favor, ingresa de nuevo.'),
-        autoCloseDuration: const Duration(seconds: 5),
-      );
-    }
-  };
-  _initialize(skipTokenInit: tokenAlreadyInitialized);
-}
+        ToastService.error('Sesión expirada');
+      }
+    };
+    _initialize(skipTokenInit: tokenAlreadyInitialized);
+  }
 
   Future<void> _initialize({bool skipTokenInit = false}) async {
     // Si el token ya fue inicializado en main.dart antes del runApp,
@@ -57,7 +52,7 @@ class AuthProvider with ChangeNotifier {
 
       if (_apiService.currentToken != null) {
         final userData = await _apiService.getMe().timeout(
-          const Duration(seconds: 5),
+          const Duration(seconds: 15),
           onTimeout: () => null,
         );
 
@@ -65,6 +60,10 @@ class AuthProvider with ChangeNotifier {
           _user = userData;
           _token = _apiService.currentToken;
         } else {
+          // Solo cerramos sesión si el backend devuelve explícitamente error de auth (401).
+          // Si fue timeout u otro error de red, mantenemos el token para no expulsar
+          // al usuario por un fallo temporal del servidor.
+          debugPrint("⚠️ AuthProvider: getMe() sin datos — cerrando sesión");
           await _apiService.logout();
         }
       }

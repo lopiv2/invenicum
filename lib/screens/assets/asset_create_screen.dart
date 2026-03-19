@@ -8,6 +8,7 @@ import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
+import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -62,7 +63,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   final _aiSearchController = TextEditingController();
   bool _isEnrichLoading = false;
   final ScrollController _scrollController = ScrollController();
-
+  ItemCondition _selectedCondition = ItemCondition.loose;
   bool _isMagicLoading = false;
   final Set<String> _highlightedFields = {};
 
@@ -151,6 +152,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
     setState(() {
       _assetType = assetType;
+      _selectedCondition = ItemCondition.loose;
       _availableLocations = container.locations;
       _selectedLocationId = _availableLocations.isNotEmpty
           ? _availableLocations.first.id
@@ -260,106 +262,108 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   Future<void> _handleEnrichSearch() async {
-  final query = _aiSearchController.text.trim();
-  if (query.isEmpty) {
-    ToastService.error("Escribe algo para buscar");
-    return;
-  }
+    final query = _aiSearchController.text.trim();
+    if (query.isEmpty) {
+      ToastService.error("Escribe algo para buscar");
+      return;
+    }
 
-  setState(() => _isEnrichLoading = true);
+    setState(() => _isEnrichLoading = true);
 
-  try {
-    // 1. Llamada al servicio
-    final Map<String, dynamic>? enrichedData = await _integrationService.enrichItem(
-      query: query,
-      source: _selectedSource!,
-    );
+    try {
+      // 1. Llamada al servicio
+      final Map<String, dynamic>? enrichedData = await _integrationService
+          .enrichItem(query: query, source: _selectedSource!);
 
-    // 2. Si hay datos, procesamos el JSON que me mostraste
-    if (enrichedData != null && mounted) {
-      setState(() {
-        // --- A. DATOS BÁSICOS ---
-        _nameController.text = enrichedData['name'] ?? _nameController.text;
-        
-        // Guardamos descripción base
-        String baseDescription = enrichedData['description'] ?? '';
+      // 2. Si hay datos, procesamos el JSON que me mostraste
+      if (enrichedData != null && mounted) {
+        setState(() {
+          // --- A. DATOS BÁSICOS ---
+          _nameController.text = enrichedData['name'] ?? _nameController.text;
 
-        // --- B. TRATAMIENTO DE IMAGEN ---
-        // El JSON de Voltorb trae "images": [{"url": "..."}]
-        if (enrichedData['images'] != null && (enrichedData['images'] as List).isNotEmpty) {
-          final imageUrl = enrichedData['images'][0]['url'];
-          if (imageUrl != null) {
-            _imagePreviewUrls.insert(0, imageUrl);
-          }
-        } else if (enrichedData['imageUrl'] != null) { 
-          // Por si el DTO cambia a formato simple
-          _imagePreviewUrls.insert(0, enrichedData['imageUrl']);
-        }
+          // Guardamos descripción base
+          String baseDescription = enrichedData['description'] ?? '';
 
-        // --- C. MAPEADO DE CAMPOS DINÁMICOS ---
-        final Map<String, dynamic> aiFields = enrichedData['customFieldValues'] ?? {};
-        final Set<String> usedAiKeys = {}; 
-        final List<String> unusedDataLines = [];
-
-        // Buscamos coincidencias en los campos de tu AssetType
-        for (var fieldDef in _assetType!.fieldDefinitions) {
-          final entry = aiFields.entries.firstWhere(
-            (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
-            orElse: () => const MapEntry('', null),
-          );
-
-          if (entry.value != null) {
-            usedAiKeys.add(entry.key);
-            final val = entry.value.toString();
-
-            if (fieldDef.type == CustomFieldType.boolean) {
-              _booleanFieldValues[fieldDef.id!] = val.toLowerCase() == 'true';
-            } else if (fieldDef.type == CustomFieldType.dropdown) {
-              final options = _listFieldValues[fieldDef.id] ?? [];
-              final match = options.firstWhere(
-                (o) => o.toLowerCase() == val.toLowerCase(),
-                orElse: () => '',
-              );
-              if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
-            } else {
-              _customControllers[fieldDef.id]?.text = val;
+          // --- B. TRATAMIENTO DE IMAGEN ---
+          // El JSON de Voltorb trae "images": [{"url": "..."}]
+          if (enrichedData['images'] != null &&
+              (enrichedData['images'] as List).isNotEmpty) {
+            final imageUrl = enrichedData['images'][0]['url'];
+            if (imageUrl != null) {
+              _imagePreviewUrls.insert(0, imageUrl);
             }
-            _highlightedFields.add(fieldDef.name);
+          } else if (enrichedData['imageUrl'] != null) {
+            // Por si el DTO cambia a formato simple
+            _imagePreviewUrls.insert(0, enrichedData['imageUrl']);
           }
-        }
 
-        // --- D. RECOGER DATOS HUÉRFANOS (Voltorb tiene muchos: Ataque_Especial, etc.) ---
-        aiFields.forEach((key, value) {
-          if (!usedAiKeys.contains(key) && key.toLowerCase() != 'external_id') {
-            unusedDataLines.add("$key: $value");
+          // --- C. MAPEADO DE CAMPOS DINÁMICOS ---
+          final Map<String, dynamic> aiFields =
+              enrichedData['customFieldValues'] ?? {};
+          final Set<String> usedAiKeys = {};
+          final List<String> unusedDataLines = [];
+
+          // Buscamos coincidencias en los campos de tu AssetType
+          for (var fieldDef in _assetType!.fieldDefinitions) {
+            final entry = aiFields.entries.firstWhere(
+              (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
+              orElse: () => const MapEntry('', null),
+            );
+
+            if (entry.value != null) {
+              usedAiKeys.add(entry.key);
+              final val = entry.value.toString();
+
+              if (fieldDef.type == CustomFieldType.boolean) {
+                _booleanFieldValues[fieldDef.id!] = val.toLowerCase() == 'true';
+              } else if (fieldDef.type == CustomFieldType.dropdown) {
+                final options = _listFieldValues[fieldDef.id] ?? [];
+                final match = options.firstWhere(
+                  (o) => o.toLowerCase() == val.toLowerCase(),
+                  orElse: () => '',
+                );
+                if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
+              } else {
+                _customControllers[fieldDef.id]?.text = val;
+              }
+              _highlightedFields.add(fieldDef.name);
+            }
           }
+
+          // --- D. RECOGER DATOS HUÉRFANOS (Voltorb tiene muchos: Ataque_Especial, etc.) ---
+          aiFields.forEach((key, value) {
+            if (!usedAiKeys.contains(key) &&
+                key.toLowerCase() != 'external_id') {
+              unusedDataLines.add("$key: $value");
+            }
+          });
+
+          // Combinamos descripción con datos no mapeados
+          if (unusedDataLines.isNotEmpty) {
+            final String extraInfo =
+                "\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}";
+            _descriptionController.text = baseDescription + extraInfo;
+          } else {
+            _descriptionController.text = baseDescription;
+          }
+
+          _highlightedFields.addAll(['name', 'description']);
         });
 
-        // Combinamos descripción con datos no mapeados
-        if (unusedDataLines.isNotEmpty) {
-          final String extraInfo = "\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}";
-          _descriptionController.text = baseDescription + extraInfo;
-        } else {
-          _descriptionController.text = baseDescription;
-        }
-
-        _highlightedFields.addAll(['name', 'description']);
-      });
-
-      ToastService.success("¡${enrichedData['name']} importado con éxito!");
-    }
-  } catch (e) {
-    debugPrint("Error en enriquecimiento: $e");
-    ToastService.error("No se pudo completar la importación");
-  } finally {
-    if (mounted) {
-      setState(() => _isEnrichLoading = false);
-      Future.delayed(const Duration(seconds: 4), () {
-        if (mounted) setState(() => _highlightedFields.clear());
-      });
+        ToastService.success("¡${enrichedData['name']} importado con éxito!");
+      }
+    } catch (e) {
+      debugPrint("Error en enriquecimiento: $e");
+      ToastService.error("No se pudo completar la importación");
+    } finally {
+      if (mounted) {
+        setState(() => _isEnrichLoading = false);
+        Future.delayed(const Duration(seconds: 4), () {
+          if (mounted) setState(() => _highlightedFields.clear());
+        });
+      }
     }
   }
-}
 
   Future<void> _runMagicAI(String url) async {
     if (_assetType == null) return;
@@ -492,6 +496,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         quantity: int.tryParse(_quantityController.text) ?? 1,
         minStock: int.tryParse(_minStockController.text) ?? 1,
         name: _nameController.text.trim(),
+        condition: _selectedCondition,
         description: _descriptionController.text.trim(),
         customFieldValues: customFieldValues,
       );
@@ -503,9 +508,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       if (mounted) {
         ToastService.success('Activo creado!');
         await itemProvider.loadInventoryItems(
-        containerId: _containerId!,
-        assetTypeId: _assetTypeId!,
-      );
+          containerId: _containerId!,
+          assetTypeId: _assetTypeId!,
+        );
         context.go(
           '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
         );
@@ -686,6 +691,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                                   () => _imagePreviewUrls.remove(url),
                                 ),
                               ),
+                            ),
+                            StatusSectionWidget(
+                              selectedCondition: _selectedCondition,
+                              onConditionChanged: (val) =>
+                                  setState(() => _selectedCondition = val),
                             ),
                             BentoBoxWidget(
                               width: 450,

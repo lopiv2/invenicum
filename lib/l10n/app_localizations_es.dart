@@ -180,6 +180,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get collectionFieldsConfigured => 'Campos de colección configurados.';
 
   @override
+  String get condition_mint => 'Caja original';
+
+  @override
+  String get condition_loose => 'Suelto (Sin caja)';
+
+  @override
+  String get condition_incomplete => 'Incompleto';
+
+  @override
+  String get condition_damaged => 'Dañado / Marcas';
+
+  @override
+  String get condition_new => 'Nuevo';
+
+  @override
+  String get condition_digital => 'Digital / Intangible';
+
+  @override
   String get configureCollectionFields => 'Configurar Campos de Colección';
 
   @override

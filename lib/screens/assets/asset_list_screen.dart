@@ -20,7 +20,7 @@ class _PageStateData {
   final bool loading;
   final int totalItems;
 
-  _PageStateData({
+  const _PageStateData({
     required this.items,
     required this.loading,
     required this.totalItems,
@@ -31,28 +31,15 @@ class _PageStateData {
     if (identical(this, other)) return true;
     if (other is! _PageStateData) return false;
 
-    if (totalItems != other.totalItems) return false;
-    // 🔑 Comparar loading
-    if (loading != other.loading) return false;
+    if (loading != other.loading || totalItems != other.totalItems) {
+      return false;
+    }
 
-    // 🔑 Comparar longitud de items
     if (items.length != other.items.length) return false;
 
-    // 🔑 CRÍTICO: Comparar contenido de items, no solo IDs
-    // Esto detecta cambios cuando editas un item y vuelves
-    for (int i = 0; i < items.length && i < 20; i++) {
-      final itemA = items[i];
-      final itemB = other.items[i];
-
-      // Comparar campos clave que pueden cambiar
-      if (itemA.id != itemB.id ||
-          itemA.name != itemB.name ||
-          itemA.quantity != itemB.quantity ||
-          itemA.minStock != itemB.minStock ||
-          itemA.description != itemB.description ||
-          itemA.barcode != itemB.barcode ||
-          itemA.marketValue != itemB.marketValue ||
-          itemA.locationId != itemB.locationId) {
+    for (int i = 0; i < items.length; i++) {
+      if (items[i].id != other.items[i].id ||
+          items[i].updatedAt != other.items[i].updatedAt) {
         return false;
       }
     }
@@ -61,10 +48,7 @@ class _PageStateData {
   }
 
   @override
-  int get hashCode {
-    // Usamos Object.hash para mayor seguridad y limpieza
-    return Object.hash(loading, items.length);
-  }
+  int get hashCode => Object.hash(loading, totalItems, items.length);
 }
 
 class AssetListScreen extends StatefulWidget {
@@ -131,23 +115,17 @@ class _AssetListScreenState extends State<AssetListScreen>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    final provider = context.read<InventoryItemProvider>();
+
     final cIdInt = int.tryParse(widget.containerId) ?? 0;
     final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
 
-    final itemProvider = Provider.of<InventoryItemProvider>(
-      context,
-      listen: false,
-    );
+    if (provider.currentContainerId != cIdInt ||
+        provider.currentAssetTypeId != atIdInt) {
+      provider.updateContextIds(cIdInt, atIdInt);
 
-    if (itemProvider.currentContainerId != cIdInt ||
-        itemProvider.currentAssetTypeId != atIdInt) {
-      // 🔑 LA SOLUCIÓN: Pospone la ejecución al siguiente micro-ciclo
-      Future.microtask(() {
-        itemProvider.updateContextIds(cIdInt, atIdInt);
-        itemProvider.loadInventoryItems(
-          containerId: cIdInt,
-          assetTypeId: atIdInt,
-        );
+      Future(() {
+        provider.loadInventoryItems(containerId: cIdInt, assetTypeId: atIdInt);
       });
     }
   }
@@ -178,15 +156,10 @@ class _AssetListScreenState extends State<AssetListScreen>
     // 🔑 Calcular hash de los items incluyendo CONTENIDO (no solo IDs)
     // Esto detecta cambios cuando editas campos y también cuando hay valores vacíos
     int itemsHash = itemProvider.totalItems ^ allItems.length;
-    for (int i = 0; i < allItems.length && i < 10; i++) {
-      final item = allItems[i];
-      itemsHash = ((itemsHash * 31) ^ item.id.hashCode) & 0x7FFFFFFF;
-      itemsHash = ((itemsHash * 31) ^ item.name.hashCode) & 0x7FFFFFFF;
-      itemsHash = ((itemsHash * 31) ^ item.quantity.hashCode) & 0x7FFFFFFF;
-      itemsHash =
-          ((itemsHash * 31) ^ (item.description?.hashCode ?? 0)) & 0x7FFFFFFF;
-      itemsHash =
-          ((itemsHash * 31) ^ (item.barcode?.hashCode ?? 0)) & 0x7FFFFFFF;
+
+    for (final item in allItems) {
+      itemsHash = ((itemsHash * 31) ^ item.id.hashCode);
+      itemsHash = ((itemsHash * 31) ^ (item.updatedAt?.hashCode ?? 0));
     }
 
     final searchTerm = _searchController.text.toLowerCase().trim();
@@ -340,6 +313,10 @@ class _AssetListScreenState extends State<AssetListScreen>
             return value >= n1 && value <= n2;
           }
         }
+      }
+      if (str.startsWith('=')) {
+        final n = num.tryParse(str.substring(1).trim());
+        return n != null && value == n;
       }
 
       // 2. Soportar comparadores: ">=", "<=", ">", "<"

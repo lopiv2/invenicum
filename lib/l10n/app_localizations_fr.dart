@@ -180,6 +180,24 @@ class AppLocalizationsFr extends AppLocalizations {
   String get collectionFieldsConfigured => 'Champs de collection configurés.';
 
   @override
+  String get condition_mint => 'Mint (Original box)';
+
+  @override
+  String get condition_loose => 'Loose (No box)';
+
+  @override
+  String get condition_incomplete => 'Incomplete';
+
+  @override
+  String get condition_damaged => 'Damaged';
+
+  @override
+  String get condition_new => 'New';
+
+  @override
+  String get condition_digital => 'Digital';
+
+  @override
   String get configureCollectionFields => 'Configurer les champs de collection';
 
   @override

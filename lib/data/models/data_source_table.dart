@@ -9,6 +9,7 @@ import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
+import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
 import 'package:invenicum/widgets/ui/price_display_widget.dart';
 import 'package:invenicum/data/models/location.dart'; // 🔑 Importar Location
 
@@ -21,7 +22,7 @@ class InventoryDataSource extends DataTableSource {
   final Function(InventoryItem) deleteCallback;
   final Function(InventoryItem) editCallback;
   final Function(InventoryItem) copyCallback;
-  final Function (InventoryItem) printLabelCallback;
+  final Function(InventoryItem) printLabelCallback;
   final Function(InventoryItem) onRowTap;
   final List<Location> availableLocations;
   final int containerId;
@@ -42,8 +43,23 @@ class InventoryDataSource extends DataTableSource {
   }) : _items = items;
 
   void updateItems(List<InventoryItem> newItems) {
-    _items = newItems;
-    notifyListeners();
+    final Map<int, InventoryItem> oldMap = {for (var i in _items) i.id: i};
+
+    bool changed = false;
+
+    for (final item in newItems) {
+      final old = oldMap[item.id];
+
+      if (old == null || old.updatedAt != item.updatedAt) {
+        changed = true;
+        break;
+      }
+    }
+
+    if (changed || newItems.length != _items.length) {
+      _items = newItems;
+      notifyListeners();
+    }
   }
 
   // 🔑 NUEVO: Función auxiliar para obtener el nombre de la ubicación
@@ -61,7 +77,6 @@ class InventoryDataSource extends DataTableSource {
     );
     return location.name;
   }
-
 
   // Método copiado de _AssetDataTableState (Necesario para las celdas)
   void _showImageDialog(BuildContext context, String fullImageUrl) {
@@ -310,7 +325,7 @@ class InventoryDataSource extends DataTableSource {
           ),
         ),
       ),
-
+      DataCell(ConditionBadgeWidget(condition: item.condition)),
       // 6. Descripción
       DataCell(
         Tooltip(

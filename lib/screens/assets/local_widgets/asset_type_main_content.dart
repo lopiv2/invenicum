@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
-import 'package:invenicum/screens/asset_types/local_widgets/asset_data_table.dart';
+import 'package:invenicum/screens/asset_types/asset_data_table_pluto.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_grid_view.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/asset_cylinder_gallery.dart';
 
@@ -34,16 +34,15 @@ class AssetTypeMainContent extends StatelessWidget {
     if (isGalleryMode) {
       return AssetCylinderGallery(items: viewItems);
     }
-
     return RepaintBoundary(
       child: _isListView
-          ? AssetDataTable(
-              key: ValueKey('table_${atIdInt}'),
-              assetType: assetType,
+          ? AssetPlutoTable(
+              key: ValueKey('pluto_${atIdInt}'),
+              assetType: assetType!,
               containerId: cIdInt,
               assetTypeId: atIdInt,
-              inventoryItems: viewItems,
-              availableLocations: locations,
+              items: viewItems,
+              availableLocations: locations ?? [],
             )
           : AssetGridView(
               assetType: assetType,

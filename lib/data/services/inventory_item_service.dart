@@ -110,6 +110,7 @@ class InventoryItemService {
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('barcode', item.barcode ?? ''));
+      formData.fields.add(MapEntry('condition', item.condition.name));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
@@ -181,6 +182,12 @@ class InventoryItemService {
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('barcode', item.barcode ?? ''));
+      formData.fields.add(
+        MapEntry(
+          'condition',
+          item.condition.name == 'new_' ? 'new' : item.condition.name,
+        ),
+      );
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
@@ -360,6 +367,15 @@ class InventoryItemService {
       throw errorMessage; // Lanzamos solo el texto del error
     } catch (e) {
       throw "Error inesperado: $e";
+    }
+  }
+
+  Future<void> toggleWishlist(int itemId, bool status) async {
+    try {
+      // Usamos el nombre del campo 'wishlisted' tal cual lo tienes en tu lógica
+      await _dio.patch('/items/$itemId/wishlist', data: {'wishlisted': status});
+    } catch (e) {
+      throw Exception('Error al comunicar con el servidor');
     }
   }
 }

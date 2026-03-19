@@ -40,13 +40,14 @@ class _AssetDataTableState extends State<AssetDataTable> {
   bool _sortAscending = true;
   InventoryDataSource? _dataSource;
   List<InventoryItem> _lastUpdateItemList = [];
+  late double _dynamicMinWidth;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final itemProvider = context.watch<InventoryItemProvider>();
-    final preferencesProvider = context.watch<PreferencesProvider>();
+    final itemProvider = context.read<InventoryItemProvider>();
+    final preferencesProvider = context.read<PreferencesProvider>();
 
     // 🔑 Inicializar UNA VEZ
     _dataSource ??= InventoryDataSource(
@@ -66,27 +67,7 @@ class _AssetDataTableState extends State<AssetDataTable> {
       containerId: widget.containerId,
     );
 
-    // 🚀 OPTIMIZADO: Detectar cambios reales en los items
-    bool itemsChanged = false;
-
-    if (widget.inventoryItems.length != _lastUpdateItemList.length) {
-      itemsChanged = true;
-    } else if (widget.inventoryItems.isNotEmpty) {
-      // Comparar primeros y últimos elementos para detectar cambios de orden o contenido
-      final first = widget.inventoryItems.first;
-      final last = widget.inventoryItems.last;
-      final lastFirst = _lastUpdateItemList.first;
-      final lastLast = _lastUpdateItemList.last;
-
-      if (first.id != lastFirst.id ||
-          last.id != lastLast.id ||
-          first.name != lastFirst.name ||
-          last.name != lastLast.name) {
-        itemsChanged = true;
-      }
-    }
-
-    if (itemsChanged) {
+    if (!identical(widget.inventoryItems, _lastUpdateItemList)) {
       _dataSource?.updateItems(widget.inventoryItems);
       _lastUpdateItemList = widget.inventoryItems;
     }
@@ -121,7 +102,8 @@ class _AssetDataTableState extends State<AssetDataTable> {
   @override
   void initState() {
     super.initState();
-
+    _dynamicMinWidth =
+      950 + (widget.assetType.fieldDefinitions.length * 180);
     // 1. Usamos read porque en initState solo queremos el valor inicial sin suscribirnos
     final itemProvider = context.read<InventoryItemProvider>();
 
@@ -138,17 +120,19 @@ class _AssetDataTableState extends State<AssetDataTable> {
         index = 3;
       } else if (currentSortKey == 'location') {
         index = 4;
-      } else if (currentSortKey == 'description') {
+      } else if (currentSortKey == 'condition') {
         index = 5;
-      } else if (currentSortKey == 'barcode') {
+      } else if (currentSortKey == 'description') {
         index = 6;
-      } else if (currentSortKey == 'marketValue') {
+      } else if (currentSortKey == 'barcode') {
         index = 7;
+      } else if (currentSortKey == 'marketValue') {
+        index = 8;
       } else {
         final customIndex = widget.assetType.fieldDefinitions.indexWhere(
           (def) => def.id.toString() == currentSortKey,
         );
-        if (customIndex != -1) index = customIndex + 6;
+        if (customIndex != -1) index = customIndex + 7;
       }
 
       if (index != -1 && mounted) {
@@ -329,15 +313,15 @@ class _AssetDataTableState extends State<AssetDataTable> {
     final itemProvider = context.watch<InventoryItemProvider>();
 
     // 💡 CÁLCULO DINÁMICO DEL ANCHO
-    double dynamicMinWidth =
-        950 + (widget.assetType.fieldDefinitions.length * 180);
     final screenWidth = MediaQuery.of(context).size.width;
-    if (dynamicMinWidth < screenWidth) dynamicMinWidth = screenWidth;
+    if (_dynamicMinWidth < screenWidth) _dynamicMinWidth = screenWidth;
 
     // 🚀 OPTIMIZACIÓN: No actualizamos en build(), ya se hace en didUpdateWidget()
 
     return PaginatedDataTable2(
-      minWidth: dynamicMinWidth,
+      autoRowsToHeight: true,
+      wrapInCard: false,
+      minWidth: _dynamicMinWidth,
       columnSpacing: 12,
       horizontalMargin: 12,
       dataRowHeight: 60,
@@ -381,6 +365,14 @@ class _AssetDataTableState extends State<AssetDataTable> {
           label: _buildFilterHeader(context, 'Ubicación', 'location'),
           size: ColumnSize.M,
           onSort: (idx, asc) => _sortItems(context, idx, 'location', asc),
+        ),
+        DataColumn2(
+          label: Text(
+            'Condición',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          size: ColumnSize.M,
+          onSort: (idx, asc) => _sortItems(context, idx, 'condition', asc),
         ),
         DataColumn2(
           label: _buildFilterHeader(context, 'Descripción', 'description'),

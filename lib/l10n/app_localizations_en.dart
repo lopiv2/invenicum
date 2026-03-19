@@ -180,6 +180,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionFieldsConfigured => 'Collection fields configured.';
 
   @override
+  String get condition_mint => 'Mint (Original box)';
+
+  @override
+  String get condition_loose => 'Loose (No box)';
+
+  @override
+  String get condition_incomplete => 'Incomplete';
+
+  @override
+  String get condition_damaged => 'Damaged';
+
+  @override
+  String get condition_new => 'New';
+
+  @override
+  String get condition_digital => 'Digital';
+
+  @override
   String get configureCollectionFields => 'Configure Collection Fields';
 
   @override

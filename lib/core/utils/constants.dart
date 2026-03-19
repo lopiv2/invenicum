@@ -5,6 +5,67 @@ import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 
+enum ItemCondition {
+  mint,       // Impecable, en caja original
+  loose,      // Sin caja, pero completo
+  incomplete, // Le faltan piezas
+  damaged,    // Roto o con marcas claras
+  new_,       // Nuevo de tienda
+  digital,    // Bien no tangible
+}
+
+extension ItemConditionExtension on ItemCondition {
+  /// Traducciones automáticas desde los archivos .arb
+  String getLocalizedString(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    switch (this) {
+      case ItemCondition.mint:       return l10n.condition_mint;
+      case ItemCondition.loose:      return l10n.condition_loose;
+      case ItemCondition.incomplete: return l10n.condition_incomplete;
+      case ItemCondition.damaged:    return l10n.condition_damaged;
+      case ItemCondition.new_:       return l10n.condition_new;
+      case ItemCondition.digital:    return l10n.condition_digital;
+    }
+  }
+
+  /// Icono representativo de cada estado
+  IconData get icon {
+    switch (this) {
+      case ItemCondition.mint:       return Icons.archive_outlined;
+      case ItemCondition.loose:      return Icons.inventory_2_outlined;
+      case ItemCondition.incomplete: return Icons.incomplete_circle_outlined;
+      case ItemCondition.damaged:    return Icons.heart_broken_outlined;
+      case ItemCondition.new_:       return Icons.new_releases_outlined;
+      case ItemCondition.digital:    return Icons.cloud_queue;
+    }
+  }
+
+  /// Color temático asociado al estado
+  Color get color {
+    switch (this) {
+      case ItemCondition.mint:       return Colors.green;
+      case ItemCondition.new_:       return Colors.blue;
+      case ItemCondition.loose:      return Colors.orange;
+      case ItemCondition.incomplete: return Colors.deepOrange;
+      case ItemCondition.damaged:    return Colors.red;
+      case ItemCondition.digital:    return Colors.purple;
+    }
+  }
+
+  /// Helper para convertir String de DB a Enum
+  static ItemCondition fromString(String? value) {
+    if (value == null) return ItemCondition.loose;
+    // Manejo especial para 'new' ya que el enum usa 'new_' por ser palabra reservada
+    if (value == 'new' || value == 'new_') return ItemCondition.new_;
+    
+    return ItemCondition.values.firstWhere(
+      (e) => e.name == value,
+      orElse: () => ItemCondition.loose,
+    );
+  }
+}
+
 class AppIntegrations {
   // IDs Únicos (Los que entiende el Backend)
   static const String gemini = 'gemini';
@@ -15,7 +76,6 @@ class AppIntegrations {
   static const String upcitemdb = 'upcitemdb';
   static const String bgg = 'bgg';
   static const String pokemon = 'pokemon';
-
 
   /// Retorna la lista de modelos completa para la UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {

@@ -1,5 +1,6 @@
 // lib/models/inventory_item.dart
 
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/data/models/price_history_point.dart';
 
@@ -63,6 +64,7 @@ class InventoryItem {
   final DateTime? updatedAt;
   final Map<String, dynamic>? customFieldValues;
   final List<PriceHistoryPoint>? priceHistory;
+  ItemCondition condition = ItemCondition.mint;
 
   // Mercado
   final double marketValue;
@@ -90,6 +92,7 @@ class InventoryItem {
     this.totalMarketValue = 0.0,
     this.lastPriceUpdate,
     this.priceHistory,
+    this.condition = ItemCondition.mint,
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
@@ -138,6 +141,9 @@ class InventoryItem {
       id: (itemData['id'] ?? 0).toInt(),
       name: itemData['name'] as String? ?? 'N/A',
       description: itemData['description'] as String?,
+      condition: ItemConditionExtension.fromString(
+        itemData['condition'] as String?,
+      ),
       barcode: itemData['barcode'] as String?,
       containerId: (itemData['containerId'] ?? 0).toInt(),
       assetTypeId: (itemData['assetTypeId'] ?? 0).toInt(),
@@ -176,12 +182,22 @@ class InventoryItem {
       'minStock': minStock,
       'name': name,
       'description': description,
-      'barcode': barcode,
-      'customFieldValues': customFieldValues,
+      'condition': condition,
+      // Aseguramos que si es vacío mande null para evitar conflictos de unicidad
+      'barcode': (barcode?.trim().isEmpty ?? true) ? null : barcode,
+
+      // 🔥 CORRECCIÓN CLAVE: Convertir llaves de Custom Fields a String
+      'customFieldValues': customFieldValues?.map(
+        (key, value) => MapEntry(key.toString(), value),
+      ),
+
       'images': images.map((img) => img.toJson()).toList(),
       'createdAt': createdAt?.toIso8601String(),
       'updatedAt': updatedAt?.toIso8601String(),
+
+      // Evita enviar el objeto location completo si el servidor solo espera la ID
       'location': location?.toJson(),
+
       'marketValue': marketValue,
       'currency': currency,
       'totalMarketValue': totalMarketValue,
@@ -197,6 +213,8 @@ class InventoryItem {
     String? currency,
     DateTime? lastPriceUpdate,
     String? description,
+    bool wishlisted = false,
+    ItemCondition condition = ItemCondition.mint,
     String? barcode,
     int? containerId,
     int? assetTypeId,
@@ -227,6 +245,7 @@ class InventoryItem {
       currency: currency ?? this.currency,
       lastPriceUpdate: lastPriceUpdate ?? this.lastPriceUpdate,
       description: description ?? this.description,
+      condition: condition,
       barcode: barcode ?? this.barcode,
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,

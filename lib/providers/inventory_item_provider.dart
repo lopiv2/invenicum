@@ -219,22 +219,23 @@ class InventoryItemProvider with ChangeNotifier {
   // CARGA DE DATOS
   // ----------------------------------------------------------------------
   void updateContextIds(int cId, int atId) {
-    if (_currentContainerId == cId && _currentAssetTypeId == atId) return;
+  if (_currentContainerId == cId && _currentAssetTypeId == atId) return;
 
-    _currentContainerId = cId;
-    _currentAssetTypeId = atId;
+  _currentContainerId = cId;
+  _currentAssetTypeId = atId;
 
-    // 🧹 LIMPIEZA: Al cambiar de categoría, reseteamos la paginación y filtros
-    // para que la UI no intente mostrar la página 5 de la categoría anterior.
-    _currentPage = 1;
-    _filters.clear();
-    _globalSearchTerm = null;
-    _aggregationDefinitions = []; // Vaciamos las definiciones
-    _aggregationResults = {}; // Vaciamos los resultados
-    _isLoading = true; // Forzamos el estado de carga inmediatamente
+  _currentPage = 1;
+  _filters.clear();
+  _globalSearchTerm = null;
+  _aggregationDefinitions = [];
+  _aggregationResults = {};
+  _isLoading = true;
 
+  // Notificar después del primer frame
+  WidgetsBinding.instance.addPostFrameCallback((_) {
     notifyListeners();
-  }
+  });
+}
 
   /// Calcula el valor económico total de TODO el inventario en caché,
   /// agrupando las definiciones monetarias de todos los tipos de activos.
@@ -422,6 +423,7 @@ class InventoryItemProvider with ChangeNotifier {
         assetTypeId: updatedItem.assetTypeId,
         forceReload: true,
       );
+      _recalculateTotalsAndNotify();
 
       return result; // Devolvemos el item fresco del servidor
     } catch (e) {
@@ -547,6 +549,10 @@ class InventoryItemProvider with ChangeNotifier {
           // Manejo de Cantidad (Stock)
           if (e.key == 'quantity') {
             return _compareNumeric(item.quantity, val);
+          }
+          // Filtro por estado
+          if (e.key == 'condition') {
+            return item.condition.name == e.value;
           }
           // Manejo de Stock Mínimo
           if (e.key == 'minStock') {

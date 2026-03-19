@@ -19,7 +19,6 @@ import 'package:provider/provider.dart';
 
 // Localizations & Routing
 import 'package:invenicum/l10n/app_localizations.dart';
-import 'package:toastification/toastification.dart';
 import 'core/routing/app_router.dart';
 
 // Providers
@@ -292,25 +291,23 @@ class _MyAppState extends State<MyApp> {
     final themeProvider = context.watch<ThemeProvider>();
     final preferencesProvider = context.watch<PreferencesProvider>();
 
-    return ToastificationWrapper(
-      child: MaterialApp.router(
-        scaffoldMessengerKey: rootScaffoldMessengerKey,
-        locale: preferencesProvider.locale,
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: AppLocalizations.supportedLocales,
-        debugShowCheckedModeBanner: false,
-        title: 'Invenicum',
-        theme: themeProvider.themeData,
-        routerConfig: _router,
-        builder: (context, child) {
-          return FToastBuilder()(context, child);
-        },
-      ),
+    return MaterialApp.router(
+      scaffoldMessengerKey: rootScaffoldMessengerKey,
+      locale: preferencesProvider.locale,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppLocalizations.supportedLocales,
+      debugShowCheckedModeBanner: false,
+      title: 'Invenicum',
+      theme: themeProvider.themeData,
+      routerConfig: _router,
+      builder: (context, child) {
+        return FToastBuilder()(context, child);
+      },
     );
   }
 }

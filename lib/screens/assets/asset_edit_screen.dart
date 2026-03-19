@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/providers/alert_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
@@ -17,6 +18,7 @@ import 'package:invenicum/screens/assets/local_widgets/images_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/inventory_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/main_data_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
+import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 import 'package:invenicum/widgets/ui/magic_ai_dialog_widget.dart';
 import 'package:provider/provider.dart';
@@ -77,6 +79,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   final Map<int, bool?> _booleanValues = {};
   InventoryItem? currentItem;
   bool _isInitialized = false;
+
+  // 🔑 ESTADO DE CONDICIÓN DEL ACTIVO
+  ItemCondition _selectedCondition = ItemCondition.mint;
 
   // Estado del modelo
   AssetType? _assetType;
@@ -151,6 +156,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _barcodeController.text = item.barcode ?? '';
     _selectedLocationId = item.locationId;
     _currentImages = List.from(item.images);
+    _selectedCondition = item.condition;
 
     // Aquí llamamos a tu lógica de campos dinámicos
     _initializeDynamicFields(item);
@@ -552,6 +558,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       minStock: int.tryParse(_minStockController.text) ?? 1,
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
+      condition: _selectedCondition,
       customFieldValues: updatedCustomValues,
       images: _currentImages,
     );
@@ -568,6 +575,10 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
       // 5. Gestión de Notificaciones y Salida
       if (mounted) {
+        await itemProvider.loadInventoryItems(
+          containerId: cIdInt,
+          assetTypeId: atIdInt,
+        );
         ToastService.success(
           AppLocalizations.of(context)!.assetUpdated(updatedItem.name),
         );
@@ -590,18 +601,14 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
 
     if (_assetType == null || currentItem == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surfaceContainerLowest,
-      appBar: AppBar(
-        title: Text('Editar: ${currentItem!.name}'),
-      ),
+      appBar: AppBar(title: Text('Editar: ${currentItem!.name}')),
       body: Stack(
         children: [
           Center(
@@ -650,17 +657,26 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                               onRemoveImage: _handleRemoveImage,
                             ),
                           ),
+                          StatusSectionWidget(
+                            selectedCondition: _selectedCondition,
+                            onConditionChanged: (val) =>
+                                setState(() => _selectedCondition = val),
+                          ),
                           // Stock y Codificación
                           BentoBoxWidget(
                             width: 450,
                             title: "Stock y Codificación",
                             icon: Icons.qr_code_scanner,
-                            child: InventorySectionWidget(
-                              barcodeController: _barcodeController,
-                              quantityController: _quantityController,
-                              minStockController: _minStockController,
-                              assetType: _assetType,
-                              highlightedFields: _highlightedFields,
+                            child: Column(
+                              children: [
+                                InventorySectionWidget(
+                                  barcodeController: _barcodeController,
+                                  quantityController: _quantityController,
+                                  minStockController: _minStockController,
+                                  assetType: _assetType,
+                                  highlightedFields: _highlightedFields,
+                                ),
+                              ],
                             ),
                           ),
                           // Especificaciones
@@ -673,13 +689,16 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                               customControllers: _dynamicControllers,
                               listFieldValues: _listFieldValues,
                               selectedListValues: _selectedListValues,
-                              booleanFieldValues: Map.from(_booleanValues),
+                              booleanFieldValues: Map.fromEntries(
+                                _booleanValues.entries
+                                    .where((e) => e.value != null)
+                                    .map((e) => MapEntry(e.key, e.value!)),
+                              ),
                               highlightedFields: _highlightedFields,
                               onDropdownChanged: (id, v) =>
                                   setState(() => _selectedListValues[id] = v),
-                              onBooleanChanged: (id, v) => setState(
-                                () => _booleanValues[id] = v,
-                              ),
+                              onBooleanChanged: (id, v) =>
+                                  setState(() => _booleanValues[id] = v),
                               onControllerText: (id, ctrl) {},
                             ),
                           ),

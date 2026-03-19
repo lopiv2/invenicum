@@ -430,6 +430,42 @@ abstract class AppLocalizations {
   /// **'Collection fields configured.'**
   String get collectionFieldsConfigured;
 
+  /// No description provided for @condition_mint.
+  ///
+  /// In en, this message translates to:
+  /// **'Mint (Original box)'**
+  String get condition_mint;
+
+  /// No description provided for @condition_loose.
+  ///
+  /// In en, this message translates to:
+  /// **'Loose (No box)'**
+  String get condition_loose;
+
+  /// No description provided for @condition_incomplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Incomplete'**
+  String get condition_incomplete;
+
+  /// No description provided for @condition_damaged.
+  ///
+  /// In en, this message translates to:
+  /// **'Damaged'**
+  String get condition_damaged;
+
+  /// No description provided for @condition_new.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get condition_new;
+
+  /// No description provided for @condition_digital.
+  ///
+  /// In en, this message translates to:
+  /// **'Digital'**
+  String get condition_digital;
+
   /// No description provided for @configureCollectionFields.
   ///
   /// In en, this message translates to:

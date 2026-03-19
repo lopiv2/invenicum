@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
@@ -62,19 +63,15 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
         description: _descriptionController.text.isEmpty
             ? null
             : _descriptionController.text,
-        parentId: _selectedParentId, context: context,
+        parentId: _selectedParentId,
+        context: context,
       );
       await containerProvider.loadDataLists(int.parse(widget.containerId));
 
       // Mostrar éxito
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Ubicación "${newLocation?.name}" creada exitosamente.',
-            ),
-            duration: const Duration(seconds: 2),
-          ),
+        ToastService.success(
+          'Ubicación "${newLocation?.name}" creada exitosamente.',
         );
         // Volver a la pantalla anterior
         context.pop();
@@ -82,13 +79,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
     } catch (e) {
       // Mostrar error
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al crear ubicación: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
-          ),
-        );
+        ToastService.error('Error al crear ubicación: ${e.toString()}');
       }
     } finally {
       if (mounted) {
