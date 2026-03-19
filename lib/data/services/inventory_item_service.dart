@@ -85,7 +85,6 @@ class InventoryItemService {
 
     // 🎯 RUTA CLAVE: Llama al nuevo endpoint sin Multer
     final url = '/containers/$containerId/asset-types/$assetTypeId/items/clone';
-
     // Realiza la petición POST con el body JSON
     final response = await _dio.post(
       url,

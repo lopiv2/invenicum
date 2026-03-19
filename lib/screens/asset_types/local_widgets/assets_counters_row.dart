@@ -25,31 +25,25 @@ class AssetCountersRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemProvider = context.watch<InventoryItemProvider>();
-    
-    // Lógica para evitar el parpadeo de datos al cargar
-    final bool isLocalEmpty = inventoryItems == null || inventoryItems!.isEmpty;
-    final itemsToCount = (isLocalEmpty && itemProvider.inventoryItems.isNotEmpty)
-        ? itemProvider.inventoryItems
-        : (inventoryItems ?? []);
-
+    final items = inventoryItems ?? [];
     final bool isLoading = itemProvider.isLoading;
 
-    // Conteos rápidos
-    int possessionCount = _countField(itemsToCount, assetType.possessionFieldId);
-    int desiredCount = _countField(itemsToCount, assetType.desiredFieldId);
+    final int possessionCount =
+        _countField(items, assetType.possessionFieldId);
+    final int desiredCount = _countField(items, assetType.desiredFieldId);
 
     return Wrap(
       spacing: 12.0,
       runSpacing: 12.0,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        // 1. TOTAL ÍTEMS
+        // 1. TOTAL ÍTEMS — usamos el total real de la caché, sin paginación
         _buildCustomHeightChip(
           context,
-          label: 'TOTAL ÍTEMS: ${itemProvider.totalItems}',
+          label: 'TOTAL ÍTEMS: ${items.length}',
           icon: Icons.inventory,
           color: Theme.of(context).colorScheme.primary,
-          isLoading: isLoading && itemProvider.totalItems == 0,
+          isLoading: isLoading && items.isEmpty,
         ),
 
         // 2. EN POSESIÓN
@@ -81,7 +75,8 @@ class AssetCountersRow extends StatelessWidget {
           final sumKey = 'sum_$fieldId';
           final dynamic rawValue = itemProvider.aggregationResults[sumKey];
 
-          return _buildAggregationChip(context, fieldName, fieldType, rawValue, isLoading);
+          return _buildAggregationChip(
+              context, fieldName, fieldType, rawValue, isLoading);
         }),
 
         // 5. INDICADOR DE CARGA
@@ -97,9 +92,10 @@ class AssetCountersRow extends StatelessWidget {
     );
   }
 
-  /// Constructor de Chips con altura aumentada para los sumatorios dinámicos
-  Widget _buildAggregationChip(BuildContext context, String name, dynamic type, dynamic value, bool loading) {
-    final bool isPrice = type == 'price' || type == CustomFieldType.price.name;
+  Widget _buildAggregationChip(BuildContext context, String name,
+      dynamic type, dynamic value, bool loading) {
+    final bool isPrice =
+        type == 'price' || type == CustomFieldType.price.name;
 
     return Chip(
       elevation: 2,
@@ -109,23 +105,26 @@ class AssetCountersRow extends StatelessWidget {
         size: 20,
         color: Theme.of(context).colorScheme.secondary,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), // 🔑 Más alto
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-      backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+      backgroundColor:
+          Theme.of(context).colorScheme.secondary.withOpacity(0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       label: Container(
         constraints: const BoxConstraints(minHeight: 25),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('$name: ', style: const TextStyle(fontWeight: FontWeight.w500)),
+            Text('$name: ',
+                style: const TextStyle(fontWeight: FontWeight.w500)),
             if (loading)
-              const Text("...")
+              const Text('...')
             else if (isPrice)
-              PriceDisplayWidget(value: value, fontSize: 14, color: Colors.black,) // 🔑 Reutilización
+              PriceDisplayWidget(value: value, fontSize: 14, color: Colors.black)
             else
               Text(
-                (double.tryParse(value?.toString() ?? '0') ?? 0.0).toStringAsFixed(2),
+                (double.tryParse(value?.toString() ?? '0') ?? 0.0)
+                    .toStringAsFixed(2),
                 style: const TextStyle(fontWeight: FontWeight.bold),
               ),
           ],
@@ -134,7 +133,6 @@ class AssetCountersRow extends StatelessWidget {
     );
   }
 
-  /// Constructor base para Chips con altura aumentada (Total, Posesión, etc.)
   Widget _buildCustomHeightChip(
     BuildContext context, {
     required String label,
@@ -145,7 +143,7 @@ class AssetCountersRow extends StatelessWidget {
     return Chip(
       elevation: 2,
       shadowColor: Colors.black26,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12), // 🔑 Más alto
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       labelPadding: const EdgeInsets.symmetric(horizontal: 8),
       backgroundColor: color.withOpacity(0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -160,7 +158,8 @@ class AssetCountersRow extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 25),
         child: Text(
           label,
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold),
         ),
       ),
     );

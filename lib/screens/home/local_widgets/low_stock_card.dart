@@ -30,7 +30,7 @@ class _LowStockCardState extends State<LowStockCard> {
       builder: (context, itemProvider, child) {
         if (itemProvider.isLoading) return _buildLoadingState(isDark);
 
-        final items = itemProvider.inventoryItems;
+        final items = itemProvider.allInventoryItems;
         final lowStockItems = items.where((item) => item.quantity < item.minStock).toList();
         
         // Color de estado: Naranja si hay alertas, Azul si todo está ok

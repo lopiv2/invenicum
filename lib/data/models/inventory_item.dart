@@ -173,37 +173,33 @@ class InventoryItem {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'containerId': containerId,
-      'assetTypeId': assetTypeId,
-      'locationId': locationId,
-      'quantity': quantity,
-      'minStock': minStock,
-      'name': name,
-      'description': description,
-      'condition': condition,
-      // Aseguramos que si es vacío mande null para evitar conflictos de unicidad
-      'barcode': (barcode?.trim().isEmpty ?? true) ? null : barcode,
+  return {
+    'id': id,
+    'containerId': containerId,
+    'assetTypeId': assetTypeId,
+    'locationId': locationId,
+    'quantity': quantity,
+    'minStock': minStock,
+    'name': name,
+    'description': description,
+    'condition': (condition as Enum).name,
+    // Forzamos null si está vacío para evitar el error P2002 de Prisma
+    'barcode': (barcode?.trim().isEmpty ?? true) ? null : barcode,
 
-      // 🔥 CORRECCIÓN CLAVE: Convertir llaves de Custom Fields a String
-      'customFieldValues': customFieldValues?.map(
-        (key, value) => MapEntry(key.toString(), value),
-      ),
+    // 🔥 CORRECCIÓN CRUCIAL: Añadimos Map.from para que sea un Map real encodable
+    'customFieldValues': customFieldValues != null 
+        ? Map<String, dynamic>.from(customFieldValues!.map((k, v) => MapEntry(k.toString(), v))) 
+        : null,
 
-      'images': images.map((img) => img.toJson()).toList(),
-      'createdAt': createdAt?.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
-
-      // Evita enviar el objeto location completo si el servidor solo espera la ID
-      'location': location?.toJson(),
-
-      'marketValue': marketValue,
-      'currency': currency,
-      'totalMarketValue': totalMarketValue,
-      'lastPriceUpdate': lastPriceUpdate?.toIso8601String(),
-    };
-  }
+    'images': images.map((img) => img.toJson()).toList(),
+    'createdAt': createdAt?.toIso8601String(),
+    'updatedAt': updatedAt?.toIso8601String(),
+    
+    'marketValue': marketValue,
+    'currency': currency,
+    'lastPriceUpdate': lastPriceUpdate?.toIso8601String(),
+  };
+}
 
   InventoryItem copyWith({
     int? id,
@@ -214,7 +210,7 @@ class InventoryItem {
     DateTime? lastPriceUpdate,
     String? description,
     bool wishlisted = false,
-    ItemCondition condition = ItemCondition.mint,
+    ItemCondition? condition,
     String? barcode,
     int? containerId,
     int? assetTypeId,
@@ -245,7 +241,7 @@ class InventoryItem {
       currency: currency ?? this.currency,
       lastPriceUpdate: lastPriceUpdate ?? this.lastPriceUpdate,
       description: description ?? this.description,
-      condition: condition,
+      condition: condition ?? this.condition,
       barcode: barcode ?? this.barcode,
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,

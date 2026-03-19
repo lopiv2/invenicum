@@ -8,14 +8,12 @@ import 'package:invenicum/screens/assets/local_widgets/asset_technical_specs_wid
 import 'package:provider/provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
-// Modelos e Imports
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 
-// Widgets UI
 import 'package:invenicum/widgets/ui/asset_image_gallery_widget.dart';
 import 'package:invenicum/widgets/ui/price_history_chart_widget.dart';
-import 'package:invenicum/widgets/ui/bento_box_widget.dart'; // Tu widget cool
+import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 
 class AssetDetailScreen extends StatefulWidget {
   final String containerId;
@@ -69,12 +67,12 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
     final theme = Theme.of(context);
     final itemProvider = context.watch<InventoryItemProvider>();
 
-    final item = itemProvider.inventoryItems.cast<InventoryItem?>().firstWhere(
-      (i) =>
-          i?.id.toString() ==
-          widget.itemId, // Compara como String por seguridad
-      orElse: () => null,
-    );
+    final item = itemProvider.allInventoryItems
+        .cast<InventoryItem?>()
+        .firstWhere(
+          (i) => i?.id.toString() == widget.itemId,
+          orElse: () => null,
+        );
 
     if (item == null) {
       return Scaffold(
@@ -111,7 +109,6 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                   spacing: 20,
                   runSpacing: 20,
                   children: [
-                    // 1. Galería Multimedia
                     BentoBoxWidget(
                       width: 780,
                       title: "Galería Visual",
@@ -126,7 +123,6 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       ),
                     ),
 
-                    // 2. Estado y Valor de Mercado (Lógica de tendencia mantenida)
                     BentoBoxWidget(
                       width: 400,
                       title: "Estado y Mercado",
@@ -134,7 +130,6 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       child: AssetMarketStatusWidget(item: item, l10n: l10n),
                     ),
 
-                    // 3. Gráfico de Historial
                     BentoBoxWidget(
                       width: 1200,
                       title: "Historial de Valoración",
@@ -144,7 +139,8 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                           if (provider.loadingHistory) {
                             return const SizedBox(
                               height: 200,
-                              child: Center(child: CircularProgressIndicator()),
+                              child: Center(
+                                  child: CircularProgressIndicator()),
                             );
                           }
                           return PriceHistoryChart(
@@ -154,7 +150,6 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       ),
                     ),
 
-                    // 4. Especificaciones y Descripción
                     BentoBoxWidget(
                       width: 720,
                       title: "Especificaciones",
@@ -166,7 +161,6 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       ),
                     ),
 
-                    // 5. Trazabilidad y Metadatos
                     BentoBoxWidget(
                       width: 460,
                       title: "Trazabilidad",
@@ -185,7 +179,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
 
   void _navigateToSibling(int offset) {
     final itemProvider = context.read<InventoryItemProvider>();
-    final items = itemProvider.inventoryItems;
+    final items = itemProvider.allInventoryItems;
     if (items.isEmpty) return;
     final int currentId = int.tryParse(widget.itemId) ?? 0;
     final int currentIndex = items.indexWhere((i) => i.id == currentId);
@@ -214,7 +208,8 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
               top: 20,
               right: 20,
               child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                icon:
+                    const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: () => Navigator.pop(context),
               ),
             ),

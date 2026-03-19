@@ -15,6 +15,7 @@ class AssetTypeMainContent extends StatelessWidget {
     required this.viewItems,
     required this.locations,
     required this.isGalleryMode,
+    this.searchController,
   }) : _isListView = isListView;
 
   final bool _isListView;
@@ -25,11 +26,12 @@ class AssetTypeMainContent extends StatelessWidget {
   final List<InventoryItem> viewItems;
   final dynamic locations;
   final bool isGalleryMode;
+  final TextEditingController? searchController;
 
   @override
   Widget build(BuildContext context) {
     if (!isCurrentRoute) {
-      return const SizedBox.shrink(); // Placeholder más ligero
+      return const SizedBox.shrink();
     }
     if (isGalleryMode) {
       return AssetCylinderGallery(items: viewItems);
@@ -37,18 +39,20 @@ class AssetTypeMainContent extends StatelessWidget {
     return RepaintBoundary(
       child: _isListView
           ? AssetPlutoTable(
-              key: ValueKey('pluto_${atIdInt}'),
+              key: ValueKey('pluto_$atIdInt'),
               assetType: assetType!,
               containerId: cIdInt,
               assetTypeId: atIdInt,
               items: viewItems,
               availableLocations: locations ?? [],
+              searchController: searchController,
             )
           : AssetGridView(
               assetType: assetType,
               items: viewItems,
               containerId: cIdInt,
               assetTypeId: atIdInt,
+              searchController: searchController,
             ),
     );
   }

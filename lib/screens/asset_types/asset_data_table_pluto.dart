@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
+import 'package:invenicum/screens/asset_types/local_widgets/custom_footer_pagination.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +20,7 @@ class AssetPlutoTable extends StatefulWidget {
   final int assetTypeId;
   final List<InventoryItem> items;
   final List<Location> availableLocations;
+  final TextEditingController? searchController;
 
   const AssetPlutoTable({
     super.key,
@@ -27,6 +29,7 @@ class AssetPlutoTable extends StatefulWidget {
     required this.assetTypeId,
     required this.items,
     required this.availableLocations,
+    this.searchController,
   });
 
   @override
@@ -36,36 +39,92 @@ class AssetPlutoTable extends StatefulWidget {
 class _AssetPlutoTableState extends State<AssetPlutoTable> {
   PlutoGridStateManager? stateManager;
   late List<PlutoColumn> columns;
-  late List<PlutoRow> rows;
+  late List<PlutoRow> _initialRows;
+  bool _goToLastPage = false;
 
   @override
   void initState() {
     super.initState();
     columns = _buildColumns();
-    rows = _buildRows();
+    // Las filas se inyectan en onLoaded, después de que el pageSize
+    // ya está configurado por createFooter, evitando el RangeError.
+    _initialRows = [];
+    widget.searchController?.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.searchController?.removeListener(_onSearchChanged);
+    super.dispose();
+  }
+
+  /// Aplica una búsqueda global en todas las columnas visibles de PlutoGrid.
+  /// PlutoGrid no expone un método nativo de búsqueda global, así que
+  /// filtramos directamente sobre refRows usando el término de búsqueda.
+  void _onSearchChanged() {
+    if (stateManager == null) return;
+    final term = widget.searchController?.text.trim().toLowerCase() ?? '';
+
+    if (term.isEmpty) {
+      // Restauramos todas las filas originales
+      stateManager!.refRows.setFilter(null);
+    } else {
+      stateManager!.refRows.setFilter((row) {
+        // Buscamos el término en cualquier celda de la fila
+        return row.cells.entries.any((entry) {
+          // Excluimos columnas ocultas o de control interno
+          if (entry.key == 'item_object' || entry.key == 'actions') {
+            return false;
+          }
+          final cellValue = entry.value.value;
+          if (cellValue == null) return false;
+          return cellValue.toString().toLowerCase().contains(term);
+        });
+      });
+    }
+    stateManager!.notifyListeners();
   }
 
   @override
   void didUpdateWidget(covariant AssetPlutoTable oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Comprobamos si la longitud ha cambiado o si los objetos son distintos
-    if (oldWidget.items.length != widget.items.length ||
-        oldWidget.items != widget.items) {
-      final newRows = _buildRows();
-      setState(() {
-        rows = newRows;
-      });
+    final itemsChanged =
+        oldWidget.items.length != widget.items.length ||
+        !_areItemListsEqual(oldWidget.items, widget.items);
 
-      if (stateManager != null) {
-        // Usamos refetch para una actualización limpia del estado interno de Pluto
+    if (itemsChanged && stateManager != null) {
+      // Diferimos al siguiente frame para que PlutoGrid termine su layout
+      // actual antes de modificar las filas, evitando el RangeError en
+      // FilteredList cuando el pageSize es menor que el total anterior.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || stateManager == null) return;
+        stateManager!.setShowLoading(true, level: PlutoGridLoadingLevel.rows);
+        final newRows = _buildRows(widget.items);
         stateManager!.removeAllRows();
         stateManager!.appendRows(newRows);
-      }
+        if (_goToLastPage) {
+          stateManager!.setPage(stateManager!.totalPage);
+          _goToLastPage = false;
+        } else {
+          stateManager!.setPage(1);
+        }
+        stateManager!.setShowLoading(false);
+      });
     }
   }
 
-  // --- MÉTODOS DE ACCIÓN (Copiados de tu DataTable anterior) ---
+  bool _areItemListsEqual(List<InventoryItem> a, List<InventoryItem> b) {
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].id != b[i].id || a[i].updatedAt != b[i].updatedAt) return false;
+    }
+    return true;
+  }
+
+  // ---------------------------------------------------------------------------
+  // ACCIONES
+  // ---------------------------------------------------------------------------
 
   void _copyAsset(InventoryItem item) async {
     final itemCopy = item.copyWith(
@@ -84,30 +143,22 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   void _deleteAsset(InventoryItem item) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Confirmar Eliminación'),
         content: Text('¿Deseas eliminar "${item.name}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(ctx),
             child: const Text('Cancelar'),
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               await context.read<InventoryItemProvider>().deleteInventoryItem(
                 item.id,
                 widget.containerId,
                 widget.assetTypeId,
               );
-              if (stateManager != null) {
-                final rowToRemove = stateManager!.rows.firstWhere(
-                  (r) =>
-                      (r.cells['item_object']!.value as InventoryItem).id ==
-                      item.id,
-                );
-                stateManager!.removeRows([rowToRemove]);
-              }
               ToastService.success('Elemento eliminado correctamente');
             },
             child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
@@ -117,15 +168,19 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     );
   }
 
-  // --- CONSTRUCCIÓN DE COLUMNAS ---
+  // ---------------------------------------------------------------------------
+  // COLUMNAS
+  // ---------------------------------------------------------------------------
 
   List<PlutoColumn> _buildColumns() {
-    List<PlutoColumn> baseColumns = [
+    final List<PlutoColumn> baseColumns = [
       PlutoColumn(
         title: 'ID Obj',
         field: 'item_object',
         type: PlutoColumnType.text(),
         hide: true,
+        enableSorting: false,
+        enableFilterMenuItem: false,
       ),
       PlutoColumn(
         title: 'Imagen',
@@ -142,7 +197,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
             padding: const EdgeInsets.all(4.0),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
-              child: fullImageUrl.isNotEmpty
+              child: imageUrl.isNotEmpty
                   ? Tooltip(
                       message: 'Ver imagen',
                       child: MouseRegion(
@@ -152,7 +207,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                           child: Image.network(
                             fullImageUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) =>
+                            errorBuilder: (_, __, ___) =>
                                 const Icon(Icons.image_not_supported, size: 20),
                           ),
                         ),
@@ -183,7 +238,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         width: 100,
       ),
       PlutoColumn(
-        title: 'Stock minimo',
+        title: 'Stock mínimo',
         field: 'minStock',
         type: PlutoColumnType.number(),
         width: 100,
@@ -210,13 +265,11 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         title: 'Condición',
         field: 'condition',
         type: PlutoColumnType.text(),
-        width: 150, // Ajusta el ancho para que quepa el badge
+        width: 150,
+        enableFilterMenuItem: false,
         renderer: (rendererContext) {
-          // 1. Extraemos el objeto completo del activo de esta fila
           final item =
               rendererContext.row.cells['item_object']!.value as InventoryItem;
-
-          // 3. Retornamos tu widget personalizado envolviéndolo en un Center o Padding si es necesario
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Center(
@@ -227,8 +280,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       ),
     ];
 
-    // Columnas Dinámicas según el AssetType
-    final customColumns = (widget.assetType.fieldDefinitions).map((field) {
+    final customColumns = widget.assetType.fieldDefinitions.map((field) {
       return PlutoColumn(
         title: field.name,
         field: field.id.toString(),
@@ -238,9 +290,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         width: 150,
         renderer: field.type == CustomFieldType.boolean
             ? (rendererContext) {
-                // Aseguramos que el valor sea bool
                 final bool isChecked = rendererContext.cell.value == true;
-
                 return Icon(
                   isChecked ? Icons.check_box : Icons.check_box_outline_blank,
                   color: isChecked
@@ -271,7 +321,8 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
               IconButton(
                 icon: const Icon(Icons.edit, size: 18, color: Colors.blue),
                 onPressed: () => context.go(
-                  '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}/edit',
+                  '/container/${widget.containerId}/asset-types/'
+                  '${widget.assetTypeId}/assets/${item.id}/edit',
                   extra: item,
                 ),
               ),
@@ -293,6 +344,59 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       ),
     ];
   }
+
+  // ---------------------------------------------------------------------------
+  // FILAS
+  // ---------------------------------------------------------------------------
+
+  List<PlutoRow> _buildRows(List<InventoryItem> items) {
+    return items.map((item) {
+      final Map<String, PlutoCell> cells = {
+        'item_object': PlutoCell(value: item),
+        'image': PlutoCell(
+          value: item.images.isNotEmpty ? item.images[0].url : '',
+        ),
+        'name': PlutoCell(value: item.name),
+        'quantity': PlutoCell(value: item.quantity),
+        'minStock': PlutoCell(value: item.minStock),
+        'location': PlutoCell(value: item.location?.name ?? ''),
+        'barcode': PlutoCell(value: item.barcode ?? ''),
+        'marketValue': PlutoCell(value: item.marketValue.toString()),
+        'condition': PlutoCell(value: item.condition),
+        'actions': PlutoCell(value: ''),
+      };
+
+      for (var field in widget.assetType.fieldDefinitions) {
+        final fieldKey = field.id.toString();
+        final dynamic rawValue =
+            item.customFieldValues?[field.id] ??
+            item.customFieldValues?[fieldKey];
+        cells[fieldKey] = PlutoCell(
+          value: _parseCustomFieldValue(rawValue, field.type),
+        );
+      }
+
+      return PlutoRow(cells: cells);
+    }).toList();
+  }
+
+  dynamic _parseCustomFieldValue(dynamic value, CustomFieldType type) {
+    if (type == CustomFieldType.boolean) {
+      if (value == null) return false;
+      if (value is bool) return value;
+      final str = value.toString().toLowerCase().trim();
+      return str == 'si' || str == 'true' || str == '1';
+    }
+    if (type == CustomFieldType.number) {
+      if (value == null) return 0;
+      return num.tryParse(value.toString()) ?? 0;
+    }
+    return value?.toString() ?? '';
+  }
+
+  // ---------------------------------------------------------------------------
+  // DIÁLOGO IMAGEN
+  // ---------------------------------------------------------------------------
 
   void _showImageDialog(BuildContext context, String fullImageUrl) {
     showDialog(
@@ -349,93 +453,29 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     );
   }
 
-  List<PlutoRow> _buildRows() {
-    return widget.items.map((item) {
-      final Map<String, PlutoCell> cells = {
-        'item_object': PlutoCell(value: item),
-        'image': PlutoCell(
-          value: (item.images.isNotEmpty) ? item.images[0].url : '',
-        ),
-        'name': PlutoCell(value: item.name),
-        'quantity': PlutoCell(value: item.quantity),
-        'minStock': PlutoCell(value: item.minStock),
-        'location': PlutoCell(value: item.location?.name ?? ''),
-        'barcode': PlutoCell(value: item.barcode ?? ''),
-        'marketValue': PlutoCell(value: item.marketValue.toString()),
-        'condition': PlutoCell(value: item.condition),
-        'actions': PlutoCell(value: ''), // Necesario para el renderer
-      };
-
-      // --- CORRECCIÓN AQUÍ ---
-      for (var field in widget.assetType.fieldDefinitions) {
-        final fieldKey = field.id.toString();
-
-        // Intentamos obtener el valor.
-        // Si tu mapa usa ints como llaves: item.customFieldValues?[field.id]
-        // Si tu mapa usa strings (JSON): item.customFieldValues?[fieldKey]
-        final dynamic rawValue =
-            item.customFieldValues?[field.id] ??
-            item.customFieldValues?[fieldKey];
-
-        cells[fieldKey] = PlutoCell(
-          value: _parseCustomFieldValue(rawValue, field.type),
-        );
-      }
-
-      return PlutoRow(cells: cells);
-    }).toList();
-  }
-
-  // Función auxiliar para formatear según el tipo
-  dynamic _parseCustomFieldValue(dynamic value, CustomFieldType type) {
-    if (type == CustomFieldType.boolean) {
-      if (value == null) return false;
-      if (value is bool) return value;
-
-      // Convertimos Strings como "si", "true", "1" a booleano true
-      final String strValue = value.toString().toLowerCase().trim();
-      return strValue == 'si' || strValue == 'true' || strValue == '1';
-    }
-
-    if (type == CustomFieldType.number) {
-      if (value == null) return 0;
-      return num.tryParse(value.toString()) ?? 0;
-    }
-
-    // Para texto y otros
-    return value?.toString() ?? '';
-  }
+  // ---------------------------------------------------------------------------
+  // BUILD
+  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
-    final itemProvider = context.watch<InventoryItemProvider>();
-
     return PlutoGrid(
       columns: columns,
-      rows: rows,
+      rows: _initialRows,
       onLoaded: (event) {
         stateManager = event.stateManager;
-        // Mostrar filtros por defecto si quieres que se parezca a tu buscador
         stateManager?.setShowColumnFilter(true);
+        // Insertamos las filas aquí: createFooter ya aplicó setPageSize(10)
+        // antes de este callback, así que PlutoGrid pagina correctamente.
+        final rows = _buildRows(widget.items);
+        stateManager?.appendRows(rows);
       },
       onRowDoubleTap: (event) {
         final item = event.row.cells['item_object']!.value as InventoryItem;
         context.go(
-          '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}',
+          '/container/${widget.containerId}/asset-types/'
+          '${widget.assetTypeId}/assets/${item.id}',
         );
-      },
-      // --- VINCULACIÓN CON EL PROVIDER ---
-      onSorted: (event) {
-        if (event.column.field == 'actions' ||
-            event.column.field == 'item_object')
-          return;
-
-        // Sincronizar el ordenamiento de Pluto con tu Provider
-        //bool ascending = event.order.isAscending;
-        /*itemProvider.sortInventoryItems(
-          dataKey: event.column.field,
-          ascending: ascending,
-        );*/
       },
       configuration: PlutoGridConfiguration(
         style: PlutoGridStyleConfig(
@@ -443,15 +483,14 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
           columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
         ),
         columnSize: const PlutoGridColumnSizeConfig(
-          autoSizeMode: PlutoAutoSizeMode.none, // Permitir scroll horizontal
+          autoSizeMode: PlutoAutoSizeMode.none,
         ),
       ),
-      // --- PAGINACIÓN ---
       createFooter: (stateManager) {
-        return PlutoPagination(
-          stateManager,
-          pageSizeToMove: itemProvider.itemsPerPage,
-        );
+        // setPageSize aquí garantiza que se aplica antes del primer render del footer,
+        // que es el momento en que PlutoGrid inicializa su paginación interna.
+        stateManager.setPageSize(10, notify: false);
+        return PlutoPaginationFooter(stateManager: stateManager);
       },
     );
   }

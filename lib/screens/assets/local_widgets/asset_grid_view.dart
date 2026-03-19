@@ -15,6 +15,7 @@ class AssetGridView extends StatefulWidget {
   final List<InventoryItem> items;
   final int containerId;
   final int assetTypeId;
+  final TextEditingController? searchController;
 
   const AssetGridView({
     super.key,
@@ -22,6 +23,7 @@ class AssetGridView extends StatefulWidget {
     required this.items,
     required this.containerId,
     required this.assetTypeId,
+    this.searchController,
   });
 
   @override
@@ -29,10 +31,37 @@ class AssetGridView extends StatefulWidget {
 }
 
 class _AssetGridViewState extends State<AssetGridView> {
-  // Configuración inicial más equilibrada para pantallas grandes/medianas
   int _columnsCount = 4;
   final int minColumns = 2;
   final int maxColumns = 8;
+
+  // Items filtrados localmente según el texto de búsqueda.
+  List<InventoryItem> get _filteredItems {
+    final term = widget.searchController?.text.trim().toLowerCase() ?? '';
+    if (term.isEmpty) return widget.items;
+    return widget.items.where((item) {
+      return item.name.toLowerCase().contains(term) ||
+          (item.description ?? '').toLowerCase().contains(term) ||
+          (item.location?.name ?? '').toLowerCase().contains(term) ||
+          (item.customFieldValues?.values
+                  .any((v) => v.toString().toLowerCase().contains(term)) ??
+              false);
+    }).toList();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.searchController?.addListener(_onSearchChanged);
+  }
+
+  @override
+  void dispose() {
+    widget.searchController?.removeListener(_onSearchChanged);
+    super.dispose();
+  }
+
+  void _onSearchChanged() => setState(() {});
 
   void _viewAssetDetails(BuildContext context, InventoryItem item) {
     context.go(
@@ -40,7 +69,6 @@ class _AssetGridViewState extends State<AssetGridView> {
     );
   }
 
-  // --- FUNCIÓN PARA VER IMAGEN EN GRANDE ---
   void _showFullImage(BuildContext context, String url, String title) {
     showDialog(
       context: context,
@@ -50,7 +78,6 @@ class _AssetGridViewState extends State<AssetGridView> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Imagen con Hero para una transición suave si lo deseas
             InteractiveViewer(
               panEnabled: true,
               minScale: 0.5,
@@ -60,7 +87,6 @@ class _AssetGridViewState extends State<AssetGridView> {
                 child: Image.network(url, fit: BoxFit.contain),
               ),
             ),
-            // Botón de cerrar y título
             Positioned(
               top: 10,
               right: 10,
@@ -103,10 +129,10 @@ class _AssetGridViewState extends State<AssetGridView> {
             onPressed: () {
               Navigator.of(dialogContext).pop();
               context.read<InventoryItemProvider>().deleteInventoryItem(
-                item.id,
-                widget.containerId,
-                widget.assetTypeId,
-              );
+                    item.id,
+                    widget.containerId,
+                    widget.assetTypeId,
+                  );
               ToastService.success('Activo eliminado.');
             },
             child: const Text('Eliminar'),
@@ -117,18 +143,19 @@ class _AssetGridViewState extends State<AssetGridView> {
   }
 
   String _getFullImageUrl(InventoryItem item) {
-    final String? imageUrl = item.images.isNotEmpty
-        ? item.images.first.url
-        : null;
+    final String? imageUrl =
+        item.images.isNotEmpty ? item.images.first.url : null;
     return imageUrl != null ? '${Environment.apiUrl}$imageUrl' : '';
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final itemProvider = context.watch<InventoryItemProvider>();
+    final displayItems = _filteredItems;
+    final hasSearch =
+        (widget.searchController?.text.trim().isNotEmpty) ?? false;
 
-    if (widget.items.isEmpty) {
+    if (displayItems.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -140,10 +167,7 @@ class _AssetGridViewState extends State<AssetGridView> {
             ),
             const SizedBox(height: 16),
             Text(
-              (itemProvider.filters.isEmpty &&
-                      itemProvider.globalSearchTerm == null)
-                  ? 'No hay activos creados aún.'
-                  : 'Sin coincidencias.',
+              hasSearch ? 'Sin coincidencias.' : 'No hay activos creados aún.',
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.hintColor,
               ),
@@ -155,7 +179,7 @@ class _AssetGridViewState extends State<AssetGridView> {
 
     return Column(
       children: [
-        // --- CONTROL DE COLUMNAS ESTILIZADO ---
+        // --- CONTROL DE COLUMNAS ---
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
           child: Container(
@@ -166,11 +190,8 @@ class _AssetGridViewState extends State<AssetGridView> {
             ),
             child: Row(
               children: [
-                Icon(
-                  Icons.grid_view_rounded,
-                  size: 18,
-                  color: theme.primaryColor,
-                ),
+                Icon(Icons.grid_view_rounded,
+                    size: 18, color: theme.primaryColor),
                 const SizedBox(width: 12),
                 Text(
                   'Vista: $_columnsCount col.',
@@ -183,12 +204,10 @@ class _AssetGridViewState extends State<AssetGridView> {
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       trackHeight: 2,
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 6,
-                      ),
-                      overlayShape: const RoundSliderOverlayShape(
-                        overlayRadius: 14,
-                      ),
+                      thumbShape:
+                          const RoundSliderThumbShape(enabledThumbRadius: 6),
+                      overlayShape:
+                          const RoundSliderOverlayShape(overlayRadius: 14),
                     ),
                     child: Slider(
                       value: _columnsCount.toDouble(),
@@ -205,32 +224,26 @@ class _AssetGridViewState extends State<AssetGridView> {
           ),
         ),
 
-        // --- GRID DE ACTIVOS ---
+        // --- GRID ---
         Expanded(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final double spacing = 16.0;
-
+              const double spacing = 16.0;
               return GridView.builder(
-                padding: EdgeInsets.fromLTRB(spacing, 0, spacing, spacing),
+                padding: const EdgeInsets.fromLTRB(
+                    spacing, 0, spacing, spacing),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: _columnsCount,
                   crossAxisSpacing: spacing,
                   mainAxisSpacing: spacing,
-                  // Ajuste dinámico de la altura: Si hay muchas columnas, hacemos la tarjeta más alta proporcionalmente
                   childAspectRatio: _columnsCount > 6 ? 0.5 : 0.8,
                 ),
-                itemCount: widget.items.length,
+                itemCount: displayItems.length,
                 itemBuilder: (context, index) {
-                  final item = widget.items[index];
+                  final item = displayItems[index];
                   final fullImageUrl = _getFullImageUrl(item);
-
                   return _buildModernAssetCard(
-                    context,
-                    item,
-                    fullImageUrl,
-                    theme,
-                  );
+                      context, item, fullImageUrl, theme);
                 },
               );
             },
@@ -267,7 +280,6 @@ class _AssetGridViewState extends State<AssetGridView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // --- IMAGEN SUPERIOR ---
                   Expanded(
                     flex: 5,
                     child: Stack(
@@ -281,7 +293,6 @@ class _AssetGridViewState extends State<AssetGridView> {
                                     _buildPlaceholderIcon(theme),
                               )
                             : _buildPlaceholderIcon(theme),
-                        // Gradiente sutil inferior para que el nombre destaque
                         Positioned.fill(
                           child: DecoratedBox(
                             decoration: BoxDecoration(
@@ -296,7 +307,6 @@ class _AssetGridViewState extends State<AssetGridView> {
                             ),
                           ),
                         ),
-                        // Menú de acciones rápido (Overlay)
                         Positioned(
                           top: 4,
                           right: 4,
@@ -305,8 +315,6 @@ class _AssetGridViewState extends State<AssetGridView> {
                       ],
                     ),
                   ),
-
-                  // --- INFORMACIÓN ---
                   Expanded(
                     flex: 4,
                     child: Padding(
@@ -340,52 +348,40 @@ class _AssetGridViewState extends State<AssetGridView> {
                               ),
                             ],
                           ),
-                          // Campos personalizados rápidos (solo si hay espacio)
                           if (_columnsCount < 6)
                             Padding(
                               padding: const EdgeInsets.only(
-                                left: 20,
-                                top: 20,
-                              ), // Un solo respiro pequeño antes de los campos
+                                  left: 20, top: 20),
                               child: Wrap(
-                                // Usamos Wrap en lugar de Column para que si son cortos quepan varios
-                                spacing: 20, // Espacio horizontal entre campos
-                                runSpacing:
-                                    10, // 🎯 CLAVE: Espacio vertical mínimo entre líneas de campos
+                                spacing: 20,
+                                runSpacing: 10,
                                 children: widget.assetType.fieldDefinitions
                                     .take(6)
                                     .map((def) {
-                                      final value =
-                                          item.customFieldValues?[def.id
+                                  final value =
+                                      item.customFieldValues?[def.id
                                               .toString()] ??
                                           '—';
-                                      return Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 4,
-                                          vertical: 1,
-                                        ), // Padding interno mínimo
-                                        decoration: BoxDecoration(
-                                          color: theme.primaryColor.withValues(
-                                            alpha: 0.05,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                        ),
-                                        child: Text(
-                                          '${def.name}: $value',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.primaryColor,
-                                            height:
-                                                1.1, // Reduce la altura de la línea del texto
-                                          ),
-                                          maxLines: 1,
-                                        ),
-                                      );
-                                    })
-                                    .toList(),
+                                  return Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 4, vertical: 1),
+                                    decoration: BoxDecoration(
+                                      color: theme.primaryColor
+                                          .withValues(alpha: 0.05),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: Text(
+                                      '${def.name}: $value',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: theme.primaryColor,
+                                        height: 1.1,
+                                      ),
+                                      maxLines: 1,
+                                    ),
+                                  );
+                                }).toList(),
                               ),
                             ),
                         ],
@@ -412,8 +408,6 @@ class _AssetGridViewState extends State<AssetGridView> {
           ],
         ),
       ),
-
-      // --- BOTÓN DE LUPA (Zoom) ---
     );
   }
 
@@ -461,7 +455,7 @@ class _AssetGridViewState extends State<AssetGridView> {
           decoration: BoxDecoration(
             color: color.withOpacity(0.9),
             shape: BoxShape.circle,
-            boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4)],
+            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
           ),
           child: Icon(icon, size: 14, color: iconColor ?? Colors.black87),
         ),
