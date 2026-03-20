@@ -109,6 +109,7 @@ class InventoryItemService {
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('barcode', item.barcode ?? ''));
+      formData.fields.add(MapEntry('serialNumber', item.serialNumber ?? ''));
       formData.fields.add(MapEntry('condition', item.condition.name));
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
@@ -181,6 +182,7 @@ class InventoryItemService {
       formData.fields.add(MapEntry('name', item.name));
       formData.fields.add(MapEntry('description', item.description ?? ''));
       formData.fields.add(MapEntry('barcode', item.barcode ?? ''));
+      formData.fields.add(MapEntry('serialNumber', item.serialNumber ?? ''));
       formData.fields.add(
         MapEntry(
           'condition',

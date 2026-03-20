@@ -9,6 +9,7 @@ import 'serialized_asset_warning.dart';
 /// Widget para la sección de inventario
 class InventorySectionWidget extends StatelessWidget {
   final TextEditingController barcodeController;
+  final TextEditingController? serialNumberController;
   final TextEditingController quantityController;
   final TextEditingController minStockController;
   final AssetType? assetType;
@@ -18,6 +19,7 @@ class InventorySectionWidget extends StatelessWidget {
   const InventorySectionWidget({
     super.key,
     required this.barcodeController,
+    this.serialNumberController,
     required this.quantityController,
     required this.minStockController,
     required this.assetType,
@@ -47,7 +49,9 @@ class InventorySectionWidget extends StatelessWidget {
               minStockController: minStockController,
             ),
           ] else if (assetType != null && assetType!.isSerialized) ...[
-            const SerializedAssetWarningWidget(),
+            SerializedAssetWarningWidget(
+              serialNumberController: serialNumberController,
+            ),
           ],
         ],
       ),

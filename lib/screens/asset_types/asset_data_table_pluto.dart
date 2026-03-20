@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/custom_footer_pagination.dart';
 import 'package:invenicum/widgets/ui/price_display_widget.dart';
@@ -171,6 +172,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     // Obtenemos los labels localizados para el select de condición.
     // Los valores del select DEBEN coincidir exactamente con los que
     // guardamos en las celdas en _buildRows (condition.getLocalizedString).
+    final l10n = AppLocalizations.of(context)!;
     final conditionLabels = ItemCondition.values
         .map((e) => e.getLocalizedString(context))
         .toList();
@@ -227,7 +229,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         },
       ),
       PlutoColumn(
-        title: 'Nombre',
+        title: l10n.assetName,
         field: 'name',
         type: PlutoColumnType.text(),
         width: 200,
@@ -250,8 +252,15 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         type: PlutoColumnType.text(),
         width: 150,
       ),
+      if (widget.assetType.isSerialized)
+        PlutoColumn(
+          title: 'Numero de serie',
+          field: 'serialNumber',
+          type: PlutoColumnType.text(),
+          width: 100,
+        ),
       PlutoColumn(
-        title: 'Código de Barras',
+        title: l10n.barCode,
         field: 'barcode',
         type: PlutoColumnType.text(),
         width: 150,
@@ -398,6 +407,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         'quantity': PlutoCell(value: item.quantity),
         'minStock': PlutoCell(value: item.minStock),
         'location': PlutoCell(value: item.location?.name ?? ''),
+        'serialNumber': PlutoCell(value: item.serialNumber ?? ''),
         'barcode': PlutoCell(value: item.barcode ?? ''),
         'marketValue': PlutoCell(value: item.marketValue.toString()),
         // El valor de la celda DEBE ser el string localizado del select

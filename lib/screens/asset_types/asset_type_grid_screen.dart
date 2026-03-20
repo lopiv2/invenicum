@@ -169,6 +169,9 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
 
                   return AssetTypeCard(
                     containerId: widget.containerId,
+                    isCollection: containerProvider.containers
+                        .firstWhere((c) => c.id == containerIdInt)
+                        .isCollection,
                     assetType: assetType,
                     assetCount: assetCount,
                     onTap: () => _goToAssetList(context, assetType),

@@ -12,6 +12,7 @@ class AssetTypeCard extends StatelessWidget {
   final String containerId;
   final AssetType assetType;
   final int assetCount;
+  final bool isCollection;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
 
@@ -20,6 +21,7 @@ class AssetTypeCard extends StatelessWidget {
     required this.containerId,
     required this.assetType,
     required this.assetCount,
+    required this.isCollection,
     this.onTap,
     this.onEdit,
   });
@@ -210,8 +212,9 @@ class AssetTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    // buildImageUrl() garantiza que nunca haya doble barra aunque apiUrl
-    // tenga trailing slash, y maneja URLs ya absolutas (http://...) sin duplicar el host.
+    final indicatorColor = isCollection
+        ? Colors.lightGreen
+        : theme.primaryColor; // Azul/Primario para individuales
     final fullImageUrl = assetType.images.isNotEmpty
         ? _buildImageUrl(assetType.images.first.url)
         : '';
@@ -220,6 +223,12 @@ class AssetTypeCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
+        border: Border(
+          bottom: BorderSide(
+            color: indicatorColor,
+            width: 4, // El grosor que quieras
+          ),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -241,7 +250,7 @@ class AssetTypeCard extends StatelessWidget {
                 children: [
                   // Imagen lateral
                   _buildHeroImage(fullImageUrl, theme),
-
+            
                   // Contenido Principal
                   Expanded(
                     child: Padding(
@@ -263,7 +272,8 @@ class AssetTypeCard extends StatelessWidget {
                           const Spacer(), // Empuja el resto hacia abajo
                           // 2. FILA INFERIOR: Badge + Botones
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
                             children: [
                               Flexible(
                                 flex: 2,

@@ -104,6 +104,7 @@ class AssetTypeService {
     required List<dynamic> fieldDefinitionsJson,
     Uint8List? imageBytes,
     String? imageName,
+    bool isSerialized = true,
     required bool removeExistingImage, // 🔑 Nuevo parámetro para la eliminación
   }) async {
     try {
@@ -112,6 +113,7 @@ class AssetTypeService {
       // 1. Construir el FormData
       final formData = FormData.fromMap({
         'name': name,
+        'isSerialized': isSerialized,
         'fieldDefinitions': jsonEncode(fieldDefinitionsJson),
 
         // 2. Lógica para subir una nueva imagen

@@ -39,13 +39,6 @@ class MainDataSectionWidget extends StatelessWidget {
             title: 'Datos Principales',
             icon: Icons.inventory_2_outlined,
           ),
-          LocationDropdownField(
-            availableLocations: availableLocations,
-            selectedLocationId: selectedLocationId,
-            onChanged: onLocationChanged,
-            containerId: containerId,
-          ),
-          const SizedBox(height: 16),
           CommonFormField(
             controller: nameController,
             label: l10n.assetName,
@@ -66,6 +59,15 @@ class MainDataSectionWidget extends StatelessWidget {
             maxLines: 3,
             highlighted: highlightedFields.contains('description'),
           ),
+          const SizedBox(height: 16),
+          LocationDropdownField(
+            availableLocations: availableLocations,
+            selectedLocationId: selectedLocationId,
+            onChanged: onLocationChanged,
+            containerId: containerId,
+          ),
+
+
         ],
       ),
     );

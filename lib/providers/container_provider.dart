@@ -271,6 +271,7 @@ class ContainerProvider with ChangeNotifier {
     required List<CustomFieldDefinition> fieldDefinitions,
     Uint8List? imageBytes,
     String? imageName,
+    bool isSerialized = true,
     required bool removeExistingImage,
   }) async {
     try {
@@ -286,6 +287,7 @@ class ContainerProvider with ChangeNotifier {
             fieldDefinitionsJson: fieldDefinitionsJson,
             imageBytes: imageBytes,
             imageName: imageName,
+            isSerialized: isSerialized,
             removeExistingImage: removeExistingImage,
           );
 

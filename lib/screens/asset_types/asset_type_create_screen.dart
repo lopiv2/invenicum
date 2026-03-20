@@ -37,6 +37,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   bool _isLoadingLists = true;
   String? _imagePreviewUrl;
   bool _isSerialized = true;
+  bool _isCollection = false;
 
   @override
   void initState() {
@@ -57,7 +58,8 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       final file = result.files.first;
       if (file.bytes != null) {
         final extension = file.extension ?? 'jpeg';
-        final base64Image = 'data:image/$extension;base64,${base64Encode(file.bytes!)}';
+        final base64Image =
+            'data:image/$extension;base64,${base64Encode(file.bytes!)}';
         setState(() => _imagePreviewUrl = base64Image);
         ToastService.info('Imagen seleccionada');
       }
@@ -73,24 +75,35 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
     final containerProvider = context.read<ContainerProvider>();
     final containerIdInt = int.tryParse(widget.containerId);
     if (containerIdInt != null) {
-      final container = containerProvider.containers.firstWhere((c) => c.id == containerIdInt);
+      final container = containerProvider.containers.firstWhere(
+        (c) => c.id == containerIdInt,
+      );
       setState(() {
         _availableDataLists = container.dataLists;
         _isLoadingLists = false;
+        _isCollection = container.isCollection;
       });
     }
   }
 
   void _addNewField() {
     setState(() {
-      _fieldDefinitions.add(CustomFieldDefinition(
-        id: 0, name: '', type: CustomFieldType.text, isRequired: false,
-        isSummable: false, isCountable: false, isMonetary: false,
-      ));
+      _fieldDefinitions.add(
+        CustomFieldDefinition(
+          id: 0,
+          name: '',
+          type: CustomFieldType.text,
+          isRequired: false,
+          isSummable: false,
+          isCountable: false,
+          isMonetary: false,
+        ),
+      );
     });
   }
 
-  void _removeField(int index) => setState(() => _fieldDefinitions.removeAt(index));
+  void _removeField(int index) =>
+      setState(() => _fieldDefinitions.removeAt(index));
 
   void _saveAssetType() async {
     if (_formKey.currentState!.validate()) {
@@ -104,7 +117,9 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
         final parts = _imagePreviewUrl!.split(',');
         if (parts.length > 1) {
           imageBytes = base64Decode(parts[1]);
-          final mimeType = RegExp(r'data:image/([^;]+);').firstMatch(parts[0])?.group(1) ?? 'jpeg';
+          final mimeType =
+              RegExp(r'data:image/([^;]+);').firstMatch(parts[0])?.group(1) ??
+              'jpeg';
           imageName = 'asset_type_image.$mimeType';
         }
       }
@@ -136,7 +151,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       // Fondo sutilmente coloreado para dar profundidad
       backgroundColor: theme.colorScheme.surfaceContainerLowest,
@@ -177,16 +192,64 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Configuración General", 
-                              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                            Text(
+                              "Configuración General",
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                             const SizedBox(height: 20),
                             AssetTypeNameField(controller: _nameController),
                             const SizedBox(height: 24),
                             const Divider(),
                             const SizedBox(height: 16),
-                            AssetTypeSerializedToggle(
-                              isSerialized: _isSerialized,
-                              onChanged: (v) => setState(() => _isSerialized = v),
+                            if (_isCollection) ...[
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primaryContainer
+                                      .withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline,
+                                      size: 20,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "Este contenedor es una Colección. Los activos serán seriados automáticamente.",
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onPrimaryContainer,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            IgnorePointer(
+                              ignoring:
+                                  _isCollection, // Bloquea la interacción si es colección
+                              child: Opacity(
+                                opacity: _isCollection
+                                    ? 0.6
+                                    : 1.0, // Visualmente parece bloqueado
+                                child: AssetTypeSerializedToggle(
+                                  isSerialized: _isSerialized,
+                                  onChanged: (_isCollection) {
+                                    (v) => setState(() => _isSerialized = v);
+                                  },
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -202,7 +265,9 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                           onAddField: _addNewField,
                           onRemoveField: _removeField,
                           onUpdateField: (index, updatedField) {
-                            setState(() => _fieldDefinitions[index] = updatedField);
+                            setState(
+                              () => _fieldDefinitions[index] = updatedField,
+                            );
                           },
                         ),
                       ),
@@ -233,8 +298,12 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(28), // Bordes muy redondeados (2026 style)
-        border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.5)),
+        borderRadius: BorderRadius.circular(
+          28,
+        ), // Bordes muy redondeados (2026 style)
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.03),

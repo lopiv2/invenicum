@@ -16,6 +16,7 @@ import 'local_widgets/asset_type_custom_fields_section.dart';
 import 'local_widgets/asset_type_form_title.dart';
 import 'local_widgets/asset_type_image_section_extended.dart';
 import 'local_widgets/asset_type_name_field.dart';
+import 'local_widgets/asset_type_serialized_toggle.dart'; // Asegúrate de importar este
 import '../../config/environment.dart';
 
 class AssetTypeEditScreen extends StatefulWidget {
@@ -40,45 +41,40 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
   List<CustomFieldDefinition> _fieldDefinitions = [];
   List<ListData> _availableDataLists = [];
   bool _isLoading = true;
+  bool _isSerialized = true;
+  bool _isCollection = false;
 
   // Estado para la imagen
   String? _imagePreviewUrl;
-  bool _imageWasRemoved =
-      false; // Bandera para indicar que la imagen existente debe eliminarse
-  bool _isNewImageBase64 =
-      false; // Bandera para saber si la URL es Base64 (nueva) o remota (existente)
+  bool _imageWasRemoved = false;
+  bool _isNewImageBase64 = false;
 
   @override
   void initState() {
     super.initState();
-    // 🎯 Iniciamos la carga de datos del tipo de activo existente
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadInitialData();
     });
   }
 
-  /// Construye la URL completa de imagen de forma segura.
-  /// Mismo comportamiento que en AssetTypeCard — fuente de verdad única.
   static String _buildImageUrl(String rawUrl) {
     if (rawUrl.isEmpty) return '';
-    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))
       return rawUrl;
-    }
     final host = Environment.apiUrl.endsWith('/')
         ? Environment.apiUrl.substring(0, Environment.apiUrl.length - 1)
         : Environment.apiUrl;
     if (rawUrl.startsWith('/')) return '$host$rawUrl';
-    return '$host/images/$rawUrl'; // registros viejos sin barra inicial
+    return '$host/images/$rawUrl';
   }
 
-  /// 🔑 CARGA INICIAL: Busca el AssetType y carga sus datos para edición.
   void _loadInitialData() {
     final containerProvider = context.read<ContainerProvider>();
     final containerIdInt = int.tryParse(widget.containerId);
     final assetTypeIdInt = int.tryParse(widget.assetTypeId);
 
     if (containerIdInt == null || assetTypeIdInt == null) {
-      ToastService.error('ID de contenedor o tipo de activo inválido.');
+      ToastService.error('ID inválido.');
       setState(() => _isLoading = false);
       return;
     }
@@ -86,38 +82,31 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
     try {
       final container = containerProvider.containers.firstWhere(
         (c) => c.id == containerIdInt,
-        orElse: () => throw Exception("Container not found"),
       );
-
       final assetType = container.assetTypes.firstWhere(
         (at) => at.id == assetTypeIdInt,
-        orElse: () => throw Exception("AssetType not found"),
       );
 
-      // 🔑 Establecer estados iniciales con los datos existentes
       _nameController.text = assetType.name;
-      // Clonar la lista de definiciones de campo para que las ediciones no afecten el modelo directamente
+      _isSerialized = assetType.isSerialized; // Cargamos el estado real
       _fieldDefinitions = List.from(assetType.fieldDefinitions);
       _availableDataLists = container.dataLists;
       _currentAssetType = assetType;
+      _isCollection = container.isCollection;
 
-      // Cargar la imagen existente si la hay.
-      // Usamos _buildImageUrl para manejar de forma segura cualquier formato
-      // de URL que pueda venir de la DB (absoluta, relativa con /, sin /).
       if (assetType.images.isNotEmpty) {
         _imagePreviewUrl = _buildImageUrl(assetType.images.first.url);
       }
 
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     } catch (e) {
-      ToastService.error('Error al cargar datos iniciales: ${e.toString()}');
+      ToastService.error('Error al cargar datos: ${e.toString()}');
       setState(() => _isLoading = false);
     }
   }
 
-  /// Muestra el selector de archivos y obtiene la URL Base64 para previsualización
+  // --- Lógica de archivos y campos (Mantenida igual) ---
+
   Future<void> _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -129,37 +118,24 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
       final file = result.files.first;
       if (file.bytes != null) {
         final extension = file.extension ?? 'jpeg';
-        final String base64Image =
+        final base64Image =
             'data:image/$extension;base64,${base64Encode(file.bytes!)}';
-
         setState(() {
           _imagePreviewUrl = base64Image;
-          _isNewImageBase64 = true; // Es una imagen nueva
-          _imageWasRemoved =
-              false; // Si se carga una nueva, no eliminamos la anterior
+          _isNewImageBase64 = true;
+          _imageWasRemoved = false;
         });
-        ToastService.info('Imagen seleccionada');
-      } else {
-        ToastService.error(
-          'Error: No se pudo obtener la data de la imagen seleccionada.',
-        );
       }
-    } else {
-      ToastService.info('Selección de archivo cancelada.');
     }
   }
 
   void _removeImage() {
     setState(() {
       _imagePreviewUrl = null;
-      _isNewImageBase64 = false; // Ya no hay imagen Base64
-
-      // Si el AssetType ya tenía una imagen, marcamos para eliminación
-      if (_currentAssetType?.images.isNotEmpty ?? false) {
+      _isNewImageBase64 = false;
+      if (_currentAssetType?.images.isNotEmpty ?? false)
         _imageWasRemoved = true;
-      }
     });
-    ToastService.info('Imagen removida');
   }
 
   void _addNewField() {
@@ -170,32 +146,18 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
           name: '',
           type: CustomFieldType.text,
           isRequired: false,
-          isSummable: false,
-          isCountable: false,
         ),
       );
     });
   }
 
-  void _removeField(int index) {
-    setState(() {
-      _fieldDefinitions.removeAt(index);
-    });
-  }
-
-  /// 🔑 GUARDA LA EDICIÓN: Llama a updateAssetType en el provider.
   void _saveAssetType() async {
     if (!_formKey.currentState!.validate() || _currentAssetType == null) return;
 
     final containerProvider = context.read<ContainerProvider>();
-    final containerIdInt = int.tryParse(widget.containerId);
-    final assetTypeIdInt = int.tryParse(widget.assetTypeId);
+    final containerIdInt = int.parse(widget.containerId);
+    final assetTypeIdInt = int.parse(widget.assetTypeId);
 
-    if (containerIdInt == null || assetTypeIdInt == null) return;
-
-    final updatedTypeName = _nameController.text;
-
-    // Lógica de la imagen para la API
     Uint8List? newImageBytes;
     String? newImageName;
 
@@ -203,7 +165,6 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
       final parts = _imagePreviewUrl!.split(',');
       if (parts.length > 1) {
         newImageBytes = base64Decode(parts[1]);
-        // Intentar obtener la extensión, por defecto 'jpeg'
         final mimeType =
             RegExp(r'data:image/([^;]+);').firstMatch(parts[0])?.group(1) ??
             'jpeg';
@@ -215,105 +176,187 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
       await containerProvider.updateAssetType(
         containerId: containerIdInt,
         assetTypeId: assetTypeIdInt,
-        name: updatedTypeName,
+        name: _nameController.text,
+        isSerialized: _isSerialized, // IMPORTANTE: enviamos el cambio
         fieldDefinitions: _fieldDefinitions,
-
-        // Parámetros de imagen
         imageBytes: newImageBytes,
         imageName: newImageName,
-        // Solo eliminamos la imagen si:
-        // 1. La bandera de remoción está activa, Y
-        // 2. No estamos subiendo una nueva imagen.
         removeExistingImage: _imageWasRemoved && !_isNewImageBase64,
       );
-
-      if (context.mounted) {
-        ToastService.success(
-          'Tipo de Activo "${updatedTypeName}" actualizado exitosamente.',
-        );
-        // Volver a la vista de grid
-        context.go('/container/${widget.containerId}/asset-types');
-      }
+      ToastService.success('Tipo de activo actualizado con éxito.');
+      if (mounted) context.go('/container/${widget.containerId}/asset-types');
     } catch (e) {
-      if (context.mounted) {
-        ToastService.error(
-          'Error al actualizar el Tipo de Activo: ${e.toString()}',
-        );
-      }
+      ToastService.error('Error al actualizar: ${e.toString()}');
     }
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(32.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            AssetTypeFormTitle(
-              title: 'Editar Tipo de Activo: "${_currentAssetType?.name ?? 'Cargando...'}"',
-            ),
-            const SizedBox(height: 20),
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surfaceContainerLowest,
+      body: Center(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 900),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  AssetTypeFormTitle(
+                    title: 'Editar: ${_currentAssetType?.name ?? ""}',
+                  ),
+                  const SizedBox(height: 32),
 
-            // --- Campo de Nombre ---
-            AssetTypeNameField(
-              controller: _nameController,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'El nombre es obligatorio';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 30),
+                  Wrap(
+                    spacing: 24,
+                    runSpacing: 24,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      // 1. Imagen (Bento 350)
+                      _buildBentoBox(
+                        width: 350,
+                        child: AssetTypeImageSectionExtended(
+                          imagePreviewUrl: _imagePreviewUrl,
+                          isNewImageBase64: _isNewImageBase64,
+                          onAddImage: _addImage,
+                          onRemoveImage: _removeImage,
+                        ),
+                      ),
 
-            // --- Sección de Imagen (Extendida para edición) ---
-            AssetTypeImageSectionExtended(
-              imagePreviewUrl: _imagePreviewUrl,
-              isNewImageBase64: _isNewImageBase64,
-              onAddImage: _addImage,
-              onRemoveImage: _removeImage,
-            ),
-            const SizedBox(height: 30),
+                      // 2. Configuración (Bento 480)
+                      _buildBentoBox(
+                        width: 480,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Configuración General",
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            AssetTypeNameField(controller: _nameController),
+                            const SizedBox(height: 24),
+                            const Divider(),
+                            const SizedBox(height: 16),
+                            if (_isCollection) ...[
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: theme.colorScheme.primaryContainer
+                                      .withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.info_outline,
+                                      size: 20,
+                                      color: theme.colorScheme.primary,
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        "Este contenedor es una Colección. Los activos serán seriados automáticamente.",
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: theme
+                                                  .colorScheme
+                                                  .onPrimaryContainer,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+                            IgnorePointer(
+                              ignoring:
+                                  _isCollection, // Bloquea la interacción si es colección
+                              child: Opacity(
+                                opacity: _isCollection
+                                    ? 0.6
+                                    : 1.0, // Visualmente parece bloqueado
+                                child: AssetTypeSerializedToggle(
+                                  isSerialized: _isSerialized,
+                                  onChanged: (_isCollection) {
+                                    (v) => setState(() => _isSerialized = v);
+                                  },
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
-            // --- Editor de Campos Dinámicos ---
-            AssetTypeCustomFieldsSection(
-              fieldDefinitions: _fieldDefinitions,
-              availableDataLists: _availableDataLists,
-              isLoading: false,
-              onAddField: _addNewField,
-              onRemoveField: _removeField,
-              onUpdateField: (index, updatedField) {
-                setState(() {
-                  // Nos aseguramos de PRESERVAR el ID que ya tenía este campo en la lista
-                  _fieldDefinitions[index] = updatedField.copyWith(
-                    id: _fieldDefinitions[index].id,
-                  );
-                });
-              },
-            ),
-            const SizedBox(height: 40),
+                      // 3. Campos Dinámicos (Bento 854)
+                      _buildBentoBox(
+                        width: 854,
+                        child: AssetTypeCustomFieldsSection(
+                          fieldDefinitions: _fieldDefinitions,
+                          availableDataLists: _availableDataLists,
+                          isLoading: false,
+                          onAddField: _addNewField,
+                          onRemoveField: (index) =>
+                              setState(() => _fieldDefinitions.removeAt(index)),
+                          onUpdateField: (index, updatedField) {
+                            setState(() {
+                              _fieldDefinitions[index] = updatedField.copyWith(
+                                id: _fieldDefinitions[index]
+                                    .id, // Preservar ID para la API
+                              );
+                            });
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
 
-            // --- Botón de Guardar ---
-            AssetTypeActionButtons(
-              onSave: _saveAssetType,
-              saveLabel: 'Actualizar Tipo de Activo',
+                  const SizedBox(height: 48),
+
+                  AssetTypeActionButtons(
+                    onSave: _saveAssetType,
+                    saveLabel: 'Actualizar Tipo de Activo',
+                  ),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBentoBox({required double width, required Widget child}) {
+    final theme = Theme.of(context);
+    return Container(
+      width: width,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: child,
     );
   }
 }

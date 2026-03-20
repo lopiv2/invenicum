@@ -53,6 +53,7 @@ class InventoryItem {
   final String name;
   final String? description;
   final String? barcode;
+  final String? serialNumber;
   final int containerId;
   final int assetTypeId;
   final int? locationId;
@@ -77,6 +78,7 @@ class InventoryItem {
     required this.name,
     this.description,
     this.barcode,
+    this.serialNumber,
     required this.containerId,
     required this.assetTypeId,
     this.locationId,
@@ -145,6 +147,7 @@ class InventoryItem {
         itemData['condition'] as String?,
       ),
       barcode: itemData['barcode'] as String?,
+      serialNumber: itemData['serialNumber'] as String?,
       containerId: (itemData['containerId'] ?? 0).toInt(),
       assetTypeId: (itemData['assetTypeId'] ?? 0).toInt(),
       priceHistory: history,
@@ -185,6 +188,7 @@ class InventoryItem {
     'condition': (condition as Enum).name,
     // Forzamos null si está vacío para evitar el error P2002 de Prisma
     'barcode': (barcode?.trim().isEmpty ?? true) ? null : barcode,
+    'serialNumber': (serialNumber?.trim().isEmpty ?? true) ? null : serialNumber,
 
     // 🔥 CORRECCIÓN CRUCIAL: Añadimos Map.from para que sea un Map real encodable
     'customFieldValues': customFieldValues != null 
@@ -212,6 +216,7 @@ class InventoryItem {
     bool wishlisted = false,
     ItemCondition? condition,
     String? barcode,
+    String? serialNumber,
     int? containerId,
     int? assetTypeId,
     int? locationId,
@@ -243,6 +248,7 @@ class InventoryItem {
       description: description ?? this.description,
       condition: condition ?? this.condition,
       barcode: barcode ?? this.barcode,
+      serialNumber: serialNumber ?? this.serialNumber,
       containerId: containerId ?? this.containerId,
       assetTypeId: assetTypeId ?? this.assetTypeId,
       locationId: locationId ?? this.locationId,

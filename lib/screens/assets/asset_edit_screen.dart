@@ -17,6 +17,7 @@ import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/custom_fields_section.dart';
+import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/images_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/inventory_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/main_data_section.dart';
@@ -61,6 +62,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   late TextEditingController _quantityController;
   late TextEditingController _minStockController;
   late TextEditingController _barcodeController;
+  late TextEditingController _serialController;
 
   bool _isMagicLoading = false;
   bool _isEnrichLoading = false;
@@ -114,6 +116,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _quantityController = TextEditingController();
     _minStockController = TextEditingController();
     _barcodeController = TextEditingController();
+    _serialController = TextEditingController();
     _dynamicControllers = {};
     _selectedLocationId = currentItem?.locationId;
     _currentImages = List.from(currentItem?.images ?? []);
@@ -169,6 +172,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _quantityController.text = item.quantity.toString();
     _minStockController.text = item.minStock.toString();
     _barcodeController.text = item.barcode ?? '';
+    _serialController.text = item.serialNumber ?? '';
     _selectedLocationId = item.locationId;
     _currentImages = List.from(item.images);
     _selectedCondition = item.condition;
@@ -246,6 +250,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _quantityController.dispose();
     _minStockController.dispose();
     _barcodeController.dispose();
+    _serialController.dispose();
     _dynamicControllers.values.forEach((c) => c.dispose());
     _aiSearchController.dispose();
     _scrollController.dispose();
@@ -614,6 +619,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       barcode: _barcodeController.text.trim().isEmpty
           ? null
           : _barcodeController.text.trim(),
+      serialNumber: _serialController.text.trim().isEmpty
+          ? null
+          : _serialController.text.trim(),
       quantity: int.tryParse(_quantityController.text) ?? 1,
       minStock: int.tryParse(_minStockController.text) ?? 1,
       name: _nameController.text.trim(),
@@ -685,81 +693,18 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
                     // ── Importar desde fuente externa ──
                     importBento: BentoBoxWidget(
-                      title: "Importar desde Fuente Externa",
-                      icon: Icons.auto_awesome,
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          // En ancho suficiente: selector + buscador en la misma fila.
-                          // En ancho estrecho: apilados verticalmente.
-                          final wide = constraints.maxWidth >= 480;
-                          final dropdown = DropdownButtonFormField<String>(
-                            value: _selectedSource,
-                            isExpanded: true, // evita overflow del texto del item
-                            decoration: const InputDecoration(
-                              labelText: "Fuente de datos",
-                              prefixIcon: Icon(Icons.api),
-                            ),
-                            items: _availableDataSources
-                                .map((source) => DropdownMenuItem(
-                                      value: source.id,
-                                      child: Row(
-                                        children: [
-                                          SizedBox(
-                                              width: 20, child: source.icon),
-                                          const SizedBox(width: 8),
-                                          Flexible(
-                                            child: Text(
-                                              source.name,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ))
-                                .toList(),
-                            onChanged: (val) =>
-                                setState(() => _selectedSource = val),
-                          );
-                          final searchField = TextFormField(
-                            controller: _aiSearchController,
-                            decoration: InputDecoration(
-                              labelText: "Buscar por nombre",
-                              hintText: "Ej: Pikachu, Catan, El Quijote...",
-                              suffixIcon: _isEnrichLoading
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(12),
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2),
-                                    )
-                                  : IconButton(
-                                      icon: const Icon(Icons.search),
-                                      onPressed: _handleEnrichSearch,
-                                    ),
-                            ),
-                            onFieldSubmitted: (_) => _handleEnrichSearch(),
-                          );
-
-                          if (wide) {
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                SizedBox(width: 220, child: dropdown),
-                                const SizedBox(width: 16),
-                                Expanded(child: searchField),
-                              ],
-                            );
-                          }
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              dropdown,
-                              const SizedBox(height: 12),
-                              searchField,
-                            ],
-                          );
-                        },
+                        title: "Importar desde Fuente Externa",
+                        icon: Icons.auto_awesome,
+                        child: ExternalImportWidget(
+                          selectedSource: _selectedSource,
+                          availableSources: _availableDataSources,
+                          searchController: _aiSearchController,
+                          isLoading: _isEnrichLoading,
+                          onSourceChanged: (val) =>
+                              setState(() => _selectedSource = val),
+                          onSearch: _handleEnrichSearch,
+                        ),
                       ),
-                    ),
 
                     // ── Datos Principales ──
                     mainDataBento: BentoBoxWidget(
@@ -800,6 +745,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                       icon: Icons.qr_code_scanner,
                       child: InventorySectionWidget(
                         barcodeController: _barcodeController,
+                        serialNumberController: _serialController,
                         quantityController: _quantityController,
                         minStockController: _minStockController,
                         assetType: _assetType,

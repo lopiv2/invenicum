@@ -7,6 +7,7 @@ import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
 import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
@@ -54,6 +55,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _barcodeController = TextEditingController();
+  final _serialController = TextEditingController();
   final _quantityController = TextEditingController(text: '1');
   final _minStockController = TextEditingController(text: '1');
   final _aiSearchController = TextEditingController();
@@ -86,9 +88,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     super.didChangeDependencies();
     final apiService = context.read<ApiService>();
     _integrationService = IntegrationService(apiService);
-    final sources = AppIntegrations.getAvailableIntegrations(context)
-        .where((i) => i.isDataSource)
-        .toList();
+    final sources = AppIntegrations.getAvailableIntegrations(
+      context,
+    ).where((i) => i.isDataSource).toList();
     if (sources.length != _availableDataSources.length) {
       _availableDataSources = sources;
       if (_selectedSource == null && sources.isNotEmpty) {
@@ -143,7 +145,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           ? container.locations.first.id
           : null;
       for (var field in assetType.fieldDefinitions) {
-        if (field.type == CustomFieldType.dropdown && field.dataListId != null) {
+        if (field.type == CustomFieldType.dropdown &&
+            field.dataListId != null) {
           _loadListValues(field.dataListId!, field.id!);
         } else if (field.type == CustomFieldType.boolean) {
           _booleanFieldValues[field.id!] = false;
@@ -194,15 +197,16 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     });
     try {
       final integrationService = IntegrationService(context.read<ApiService>());
-      final InventoryItem? suggestedItem =
-          await integrationService.lookupBarcode(scannedCode);
+      final InventoryItem? suggestedItem = await integrationService
+          .lookupBarcode(scannedCode);
       if (suggestedItem != null && mounted) {
         setState(() {
           _nameController.text = suggestedItem.name;
           _descriptionController.text = suggestedItem.description ?? '';
           if (suggestedItem.images.isNotEmpty) {
-            _imagePreviewUrls =
-                suggestedItem.images.map((img) => img.url).toList();
+            _imagePreviewUrls = suggestedItem.images
+                .map((img) => img.url)
+                .toList();
           }
           _highlightedFields.addAll(['name', 'description', 'barcode']);
         });
@@ -226,9 +230,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
     setState(() => _isEnrichLoading = true);
     try {
-      final Map<String, dynamic>? enrichedData =
-          await _integrationService.enrichItem(
-              query: query, source: _selectedSource!);
+      final Map<String, dynamic>? enrichedData = await _integrationService
+          .enrichItem(query: query, source: _selectedSource!);
       if (enrichedData != null && mounted) {
         setState(() {
           _nameController.text = enrichedData['name'] ?? _nameController.text;
@@ -253,16 +256,16 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
               usedAiKeys.add(entry.key);
               final val = entry.value.toString();
               if (fieldDef.type == CustomFieldType.boolean) {
-                _booleanFieldValues[fieldDef.id!] =
-                    val.toLowerCase() == 'true';
+                _booleanFieldValues[fieldDef.id!] = val.toLowerCase() == 'true';
               } else if (fieldDef.type == CustomFieldType.dropdown) {
                 final options = _listFieldValues[fieldDef.id] ?? [];
                 final match = options.firstWhere(
                   (o) => o.toLowerCase() == val.toLowerCase(),
                   orElse: () => '',
                 );
-                if (match.isNotEmpty)
+                if (match.isNotEmpty) {
                   _selectedListValues[fieldDef.id!] = match;
+                }
               } else {
                 _customControllers[fieldDef.id]?.text = val;
               }
@@ -276,8 +279,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
             }
           });
           if (unusedDataLines.isNotEmpty) {
-            _descriptionController.text = baseDescription +
-                "\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}";
+            _descriptionController.text =
+                "$baseDescription\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}";
           } else {
             _descriptionController.text = baseDescription;
           }
@@ -301,8 +304,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     if (_assetType == null) return;
     setState(() => _isMagicLoading = true);
     try {
-      final List<String> fieldsToExtract =
-          _assetType!.fieldDefinitions.map((f) => f.name).toList();
+      final List<String> fieldsToExtract = _assetType!.fieldDefinitions
+          .map((f) => f.name)
+          .toList();
       if (!fieldsToExtract.any((f) => f.toLowerCase() == 'barcode')) {
         fieldsToExtract.add('barcode');
       }
@@ -310,13 +314,13 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         url: url,
         fields: fieldsToExtract,
       );
-      final lowerCaseResult =
-          result.map((key, value) => MapEntry(key.toLowerCase(), value));
+      final lowerCaseResult = result.map(
+        (key, value) => MapEntry(key.toLowerCase(), value),
+      );
       setState(() {
         final imageUrl =
             lowerCaseResult['imageurl'] ?? lowerCaseResult['image'];
-        if (imageUrl != null &&
-            imageUrl.toString().startsWith('data:image')) {
+        if (imageUrl != null && imageUrl.toString().startsWith('data:image')) {
           _imagePreviewUrls.add(imageUrl.toString());
         }
         if (lowerCaseResult['name'] != null) {
@@ -324,16 +328,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           _highlightedFields.add('name');
         }
         if (lowerCaseResult['description'] != null) {
-          _descriptionController.text =
-              lowerCaseResult['description'].toString();
+          _descriptionController.text = lowerCaseResult['description']
+              .toString();
           _highlightedFields.add('description');
         }
         final dynamic barcodeValue =
             lowerCaseResult['barcode'] ?? lowerCaseResult['upc'];
         if (barcodeValue != null) {
-          _barcodeController.text = barcodeValue
-              .toString()
-              .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
+          _barcodeController.text = barcodeValue.toString().replaceAll(
+            RegExp(r'[^a-zA-Z0-9]'),
+            '',
+          );
           _highlightedFields.add('barcode');
         }
         for (var fieldDef in _assetType!.fieldDefinitions) {
@@ -396,8 +401,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         if (controller != null && controller.text.isNotEmpty) {
           String val = controller.text;
           if (fieldDef.type == CustomFieldType.price) {
-            double localVal =
-                double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
+            double localVal = double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
             val = context
                 .read<PreferencesProvider>()
                 .convertToBase(localVal)
@@ -413,6 +417,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         containerId: _containerId!,
         assetTypeId: _assetTypeId!,
         barcode: _barcodeController.text.trim(),
+        serialNumber: _serialController.text.trim(),
         locationId: _selectedLocationId,
         quantity: int.tryParse(_quantityController.text) ?? 1,
         minStock: int.tryParse(_minStockController.text) ?? 1,
@@ -422,9 +427,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         customFieldValues: customFieldValues,
       );
       await context.read<InventoryItemProvider>().createInventoryItem(
-            newItem,
-            filesData: AssetFormUtils.processImages(_imagePreviewUrls),
-          );
+        newItem,
+        filesData: AssetFormUtils.processImages(_imagePreviewUrls),
+      );
       if (mounted) {
         ToastService.success('Activo creado!');
         await itemProvider.loadInventoryItems(
@@ -473,6 +478,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _nameController.dispose();
     _descriptionController.dispose();
     _barcodeController.dispose();
+    _serialController.dispose();
     _quantityController.dispose();
     _minStockController.dispose();
     _scrollController.dispose();
@@ -505,8 +511,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     final liveLocations = liveContainer.locations;
 
     if (_assetType == null) {
-      return const Scaffold(
-          body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -537,74 +542,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       importBento: BentoBoxWidget(
                         title: "Importar desde Fuente Externa",
                         icon: Icons.auto_awesome,
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            final wide = constraints.maxWidth >= 480;
-                            final dropdown = DropdownButtonFormField<String>(
-                              value: _selectedSource,
-                              isExpanded: true,
-                              decoration: const InputDecoration(
-                                labelText: "Fuente de datos",
-                                prefixIcon: Icon(Icons.api),
-                              ),
-                              items: _availableDataSources
-                                  .map((source) => DropdownMenuItem(
-                                        value: source.id,
-                                        child: Row(
-                                          children: [
-                                            SizedBox(width: 20, child: source.icon),
-                                            const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                source.name,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ))
-                                  .toList(),
-                              onChanged: (val) =>
-                                  setState(() => _selectedSource = val),
-                            );
-                            final searchField = TextFormField(
-                              controller: _aiSearchController,
-                              decoration: InputDecoration(
-                                labelText: "Buscar por nombre",
-                                hintText: "Ej: Pikachu, Catan, El Quijote...",
-                                suffixIcon: _isEnrichLoading
-                                    ? const Padding(
-                                        padding: EdgeInsets.all(12),
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2),
-                                      )
-                                    : IconButton(
-                                        icon: const Icon(Icons.search),
-                                        onPressed: _handleEnrichSearch,
-                                      ),
-                              ),
-                              onFieldSubmitted: (_) => _handleEnrichSearch(),
-                            );
-
-                            if (wide) {
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  SizedBox(width: 220, child: dropdown),
-                                  const SizedBox(width: 16),
-                                  Expanded(child: searchField),
-                                ],
-                              );
-                            }
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                dropdown,
-                                const SizedBox(height: 12),
-                                searchField,
-                              ],
-                            );
-                          },
+                        child: ExternalImportWidget(
+                          selectedSource: _selectedSource,
+                          availableSources: _availableDataSources,
+                          searchController: _aiSearchController,
+                          isLoading: _isEnrichLoading,
+                          onSourceChanged: (val) =>
+                              setState(() => _selectedSource = val),
+                          onSearch: _handleEnrichSearch,
                         ),
                       ),
 
@@ -649,6 +594,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         icon: Icons.qr_code_scanner,
                         child: InventorySectionWidget(
                           barcodeController: _barcodeController,
+                          serialNumberController: _serialController,
                           quantityController: _quantityController,
                           minStockController: _minStockController,
                           assetType: _assetType,
@@ -663,18 +609,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                               title: "Especificaciones",
                               icon: Icons.list_alt,
                               child: CustomFieldsSectionWidget(
-                                fieldDefinitions:
-                                    _assetType!.fieldDefinitions,
+                                fieldDefinitions: _assetType!.fieldDefinitions,
                                 customControllers: _customControllers,
                                 listFieldValues: _listFieldValues,
                                 selectedListValues: _selectedListValues,
                                 booleanFieldValues: _booleanFieldValues,
                                 highlightedFields: _highlightedFields,
-                                onDropdownChanged: (id, v) => setState(
-                                    () => _selectedListValues[id] = v),
+                                onDropdownChanged: (id, v) =>
+                                    setState(() => _selectedListValues[id] = v),
                                 onBooleanChanged: (id, v) => setState(
-                                    () =>
-                                        _booleanFieldValues[id] = v ?? false),
+                                  () => _booleanFieldValues[id] = v ?? false,
+                                ),
                                 onControllerText: (id, ctrl) {},
                               ),
                             )
@@ -698,7 +643,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
 class _AssetFormLayout extends StatelessWidget {
   final Widget? aiBanner;
-  final Widget? importBento;   // Solo en Create
+  final Widget? importBento; // Solo en Create
   final Widget mainDataBento;
   final Widget galleryBento;
   final Widget statusWidget;
@@ -721,16 +666,10 @@ class _AssetFormLayout extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // ── Banner IA ──────────────────────────────────────────────────────
-        if (aiBanner != null) ...[
-          aiBanner!,
-          const SizedBox(height: 24),
-        ],
+        if (aiBanner != null) ...[aiBanner!, const SizedBox(height: 24)],
 
         // ── Importar (solo create) ─────────────────────────────────────────
-        if (importBento != null) ...[
-          importBento!,
-          const SizedBox(height: 24),
-        ],
+        if (importBento != null) ...[importBento!, const SizedBox(height: 24)],
 
         // ── Fila: Datos Principales (2/3) + Galería (1/3) ─────────────────
         LayoutBuilder(
@@ -780,20 +719,13 @@ class _AssetFormLayout extends StatelessWidget {
               );
             }
             return Column(
-              children: [
-                statusWidget,
-                const SizedBox(height: 16),
-                stockBento,
-              ],
+              children: [statusWidget, const SizedBox(height: 16), stockBento],
             );
           },
         ),
 
         // ── Especificaciones (full width, solo si hay campos) ─────────────
-        if (specsBento != null) ...[
-          const SizedBox(height: 24),
-          specsBento!,
-        ],
+        if (specsBento != null) ...[const SizedBox(height: 24), specsBento!],
       ],
     );
   }
