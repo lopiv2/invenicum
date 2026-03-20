@@ -14,6 +14,7 @@ class MainDataSectionWidget extends StatelessWidget {
   final int? selectedLocationId;
   final ValueChanged<int?> onLocationChanged;
   final Set<String> highlightedFields;
+  final int? containerId;
 
   const MainDataSectionWidget({
     super.key,
@@ -23,6 +24,7 @@ class MainDataSectionWidget extends StatelessWidget {
     required this.selectedLocationId,
     required this.onLocationChanged,
     this.highlightedFields = const {},
+    this.containerId,
   });
 
   @override
@@ -41,6 +43,7 @@ class MainDataSectionWidget extends StatelessWidget {
             availableLocations: availableLocations,
             selectedLocationId: selectedLocationId,
             onChanged: onLocationChanged,
+            containerId: containerId,
           ),
           const SizedBox(height: 16),
           CommonFormField(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import '../data/models/user_data_model.dart';
 import '../data/models/login_response.dart';
@@ -51,20 +52,31 @@ class AuthProvider with ChangeNotifier {
       }
 
       if (_apiService.currentToken != null) {
-        final userData = await _apiService.getMe().timeout(
-          const Duration(seconds: 15),
-          onTimeout: () => null,
-        );
+        try {
+          final userData = await _apiService.getMe().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => null,
+          );
 
-        if (userData != null) {
-          _user = userData;
-          _token = _apiService.currentToken;
-        } else {
-          // Solo cerramos sesión si el backend devuelve explícitamente error de auth (401).
-          // Si fue timeout u otro error de red, mantenemos el token para no expulsar
-          // al usuario por un fallo temporal del servidor.
-          debugPrint("⚠️ AuthProvider: getMe() sin datos — cerrando sesión");
-          await _apiService.logout();
+          if (userData != null) {
+            _user = userData;
+            _token = _apiService.currentToken;
+          } else {
+            // getMe() devolvió null sin lanzar excepción — caso raro,
+            // lo tratamos como error temporal y mantenemos el token.
+            debugPrint("⚠️ AuthProvider: getMe() sin datos, manteniendo sesión");
+            _token = _apiService.currentToken;
+          }
+        } on DioException catch (e) {
+          if (e.response?.statusCode == 401) {
+            // 401 explícito del servidor → token inválido o expirado → logout
+            debugPrint("⚠️ AuthProvider: token inválido (401) — cerrando sesión");
+            await _apiService.logout();
+          } else {
+            // Error de red, timeout, 5xx, etc. → no cerramos sesión
+            debugPrint("⚠️ AuthProvider: error de red (${e.response?.statusCode}) — manteniendo sesión");
+            _token = _apiService.currentToken;
+          }
         }
       }
     } catch (e) {

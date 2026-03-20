@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:invenicum/data/models/asset_type_model.dart';
+import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/models/list_data.dart';
@@ -297,12 +298,23 @@ class ContainerProvider with ChangeNotifier {
 
       final originalContainer = _containers[containerIndex];
 
-      // a. Eliminar el AssetType antiguo y añadir el nuevo
+      // Recuperamos el AssetType original para preservar los campos de colección
+      // (possessionFieldId, desiredFieldId) que el endpoint de edición general
+      // no gestiona y que el backend devuelve como null si no los recibe.
+      final originalAssetType = originalContainer.assetTypes
+          .firstWhere((at) => at.id == assetTypeId, orElse: () => updatedAssetTypeFromApi);
+
+      final mergedAssetType = updatedAssetTypeFromApi.copyWith(
+        possessionFieldId: updatedAssetTypeFromApi.possessionFieldId ?? originalAssetType.possessionFieldId,
+        desiredFieldId: updatedAssetTypeFromApi.desiredFieldId ?? originalAssetType.desiredFieldId,
+      );
+
+      // a. Eliminar el AssetType antiguo y añadir el nuevo (con campos preservados)
       final assetTypesWithoutOld = originalContainer.assetTypes
           .where((type) => type.id != assetTypeId)
           .toList();
       final updatedAssetTypes = List<AssetType>.from(assetTypesWithoutOld)
-        ..add(updatedAssetTypeFromApi);
+        ..add(mergedAssetType);
 
       // b. Crear un nuevo ContainerNode con la lista de AssetTypes actualizada
       // 🎯 CORRECCIÓN: Ya no pasamos locationsCount
@@ -578,6 +590,26 @@ class ContainerProvider with ChangeNotifier {
       print('Error al eliminar lista personalizada: $e');
       rethrow;
     }
+  }
+
+  /// Añade una ubicación al ContainerNode en memoria sin hacer petición de red.
+  /// Usar tras crear una ubicación para actualizar el dropdown inmediatamente,
+  /// evitando el frame intermedio donde value no tiene item correspondiente.
+  void addLocationToContainer(int containerId, Location location) {
+    final index = _containers.indexWhere((c) => c.id == containerId);
+    if (index == -1) return;
+
+    final container = _containers[index];
+    // Evitar duplicados por si ya existe (ej: por una recarga paralela)
+    if (container.locations.any((l) => l.id == location.id)) return;
+
+    final updatedContainer = container.copyWith(
+      locations: [...container.locations, location],
+    );
+    final newList = List<ContainerNode>.from(_containers);
+    newList[index] = updatedContainer;
+    _containers = newList;
+    notifyListeners();
   }
 
   // 🎯 MÉTODO CORREGIDO: Ahora carga la lista de ubicaciones completa

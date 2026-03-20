@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/custom_footer_pagination.dart';
+import 'package:invenicum/widgets/ui/price_display_widget.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -45,11 +47,22 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   @override
   void initState() {
     super.initState();
-    columns = _buildColumns();
-    // Las filas se inyectan en onLoaded, después de que el pageSize
-    // ya está configurado por createFooter, evitando el RangeError.
+    // columns se construye en didChangeDependencies porque _buildColumns()
+    // llama a getLocalizedString(context) que necesita las localizaciones,
+    // las cuales no están disponibles en initState.
     _initialRows = [];
     widget.searchController?.addListener(_onSearchChanged);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reconstruimos las columnas aquí donde context ya tiene localizaciones.
+    // Solo la primera vez — si ya hay un stateManager activo no tocamos las columnas
+    // para no romper el grid mientras está renderizado.
+    if (stateManager == null) {
+      columns = _buildColumns();
+    }
   }
 
   @override
@@ -58,24 +71,17 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     super.dispose();
   }
 
-  /// Aplica una búsqueda global en todas las columnas visibles de PlutoGrid.
-  /// PlutoGrid no expone un método nativo de búsqueda global, así que
-  /// filtramos directamente sobre refRows usando el término de búsqueda.
   void _onSearchChanged() {
     if (stateManager == null) return;
     final term = widget.searchController?.text.trim().toLowerCase() ?? '';
 
     if (term.isEmpty) {
-      // Restauramos todas las filas originales
       stateManager!.refRows.setFilter(null);
     } else {
       stateManager!.refRows.setFilter((row) {
-        // Buscamos el término en cualquier celda de la fila
         return row.cells.entries.any((entry) {
-          // Excluimos columnas ocultas o de control interno
-          if (entry.key == 'item_object' || entry.key == 'actions') {
+          if (entry.key == 'item_object' || entry.key == 'actions')
             return false;
-          }
           final cellValue = entry.value.value;
           if (cellValue == null) return false;
           return cellValue.toString().toLowerCase().contains(term);
@@ -94,9 +100,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         !_areItemListsEqual(oldWidget.items, widget.items);
 
     if (itemsChanged && stateManager != null) {
-      // Diferimos al siguiente frame para que PlutoGrid termine su layout
-      // actual antes de modificar las filas, evitando el RangeError en
-      // FilteredList cuando el pageSize es menor que el total anterior.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || stateManager == null) return;
         stateManager!.setShowLoading(true, level: PlutoGridLoadingLevel.rows);
@@ -121,10 +124,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     }
     return true;
   }
-
-  // ---------------------------------------------------------------------------
-  // ACCIONES
-  // ---------------------------------------------------------------------------
 
   void _copyAsset(InventoryItem item) async {
     final itemCopy = item.copyWith(
@@ -168,11 +167,14 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // COLUMNAS
-  // ---------------------------------------------------------------------------
-
   List<PlutoColumn> _buildColumns() {
+    // Obtenemos los labels localizados para el select de condición.
+    // Los valores del select DEBEN coincidir exactamente con los que
+    // guardamos en las celdas en _buildRows (condition.getLocalizedString).
+    final conditionLabels = ItemCondition.values
+        .map((e) => e.getLocalizedString(context))
+        .toList();
+
     final List<PlutoColumn> baseColumns = [
       PlutoColumn(
         title: 'ID Obj',
@@ -192,7 +194,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         renderer: (rendererContext) {
           final String imageUrl = rendererContext.cell.value.toString();
           final String fullImageUrl = '${Environment.apiUrl}$imageUrl';
-
           return Padding(
             padding: const EdgeInsets.all(4.0),
             child: ClipRRect(
@@ -260,14 +261,36 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         field: 'marketValue',
         type: PlutoColumnType.text(),
         width: 150,
+        renderer: (rendererContext) {
+          // Usamos item_object para tener el enum real y mostrar el badge.
+          final item =
+              rendererContext.row.cells['item_object']!.value as InventoryItem;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Center(
+              child: Tooltip(
+                message: item.marketValue.toString(),
+                child: PriceDisplayWidget(
+                  value: item.marketValue,
+                  fontSize: 14,
+                  color: Colors
+                      .black87, // Color más neutro para la tabla si se prefiere
+                ),
+              ),
+            ),
+          );
+        },
       ),
       PlutoColumn(
         title: 'Condición',
         field: 'condition',
-        type: PlutoColumnType.text(),
+        // select con los strings localizados — PlutoGrid muestra un dropdown
+        // al filtrar con exactamente estas opciones.
+        type: PlutoColumnType.select(conditionLabels),
         width: 150,
-        enableFilterMenuItem: false,
+        enableFilterMenuItem: true,
         renderer: (rendererContext) {
+          // Usamos item_object para tener el enum real y mostrar el badge.
           final item =
               rendererContext.row.cells['item_object']!.value as InventoryItem;
           return Padding(
@@ -296,6 +319,25 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                   color: isChecked
                       ? Theme.of(context).primaryColor
                       : Colors.grey.withOpacity(0.5),
+                );
+              }
+            : field.type == CustomFieldType.price
+            ? (rendererContext) {
+                final dynamic raw = rendererContext.cell.value;
+                final double numVal =
+                    double.tryParse(raw?.toString() ?? '') ?? 0.0;
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Center(
+                    child: Tooltip(
+                      message: numVal.toString(),
+                      child: PriceDisplayWidget(
+                        value: numVal,
+                        fontSize: 14,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ),
                 );
               }
             : null,
@@ -345,10 +387,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     ];
   }
 
-  // ---------------------------------------------------------------------------
-  // FILAS
-  // ---------------------------------------------------------------------------
-
   List<PlutoRow> _buildRows(List<InventoryItem> items) {
     return items.map((item) {
       final Map<String, PlutoCell> cells = {
@@ -362,7 +400,11 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         'location': PlutoCell(value: item.location?.name ?? ''),
         'barcode': PlutoCell(value: item.barcode ?? ''),
         'marketValue': PlutoCell(value: item.marketValue.toString()),
-        'condition': PlutoCell(value: item.condition),
+        // El valor de la celda DEBE ser el string localizado del select
+        // para que PlutoGrid pueda filtrar correctamente con el dropdown.
+        'condition': PlutoCell(
+          value: item.condition.getLocalizedString(context),
+        ),
         'actions': PlutoCell(value: ''),
       };
 
@@ -393,10 +435,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     }
     return value?.toString() ?? '';
   }
-
-  // ---------------------------------------------------------------------------
-  // DIÁLOGO IMAGEN
-  // ---------------------------------------------------------------------------
 
   void _showImageDialog(BuildContext context, String fullImageUrl) {
     showDialog(
@@ -453,10 +491,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     );
   }
 
-  // ---------------------------------------------------------------------------
-  // BUILD
-  // ---------------------------------------------------------------------------
-
   @override
   Widget build(BuildContext context) {
     return PlutoGrid(
@@ -465,8 +499,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       onLoaded: (event) {
         stateManager = event.stateManager;
         stateManager?.setShowColumnFilter(true);
-        // Insertamos las filas aquí: createFooter ya aplicó setPageSize(10)
-        // antes de este callback, así que PlutoGrid pagina correctamente.
         final rows = _buildRows(widget.items);
         stateManager?.appendRows(rows);
       },
@@ -487,8 +519,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         ),
       ),
       createFooter: (stateManager) {
-        // setPageSize aquí garantiza que se aplica antes del primer render del footer,
-        // que es el momento en que PlutoGrid inicializa su paginación interna.
         stateManager.setPageSize(10, notify: false);
         return PlutoPaginationFooter(stateManager: stateManager);
       },

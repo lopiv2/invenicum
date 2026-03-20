@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class BentoBoxWidget extends StatelessWidget {
-  final double width;
+  final double? width; // opcional — si es null, ocupa el ancho disponible
   final String title;
   final IconData icon;
   final Widget child;
@@ -9,7 +9,7 @@ class BentoBoxWidget extends StatelessWidget {
 
   const BentoBoxWidget({
     super.key,
-    required this.width,
+    this.width,               // ya no es required
     required this.title,
     required this.icon,
     required this.child,
@@ -21,22 +21,21 @@ class BentoBoxWidget extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      width: width,
-      // Constraints para asegurar que en móviles no se salga de la pantalla
-      constraints: const BoxConstraints(minWidth: 100), 
+      width: width,           // null → se expande al ancho del padre
+      constraints: const BoxConstraints(minWidth: 100),
       padding: padding,
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
         ],
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withValues(alpha:0.5),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -48,7 +47,7 @@ class BentoBoxWidget extends StatelessWidget {
               Icon(
                 icon,
                 size: 20,
-                color: theme.colorScheme.primary.withValues(alpha:0.8),
+                color: theme.colorScheme.primary.withValues(alpha: 0.8),
               ),
               const SizedBox(width: 12),
               Text(
@@ -63,7 +62,7 @@ class BentoBoxWidget extends StatelessWidget {
           const SizedBox(height: 16),
           Divider(
             height: 1,
-            color: theme.colorScheme.outlineVariant.withValues(alpha:0.4),
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
           ),
           const SizedBox(height: 20),
           child,

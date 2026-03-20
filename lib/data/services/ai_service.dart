@@ -21,32 +21,49 @@ class AIService {
         data: {'url': url, 'fields': fields},
       );
 
-      // 1. Verificamos el éxito de la operación
-      if (response.data['success'] == true) {
-        final data = response.data['data'];
-        if (data is Map) {
-          return Map<String, dynamic>.from(data);
-        }
-        throw 'Formato de datos inválido';
+      final responseData = response.data;
+
+      // Dio en Flutter Web a veces devuelve el body ya como Map,
+      // otras veces como String — normalizamos aquí.
+      final Map<String, dynamic> body;
+      if (responseData is Map<String, dynamic>) {
+        body = responseData;
+      } else if (responseData is Map) {
+        body = Map<String, dynamic>.from(responseData);
       } else {
-        // 🚩 Si success es false, buscamos 'error' o 'message'
-        throw response.data['error'] ??
-            response.data['message'] ??
-            'Error desconocido en la IA';
+        throw 'Respuesta inesperada del servidor: ${responseData.runtimeType}';
       }
+
+      if (body['success'] != true) {
+        throw body['error'] ?? body['message'] ?? 'Error desconocido en la IA';
+      }
+
+      final data = body['data'];
+
+      if (data == null) {
+        throw 'El servidor no devolvió datos extraídos. Comprueba que la URL es accesible.';
+      }
+
+      if (data is Map<String, dynamic>) return data;
+      if (data is Map) return Map<String, dynamic>.from(data);
+
+      throw 'Formato de datos inválido: se recibió ${data.runtimeType} en lugar de un objeto JSON.';
     } on DioException catch (e) {
-      // 🛡️ Extraemos el mensaje enviado por el backend en errores HTTP (400, 401, 500, etc.)
-      String errorMessage = "Error en el servicio de IA";
+      String errorMessage = 'Error en el servicio de IA';
 
       if (e.response?.data != null) {
         final data = e.response!.data;
-        // Tu backend usa 'error' en el catch del router
-        errorMessage = data['error'] ?? data['message'] ?? errorMessage;
+        if (data is Map) {
+          errorMessage =
+              (data['error'] ?? data['message'] ?? errorMessage).toString();
+        }
       }
 
       throw errorMessage;
     } catch (e) {
-      throw "Error inesperado: $e";
+      // Re-lanzamos strings (nuestros mensajes de error) directamente.
+      if (e is String) rethrow;
+      throw 'Error inesperado: $e';
     }
   }
 }

@@ -13,14 +13,11 @@ import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
-// Modelos y Datos
 import 'package:invenicum/data/models/custom_field_definition.dart';
-import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/data/models/asset_type_model.dart';
 import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 
-// Providers y Servicios
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
@@ -29,7 +26,6 @@ import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/core/utils/asset_form_utils.dart';
 
-// UI Widgets
 import 'package:invenicum/widgets/ui/magic_ai_dialog_widget.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_create_app_bar.dart';
@@ -67,7 +63,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   bool _isMagicLoading = false;
   final Set<String> _highlightedFields = {};
 
-  List<Location> _availableLocations = [];
   int? _selectedLocationId;
   List<String> _imagePreviewUrls = [];
 
@@ -89,18 +84,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     final apiService = context.read<ApiService>();
     _integrationService = IntegrationService(apiService);
-
-    // getAvailableIntegrations usa AppLocalizations.of(context) internamente,
-    // por eso DEBE estar aquí y no en initState — en initState las
-    // localizaciones aún no están disponibles y lanza una excepción.
-    final sources = AppIntegrations.getAvailableIntegrations(
-      context,
-    ).where((i) => i.isDataSource).toList();
-
-    // Solo actualizamos si la lista cambió para no perder la selección actual
+    final sources = AppIntegrations.getAvailableIntegrations(context)
+        .where((i) => i.isDataSource)
+        .toList();
     if (sources.length != _availableDataSources.length) {
       _availableDataSources = sources;
       if (_selectedSource == null && sources.isNotEmpty) {
@@ -115,8 +103,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _containerId = int.tryParse(widget.containerId);
     _assetTypeId = int.tryParse(widget.assetTypeId);
     _aiService = AIService(context.read<ApiService>());
-    // _availableDataSources se inicializa en didChangeDependencies
-    // porque AppLocalizations.of(context) requiere el árbol de widgets completo.
     _fadeController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -153,14 +139,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     setState(() {
       _assetType = assetType;
       _selectedCondition = ItemCondition.loose;
-      _availableLocations = container.locations;
-      _selectedLocationId = _availableLocations.isNotEmpty
-          ? _availableLocations.first.id
+      _selectedLocationId = container.locations.isNotEmpty
+          ? container.locations.first.id
           : null;
-
       for (var field in assetType.fieldDefinitions) {
-        if (field.type == CustomFieldType.dropdown &&
-            field.dataListId != null) {
+        if (field.type == CustomFieldType.dropdown && field.dataListId != null) {
           _loadListValues(field.dataListId!, field.id!);
         } else if (field.type == CustomFieldType.boolean) {
           _booleanFieldValues[field.id!] = false;
@@ -172,8 +155,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
     _fadeController.forward();
   }
-
-  // --- MÉTODOS DE LÓGICA ORIGINALES REINSTAURADOS ---
 
   Future<void> _loadListValues(int dataListId, int fieldId) async {
     try {
@@ -190,71 +171,47 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
   }
 
-  // En tu AssetCreateScreen, antes de llamar al modal
   Future<void> _startScan() async {
     var status = await Permission.camera.status;
-    if (status.isDenied) {
-      status = await Permission.camera.request();
-    }
-
+    if (status.isDenied) status = await Permission.camera.request();
     if (status.isGranted) {
-      _handleBarcodeScan(); // Tu función que abre el BarcodeScannerWidget
+      _handleBarcodeScan();
     } else {
       ToastService.error("Se requiere permiso de cámara para escanear");
     }
   }
 
   Future<void> _handleBarcodeScan() async {
-    // 1. Abrimos el scanner (tu widget Stateful que ya definimos)
     final String? scannedCode = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
       builder: (context) => const BarcodeScannerWidget(),
     );
-
     if (scannedCode == null || !mounted) return;
-
-    // 2. Iniciamos carga y ponemos el código en el campo
     setState(() {
       _barcodeController.text = scannedCode;
-      _isMagicLoading = true; // Si tienes un overlay de carga
+      _isMagicLoading = true;
     });
-
     try {
       final integrationService = IntegrationService(context.read<ApiService>());
-      final InventoryItem? suggestedItem = await integrationService
-          .lookupBarcode(scannedCode);
-
+      final InventoryItem? suggestedItem =
+          await integrationService.lookupBarcode(scannedCode);
       if (suggestedItem != null && mounted) {
         setState(() {
-          // Rellenamos controladores
           _nameController.text = suggestedItem.name;
           _descriptionController.text = suggestedItem.description ?? '';
-
-          // 🖼️ Gestión de Imágenes
-          // Si el DTO trajo imágenes de la API externa (como UPCItemDB)
           if (suggestedItem.images.isNotEmpty) {
-            _imagePreviewUrls = suggestedItem.images
-                .map((img) => img.url)
-                .toList();
+            _imagePreviewUrls =
+                suggestedItem.images.map((img) => img.url).toList();
           }
-
-          // Resaltamos los campos para que el usuario vea qué ha cambiado
-          _highlightedFields.addAll([
-            'name',
-            'description',
-            'barcode',
-            'marketValue',
-          ]);
+          _highlightedFields.addAll(['name', 'description', 'barcode']);
         });
-
         ToastService.success("¡Datos encontrados en la nube!");
       }
     } catch (e) {
       debugPrint("Error procesando sugerencia: $e");
     } finally {
       if (mounted) setState(() => _isMagicLoading = false);
-      // Limpiamos el resaltado después de un tiempo
       Future.delayed(const Duration(seconds: 4), () {
         if (mounted) setState(() => _highlightedFields.clear());
       });
@@ -267,93 +224,68 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       ToastService.error("Escribe algo para buscar");
       return;
     }
-
     setState(() => _isEnrichLoading = true);
-
     try {
-      // 1. Llamada al servicio
-      final Map<String, dynamic>? enrichedData = await _integrationService
-          .enrichItem(query: query, source: _selectedSource!);
-
-      // 2. Si hay datos, procesamos el JSON que me mostraste
+      final Map<String, dynamic>? enrichedData =
+          await _integrationService.enrichItem(
+              query: query, source: _selectedSource!);
       if (enrichedData != null && mounted) {
         setState(() {
-          // --- A. DATOS BÁSICOS ---
           _nameController.text = enrichedData['name'] ?? _nameController.text;
-
-          // Guardamos descripción base
           String baseDescription = enrichedData['description'] ?? '';
-
-          // --- B. TRATAMIENTO DE IMAGEN ---
-          // El JSON de Voltorb trae "images": [{"url": "..."}]
           if (enrichedData['images'] != null &&
               (enrichedData['images'] as List).isNotEmpty) {
             final imageUrl = enrichedData['images'][0]['url'];
-            if (imageUrl != null) {
-              _imagePreviewUrls.insert(0, imageUrl);
-            }
+            if (imageUrl != null) _imagePreviewUrls.insert(0, imageUrl);
           } else if (enrichedData['imageUrl'] != null) {
-            // Por si el DTO cambia a formato simple
             _imagePreviewUrls.insert(0, enrichedData['imageUrl']);
           }
-
-          // --- C. MAPEADO DE CAMPOS DINÁMICOS ---
           final Map<String, dynamic> aiFields =
               enrichedData['customFieldValues'] ?? {};
           final Set<String> usedAiKeys = {};
           final List<String> unusedDataLines = [];
-
-          // Buscamos coincidencias en los campos de tu AssetType
           for (var fieldDef in _assetType!.fieldDefinitions) {
             final entry = aiFields.entries.firstWhere(
               (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
               orElse: () => const MapEntry('', null),
             );
-
             if (entry.value != null) {
               usedAiKeys.add(entry.key);
               final val = entry.value.toString();
-
               if (fieldDef.type == CustomFieldType.boolean) {
-                _booleanFieldValues[fieldDef.id!] = val.toLowerCase() == 'true';
+                _booleanFieldValues[fieldDef.id!] =
+                    val.toLowerCase() == 'true';
               } else if (fieldDef.type == CustomFieldType.dropdown) {
                 final options = _listFieldValues[fieldDef.id] ?? [];
                 final match = options.firstWhere(
                   (o) => o.toLowerCase() == val.toLowerCase(),
                   orElse: () => '',
                 );
-                if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
+                if (match.isNotEmpty)
+                  _selectedListValues[fieldDef.id!] = match;
               } else {
                 _customControllers[fieldDef.id]?.text = val;
               }
               _highlightedFields.add(fieldDef.name);
             }
           }
-
-          // --- D. RECOGER DATOS HUÉRFANOS (Voltorb tiene muchos: Ataque_Especial, etc.) ---
           aiFields.forEach((key, value) {
             if (!usedAiKeys.contains(key) &&
                 key.toLowerCase() != 'external_id') {
               unusedDataLines.add("$key: $value");
             }
           });
-
-          // Combinamos descripción con datos no mapeados
           if (unusedDataLines.isNotEmpty) {
-            final String extraInfo =
+            _descriptionController.text = baseDescription +
                 "\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}";
-            _descriptionController.text = baseDescription + extraInfo;
           } else {
             _descriptionController.text = baseDescription;
           }
-
           _highlightedFields.addAll(['name', 'description']);
         });
-
         ToastService.success("¡${enrichedData['name']} importado con éxito!");
       }
     } catch (e) {
-      debugPrint("Error en enriquecimiento: $e");
       ToastService.error("No se pudo completar la importación");
     } finally {
       if (mounted) {
@@ -368,57 +300,47 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   Future<void> _runMagicAI(String url) async {
     if (_assetType == null) return;
     setState(() => _isMagicLoading = true);
-
     try {
-      final List<String> fieldsToExtract = _assetType!.fieldDefinitions
-          .map((f) => f.name)
-          .toList();
+      final List<String> fieldsToExtract =
+          _assetType!.fieldDefinitions.map((f) => f.name).toList();
       if (!fieldsToExtract.any((f) => f.toLowerCase() == 'barcode')) {
         fieldsToExtract.add('barcode');
       }
-
       final Map<String, dynamic> result = await _aiService.extractDataFromUrl(
         url: url,
         fields: fieldsToExtract,
       );
-      final lowerCaseResult = result.map(
-        (key, value) => MapEntry(key.toLowerCase(), value),
-      );
-
+      final lowerCaseResult =
+          result.map((key, value) => MapEntry(key.toLowerCase(), value));
       setState(() {
-        // Imagen
         final imageUrl =
             lowerCaseResult['imageurl'] ?? lowerCaseResult['image'];
-        if (imageUrl != null && imageUrl.toString().startsWith('data:image')) {
+        if (imageUrl != null &&
+            imageUrl.toString().startsWith('data:image')) {
           _imagePreviewUrls.add(imageUrl.toString());
         }
-        // Campos base
         if (lowerCaseResult['name'] != null) {
           _nameController.text = lowerCaseResult['name'].toString();
           _highlightedFields.add('name');
         }
         if (lowerCaseResult['description'] != null) {
-          _descriptionController.text = lowerCaseResult['description']
-              .toString();
+          _descriptionController.text =
+              lowerCaseResult['description'].toString();
           _highlightedFields.add('description');
         }
-        // Barcode
         final dynamic barcodeValue =
             lowerCaseResult['barcode'] ?? lowerCaseResult['upc'];
         if (barcodeValue != null) {
-          _barcodeController.text = barcodeValue.toString().replaceAll(
-            RegExp(r'[^a-zA-Z0-9]'),
-            '',
-          );
+          _barcodeController.text = barcodeValue
+              .toString()
+              .replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
           _highlightedFields.add('barcode');
         }
-        // Campos custom
         for (var fieldDef in _assetType!.fieldDefinitions) {
           final key = fieldDef.name;
           if (!result.containsKey(key) || result[key] == null) continue;
           final value = result[key];
           _highlightedFields.add(key);
-
           if (fieldDef.type == CustomFieldType.boolean) {
             _booleanFieldValues[fieldDef.id!] = value is bool
                 ? value
@@ -459,7 +381,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         return;
       }
     }
-
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
@@ -475,7 +396,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         if (controller != null && controller.text.isNotEmpty) {
           String val = controller.text;
           if (fieldDef.type == CustomFieldType.price) {
-            double localVal = double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
+            double localVal =
+                double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
             val = context
                 .read<PreferencesProvider>()
                 .convertToBase(localVal)
@@ -485,7 +407,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         }
       }
     }
-
     try {
       final newItem = InventoryItem(
         id: 0,
@@ -500,11 +421,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         description: _descriptionController.text.trim(),
         customFieldValues: customFieldValues,
       );
-
       await context.read<InventoryItemProvider>().createInventoryItem(
-        newItem,
-        filesData: AssetFormUtils.processImages(_imagePreviewUrls),
-      );
+            newItem,
+            filesData: AssetFormUtils.processImages(_imagePreviewUrls),
+          );
       if (mounted) {
         ToastService.success('Activo creado!');
         await itemProvider.loadInventoryItems(
@@ -560,15 +480,33 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     super.dispose();
   }
 
-  // --- UI BENTO GRID 2026 ---
+  // ---------------------------------------------------------------------------
+  // BUILD
+  // ---------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
 
+    final containerProvider = context.watch<ContainerProvider>();
+    final liveContainer = containerProvider.containers.firstWhere(
+      (c) => c.id == _containerId,
+      orElse: () => ContainerNode(
+        id: -1,
+        name: '',
+        description: '',
+        assetTypes: [],
+        dataLists: [],
+        locations: [],
+        status: '',
+      ),
+    );
+    final liveLocations = liveContainer.locations;
+
     if (_assetType == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(
+          body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -586,152 +524,161 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                   padding: const EdgeInsets.fromLTRB(24, 20, 24, 120),
                   child: Form(
                     key: _formKey,
-                    child: Column(
-                      children: [
-                        if (aiEnabled)
-                          AiMagicBannerWidget(
-                            isLoading: _isMagicLoading,
-                            onPressed: _showMagicDialog,
-                          ),
-                        const SizedBox(height: 32),
-                        Wrap(
-                          spacing: 24,
-                          runSpacing: 24,
-                          children: [
-                            BentoBoxWidget(
-                              width:
-                                  1044, // Ancho completo (aprox) para destacar sobre el resto
-                              title: "Importar desde Fuente Externa",
-                              icon: Icons.auto_awesome,
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  // 1. Selector de Fuente (Basado en tus constantes)
-                                  SizedBox(
-                                    width: 250,
-                                    child: DropdownButtonFormField<String>(
-                                      value: _selectedSource,
-                                      decoration: const InputDecoration(
-                                        labelText: "Fuente de datos",
-                                        prefixIcon: Icon(Icons.api),
-                                      ),
-                                      items: _availableDataSources
-                                          .map(
-                                            (source) => DropdownMenuItem(
-                                              value: source.id,
-                                              child: Row(
-                                                children: [
-                                                  SizedBox(
-                                                    width: 20,
-                                                    child: source.icon,
-                                                  ),
-                                                  const SizedBox(width: 10),
-                                                  Text(source.name),
-                                                ],
+                    child: _AssetFormLayout(
+                      // ── Fila 0: Banner IA (URL mágica) ──
+                      aiBanner: aiEnabled
+                          ? AiMagicBannerWidget(
+                              isLoading: _isMagicLoading,
+                              onPressed: _showMagicDialog,
+                            )
+                          : null,
+
+                      // ── Fila 1: Importar desde fuente externa ──
+                      importBento: BentoBoxWidget(
+                        title: "Importar desde Fuente Externa",
+                        icon: Icons.auto_awesome,
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            final wide = constraints.maxWidth >= 480;
+                            final dropdown = DropdownButtonFormField<String>(
+                              value: _selectedSource,
+                              isExpanded: true,
+                              decoration: const InputDecoration(
+                                labelText: "Fuente de datos",
+                                prefixIcon: Icon(Icons.api),
+                              ),
+                              items: _availableDataSources
+                                  .map((source) => DropdownMenuItem(
+                                        value: source.id,
+                                        child: Row(
+                                          children: [
+                                            SizedBox(width: 20, child: source.icon),
+                                            const SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                source.name,
+                                                overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
-                                          )
-                                          .toList(),
-                                      onChanged: (val) =>
-                                          setState(() => _selectedSource = val),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 16),
-                                  // 2. Campo de búsqueda y botón de acción
-                                  Expanded(
-                                    child: TextFormField(
-                                      controller: _aiSearchController,
-                                      decoration: InputDecoration(
-                                        labelText: "Buscar por nombre",
-                                        hintText:
-                                            "Ej: Pikachu, Catan, El Quijote...",
-                                        suffixIcon: _isEnrichLoading
-                                            ? const Padding(
-                                                padding: EdgeInsets.all(12.0),
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                    ),
-                                              )
-                                            : IconButton(
-                                                icon: const Icon(Icons.search),
-                                                onPressed:
-                                                    _handleEnrichSearch, // La función que creamos antes
-                                              ),
+                                          ],
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (val) =>
+                                  setState(() => _selectedSource = val),
+                            );
+                            final searchField = TextFormField(
+                              controller: _aiSearchController,
+                              decoration: InputDecoration(
+                                labelText: "Buscar por nombre",
+                                hintText: "Ej: Pikachu, Catan, El Quijote...",
+                                suffixIcon: _isEnrichLoading
+                                    ? const Padding(
+                                        padding: EdgeInsets.all(12),
+                                        child: CircularProgressIndicator(
+                                            strokeWidth: 2),
+                                      )
+                                    : IconButton(
+                                        icon: const Icon(Icons.search),
+                                        onPressed: _handleEnrichSearch,
                                       ),
-                                      onFieldSubmitted: (_) =>
-                                          _handleEnrichSearch(),
-                                    ),
-                                  ),
+                              ),
+                              onFieldSubmitted: (_) => _handleEnrichSearch(),
+                            );
+
+                            if (wide) {
+                              return Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  SizedBox(width: 220, child: dropdown),
+                                  const SizedBox(width: 16),
+                                  Expanded(child: searchField),
                                 ],
-                              ),
-                            ),
-                            BentoBoxWidget(
-                              width: 650,
-                              title: "Datos Principales",
-                              icon: Icons.info_outline,
-                              child: MainDataSectionWidget(
-                                nameController: _nameController,
-                                descriptionController: _descriptionController,
-                                availableLocations: _availableLocations,
-                                selectedLocationId: _selectedLocationId,
-                                onLocationChanged: (v) =>
-                                    setState(() => _selectedLocationId = v),
-                                highlightedFields: _highlightedFields,
-                              ),
-                            ),
-                            BentoBoxWidget(
-                              width: 370,
-                              title: "Galería",
-                              icon: Icons.camera_alt_outlined,
-                              child: ImagesSectionWidget(
-                                imageUrls: _imagePreviewUrls,
-                                onAddImage: _addImage,
-                                onRemoveImage: (url) => setState(
-                                  () => _imagePreviewUrls.remove(url),
-                                ),
-                              ),
-                            ),
-                            StatusSectionWidget(
-                              selectedCondition: _selectedCondition,
-                              onConditionChanged: (val) =>
-                                  setState(() => _selectedCondition = val),
-                            ),
-                            BentoBoxWidget(
-                              width: 450,
-                              title: "Stock y Codificación",
-                              icon: Icons.qr_code_scanner,
-                              child: InventorySectionWidget(
-                                barcodeController: _barcodeController,
-                                quantityController: _quantityController,
-                                minStockController: _minStockController,
-                                assetType: _assetType,
-                                highlightedFields: _highlightedFields,
-                                onScanPressed: _startScan,
-                              ),
-                            ),
-                            BentoBoxWidget(
-                              width: 570,
+                              );
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                dropdown,
+                                const SizedBox(height: 12),
+                                searchField,
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+
+                      // ── Fila 2a: Datos principales ──
+                      mainDataBento: BentoBoxWidget(
+                        title: "Datos Principales",
+                        icon: Icons.info_outline,
+                        child: MainDataSectionWidget(
+                          nameController: _nameController,
+                          descriptionController: _descriptionController,
+                          availableLocations: liveLocations,
+                          selectedLocationId: _selectedLocationId,
+                          onLocationChanged: (v) =>
+                              setState(() => _selectedLocationId = v),
+                          highlightedFields: _highlightedFields,
+                          containerId: _containerId,
+                        ),
+                      ),
+
+                      // ── Fila 2b: Galería ──
+                      galleryBento: BentoBoxWidget(
+                        title: "Galería",
+                        icon: Icons.camera_alt_outlined,
+                        child: ImagesSectionWidget(
+                          imageUrls: _imagePreviewUrls,
+                          onAddImage: _addImage,
+                          onRemoveImage: (url) =>
+                              setState(() => _imagePreviewUrls.remove(url)),
+                        ),
+                      ),
+
+                      // ── Fila 3a: Estado ──
+                      statusWidget: StatusSectionWidget(
+                        selectedCondition: _selectedCondition,
+                        onConditionChanged: (val) =>
+                            setState(() => _selectedCondition = val),
+                      ),
+
+                      // ── Fila 3b: Stock y Codificación ──
+                      stockBento: BentoBoxWidget(
+                        title: "Stock y Codificación",
+                        icon: Icons.qr_code_scanner,
+                        child: InventorySectionWidget(
+                          barcodeController: _barcodeController,
+                          quantityController: _quantityController,
+                          minStockController: _minStockController,
+                          assetType: _assetType,
+                          highlightedFields: _highlightedFields,
+                          onScanPressed: _startScan,
+                        ),
+                      ),
+
+                      // ── Fila 4: Especificaciones (full width si hay campos) ──
+                      specsBento: _assetType!.fieldDefinitions.isNotEmpty
+                          ? BentoBoxWidget(
                               title: "Especificaciones",
                               icon: Icons.list_alt,
                               child: CustomFieldsSectionWidget(
-                                fieldDefinitions: _assetType!.fieldDefinitions,
+                                fieldDefinitions:
+                                    _assetType!.fieldDefinitions,
                                 customControllers: _customControllers,
                                 listFieldValues: _listFieldValues,
                                 selectedListValues: _selectedListValues,
                                 booleanFieldValues: _booleanFieldValues,
                                 highlightedFields: _highlightedFields,
-                                onDropdownChanged: (id, v) =>
-                                    setState(() => _selectedListValues[id] = v),
+                                onDropdownChanged: (id, v) => setState(
+                                    () => _selectedListValues[id] = v),
                                 onBooleanChanged: (id, v) => setState(
-                                  () => _booleanFieldValues[id] = v ?? false,
-                                ),
+                                    () =>
+                                        _booleanFieldValues[id] = v ?? false),
                                 onControllerText: (id, ctrl) {},
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                            )
+                          : null,
                     ),
                   ),
                 ),
@@ -741,6 +688,113 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           ],
         ),
       ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Layout compartido — usado tanto en Create como en Edit
+// ---------------------------------------------------------------------------
+
+class _AssetFormLayout extends StatelessWidget {
+  final Widget? aiBanner;
+  final Widget? importBento;   // Solo en Create
+  final Widget mainDataBento;
+  final Widget galleryBento;
+  final Widget statusWidget;
+  final Widget stockBento;
+  final Widget? specsBento;
+
+  const _AssetFormLayout({
+    this.aiBanner,
+    this.importBento,
+    required this.mainDataBento,
+    required this.galleryBento,
+    required this.statusWidget,
+    required this.stockBento,
+    this.specsBento,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // ── Banner IA ──────────────────────────────────────────────────────
+        if (aiBanner != null) ...[
+          aiBanner!,
+          const SizedBox(height: 24),
+        ],
+
+        // ── Importar (solo create) ─────────────────────────────────────────
+        if (importBento != null) ...[
+          importBento!,
+          const SizedBox(height: 24),
+        ],
+
+        // ── Fila: Datos Principales (2/3) + Galería (1/3) ─────────────────
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final w = constraints.maxWidth;
+            // En pantallas anchas: side-by-side. En estrechas: apiladas.
+            if (w >= 700) {
+              final galleryWidth = (w * 0.35).clamp(260.0, 380.0);
+              final mainWidth = w - galleryWidth - 24;
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(width: mainWidth, child: mainDataBento),
+                  const SizedBox(width: 24),
+                  SizedBox(width: galleryWidth, child: galleryBento),
+                ],
+              );
+            }
+            return Column(
+              children: [
+                mainDataBento,
+                const SizedBox(height: 16),
+                galleryBento,
+              ],
+            );
+          },
+        ),
+
+        const SizedBox(height: 24),
+
+        // ── Fila: Estado (auto) + Stock (flex) ────────────────────────────
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final w = constraints.maxWidth;
+            if (w >= 600) {
+              return IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // StatusSectionWidget tiene su propio BentoBox internamente;
+                    // lo envolvemos en Flexible para que tome el espacio justo.
+                    Flexible(flex: 2, child: statusWidget),
+                    const SizedBox(width: 24),
+                    Flexible(flex: 3, child: stockBento),
+                  ],
+                ),
+              );
+            }
+            return Column(
+              children: [
+                statusWidget,
+                const SizedBox(height: 16),
+                stockBento,
+              ],
+            );
+          },
+        ),
+
+        // ── Especificaciones (full width, solo si hay campos) ─────────────
+        if (specsBento != null) ...[
+          const SizedBox(height: 24),
+          specsBento!,
+        ],
+      ],
     );
   }
 }

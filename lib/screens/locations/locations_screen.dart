@@ -16,10 +16,12 @@ class LocationsScreen extends StatefulWidget {
   _LocationsScreenState createState() => _LocationsScreenState();
 }
 
-class _LocationsScreenState extends State<LocationsScreen> with TickerProviderStateMixin {
+class _LocationsScreenState extends State<LocationsScreen>
+    with TickerProviderStateMixin {
   final GraphViewController _controller = GraphViewController();
   List<Location> _lastLocations = [];
   int? _selectedLocationId;
+
 
   Graph graph = Graph()..isTree = true;
   BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
@@ -53,8 +55,10 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
 
   void _deleteLocation(int locationId, String locationName) {
     final l10n = AppLocalizations.of(context)!;
+    // Capturamos el contexto del Scaffold antes de abrir el diálogo.
+    final scaffoldContext = context;
     showDialog(
-      context: context,
+      context: scaffoldContext,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.confirmDeletion),
         content: Text(l10n.confirmDeleteLocationMessage(locationName)),
@@ -68,7 +72,8 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
               Navigator.of(ctx).pop();
               await _performDeletion(locationId);
             },
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+            child:
+                Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -80,8 +85,15 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
     final l10n = AppLocalizations.of(context)!;
 
     try {
-      await provider.deleteLocation(locationId, containerId: int.parse(widget.containerId), context: context);
+      await provider.deleteLocation(
+        locationId,
+        containerId: int.parse(widget.containerId),
+        context: context,
+      );
       if (mounted) {
+        // Deseleccionamos antes de recargar para evitar que el panel
+        // intente mostrar una ubicación que ya no existe.
+        setState(() => _selectedLocationId = null);
         ToastService.success(l10n.deleteSuccess);
         _loadLocations();
       }
@@ -95,11 +107,9 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
   Future<void> _loadLocations() async {
     final locationProvider = context.read<LocationProvider>();
     final int containerIdInt = int.parse(widget.containerId);
-    print('Loading locations for container: $containerIdInt');
     await locationProvider.fetchLocations(containerIdInt);
     if (mounted) {
       final locations = locationProvider.locations;
-      print('Loaded ${locations.length} locations');
       _updateGraph(locations);
     }
   }
@@ -113,28 +123,33 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
     }
 
     if (listChanged || (_lastLocations.isEmpty && newLocations.isNotEmpty)) {
+      // Paso 1: vaciamos el grafo para que GraphView procese el estado limpio.
       setState(() {
-        _lastLocations = List.from(newLocations);
-        graph = buildLocationGraph(newLocations);
-        print('Graph updated with ${newLocations.length} locations');
+        graph = Graph()..isTree = true;
       });
-      
-      // Centrar la vista después de que se renderice el grafo
+      // Paso 2: en el siguiente frame reconstruimos con los datos nuevos.
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          try {
-            _controller.zoomToFit();
-            print('Graph centered and fitted');
-          } catch (e) {
-            print('Error fitting graph: $e');
-          }
+        if (!mounted) return;
+        setState(() {
+          _lastLocations = List.from(newLocations);
+          graph = buildLocationGraph(newLocations);
+        });
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (!mounted) return;
+            try {
+              _controller.zoomToFit();
+            } catch (e) {
+              // ignoramos errores de zoom
+            }
+          });
         });
       });
     } else if (newLocations.isEmpty && _lastLocations.isNotEmpty) {
       setState(() {
         _lastLocations = [];
         graph = Graph()..isTree = true;
-        print('Graph cleared');
       });
     }
   }
@@ -154,13 +169,22 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
     final errorMessage = locationProvider.errorMessage;
     final locations = locationProvider.locations;
     final theme = Theme.of(context);
-    
-    final Map<int, Location> locationMap = { for (var loc in locations) loc.id: loc };
+
+    final Map<int, Location> locationMap = {
+      for (var loc in locations) loc.id: loc
+    };
+
+    // Capturamos los valores seleccionados en este frame para que los
+    // closures de los botones no dependan de estado mutable que puede
+    // cambiar entre el tap y la ejecución del callback.
+    final selectedId = _selectedLocationId;
+    final selectedLocation = _selectedLocation;
 
     if (isLoading && locations.isEmpty) {
       return Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: CircularProgressIndicator(color: theme.primaryColor)),
+        body: Center(
+            child: CircularProgressIndicator(color: theme.primaryColor)),
       );
     }
 
@@ -168,7 +192,10 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
       return Scaffold(
         backgroundColor: Colors.transparent,
         appBar: AppBar(title: Text(l10n.locationsScheme)),
-        body: Center(child: Text(l10n.errorLoadingLocations(errorMessage), style: const TextStyle(color: Colors.red))),
+        body: Center(
+          child: Text(l10n.errorLoadingLocations(errorMessage),
+              style: const TextStyle(color: Colors.red)),
+        ),
       );
     }
 
@@ -178,7 +205,11 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
         appBar: AppBar(
           title: Text(l10n.locationsScheme),
           actions: [
-            IconButton(icon: const Icon(Icons.add_location_alt), onPressed: _addLocation, tooltip: l10n.addNewLocation),
+            IconButton(
+              icon: const Icon(Icons.add_location_alt),
+              onPressed: _addLocation,
+              tooltip: l10n.addNewLocation,
+            ),
           ],
         ),
         body: Center(child: Text(l10n.noLocationsMessage)),
@@ -189,10 +220,26 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
       appBar: AppBar(
         title: Text(l10n.locationsScheme),
         actions: [
-          IconButton(icon: const Icon(Icons.refresh), onPressed: isLoading ? null : _loadLocations, tooltip: l10n.reloadLocations),
-          IconButton(icon: const Icon(Icons.center_focus_strong), onPressed: () => _controller.animateToNode(ValueKey(1)), tooltip: l10n.centerView),
-          IconButton(icon: const Icon(Icons.zoom_in), onPressed: _controller.zoomToFit, tooltip: l10n.zoomToFit),
-          IconButton(icon: const Icon(Icons.add_location_alt), onPressed: _addLocation, tooltip: l10n.addNewLocation),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: isLoading ? null : _loadLocations,
+            tooltip: l10n.reloadLocations,
+          ),
+          IconButton(
+            icon: const Icon(Icons.center_focus_strong),
+            onPressed: () => _controller.animateToNode(ValueKey(1)),
+            tooltip: l10n.centerView,
+          ),
+          IconButton(
+            icon: const Icon(Icons.zoom_in),
+            onPressed: _controller.zoomToFit,
+            tooltip: l10n.zoomToFit,
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_location_alt),
+            onPressed: _addLocation,
+            tooltip: l10n.addNewLocation,
+          ),
         ],
       ),
       body: Column(
@@ -204,21 +251,29 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
               graph: graph,
               algorithm: algorithm,
               centerGraph: true,
-              builder: (Node node) => _locationNodeBuilder(node, locationMap),
+              builder: (Node node) =>
+                  _locationNodeBuilder(node, locationMap),
             ),
           ),
-          if (_selectedLocation != null) _buildActionPanel(l10n),
+          if (selectedId != null && selectedLocation != null)
+            _buildActionPanel(l10n, selectedId, selectedLocation),
         ],
       ),
     );
   }
 
-  Widget _buildActionPanel(AppLocalizations l10n) {
+  Widget _buildActionPanel(
+    AppLocalizations l10n,
+    int selectedId,
+    Location selectedLocation,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))],
+        boxShadow: const [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))
+        ],
         border: Border(top: BorderSide(color: Colors.grey.shade300)),
       ),
       child: SafeArea(
@@ -227,7 +282,7 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
           children: [
             Expanded(
               child: Text(
-                l10n.selectedLocationLabel(_selectedLocation!.name),
+                l10n.selectedLocationLabel(selectedLocation.name),
                 style: const TextStyle(fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -235,17 +290,26 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
             Row(
               children: [
                 ElevatedButton.icon(
-                  onPressed: () => _editLocation(_selectedLocationId!),
+                  // Los valores están capturados en variables locales del
+                  // frame actual — no dependen del estado mutable del widget.
+                  onPressed: () => _editLocation(selectedId),
                   icon: const Icon(Icons.edit, size: 18),
                   label: Text(l10n.edit),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
-                  onPressed: () => _deleteLocation(_selectedLocationId!, _selectedLocation!.name),
+                  onPressed: () =>
+                      _deleteLocation(selectedId, selectedLocation.name),
                   icon: const Icon(Icons.delete, size: 18),
                   label: Text(l10n.delete),
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ],
             ),
@@ -257,19 +321,19 @@ class _LocationsScreenState extends State<LocationsScreen> with TickerProviderSt
 
   Widget _locationNodeBuilder(Node node, Map<int, Location> locationMap) {
     final locationId = node.key!.value as int;
+
+    if (locationId == -1) return const SizedBox.shrink();
+
     final location = locationMap[locationId];
-    if (location == null) {
-      print('Location not found for ID: $locationId');
-      return const SizedBox(width: 160, height: 80);
-    }
-    print('Building node for location: ${location.name}');
+    if (location == null) return const SizedBox(width: 160, height: 80);
 
     return SizedBox(
       width: 160,
       height: 80,
       child: LocationCardContent(
         location: location,
-        onTap: () => setState(() => _selectedLocationId = (_selectedLocationId == locationId ? null : locationId)),
+        onTap: () => setState(() => _selectedLocationId =
+            (_selectedLocationId == locationId ? null : locationId)),
         isSelected: location.id == _selectedLocationId,
       ),
     );

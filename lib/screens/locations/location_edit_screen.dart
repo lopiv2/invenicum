@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/providers/location_provider.dart';
@@ -55,13 +56,7 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
 
     // Prevención de auto-parenting: No puedes ser tu propio padre
     if (_selectedParentId == widget.location.id) {
-       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Error: Una ubicación no puede ser su propia padre.'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 3),
-          ),
-        );
+      ToastService.error('Una ubicación no puede ser su propia padre.');
       return;
     }
 
@@ -82,25 +77,14 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
 
       // Mostrar éxito
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Ubicación "${updatedLocation?.name}" actualizada.'),
-            duration: const Duration(seconds: 2),
-          ),
-        );
+        ToastService.success('Ubicación "${updatedLocation?.name}" actualizada.');
         // Volver a la pantalla anterior
         context.pop();
       }
     } catch (e) {
       // Mostrar error
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al actualizar ubicación: ${e.toString()}'),
-            backgroundColor: Colors.red,
-            duration: const Duration(seconds: 5),
-          ),
-        );
+        ToastService.error('Error al actualizar ubicación: ${e.toString()}');
       }
     } finally {
       if (mounted) {

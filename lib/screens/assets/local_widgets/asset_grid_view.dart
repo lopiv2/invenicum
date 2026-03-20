@@ -2,10 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../config/environment.dart';
 import '../../../data/models/asset_type_model.dart';
+import '../../../data/models/custom_field_definition.dart';
+import '../../../../widgets/ui/price_display_widget.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../../providers/inventory_item_provider.dart';
 import '../../../data/services/toast_service.dart';
@@ -358,10 +361,8 @@ class _AssetGridViewState extends State<AssetGridView> {
                                 children: widget.assetType.fieldDefinitions
                                     .take(6)
                                     .map((def) {
-                                  final value =
-                                      item.customFieldValues?[def.id
-                                              .toString()] ??
-                                          '—';
+                                  final raw = item.customFieldValues?[
+                                      def.id.toString()];
                                   return Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 4, vertical: 1),
@@ -370,15 +371,20 @@ class _AssetGridViewState extends State<AssetGridView> {
                                           .withValues(alpha: 0.05),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: Text(
-                                      '${def.name}: $value',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: theme.primaryColor,
-                                        height: 1.1,
-                                      ),
-                                      maxLines: 1,
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          '${def.name}: ',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: theme.primaryColor,
+                                            height: 1.1,
+                                          ),
+                                        ),
+                                        _buildFieldValue(def, raw, theme),
+                                      ],
                                     ),
                                   );
                                 }).toList(),
@@ -408,6 +414,46 @@ class _AssetGridViewState extends State<AssetGridView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildFieldValue(
+      CustomFieldDefinition def, dynamic raw, ThemeData theme) {
+    // Boolean: tick verde o X roja
+    if (def.type == CustomFieldType.boolean) {
+      final bool isTrue = raw == true ||
+          raw == 1 ||
+          raw?.toString().toLowerCase() == 'true' ||
+          raw?.toString() == '1';
+      return Icon(
+        isTrue ? Icons.check_circle : Icons.cancel,
+        size: 14,
+        color: isTrue ? Colors.green : Colors.red,
+      );
+    }
+
+    // Price: PriceDisplayWidget
+    if (def.type == CustomFieldType.price) {
+      final double numVal =
+          double.tryParse(raw?.toString() ?? '') ?? 0.0;
+      return PriceDisplayWidget(
+        value: numVal,
+        fontSize: 12,
+        color: theme.primaryColor,
+      );
+    }
+
+    // Resto: texto plano
+    return Text(
+      raw?.toString() ?? '—',
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w600,
+        color: theme.primaryColor,
+        height: 1.1,
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
