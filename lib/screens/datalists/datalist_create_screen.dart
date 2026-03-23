@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
@@ -7,10 +8,7 @@ import 'package:invenicum/data/services/toast_service.dart';
 class DataListCreateScreen extends StatefulWidget {
   final String containerId;
 
-  const DataListCreateScreen({
-    super.key,
-    required this.containerId,
-  });
+  const DataListCreateScreen({super.key, required this.containerId});
 
   @override
   State<DataListCreateScreen> createState() => _DataListCreateScreenState();
@@ -68,7 +66,10 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
       if (!mounted) return;
 
       ToastService.success('Lista personalizada creada con éxito');
-      context.go('/container/${widget.containerId}/datalists');
+      context.goNamed(
+        RouteNames.dataLists,
+        pathParameters: {'containerId': widget.containerId},
+      );
     } catch (e) {
       if (!mounted) return;
       ToastService.error('Error al crear la lista: ${e.toString()}');
@@ -87,10 +88,9 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
             // --- TÍTULO ---
             Text(
               'Nueva Lista Personalizada',
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineMedium
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
 
@@ -130,8 +130,10 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                     // Sección de elementos
                     const Text(
                       'Elementos de la Lista',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -193,8 +195,10 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () => context
-                      .go('/container/${widget.containerId}/datalists'),
+                  onPressed: () => context.goNamed(
+                    RouteNames.dataLists,
+                    pathParameters: {'containerId': widget.containerId},
+                  ),
                   child: const Text('Cancelar'),
                 ),
                 const SizedBox(width: 16),

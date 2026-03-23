@@ -48,17 +48,25 @@ class PreferencesService {
   }
 
   Future<void> updateNotificationSettings(NotificationSettings settings) async {
-  try {
-    await _dio.put(
-      '/preferences/notifications',
-      // 🚀 CAMBIO AQUÍ: Envolvemos el mapa en la llave 'notifications'
-      data: {
-        'notifications': settings.toJson(),
-      },
-    );
-  } catch (e) {
-    print("Error en updateNotificationSettings: $e");
-    rethrow;
+    try {
+      await _dio.put(
+        '/preferences/notifications',
+        data: {'notifications': settings.toJson()},
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
-}
+
+  /// Actualiza el proveedor de IA activo y el modelo seleccionado
+  Future<void> updateAiProvider(String provider, String model) async {
+    try {
+      await _dio.patch(
+        '/preferences/ai-provider',
+        data: {'aiProvider': provider, 'aiModel': model},
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

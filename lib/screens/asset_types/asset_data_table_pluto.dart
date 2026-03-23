@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
@@ -371,9 +372,13 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, size: 18, color: Colors.blue),
-                onPressed: () => context.go(
-                  '/container/${widget.containerId}/asset-types/'
-                  '${widget.assetTypeId}/assets/${item.id}/edit',
+                onPressed: () => context.goNamed(
+                  RouteNames.assetEdit,
+                  pathParameters: {
+                    'containerId': widget.containerId.toString(),
+                    'assetTypeId': widget.assetTypeId.toString(),
+                    'assetId': item.id.toString(),
+                  },
                   extra: item,
                 ),
               ),
@@ -514,9 +519,13 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       },
       onRowDoubleTap: (event) {
         final item = event.row.cells['item_object']!.value as InventoryItem;
-        context.go(
-          '/container/${widget.containerId}/asset-types/'
-          '${widget.assetTypeId}/assets/${item.id}',
+        context.goNamed(
+          RouteNames.assetDetail,
+          pathParameters: {
+            'containerId': widget.containerId.toString(),
+            'assetTypeId': widget.assetTypeId.toString(),
+            'assetId': item.id.toString(),
+          },
         );
       },
       configuration: PlutoGridConfiguration(

@@ -50,6 +50,7 @@ import 'package:invenicum/screens/reports/reports_screen.dart';
 
 // Layout
 import 'package:invenicum/widgets/layout/main_layout.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 
 // Services
 import 'package:invenicum/data/services/dashboard_service.dart';
@@ -125,10 +126,11 @@ GoRouter createAppRouter(
     },
     routes: [
       // ── Rutas públicas (fuera del Shell) ────────────────────────────────
-      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(name: RouteNames.login, path: '/login', builder: (context, state) => const LoginScreen()),
 
       // 🆕 Pantalla de configuración de primer uso
       GoRoute(
+        name: RouteNames.setup,
         path: '/setup',
         builder: (context, state) => const FirstRunSetupScreen(),
       ),
@@ -138,6 +140,7 @@ GoRouter createAppRouter(
         builder: (context, state, child) => MainLayout(child: child),
         routes: [
           GoRoute(
+            name: RouteNames.myProfile,
             path: '/myprofile',
             builder: (context, state) {
               String? code = state.uri.queryParameters['code'];
@@ -161,30 +164,36 @@ GoRouter createAppRouter(
             },
           ),
           GoRoute(
+            name: RouteNames.dashboard,
             path: '/dashboard',
             builder: (context, state) => DashboardScreen(
               dashboardService: context.read<DashboardService>(),
             ),
           ),
           GoRoute(
+            name: RouteNames.alerts,
             path: '/alerts',
             builder: (context, state) => const AlertsScreen(),
           ),
           GoRoute(
+            name: RouteNames.preferences,
             path: '/preferences',
             builder: (context, state) => const PreferencesScreen(),
           ),
           GoRoute(
+            name: RouteNames.reports,
             path: '/reports',
             builder: (context, state) => const ReportsScreen(),
           ),
           GoRoute(
+            name: RouteNames.voucherEditor,
             path: '/delivery-voucher-editor',
             builder: (context, state) => const DeliveryVoucherEditorScreen(),
           ),
 
           // --- CONTENEDORES / ASSET TYPES ---
           GoRoute(
+            name: RouteNames.assetTypes,
             path: '/container/:containerId/asset-types',
             builder: (context, state) {
               final containerId = state.pathParameters['containerId']!;
@@ -192,12 +201,14 @@ GoRouter createAppRouter(
             },
             routes: [
               GoRoute(
+                name: RouteNames.assetTypeCreate,
                 path: 'new',
                 builder: (context, state) => AssetTypeCreateScreen(
                   containerId: state.pathParameters['containerId']!,
                 ),
               ),
               GoRoute(
+                name: RouteNames.assetTypeEdit,
                 path: ':assetTypeId/edit',
                 builder: (context, state) => AssetTypeEditScreen(
                   containerId: state.pathParameters['containerId']!,
@@ -207,6 +218,7 @@ GoRouter createAppRouter(
             ],
           ),
           GoRoute(
+            name: RouteNames.achievements,
             path: '/achievements',
             builder: (context, state) => const Scaffold(
               body: SingleChildScrollView(
@@ -216,14 +228,17 @@ GoRouter createAppRouter(
             ),
           ),
           GoRoute(
+            name: RouteNames.integrations,
             path: '/integrations',
             builder: (context, state) => IntegrationsScreen(),
           ),
           GoRoute(
+            name: RouteNames.templates,
             path: '/templates',
             builder: (context, state) => const AssetTemplatesMarketScreen(),
             routes: [
               GoRoute(
+                name: RouteNames.templateCreate,
                 path: 'create',
                 builder: (context, state) {
                   final Object? extra = state.extra;
@@ -235,6 +250,7 @@ GoRouter createAppRouter(
                 },
               ),
               GoRoute(
+                name: RouteNames.templateDetail,
                 path: 'details/:templateId',
                 builder: (context, state) {
                   final AssetTemplate? templateFromExtra =
@@ -250,10 +266,12 @@ GoRouter createAppRouter(
             ],
           ),
           GoRoute(
+            name: RouteNames.plugins,
             path: '/plugins-admin',
             builder: (context, state) => const PluginAdminScreen(),
           ),
           GoRoute(
+            name: RouteNames.pluginDetail,
             path: '/plugins/:pluginId',
             builder: (context, state) {
               final pluginId = state.pathParameters['pluginId']!;
@@ -281,6 +299,7 @@ GoRouter createAppRouter(
 
           // --- ASSETS (ITEMS) ---
           GoRoute(
+            name: RouteNames.assetList,
             path: '/container/:containerId/asset-types/:assetTypeId/assets',
             builder: (context, state) => AssetListScreen(
               containerId: state.pathParameters['containerId']!,
@@ -288,6 +307,7 @@ GoRouter createAppRouter(
             ),
             routes: [
               GoRoute(
+                name: RouteNames.assetCreate,
                 path: 'new',
                 builder: (context, state) => AssetCreateScreen(
                   containerId: state.pathParameters['containerId']!,
@@ -295,6 +315,7 @@ GoRouter createAppRouter(
                 ),
               ),
               GoRoute(
+                name: RouteNames.assetImport,
                 path: 'import-csv',
                 builder: (context, state) => AssetImportScreen(
                   containerId: state.pathParameters['containerId']!,
@@ -302,6 +323,7 @@ GoRouter createAppRouter(
                 ),
               ),
               GoRoute(
+                name: RouteNames.assetDetail,
                 path: ':assetId',
                 builder: (context, state) => AssetDetailScreen(
                   containerId: state.pathParameters['containerId']!,
@@ -310,6 +332,7 @@ GoRouter createAppRouter(
                 ),
               ),
               GoRoute(
+                name: RouteNames.assetEdit,
                 path: ':assetId/edit',
                 builder: (context, state) {
                   final item = state.extra as InventoryItem?;
@@ -326,18 +349,21 @@ GoRouter createAppRouter(
 
           // --- DATALISTS ---
           GoRoute(
+            name: RouteNames.dataLists,
             path: '/container/:containerId/datalists',
             builder: (context, state) => DataListGridScreen(
               containerId: state.pathParameters['containerId']!,
             ),
             routes: [
               GoRoute(
+                name: RouteNames.dataListCreate,
                 path: 'new',
                 builder: (context, state) => DataListCreateScreen(
                   containerId: state.pathParameters['containerId']!,
                 ),
               ),
               GoRoute(
+                name: RouteNames.dataListEdit,
                 path: ':dataListId/edit',
                 builder: (context, state) {
                   final listData = state.extra as ListData?;
@@ -353,18 +379,21 @@ GoRouter createAppRouter(
 
           // --- LOCATIONS ---
           GoRoute(
+            name: RouteNames.locations,
             path: '/container/:containerId/locations',
             builder: (context, state) => LocationsScreen(
               containerId: state.pathParameters['containerId']!,
             ),
             routes: [
               GoRoute(
+                name: RouteNames.locationCreate,
                 path: 'new',
                 builder: (context, state) => LocationCreateScreen(
                   containerId: state.pathParameters['containerId']!,
                 ),
               ),
               GoRoute(
+                name: RouteNames.locationEdit,
                 path: ':locationId/edit',
                 builder: (context, state) {
                   final containerId = state.pathParameters['containerId']!;
@@ -390,12 +419,14 @@ GoRouter createAppRouter(
 
           // --- LOANS ---
           GoRoute(
+            name: RouteNames.loans,
             path: '/container/:containerId/loans',
             builder: (context, state) => LoansScreen(
               containerId: state.pathParameters['containerId']!,
             ),
             routes: [
               GoRoute(
+                name: RouteNames.loanCreate,
                 path: 'new',
                 builder: (context, state) => LoanCreateScreen(
                   containerId: state.pathParameters['containerId']!,

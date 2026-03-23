@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/template_provider.dart';
 import 'package:invenicum/data/models/asset_template_model.dart';
@@ -71,7 +72,7 @@ class _AssetTemplatesMarketScreenState
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.go('/templates/create'),
+        onPressed: () => context.goNamed(RouteNames.templateCreate),
         icon: const Icon(Icons.add_to_photos),
         label: const Text('Publicar Plantilla'),
       ),
@@ -411,7 +412,11 @@ class _TemplateCard extends StatelessWidget {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          context.go('/templates/details/${template.id}', extra: template);
+          context.goNamed(
+            RouteNames.templateDetail,
+            pathParameters: {'templateId': template.id},
+            extra: template,
+          );
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

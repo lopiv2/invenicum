@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
@@ -436,8 +437,12 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           containerId: _containerId!,
           assetTypeId: _assetTypeId!,
         );
-        context.go(
-          '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
+        context.goNamed(
+          RouteNames.assetList,
+          pathParameters: {
+            'containerId': widget.containerId,
+            'assetTypeId': widget.assetTypeId.toString(),
+          },
         );
       }
     } catch (e) {

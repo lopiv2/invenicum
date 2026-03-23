@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_search_bar.dart';
@@ -90,21 +91,24 @@ class _AssetListScreenState extends State<AssetListScreen>
         provider.currentAssetTypeId != atIdInt) {
       provider.updateContextIds(cIdInt, atIdInt);
       Future(() {
-        provider.loadInventoryItems(
-            containerId: cIdInt, assetTypeId: atIdInt);
+        provider.loadInventoryItems(containerId: cIdInt, assetTypeId: atIdInt);
       });
     }
   }
 
   void _goBack(BuildContext context) {
-    context.go('/container/${widget.containerId}/asset-types');
+    context.goNamed(
+      RouteNames.assetTypes,
+      pathParameters: {'containerId': widget.containerId},
+    );
   }
 
   void _showCountFilterDialog(BuildContext context, AssetType assetType) {
     final l10n = AppLocalizations.of(context)!;
     String? tempFieldId = _selectedCountFieldId;
-    final tempValueController =
-        TextEditingController(text: _selectedCountValue);
+    final tempValueController = TextEditingController(
+      text: _selectedCountValue,
+    );
 
     showDialog(
       context: context,
@@ -117,10 +121,12 @@ class _AssetListScreenState extends State<AssetListScreen>
               decoration: InputDecoration(labelText: l10n.fieldToCount),
               value: tempFieldId,
               items: assetType.fieldDefinitions
-                  .map((def) => DropdownMenuItem(
-                        value: def.id.toString(),
-                        child: Text(def.name),
-                      ))
+                  .map(
+                    (def) => DropdownMenuItem(
+                      value: def.id.toString(),
+                      child: Text(def.name),
+                    ),
+                  )
                   .toList(),
               onChanged: (val) => tempFieldId = val,
             ),
@@ -185,9 +191,9 @@ class _AssetListScreenState extends State<AssetListScreen>
             .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
 
         final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
-              (at) => at?.id == atIdInt,
-              orElse: () => null,
-            );
+          (at) => at?.id == atIdInt,
+          orElse: () => null,
+        );
 
         if (data.loading && data.items.isEmpty) {
           return Scaffold(
@@ -197,8 +203,7 @@ class _AssetListScreenState extends State<AssetListScreen>
         }
 
         if (container == null || assetType == null) {
-          return Scaffold(
-              body: Center(child: Text(l10n.invalidNavigationIds)));
+          return Scaffold(body: Center(child: Text(l10n.invalidNavigationIds)));
         }
 
         // Items filtrados localmente para los widgets de estadísticas
@@ -220,13 +225,19 @@ class _AssetListScreenState extends State<AssetListScreen>
               children: [
                 AssetListHeader(
                   assetType: assetType,
-                  onGoToCreateAsset: () => context.go(
-                    '/container/${widget.containerId}/asset-types/'
-                    '${widget.assetTypeId}/assets/new',
+                  onGoToCreateAsset: () => context.goNamed(
+                    RouteNames.assetCreate,
+                    pathParameters: {
+                      'containerId': widget.containerId,
+                      'assetTypeId': widget.assetTypeId,
+                    },
                   ),
-                  onImportCSV: () => context.go(
-                    '/container/${widget.containerId}/asset-types/'
-                    '${widget.assetTypeId}/assets/import-csv',
+                  onImportCSV: () => context.goNamed(
+                    RouteNames.assetImport,
+                    pathParameters: {
+                      'containerId': widget.containerId,
+                      'assetTypeId': widget.assetTypeId,
+                    },
                   ),
                   onShowCountFilterDialog: () =>
                       _showCountFilterDialog(context, assetType),
@@ -313,8 +324,7 @@ class _AssetListScreenState extends State<AssetListScreen>
               top: 40,
               right: 20,
               child: IconButton(
-                icon:
-                    const Icon(Icons.close, color: Colors.white, size: 30),
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: () => Navigator.pop(context),
               ),
             ),

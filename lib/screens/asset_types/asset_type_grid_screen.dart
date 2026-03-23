@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 
 import 'package:invenicum/data/models/asset_type_model.dart';
@@ -63,18 +64,29 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
   }
 
   void _goToCreateAssetType(BuildContext context) {
-    context.go('/container/${widget.containerId}/asset-types/new');
+    context.goNamed(
+      RouteNames.assetTypeCreate,
+      pathParameters: {'containerId': widget.containerId},
+    );
   }
 
   void _goToAssetList(BuildContext context, AssetType assetType) {
-    context.go(
-      '/container/${widget.containerId}/asset-types/${assetType.id}/assets',
+    context.goNamed(
+      RouteNames.assetList,
+      pathParameters: {
+        'containerId': widget.containerId,
+        'assetTypeId': assetType.id.toString(),
+      },
     );
   }
 
   void _goToEditAssetType(BuildContext context, AssetType assetType) {
-    context.go(
-      '/container/${widget.containerId}/asset-types/${assetType.id}/edit',
+    context.goNamed(
+      RouteNames.assetTypeEdit,
+      pathParameters: {
+        'containerId': widget.containerId,
+        'assetTypeId': assetType.id.toString(),
+      },
     );
   }
 

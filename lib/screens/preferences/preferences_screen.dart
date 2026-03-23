@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/theme_provider.dart';
+import 'package:invenicum/screens/preferences/local_widgets/ai_provider_card_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/general_settings_card_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/loan_management_card_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/about_card_widget.dart';
@@ -9,7 +10,7 @@ import 'package:invenicum/screens/preferences/local_widgets/notification_setting
 import 'package:provider/provider.dart';
 
 // Definimos las categorías para el menú lateral
-enum PreferenceCategory { general, notifications, loans, about }
+enum PreferenceCategory { general, ai, notifications, loans, about }
 
 class PreferencesScreen extends StatefulWidget {
   const PreferencesScreen({super.key});
@@ -76,6 +77,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
             onThemePickerTap: () => showThemePickerModal(context, provider),
           ),
           const SizedBox(height: 16),
+          const AiProviderCardWidget(),
+          const SizedBox(height: 16),
           const NotificationSettingsCardWidget(),
           const SizedBox(height: 16),
           const LoanManagementCardWidget(),
@@ -109,6 +112,11 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
                 title: "Ajustes Generales",
                 icon: Icons.settings_outlined,
                 category: PreferenceCategory.general,
+              ),
+              _buildCategoryItem(
+                title: "Asistente IA",
+                icon: Icons.psychology_outlined,
+                category: PreferenceCategory.ai,
               ),
               _buildCategoryItem(
                 title: "Notificaciones",
@@ -213,6 +221,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           themeColor: themeColor,
           onThemePickerTap: () => showThemePickerModal(context, provider),
         );
+      case PreferenceCategory.ai:
+        return const AiProviderCardWidget(key: ValueKey('ai'));
       case PreferenceCategory.notifications:
         return const NotificationSettingsCardWidget(key: ValueKey('notifs'));
       case PreferenceCategory.loans:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphview/GraphView.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/providers/location_provider.dart';
@@ -21,7 +22,6 @@ class _LocationsScreenState extends State<LocationsScreen>
   final GraphViewController _controller = GraphViewController();
   List<Location> _lastLocations = [];
   int? _selectedLocationId;
-
 
   Graph graph = Graph()..isTree = true;
   BuchheimWalkerConfiguration builder = BuchheimWalkerConfiguration();
@@ -46,11 +46,20 @@ class _LocationsScreenState extends State<LocationsScreen>
   }
 
   void _addLocation() {
-    context.go('/container/${widget.containerId}/locations/new');
+    context.goNamed(
+      RouteNames.locationCreate,
+      pathParameters: {'containerId': widget.containerId.toString()},
+    );
   }
 
   void _editLocation(int locationId) {
-    context.go('/container/${widget.containerId}/locations/$locationId/edit');
+    context.goNamed(
+      RouteNames.locationEdit,
+      pathParameters: {
+        'containerId': widget.containerId.toString(),
+        'locationId': locationId.toString(),
+      },
+    );
   }
 
   void _deleteLocation(int locationId, String locationName) {
@@ -72,8 +81,7 @@ class _LocationsScreenState extends State<LocationsScreen>
               Navigator.of(ctx).pop();
               await _performDeletion(locationId);
             },
-            child:
-                Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -171,7 +179,7 @@ class _LocationsScreenState extends State<LocationsScreen>
     final theme = Theme.of(context);
 
     final Map<int, Location> locationMap = {
-      for (var loc in locations) loc.id: loc
+      for (var loc in locations) loc.id: loc,
     };
 
     // Capturamos los valores seleccionados en este frame para que los
@@ -184,7 +192,8 @@ class _LocationsScreenState extends State<LocationsScreen>
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-            child: CircularProgressIndicator(color: theme.primaryColor)),
+          child: CircularProgressIndicator(color: theme.primaryColor),
+        ),
       );
     }
 
@@ -193,8 +202,10 @@ class _LocationsScreenState extends State<LocationsScreen>
         backgroundColor: Colors.transparent,
         appBar: AppBar(title: Text(l10n.locationsScheme)),
         body: Center(
-          child: Text(l10n.errorLoadingLocations(errorMessage),
-              style: const TextStyle(color: Colors.red)),
+          child: Text(
+            l10n.errorLoadingLocations(errorMessage),
+            style: const TextStyle(color: Colors.red),
+          ),
         ),
       );
     }
@@ -251,8 +262,7 @@ class _LocationsScreenState extends State<LocationsScreen>
               graph: graph,
               algorithm: algorithm,
               centerGraph: true,
-              builder: (Node node) =>
-                  _locationNodeBuilder(node, locationMap),
+              builder: (Node node) => _locationNodeBuilder(node, locationMap),
             ),
           ),
           if (selectedId != null && selectedLocation != null)
@@ -272,7 +282,11 @@ class _LocationsScreenState extends State<LocationsScreen>
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: const [
-          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, -2))
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            offset: Offset(0, -2),
+          ),
         ],
         border: Border(top: BorderSide(color: Colors.grey.shade300)),
       ),
@@ -332,8 +346,11 @@ class _LocationsScreenState extends State<LocationsScreen>
       height: 80,
       child: LocationCardContent(
         location: location,
-        onTap: () => setState(() => _selectedLocationId =
-            (_selectedLocationId == locationId ? null : locationId)),
+        onTap: () => setState(
+          () => _selectedLocationId = (_selectedLocationId == locationId
+              ? null
+              : locationId),
+        ),
         isSelected: location.id == _selectedLocationId,
       ),
     );

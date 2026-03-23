@@ -208,15 +208,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       final success = await authProvider.linkGitHubAccount(code);
 
       if (success && mounted) {
-        // authProvider.linkGitHubAccount ya llama notifyListeners() internamente,
-        // lo que dispara didChangeDependencies() y sincroniza los controllers
-        // automáticamente. No necesitamos hacer nada más aquí.
-        //
-        // ❌ ELIMINADO: context.go('/myprofile') — ese go() destruía el widget
-        // y lo recreaba, ejecutando initState() ANTES de que notifyListeners()
-        // hubiera actualizado el provider, por lo que los controllers leían
-        // los datos viejos. Al salir y volver a entrar manualmente ya estaban
-        // actualizados porque entonces sí había terminado el ciclo completo.
         ToastService.success("¡GitHub vinculado correctamente!");
       }
     } catch (e) {

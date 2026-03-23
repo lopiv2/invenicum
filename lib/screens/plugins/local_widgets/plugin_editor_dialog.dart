@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
@@ -211,9 +212,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                           Navigator.pop(
                             context,
                           ); // Cerramos el editor de plugin
-                          context.push(
-                            '/myprofile',
-                          ); // O context.go('/myprofile')
+                          context.pushNamed(RouteNames.myProfile);
                         }
                       }
                       return; // Detenemos el cambio del switch

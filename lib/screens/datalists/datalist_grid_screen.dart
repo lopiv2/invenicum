@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/list_data.dart';
@@ -125,8 +126,9 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                     ),
                     FilledButton.icon(
                       onPressed: () {
-                        context.go(
-                          '/container/${widget.containerId}/datalists/new',
+                        context.goNamed(
+                          RouteNames.dataListCreate,
+                          pathParameters: {'containerId': widget.containerId},
                         );
                       },
                       icon: const Icon(Icons.add),
@@ -174,8 +176,13 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
       elevation: 2,
       child: InkWell(
         onTap: () {
-          context.push(
-            '/container/${widget.containerId}/datalists/${dataList.id}/edit',
+          context.pushNamed(
+            RouteNames.dataListEdit,
+            pathParameters: {
+              'containerId': widget.containerId,
+              'dataListId': dataList.id
+                  .toString(), // GoRouter siempre espera Strings en los parámetros de ruta
+            },
             extra: dataList,
           );
         },
@@ -212,8 +219,12 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                           color: Theme.of(context).primaryColor,
                           size: 20,
                         ),
-                        onPressed: () => context.go(
-                          '/container/${widget.containerId}/datalists/${dataList.id}/edit',
+                        onPressed: () => context.goNamed(
+                          RouteNames.dataListEdit,
+                          pathParameters: {
+                            'containerId': widget.containerId,
+                            'dataListId': dataList.id.toString(),
+                          },
                           extra: dataList,
                         ),
                       ),

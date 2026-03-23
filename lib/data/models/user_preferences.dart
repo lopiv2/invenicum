@@ -5,6 +5,8 @@ class UserPreferences {
   final String language;
   final String currency;
   final bool aiEnabled;
+  final String? aiProvider;
+  final String? aiModel;
   final int? userId;
   final DateTime? updatedAt;
   final Map<String, double>? exchangeRates;
@@ -15,6 +17,8 @@ class UserPreferences {
     this.language = 'es',
     this.currency = 'USD',
     this.aiEnabled = true,
+    this.aiProvider,
+    this.aiModel,
     this.userId,
     this.updatedAt,
     this.exchangeRates,
@@ -33,7 +37,9 @@ class UserPreferences {
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'es',
       currency: json['currency'] as String? ?? 'USD',
-      aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
+      aiEnabled:  (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
+      aiProvider: json['aiProvider'] as String?,
+      aiModel:    json['aiModel']    as String?,
       userId: json['userId'] as int?,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
@@ -52,7 +58,9 @@ class UserPreferences {
       'id': id,
       'language': language,
       'currency': currency,
-      'aiEnabled': aiEnabled,
+      'aiEnabled':  aiEnabled,
+      'aiProvider': aiProvider,
+      'aiModel':    aiModel,
       'userId': userId,
       // 🚀 Aplanamos las notificaciones para que el Backend las reciba
       // como espera su DTO (UserPreferencesDTO.fromRequest).
@@ -75,6 +83,8 @@ class UserPreferences {
     String? language,
     String? currency,
     bool? aiEnabled,
+    String? aiProvider,
+    String? aiModel,
     Map<String, double>? exchangeRates,
     NotificationSettings? notifications,
   }) {
@@ -82,7 +92,9 @@ class UserPreferences {
       id: id ?? this.id,
       language: language ?? this.language,
       currency: currency ?? this.currency,
-      aiEnabled: aiEnabled ?? this.aiEnabled,
+      aiEnabled:  aiEnabled  ?? this.aiEnabled,
+      aiProvider: aiProvider ?? this.aiProvider,
+      aiModel:    aiModel    ?? this.aiModel,
       exchangeRates: exchangeRates ?? this.exchangeRates,
       notifications: notifications ?? this.notifications,
     );

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -184,7 +185,12 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         removeExistingImage: _imageWasRemoved && !_isNewImageBase64,
       );
       ToastService.success('Tipo de activo actualizado con éxito.');
-      if (mounted) context.go('/container/${widget.containerId}/asset-types');
+      if (mounted) {
+        context.goNamed(
+          RouteNames.assetTypes,
+          pathParameters: {'containerId': widget.containerId},
+        );
+      }
     } catch (e) {
       ToastService.error('Error al actualizar: ${e.toString()}');
     }

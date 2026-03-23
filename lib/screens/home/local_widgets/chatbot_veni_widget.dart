@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/asset_template_model.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
@@ -105,10 +106,10 @@ class _VeniChatbotState extends State<VeniChatbot> {
       try {
         // 🚀 Convertimos los datos crudos de Gemini al modelo que entiende el Editor
         final draft = _mapAiDataToTemplate(data);
-
+    
         // Usamos push para que si el usuario cancela, vuelva a donde estaba
         // o 'go' si prefieres sustituir la ruta de fondo
-        context.go('/templates/create', extra: draft);
+        context.goNamed(RouteNames.templateCreate, extra: draft);
 
         // Opcional: Cerrar el chat automáticamente al navegar al editor
         if (widget.onClose != null) widget.onClose!();
@@ -304,10 +305,7 @@ class _ChatBubble extends StatelessWidget {
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 240),
-              child: Text(
-                text,
-                style: TextStyle(color: textColor),
-              ),
+              child: Text(text, style: TextStyle(color: textColor)),
             ),
           ),
         ),
@@ -323,9 +321,9 @@ class _BubbleShapePainter extends CustomPainter {
   const _BubbleShapePainter({required this.isUser, required this.color});
 
   // Medidas del piquito y radio de esquinas
-  static const double _r = 14;   // radio esquinas
-  static const double _tw = 9;   // ancho base piquito
-  static const double _th = 9;   // alto piquito
+  static const double _r = 14; // radio esquinas
+  static const double _tw = 9; // ancho base piquito
+  static const double _th = 9; // alto piquito
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -344,28 +342,40 @@ class _BubbleShapePainter extends CustomPainter {
       // Borde superior
       path.lineTo(w - _r, 0);
       // Esquina superior-derecha
-      path.arcToPoint(Offset(w, _r),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(w, _r),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
       // Borde derecho
       path.lineTo(w, h - _r);
       // Esquina inferior-derecha → piquito sale aquí
-      path.arcToPoint(Offset(w - _r, h),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(w - _r, h),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
       // Piquito abajo-derecha: base → punta → regreso
       path.lineTo(w - _r, h);
       path.lineTo(w - _r + _tw * 0.4, h + _th * 0.4);
-      path.lineTo(w - _r + _tw, h + _th);   // punta del piquito
-      path.lineTo(w - _r - _tw * 0.8, h);   // regreso a la base
+      path.lineTo(w - _r + _tw, h + _th); // punta del piquito
+      path.lineTo(w - _r - _tw * 0.8, h); // regreso a la base
       // Borde inferior hacia la izquierda
       path.lineTo(_r, h);
       // Esquina inferior-izquierda
-      path.arcToPoint(Offset(0, h - _r),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(0, h - _r),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
       // Borde izquierdo
       path.lineTo(0, _r);
       // Esquina superior-izquierda (cierre)
-      path.arcToPoint(Offset(_r, 0),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(_r, 0),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
     } else {
       // Empezamos arriba-izquierda, sentido horario
       // Esquina superior-izquierda
@@ -373,28 +383,40 @@ class _BubbleShapePainter extends CustomPainter {
       // Borde superior
       path.lineTo(w - _r, 0);
       // Esquina superior-derecha
-      path.arcToPoint(Offset(w, _r),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(w, _r),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
       // Borde derecho
       path.lineTo(w, h - _r);
       // Esquina inferior-derecha
-      path.arcToPoint(Offset(w - _r, h),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(w - _r, h),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
       // Borde inferior hacia la izquierda
       path.lineTo(_r + _tw * 0.2, h);
       // Piquito abajo-izquierda: base → punta → regreso
       path.lineTo(_r - _tw + _tw * 0.8, h + _th * 0.4);
-      path.lineTo(_r - _tw, h + _th);         // punta del piquito
-      path.lineTo(_r - _tw * 0.4, h);         // regreso a la base
+      path.lineTo(_r - _tw, h + _th); // punta del piquito
+      path.lineTo(_r - _tw * 0.4, h); // regreso a la base
       path.lineTo(_r, h);
       // Esquina inferior-izquierda
-      path.arcToPoint(Offset(0, h - _r),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(0, h - _r),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
       // Borde izquierdo
       path.lineTo(0, _r);
       // Esquina superior-izquierda (cierre)
-      path.arcToPoint(Offset(_r, 0),
-          radius: const Radius.circular(_r), clockwise: true);
+      path.arcToPoint(
+        Offset(_r, 0),
+        radius: const Radius.circular(_r),
+        clockwise: true,
+      );
     }
 
     path.close();

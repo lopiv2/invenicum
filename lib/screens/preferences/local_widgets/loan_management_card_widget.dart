@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
 class LoanManagementCardWidget extends StatelessWidget {
@@ -23,7 +24,7 @@ class LoanManagementCardWidget extends StatelessWidget {
               subtitle: Text(AppLocalizations.of(context)!.customizeDeliveryVoucher),
               trailing: const Icon(Icons.arrow_forward),
               onTap: () {
-                context.push('/delivery-voucher-editor');
+                context.pushNamed(RouteNames.voucherEditor);
               },
             ),
           ],

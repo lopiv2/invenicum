@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/loan_provider.dart';
@@ -69,31 +70,48 @@ class ContainerTreeView extends StatelessWidget {
                       icon: Icons.category_outlined,
                       label:
                           "${AppLocalizations.of(context)!.assetTypes} (${container.assetTypes.length})",
-                      onTap: () =>
-                          context.go('/container/${container.id}/asset-types'),
+                      onTap: () => context.goNamed(
+                        RouteNames.assetTypes,
+                        pathParameters: {
+                          'containerId': container.id.toString(),
+                        },
+                      ),
                     ),
                     _buildSubItem(
                       context,
                       icon: Icons.place_outlined,
                       label:
                           "${AppLocalizations.of(context)!.locations} (${container.locations.length})",
-                      onTap: () =>
-                          context.go('/container/${container.id}/locations'),
+                      onTap: () => context.goNamed(
+                        RouteNames.locations,
+                        pathParameters: {
+                          'containerId': container.id.toString(),
+                        },
+                      ),
                     ),
                     _buildSubItem(
                       context,
                       icon: Icons.handshake_outlined,
                       label:
                           "${AppLocalizations.of(context)!.loans} (${loanProvider.loans.length})",
-                      onTap: () => context.go('/container/${container.id}/loans'),
+                      onTap: () => context.goNamed(
+                        RouteNames.loans,
+                        pathParameters: {
+                          'containerId': container.id.toString(),
+                        },
+                      ),
                     ),
                     _buildSubItem(
                       context,
                       icon: Icons.list_alt,
                       label:
                           "${AppLocalizations.of(context)!.datalists} (${container.dataLists.length})",
-                      onTap: () =>
-                          context.go('/container/${container.id}/datalists'),
+                      onTap: () => context.goNamed(
+                        RouteNames.dataLists,
+                        pathParameters: {
+                          'containerId': container.id.toString(),
+                        },
+                      ),
                     ),
                   ],
                 ),

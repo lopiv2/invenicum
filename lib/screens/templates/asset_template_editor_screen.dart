@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/data/models/asset_template_model.dart'; // Tu modelo
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
@@ -131,7 +132,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
                 label: Text(
                   isLinked ? "GitHub Verificado" : "GitHub No Vinculado",
                 ),
-                onPressed: () => context.push('/myprofile'),
+                onPressed: () => context.pushNamed(RouteNames.myProfile),
               ),
             ),
           ),

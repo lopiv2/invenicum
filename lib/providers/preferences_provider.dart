@@ -10,6 +10,10 @@ class PreferencesProvider with ChangeNotifier {
 
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
+  bool _useSystemTheme = false;
+  bool get useSystemTheme => _useSystemTheme;
+  bool _isDarkMode = false;
+  bool get isDarkMode => _isDarkMode;
 
   UserPreferences _prefs = UserPreferences.empty();
   UserPreferences get prefs => _prefs;
@@ -19,12 +23,32 @@ class PreferencesProvider with ChangeNotifier {
   // Helpers actualizados
   Locale get locale => Locale(_prefs.language);
   bool get aiEnabled => _prefs.aiEnabled;
+  String? get aiProvider => _prefs.aiProvider;
+  String? get aiModel => _prefs.aiModel;
   // 🔑 Ahora la moneda viene de las preferencias guardadas
   String get selectedCurrency => _prefs.currency;
 
   PreferencesProvider(this._preferencesService);
 
   NotificationSettings get notificationSettings => _prefs.notifications;
+
+  /// Cambia si debemos seguir el tema del sistema operativo
+  Future<void> setUseSystemTheme(bool value) async {
+    _useSystemTheme = value;
+    notifyListeners(); // Actualiza la UI inmediatamente
+
+    //final prefs = await SharedPreferences.getInstance();
+    //await prefs.setBool(_keySystemTheme, value);
+  }
+
+  /// Cambia manualmente entre modo claro y oscuro
+  Future<void> setDarkMode(bool value) async {
+    _isDarkMode = value;
+    notifyListeners();
+
+    //final prefs = await SharedPreferences.getInstance();
+    //await prefs.setBool(_keyDarkMode, value);
+  }
 
   /// Carga las preferencias completas y actualiza el estado
   Future<void> loadPreferences() async {
@@ -70,13 +94,26 @@ class PreferencesProvider with ChangeNotifier {
 
     // 🔑 Mapeamos los tipos de la UI a los nuevos campos del modelo
     switch (type) {
-      case 'stock': updatedNotifs = currentNotifs.copyWith(alertStockLow: enabled); break;
-      case 'preorder': updatedNotifs = currentNotifs.copyWith(alertPreSales: enabled); break;
-      case 'loan': updatedNotifs = currentNotifs.copyWith(alertLoanReminders: enabled); break;
-      case 'overdue': updatedNotifs = currentNotifs.copyWith(alertOverdueLoans: enabled); break;
-      case 'maintenance': updatedNotifs = currentNotifs.copyWith(alertMaintenance: enabled); break;
-      case 'price': updatedNotifs = currentNotifs.copyWith(alertPriceChange: enabled); break;
-      default: return;
+      case 'stock':
+        updatedNotifs = currentNotifs.copyWith(alertStockLow: enabled);
+        break;
+      case 'preorder':
+        updatedNotifs = currentNotifs.copyWith(alertPreSales: enabled);
+        break;
+      case 'loan':
+        updatedNotifs = currentNotifs.copyWith(alertLoanReminders: enabled);
+        break;
+      case 'overdue':
+        updatedNotifs = currentNotifs.copyWith(alertOverdueLoans: enabled);
+        break;
+      case 'maintenance':
+        updatedNotifs = currentNotifs.copyWith(alertMaintenance: enabled);
+        break;
+      case 'price':
+        updatedNotifs = currentNotifs.copyWith(alertPriceChange: enabled);
+        break;
+      default:
+        return;
     }
 
     // 3. Actualización optimista del estado principal
@@ -188,6 +225,24 @@ class PreferencesProvider with ChangeNotifier {
       _prefs = previousPrefs; // Revertimos si falla
       notifyListeners();
       debugPrint('Error actualizando estado IA: $e');
+      rethrow;
+    }
+  }
+
+  /// Actualiza el proveedor de IA y el modelo activo
+  Future<void> updateAiProvider(String provider, String model) async {
+    final previousPrefs = _prefs;
+
+    // Actualización optimista
+    _prefs = _prefs.copyWith(aiProvider: provider, aiModel: model);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updateAiProvider(provider, model);
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error actualizando proveedor de IA: $e');
       rethrow;
     }
   }

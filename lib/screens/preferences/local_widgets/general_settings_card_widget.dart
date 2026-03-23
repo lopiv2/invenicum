@@ -24,6 +24,8 @@ class GeneralSettingsCardWidget extends StatelessWidget {
     final prefsProvider = context.watch<PreferencesProvider>();
     final integrationProvider = context.watch<IntegrationProvider>();
     final bool isGeminiConnected = integrationProvider.isLinked('gemini');
+    final bool isAutoDark = prefsProvider.useSystemTheme;
+    final bool isManualDark = prefsProvider.isDarkMode;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,6 +37,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
+            // --- SELECTOR DE COLOR DE TEMA ---
             ListTile(
               leading: const Icon(Icons.palette_outlined),
               title: Text(AppLocalizations.of(context)!.applicationTheme),
@@ -43,6 +46,30 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               ),
               trailing: CircleAvatar(backgroundColor: themeColor, radius: 12),
               onTap: onThemePickerTap,
+            ),
+            // --- MODO OSCURO AUTOMÁTICO ---
+            SwitchListTile(
+              secondary: const Icon(Icons.brightness_auto),
+              title: const Text("Modo oscuro automático"),
+              subtitle: const Text("Sincronizar con el sistema"),
+              value: isAutoDark,
+              onChanged: (bool value) {
+                prefsProvider.setUseSystemTheme(value);
+              },
+            ),
+
+            // --- MODO OSCURO MANUAL (Se deshabilita si el automático está activo) ---
+            SwitchListTile(
+              secondary: const Icon(Icons.dark_mode_outlined),
+              title: const Text("Modo oscuro manual"),
+              subtitle: isAutoDark
+                  ? const Text("Desactiva el modo automático para cambiarlo")
+                  : const Text("Cambiar entre claro y oscuro"),
+              value: isManualDark,
+              // 🚀 CRÍTICO: Si isAutoDark es true, el switch se ve gris y no responde
+              onChanged: prefsProvider.useSystemTheme
+                  ? null
+                  : (bool value) => prefsProvider.setDarkMode(value),
             ),
             const Divider(),
             ListTile(

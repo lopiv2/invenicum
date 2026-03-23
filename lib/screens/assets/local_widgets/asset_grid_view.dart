@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:provider/provider.dart';
 
@@ -46,8 +47,9 @@ class _AssetGridViewState extends State<AssetGridView> {
       return item.name.toLowerCase().contains(term) ||
           (item.description ?? '').toLowerCase().contains(term) ||
           (item.location?.name ?? '').toLowerCase().contains(term) ||
-          (item.customFieldValues?.values
-                  .any((v) => v.toString().toLowerCase().contains(term)) ??
+          (item.customFieldValues?.values.any(
+                (v) => v.toString().toLowerCase().contains(term),
+              ) ??
               false);
     }).toList();
   }
@@ -67,8 +69,13 @@ class _AssetGridViewState extends State<AssetGridView> {
   void _onSearchChanged() => setState(() {});
 
   void _viewAssetDetails(BuildContext context, InventoryItem item) {
-    context.go(
-      '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}',
+    context.goNamed(
+      RouteNames.assetDetail,
+      pathParameters: {
+        'containerId': widget.containerId.toString(),
+        'assetTypeId': widget.assetTypeId.toString(),
+        'assetId': item.id.toString(),
+      },
     );
   }
 
@@ -105,8 +112,13 @@ class _AssetGridViewState extends State<AssetGridView> {
   }
 
   void _editAsset(BuildContext context, InventoryItem item) {
-    context.go(
-      '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${item.id}/edit',
+    context.goNamed(
+      RouteNames.assetEdit,
+      pathParameters: {
+        'containerId': widget.containerId.toString(),
+        'assetTypeId': widget.assetTypeId.toString(),
+        'assetId': item.id.toString(),
+      },
       extra: item,
     );
   }
@@ -132,10 +144,10 @@ class _AssetGridViewState extends State<AssetGridView> {
             onPressed: () {
               Navigator.of(dialogContext).pop();
               context.read<InventoryItemProvider>().deleteInventoryItem(
-                    item.id,
-                    widget.containerId,
-                    widget.assetTypeId,
-                  );
+                item.id,
+                widget.containerId,
+                widget.assetTypeId,
+              );
               ToastService.success('Activo eliminado.');
             },
             child: const Text('Eliminar'),
@@ -146,8 +158,9 @@ class _AssetGridViewState extends State<AssetGridView> {
   }
 
   String _getFullImageUrl(InventoryItem item) {
-    final String? imageUrl =
-        item.images.isNotEmpty ? item.images.first.url : null;
+    final String? imageUrl = item.images.isNotEmpty
+        ? item.images.first.url
+        : null;
     return imageUrl != null ? '${Environment.apiUrl}$imageUrl' : '';
   }
 
@@ -193,8 +206,11 @@ class _AssetGridViewState extends State<AssetGridView> {
             ),
             child: Row(
               children: [
-                Icon(Icons.grid_view_rounded,
-                    size: 18, color: theme.primaryColor),
+                Icon(
+                  Icons.grid_view_rounded,
+                  size: 18,
+                  color: theme.primaryColor,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   'Vista: $_columnsCount col.',
@@ -207,10 +223,12 @@ class _AssetGridViewState extends State<AssetGridView> {
                   child: SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       trackHeight: 2,
-                      thumbShape:
-                          const RoundSliderThumbShape(enabledThumbRadius: 6),
-                      overlayShape:
-                          const RoundSliderOverlayShape(overlayRadius: 14),
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 6,
+                      ),
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 14,
+                      ),
                     ),
                     child: Slider(
                       value: _columnsCount.toDouble(),
@@ -234,7 +252,11 @@ class _AssetGridViewState extends State<AssetGridView> {
               const double spacing = 16.0;
               return GridView.builder(
                 padding: const EdgeInsets.fromLTRB(
-                    spacing, 0, spacing, spacing),
+                  spacing,
+                  0,
+                  spacing,
+                  spacing,
+                ),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: _columnsCount,
                   crossAxisSpacing: spacing,
@@ -246,7 +268,11 @@ class _AssetGridViewState extends State<AssetGridView> {
                   final item = displayItems[index];
                   final fullImageUrl = _getFullImageUrl(item);
                   return _buildModernAssetCard(
-                      context, item, fullImageUrl, theme);
+                    context,
+                    item,
+                    fullImageUrl,
+                    theme,
+                  );
                 },
               );
             },
@@ -353,41 +379,47 @@ class _AssetGridViewState extends State<AssetGridView> {
                           ),
                           if (_columnsCount < 6)
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 20, top: 20),
+                              padding: const EdgeInsets.only(left: 20, top: 20),
                               child: Wrap(
                                 spacing: 20,
                                 runSpacing: 10,
                                 children: widget.assetType.fieldDefinitions
                                     .take(6)
                                     .map((def) {
-                                  final raw = item.customFieldValues?[
-                                      def.id.toString()];
-                                  return Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 4, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: theme.primaryColor
-                                          .withValues(alpha: 0.05),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          '${def.name}: ',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w600,
-                                            color: theme.primaryColor,
-                                            height: 1.1,
+                                      final raw =
+                                          item.customFieldValues?[def.id
+                                              .toString()];
+                                      return Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 4,
+                                          vertical: 1,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: theme.primaryColor.withValues(
+                                            alpha: 0.05,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
                                           ),
                                         ),
-                                        _buildFieldValue(def, raw, theme),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              '${def.name}: ',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w600,
+                                                color: theme.primaryColor,
+                                                height: 1.1,
+                                              ),
+                                            ),
+                                            _buildFieldValue(def, raw, theme),
+                                          ],
+                                        ),
+                                      );
+                                    })
+                                    .toList(),
                               ),
                             ),
                         ],
@@ -418,10 +450,14 @@ class _AssetGridViewState extends State<AssetGridView> {
   }
 
   Widget _buildFieldValue(
-      CustomFieldDefinition def, dynamic raw, ThemeData theme) {
+    CustomFieldDefinition def,
+    dynamic raw,
+    ThemeData theme,
+  ) {
     // Boolean: tick verde o X roja
     if (def.type == CustomFieldType.boolean) {
-      final bool isTrue = raw == true ||
+      final bool isTrue =
+          raw == true ||
           raw == 1 ||
           raw?.toString().toLowerCase() == 'true' ||
           raw?.toString() == '1';
@@ -434,8 +470,7 @@ class _AssetGridViewState extends State<AssetGridView> {
 
     // Price: PriceDisplayWidget
     if (def.type == CustomFieldType.price) {
-      final double numVal =
-          double.tryParse(raw?.toString() ?? '') ?? 0.0;
+      final double numVal = double.tryParse(raw?.toString() ?? '') ?? 0.0;
       return PriceDisplayWidget(
         value: numVal,
         fontSize: 12,

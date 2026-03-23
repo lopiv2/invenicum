@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/providers/first_run_provider.dart';
 import 'package:provider/provider.dart';
@@ -683,7 +684,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
         _PrimaryButton(
           label: 'Ir al inicio de sesión',
           icon: Icons.login_rounded,
-          onPressed: () => context.go('/login'),
+          onPressed: () => context.goNamed(RouteNames.login),
         ),
       ],
     );

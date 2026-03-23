@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_detail_appbar_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_detail_title_header_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_market_status_widget.dart';
@@ -178,19 +179,24 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   }
 
   void _navigateToSibling(int offset) {
-    final itemProvider = context.read<InventoryItemProvider>();
-    final items = itemProvider.allInventoryItems;
-    if (items.isEmpty) return;
-    final int currentId = int.tryParse(widget.itemId) ?? 0;
-    final int currentIndex = items.indexWhere((i) => i.id == currentId);
-    if (currentIndex != -1) {
-      int nextIndex = (currentIndex + offset) % items.length;
-      if (nextIndex < 0) nextIndex = items.length - 1;
-      context.go(
-        '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets/${items[nextIndex].id}',
-      );
-    }
+  final itemProvider = context.read<InventoryItemProvider>();
+  final items = itemProvider.allInventoryItems;
+  if (items.isEmpty) return;
+  final int currentId = int.tryParse(widget.itemId) ?? 0;
+  final int currentIndex = items.indexWhere((i) => i.id == currentId);
+  if (currentIndex != -1) {
+    int nextIndex = (currentIndex + offset) % items.length;
+    if (nextIndex < 0) nextIndex = items.length - 1;
+    context.goNamed(
+      RouteNames.assetDetail,
+      pathParameters: {
+        'containerId': widget.containerId,
+        'assetTypeId': widget.assetTypeId,
+        'assetId': items[nextIndex].id.toString(),
+      },
+    );
   }
+}
 
   void _showFullScreenImage(BuildContext context, String imageUrl) {
     showDialog(

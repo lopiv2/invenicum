@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
@@ -130,9 +131,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     super.didChangeDependencies();
 
     // Cargar fuentes de datos para el enriquecimiento
-    final sources = AppIntegrations.getAvailableIntegrations(context)
-        .where((i) => i.isDataSource)
-        .toList();
+    final sources = AppIntegrations.getAvailableIntegrations(
+      context,
+    ).where((i) => i.isDataSource).toList();
     if (sources.length != _availableDataSources.length) {
       _availableDataSources = sources;
       if (_selectedSource == null && sources.isNotEmpty) {
@@ -151,10 +152,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     if (currentItem == null && !itemProvider.isLoading && itemId != null) {
       final cId = int.tryParse(widget.containerId) ?? 0;
       final atId = int.tryParse(widget.assetTypeId) ?? 0;
-      Future.microtask(() => itemProvider.loadInventoryItems(
-            containerId: cId,
-            assetTypeId: atId,
-          ));
+      Future.microtask(
+        () => itemProvider.loadInventoryItems(
+          containerId: cId,
+          assetTypeId: atId,
+        ),
+      );
       return;
     }
 
@@ -191,9 +194,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         .cast<ContainerNode?>()
         .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
     final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
-          (at) => at?.id == atIdInt,
-          orElse: () => null,
-        );
+      (at) => at?.id == atIdInt,
+      orElse: () => null,
+    );
 
     if (assetType != null && container != null) {
       setState(() {
@@ -215,13 +218,13 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             String textToShow = initialValue?.toString() ?? '';
             if (fieldDef.type == CustomFieldType.price &&
                 initialValue != null) {
-              double dbValue =
-                  double.tryParse(initialValue.toString()) ?? 0.0;
+              double dbValue = double.tryParse(initialValue.toString()) ?? 0.0;
               double localValue = preferences.convertPrice(dbValue);
               textToShow = localValue.toStringAsFixed(2);
             }
-            _dynamicControllers[fieldId] =
-                TextEditingController(text: textToShow);
+            _dynamicControllers[fieldId] = TextEditingController(
+              text: textToShow,
+            );
           }
         }
       });
@@ -238,7 +241,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     } catch (e) {
       if (mounted) {
         ToastService.error(
-            AppLocalizations.of(context)!.errorLoadingListValues(e.toString()));
+          AppLocalizations.of(context)!.errorLoadingListValues(e.toString()),
+        );
       }
     }
   }
@@ -290,16 +294,17 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
     try {
       final integrationService = IntegrationService(context.read<ApiService>());
-      final InventoryItem? suggestedItem =
-          await integrationService.lookupBarcode(scannedCode);
+      final InventoryItem? suggestedItem = await integrationService
+          .lookupBarcode(scannedCode);
 
       if (suggestedItem != null && mounted) {
         setState(() {
           _nameController.text = suggestedItem.name;
           _descriptionController.text = suggestedItem.description ?? '';
           if (suggestedItem.images.isNotEmpty) {
-            _newImagePreviewUrls =
-                suggestedItem.images.map((img) => img.url).toList();
+            _newImagePreviewUrls = suggestedItem.images
+                .map((img) => img.url)
+                .toList();
           }
           _highlightedFields.addAll(['name', 'description', 'barcode']);
         });
@@ -327,9 +332,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     }
     setState(() => _isEnrichLoading = true);
     try {
-      final Map<String, dynamic>? enrichedData =
-          await _integrationService.enrichItem(
-              query: query, source: _selectedSource!);
+      final Map<String, dynamic>? enrichedData = await _integrationService
+          .enrichItem(query: query, source: _selectedSource!);
 
       if (enrichedData != null && mounted) {
         setState(() {
@@ -374,7 +378,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           }
 
           aiFields.forEach((key, value) {
-            if (!usedAiKeys.contains(key) && key.toLowerCase() != 'external_id') {
+            if (!usedAiKeys.contains(key) &&
+                key.toLowerCase() != 'external_id') {
               unusedDataLines.add("$key: $value");
             }
           });
@@ -407,8 +412,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     if (_assetType == null) return;
     setState(() => _isMagicLoading = true);
     try {
-      final List<String> customFields =
-          _assetType!.fieldDefinitions.map((f) => f.name).toList();
+      final List<String> customFields = _assetType!.fieldDefinitions
+          .map((f) => f.name)
+          .toList();
       final Map<String, dynamic> result = await _aiService.extractDataFromUrl(
         url: url,
         fields: customFields,
@@ -462,9 +468,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) setState(() => _highlightedFields.clear());
       });
-      _scrollController.animateTo(0,
-          duration: const Duration(milliseconds: 500),
-          curve: Curves.easeInOut);
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
     } catch (e) {
       ToastService.error(e.toString().replaceAll('Exception: ', ''));
     } finally {
@@ -495,13 +503,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       for (final file in result.files) {
         if (file.bytes != null) {
           newImageUrls.add(
-              'data:image/${file.extension ?? 'jpeg'};base64,${base64Encode(file.bytes!)}');
+            'data:image/${file.extension ?? 'jpeg'};base64,${base64Encode(file.bytes!)}',
+          );
         }
       }
       if (newImageUrls.isNotEmpty) {
         setState(() => _newImagePreviewUrls.addAll(newImageUrls));
         ToastService.info(
-            'Se seleccionaron ${newImageUrls.length} nuevas imágenes.');
+          'Se seleccionaron ${newImageUrls.length} nuevas imágenes.',
+        );
       }
     }
   }
@@ -548,7 +558,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         _selectedLocationId == null) {
       if (_selectedLocationId == null && mounted) {
         ToastService.error(
-            AppLocalizations.of(context)!.selectLocationRequired);
+          AppLocalizations.of(context)!.selectLocationRequired,
+        );
       }
       return;
     }
@@ -562,8 +573,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
     if (cIdInt == null || atIdInt == null || assetItemIdInt == null) {
       if (mounted)
-        ToastService.error(
-            AppLocalizations.of(context)!.invalidNavigationIds);
+        ToastService.error(AppLocalizations.of(context)!.invalidNavigationIds);
       return;
     }
 
@@ -577,15 +587,17 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         if (selectedValue != null) {
           updatedCustomValues[fieldId.toString()] = selectedValue;
         } else if (fieldDef.isRequired && mounted) {
-          ToastService.error(AppLocalizations.of(context)!
-              .fieldRequiredWithName(fieldDef.name));
+          ToastService.error(
+            AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name),
+          );
           return;
         }
       } else if (fieldDef.type == CustomFieldType.boolean) {
         final boolValue = _booleanValues[fieldId];
         if (fieldDef.isRequired && boolValue == null && mounted) {
-          ToastService.error(AppLocalizations.of(context)!
-              .fieldRequiredWithName(fieldDef.name));
+          ToastService.error(
+            AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name),
+          );
           return;
         }
         if (boolValue != null)
@@ -595,13 +607,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         if (fieldDef.type == CustomFieldType.price) {
           double localValue =
               double.tryParse(valueToSave.replaceAll(',', '.')) ?? 0;
-          valueToSave =
-              preferences.convertToBase(localValue).toStringAsFixed(2);
+          valueToSave = preferences
+              .convertToBase(localValue)
+              .toStringAsFixed(2);
         }
         updatedCustomValues[fieldId.toString()] = valueToSave;
       } else if (fieldDef.isRequired && mounted) {
-        ToastService.error(AppLocalizations.of(context)!
-            .fieldRequiredWithName(fieldDef.name));
+        ToastService.error(
+          AppLocalizations.of(context)!.fieldRequiredWithName(fieldDef.name),
+        );
         return;
       }
     }
@@ -644,9 +658,14 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           assetTypeId: atIdInt,
         );
         ToastService.success(
-            AppLocalizations.of(context)!.assetUpdated(updatedItem.name));
-        context.go(
-          '/container/${widget.containerId}/asset-types/${widget.assetTypeId}/assets',
+          AppLocalizations.of(context)!.assetUpdated(updatedItem.name),
+        );
+        context.goNamed(
+          RouteNames.assetList,
+          pathParameters: {
+            'containerId': widget.containerId,
+            'assetTypeId': widget.assetTypeId,
+          },
         );
       }
     } catch (e) {
@@ -665,8 +684,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     final theme = Theme.of(context);
 
     if (_assetType == null || currentItem == null) {
-      return const Scaffold(
-          body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
@@ -693,18 +711,18 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
                     // ── Importar desde fuente externa ──
                     importBento: BentoBoxWidget(
-                        title: "Importar desde Fuente Externa",
-                        icon: Icons.auto_awesome,
-                        child: ExternalImportWidget(
-                          selectedSource: _selectedSource,
-                          availableSources: _availableDataSources,
-                          searchController: _aiSearchController,
-                          isLoading: _isEnrichLoading,
-                          onSourceChanged: (val) =>
-                              setState(() => _selectedSource = val),
-                          onSearch: _handleEnrichSearch,
-                        ),
+                      title: "Importar desde Fuente Externa",
+                      icon: Icons.auto_awesome,
+                      child: ExternalImportWidget(
+                        selectedSource: _selectedSource,
+                        availableSources: _availableDataSources,
+                        searchController: _aiSearchController,
+                        isLoading: _isEnrichLoading,
+                        onSourceChanged: (val) =>
+                            setState(() => _selectedSource = val),
+                        onSearch: _handleEnrichSearch,
                       ),
+                    ),
 
                     // ── Datos Principales ──
                     mainDataBento: BentoBoxWidget(

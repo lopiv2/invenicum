@@ -5,6 +5,7 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart'; // Asegúrate de que la ruta sea correcta
 import 'package:invenicum/data/models/loan.dart';
 import 'package:invenicum/providers/loan_provider.dart';
@@ -64,7 +65,10 @@ class _LoansScreenState extends State<LoansScreen> {
   }
 
   void _addLoan() {
-    context.go('/container/${widget.containerId}/loans/new');
+    context.goNamed(
+      RouteNames.loanCreate,
+      pathParameters: {'containerId': widget.containerId.toString()},
+    );
   }
 
   Future<void> _returnLoan(Loan loan) async {
@@ -352,7 +356,13 @@ class _LoansScreenState extends State<LoansScreen> {
                             cells: [
                               DataCell(Text(loan.itemName)),
                               DataCell(Text(loan.borrowerName ?? '-')),
-                              DataCell(Text(loan.borrowerEmail ?? loan.borrowerPhone ?? '-')),
+                              DataCell(
+                                Text(
+                                  loan.borrowerEmail ??
+                                      loan.borrowerPhone ??
+                                      '-',
+                                ),
+                              ),
                               DataCell(Text(loan.quantity.toString())),
                               DataCell(
                                 Text(DateFormat.yMd().format(loan.loanDate)),

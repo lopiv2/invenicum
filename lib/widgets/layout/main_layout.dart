@@ -3,6 +3,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/providers/alert_provider.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -361,16 +362,20 @@ class _HeaderState extends State<_Header> {
                     elevation: 8,
                     onSelected: (value) async {
                       if (value == 'alerts') {
-                        context.go('/alerts');
+                        context.goNamed(RouteNames.alerts);
                       }
                       if (value == 'logout') {
+                        // Limpieza de estados antes de salir
                         context.read<InventoryItemProvider>().resetState();
                         await context.read<AuthProvider>().logout();
-                        if (context.mounted) context.go('/login');
+
+                        if (context.mounted) {
+                          context.goNamed(RouteNames.login);
+                        }
                       } else if (value == 'settings') {
-                        context.go('/preferences');
+                        context.goNamed(RouteNames.preferences);
                       } else if (value == 'profile') {
-                        context.go('/myprofile');
+                        context.goNamed(RouteNames.myProfile);
                       }
                     },
                     child: Container(

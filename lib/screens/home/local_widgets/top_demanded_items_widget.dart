@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/data/models/top_loaned_items.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
@@ -32,14 +33,18 @@ class TopDemandedItemsWidget extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15), // Blur ligeramente superior
+          filter: ImageFilter.blur(
+            sigmaX: 15,
+            sigmaY: 15,
+          ), // Blur ligeramente superior
           child: Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 // Borde más definido
-                color: (isDark ? Colors.white : Colors.blue.shade900).withValues(alpha: 0.12),
+                color: (isDark ? Colors.white : Colors.blue.shade900)
+                    .withValues(alpha: 0.12),
                 width: 1.5,
               ),
               gradient: LinearGradient(
@@ -47,8 +52,12 @@ class TopDemandedItemsWidget extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: [
                   // Colores más opacos (0.85 y 0.6) para que no sea tan transparente
-                  (isDark ? Colors.grey.shade900 : Colors.white).withValues(alpha: 0.85),
-                  (isDark ? Colors.black : Colors.blue.shade50).withValues(alpha: 0.6),
+                  (isDark ? Colors.grey.shade900 : Colors.white).withValues(
+                    alpha: 0.85,
+                  ),
+                  (isDark ? Colors.black : Colors.blue.shade50).withValues(
+                    alpha: 0.6,
+                  ),
                 ],
               ),
             ),
@@ -69,7 +78,9 @@ class TopDemandedItemsWidget extends StatelessWidget {
                             fontSize: 14,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 1.2,
-                            color: isDark ? Colors.white : Colors.blueGrey.shade800,
+                            color: isDark
+                                ? Colors.white
+                                : Colors.blueGrey.shade800,
                           ),
                         ),
                       ],
@@ -77,7 +88,7 @@ class TopDemandedItemsWidget extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 24),
-                
+
                 // Lista de Items
                 ListView.separated(
                   shrinkWrap: true,
@@ -86,12 +97,19 @@ class TopDemandedItemsWidget extends StatelessWidget {
                   separatorBuilder: (_, __) => const SizedBox(height: 20),
                   itemBuilder: (context, index) {
                     final item = items[index];
-                    final double progress = maxLoans > 0 ? item.count / maxLoans : 0;
-                    
+                    final double progress = maxLoans > 0
+                        ? item.count / maxLoans
+                        : 0;
+
                     return InkWell(
                       borderRadius: BorderRadius.circular(12),
-                      onTap: () => context.go(
-                        '/container/${item.containerId}/asset-types/${item.assetTypeId}/assets/${item.id}',
+                      onTap: () => context.goNamed(
+                        RouteNames.assetDetail,
+                        pathParameters: {
+                          'containerId': item.containerId.toString(),
+                          'assetTypeId': item.assetTypeId.toString(),
+                          'assetId': item.id.toString(),
+                        },
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +144,10 @@ class TopDemandedItemsWidget extends StatelessWidget {
                               const SizedBox(width: 4),
                               Text(
                                 l10n.loans.toLowerCase(),
-                                style: const TextStyle(fontSize: 10, color: Colors.grey),
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ],
                           ),

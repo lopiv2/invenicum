@@ -69,8 +69,10 @@ extension ItemConditionExtension on ItemCondition {
 class AppIntegrations {
   // IDs Únicos (Los que entiende el Backend)
   static const String gemini = 'gemini';
+  static const String openai = 'openai';
+  static const String claude = 'claude';
   static const String telegram = 'telegram';
-  static const String email = 'email'; // Nuevo
+  static const String email = 'email';
   static const String qrLabels = 'qr_labels';
   static const String priceCharting = 'price_charting';
   static const String upcitemdb = 'upcitemdb';
@@ -87,7 +89,7 @@ class AppIntegrations {
         id: gemini,
         name: 'Google Gemini AI',
         isDataSource: false,
-        icon: Icon(Icons.auto_awesome),
+        icon: Icon(Icons.auto_awesome, color: Colors.deepPurpleAccent,),
         description: l10n.integrationGeminiDesc,
         fields: [
           IntegrationField(
@@ -99,8 +101,54 @@ class AppIntegrations {
           IntegrationField(
             id: 'model',
             label: l10n.geminiLabelModel,
-            type: IntegrationFieldType.text,
+            type: IntegrationFieldType.dropdown,
             helperText: 'Default: gemini-3-flash-preview',
+            options: AiModels.gemini.map((m) => m.id).toList(),
+          ),
+        ],
+      ),
+      IntegrationModel(
+        id: openai,
+        name: 'OpenAI (ChatGPT)',
+        isDataSource: false,
+        icon: FaIcon(FontAwesomeIcons.openai),
+        //icon: Icon(Icons.auto_awesome_mosaic_outlined),
+        description: 'Usa GPT-4o y otros modelos de OpenAI como asistente inteligente.',
+        fields: [
+          IntegrationField(
+            id: 'apiKey',
+            label: 'API Key',
+            type: IntegrationFieldType.password,
+            helperText: 'Obtenida en platform.openai.com/api-keys',
+          ),
+          IntegrationField(
+            id: 'model',
+            label: 'Modelo',
+            type: IntegrationFieldType.dropdown,
+            helperText: 'Default: gpt-4o',
+            options: AiModels.openai.map((m) => m.id).toList(),
+          ),
+        ],
+      ),
+      IntegrationModel(
+        id: claude,
+        name: 'Anthropic Claude',
+        isDataSource: false,
+        icon: FaIcon(FontAwesomeIcons.claude, color: Colors.orange[900],),
+        description: 'Usa Claude Sonnet, Opus y Haiku como asistente inteligente.',
+        fields: [
+          IntegrationField(
+            id: 'apiKey',
+            label: 'API Key',
+            type: IntegrationFieldType.password,
+            helperText: 'Obtenida en console.anthropic.com/settings/keys',
+          ),
+          IntegrationField(
+            id: 'model',
+            label: 'Modelo',
+            type: IntegrationFieldType.dropdown,
+            helperText: 'Default: claude-sonnet-4-6',
+            options: AiModels.claude.map((m) => m.id).toList(),
           ),
         ],
       ),
@@ -227,6 +275,93 @@ class AppIntegrations {
       ),
     ];
   }
+}
+
+// ── Modelos de IA disponibles (espejo de aiConstants.js) ─────────────────────
+class AiModelInfo {
+  final String id;
+  final String label;
+  const AiModelInfo({required this.id, required this.label});
+}
+
+// Metadata visual de cada proveedor — única fuente de verdad para
+// iconos, colores y labels usados en la UI (IntegrationsScreen,
+// AiProviderCardWidget, etc.)
+class AiProviderInfo {
+  final String id;
+  final String label;
+  final Widget icon; // Widget para soportar Icon y FaIcon
+  final Color color;
+  const AiProviderInfo({
+    required this.id,
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
+}
+
+class AiModels {
+  // ── Listas de modelos ─────────────────────────────────────────────────────
+  static const List<AiModelInfo> gemini = [
+    AiModelInfo(id: 'gemini-3-flash-preview',     label: 'Gemini 3.0 Flash Preview'),
+    AiModelInfo(id: 'gemini-2.0-flash',           label: 'Gemini 2.0 Flash'),
+    AiModelInfo(id: 'gemini-2.0-flash-thinking',  label: 'Gemini 2.0 Flash Thinking'),
+    AiModelInfo(id: 'gemini-1.5-pro',             label: 'Gemini 1.5 Pro'),
+  ];
+
+  static const List<AiModelInfo> openai = [
+    AiModelInfo(id: 'gpt-4o',      label: 'GPT-4o'),
+    AiModelInfo(id: 'gpt-4o-mini', label: 'GPT-4o Mini'),
+    AiModelInfo(id: 'gpt-4-turbo', label: 'GPT-4 Turbo'),
+  ];
+
+  static const List<AiModelInfo> claude = [
+    AiModelInfo(id: 'claude-sonnet-4-6',         label: 'Claude Sonnet 4.6'),
+    AiModelInfo(id: 'claude-opus-4-6',           label: 'Claude Opus 4.6'),
+    AiModelInfo(id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5'),
+  ];
+
+  // ── Metadata visual de proveedores ────────────────────────────────────────
+  static const List<AiProviderInfo> providers = [
+    AiProviderInfo(
+      id:    AppIntegrations.gemini,
+      label: 'Google Gemini',
+      icon:  Icon(Icons.auto_awesome),
+      color: Color(0xFF8B5CF6),
+    ),
+    AiProviderInfo(
+      id:    AppIntegrations.openai,
+      label: 'OpenAI (ChatGPT)',
+      icon:  FaIcon(FontAwesomeIcons.openai),
+      color: Color(0xFF10A37F),
+    ),
+    AiProviderInfo(
+      id:    AppIntegrations.claude,
+      label: 'Anthropic Claude',
+      icon:  FaIcon(FontAwesomeIcons.claude),
+      color: Color(0xFFD4A27F),
+    ),
+  ];
+
+  /// Devuelve el AiProviderInfo de un proveedor por su ID
+  static AiProviderInfo providerInfo(String providerId) =>
+      providers.firstWhere(
+        (p) => p.id == providerId,
+        orElse: () => providers.first,
+      );
+
+  /// Todos los modelos de un proveedor dado por su ID string
+  static List<AiModelInfo> forProvider(String provider) {
+    switch (provider) {
+      case 'openai': return openai;
+      case 'claude': return claude;
+      case 'gemini':
+      default:       return gemini;
+    }
+  }
+
+  /// Modelo por defecto de un proveedor
+  static String defaultFor(String provider) => forProvider(provider).first.id;
 }
 
 class AppSlots {

@@ -59,10 +59,33 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
           _buildIntegrationCard(
             context,
             title: "Google Gemini",
-            subtitle: "Habilita el asistente inteligente y análisis Pro.",
-            icon: Icon(Icons.auto_awesome, color: Colors.deepPurpleAccent),
+            subtitle: "Asistente inteligente con los modelos Gemini de Google.",
+            icon: AppIntegrations.getAvailableIntegrations(context)
+                .firstWhere((element) => element.id == AppIntegrations.gemini)
+                .icon,
             isLinked: integrationProv.isLinked(AppIntegrations.gemini),
             onTap: () => _openConfig(context, AppIntegrations.gemini),
+          ),
+          _buildIntegrationCard(
+            context,
+            title: "OpenAI (ChatGPT)",
+            subtitle: "Usa GPT-4o y otros modelos de OpenAI.",
+            icon: AppIntegrations.getAvailableIntegrations(context)
+                .firstWhere((element) => element.id == AppIntegrations.openai)
+                .icon,
+            //icon: const Icon(Icons.auto_awesome_mosaic_outlined, color: Color(0xFF10A37F)),
+            isLinked: integrationProv.isLinked(AppIntegrations.openai),
+            onTap: () => _openConfig(context, AppIntegrations.openai),
+          ),
+          _buildIntegrationCard(
+            context,
+            title: "Anthropic Claude",
+            subtitle: "Usa Claude Sonnet, Opus y Haiku.",
+            icon: AppIntegrations.getAvailableIntegrations(context)
+                .firstWhere((element) => element.id == AppIntegrations.claude)
+                .icon,
+            isLinked: integrationProv.isLinked(AppIntegrations.claude),
+            onTap: () => _openConfig(context, AppIntegrations.claude),
           ),
           const SizedBox(height: 24),
 

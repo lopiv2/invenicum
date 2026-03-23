@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
@@ -50,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
               context.go(redirectTo);
             } else {
               // Flujo normal
-              context.go('/dashboard');
+              context.goNamed(RouteNames.dashboard);
             }
           }
         } else {

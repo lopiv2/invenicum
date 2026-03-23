@@ -1,19 +1,21 @@
-
 import 'package:flutter/material.dart';
 
-enum IntegrationFieldType { text, boolean, number, password }
+enum IntegrationFieldType { text, boolean, number, password, dropdown }
 
 class IntegrationField {
   final String id;
   final String label;
   final IntegrationFieldType type;
   final String? helperText;
+  // Solo relevante cuando type == IntegrationFieldType.dropdown
+  final List<String> options;
 
   IntegrationField({
     required this.id,
     required this.label,
     required this.type,
     this.helperText,
+    this.options = const [],
   });
 }
 

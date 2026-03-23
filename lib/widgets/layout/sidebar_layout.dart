@@ -6,6 +6,7 @@ import 'package:invenicum/widgets/layout/sidebar_tree_section.dart';
 
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/widgets/ui/stac_slot.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 
 class SidebarLayout extends StatelessWidget {
   const SidebarLayout({super.key});
@@ -13,7 +14,6 @@ class SidebarLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final String location = GoRouterState.of(context).uri.toString();
     final l10n = AppLocalizations.of(context)!;
     return Container(
       width: 260,
@@ -37,8 +37,8 @@ class SidebarLayout extends StatelessWidget {
                 child: SidebarNavButton(
                   icon: Icons.dashboard_customize_outlined,
                   title: AppLocalizations.of(context)!.dashboard,
-                  selected: location == '/dashboard',
-                  onTap: () => context.go('/dashboard'),
+                  routeName: RouteNames.dashboard,
+                  onTap: () => context.goNamed(RouteNames.dashboard),
                 ),
               ),
             ),
@@ -59,54 +59,48 @@ class SidebarLayout extends StatelessWidget {
                 ), // Slot para plugins en la barra lateral
                 SidebarNavButton(
                   icon: Icons.emoji_events_outlined,
-                  title:
-                      l10n.myAchievements, // O usa AppLocalizations.of(context)!.achievements si ya tienes el string
-                  selected: location == '/achievements',
-                  onTap: () => context.go('/achievements'),
+                  title: l10n.myAchievements,
+                  routeName: RouteNames.achievements,
+                  onTap: () => context.goNamed(RouteNames.achievements),
                 ),
                 SidebarNavButton(
                   icon: Icons
                       .integration_instructions_outlined, // Icono representativo de integraciones
                   title: AppLocalizations.of(context)!.integrations,
-                  selected:
-                      GoRouterState.of(context).matchedLocation ==
-                      '/integrations',
-                  onTap: () => context.go('/integrations'),
+                  routeName: RouteNames.integrations,
+                  onTap: () => context.goNamed(RouteNames.integrations),
                 ),
                 SidebarNavButton(
                   icon: Icons.layers, // Icono representativo de integraciones
                   title: AppLocalizations.of(context)!.templates,
-                  selected:
-                      GoRouterState.of(context).matchedLocation == '/templates',
-                  onTap: () => context.go('/templates'),
+                  routeName: RouteNames.templates,
+                  onTap: () => context.goNamed(RouteNames.templates),
                 ),
                 SidebarNavButton(
                   icon: Icons
                       .extension_outlined, // Icono representativo de plugins
                   title: AppLocalizations.of(context)!.plugins,
-                  selected:
-                      GoRouterState.of(context).matchedLocation ==
-                      '/plugins-admin',
-                  onTap: () => context.go('/plugins-admin'),
+                  routeName: RouteNames.plugins,
+                  onTap: () => context.goNamed(RouteNames.plugins),
                 ),
                 SidebarNavButton(
                   icon: Icons.notifications_none_rounded,
                   title: AppLocalizations.of(context)!.alerts,
-                  selected: location == '/alerts',
-                  onTap: () => context.go('/alerts'),
+                  routeName: RouteNames.alerts,
+                  onTap: () => context.goNamed(RouteNames.alerts),
                   compact: true,
                 ),
                 SidebarNavButton(
                   icon: Icons.description_outlined,
                   title: AppLocalizations.of(context)!.reports,
-                  selected: location == '/reports',
-                  onTap: () => context.go('/reports'),
+                  routeName: RouteNames.reports,
+                  onTap: () => context.goNamed(RouteNames.reports),
                 ),
                 SidebarNavButton(
                   icon: Icons.settings_outlined,
                   title: AppLocalizations.of(context)!.preferences,
-                  selected: location == '/preferences',
-                  onTap: () => context.go('/preferences'),
+                  routeName: RouteNames.preferences,
+                  onTap: () => context.goNamed(RouteNames.preferences),
                 ),
 
                 const SizedBox(height: 20), // Espacio final

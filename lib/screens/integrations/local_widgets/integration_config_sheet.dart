@@ -18,6 +18,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
   // Mapa para gestionar los controladores de cada campo dinámico
   final Map<String, TextEditingController> _controllers = {};
   final Map<String, bool> _obscureTextMap = {};
+  final Map<String, String?> _dropdownValues = {};
   bool _isIdLoading = true;
 
   @override
@@ -33,6 +34,9 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
       if (field.type == IntegrationFieldType.password) {
         _obscureTextMap[field.id] = true;
       }
+      if (field.type == IntegrationFieldType.dropdown && field.options.isNotEmpty) {
+        _dropdownValues[field.id] = field.options.first;
+      }
     }
 
     // 2. Cargamos los datos guardados del backend mediante el Provider
@@ -43,6 +47,17 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
       savedConfig.forEach((key, value) {
         if (_controllers.containsKey(key)) {
           _controllers[key]!.text = value.toString();
+        }
+        // Si el campo es dropdown, restauramos el valor guardado
+        if (_dropdownValues.containsKey(key)) {
+          final savedValue = value.toString();
+          final field = widget.integration.fields.firstWhere(
+            (f) => f.id == key,
+            orElse: () => widget.integration.fields.first,
+          );
+          if (field.options.contains(savedValue)) {
+            _dropdownValues[key] = savedValue;
+          }
         }
       });
     }
@@ -117,51 +132,79 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
             )
           else
             ...widget.integration.fields.map((field) {
-              final bool isPassword =
-                  field.type == IntegrationFieldType.password;
+              final bool isPassword = field.type == IntegrationFieldType.password;
+              final bool isDropdown = field.type == IntegrationFieldType.dropdown;
+
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextFormField(
-                      controller: _controllers[field.id],
-                      obscureText: isPassword
-                          ? (_obscureTextMap[field.id] ?? true)
-                          : false,
-                      decoration: InputDecoration(
-                        labelText: field.label,
-                        helperText: field.helperText,
-                        border: const OutlineInputBorder(),
-                        suffixIcon: isPassword
-                            ? IconButton(
-                                icon: Icon(
-                                  _obscureTextMap[field.id] == true
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _obscureTextMap[field.id] =
-                                        !(_obscureTextMap[field.id] ?? true);
-                                  });
-                                },
-                              )
-                            : null,
+                    if (isDropdown) ...[
+                      DropdownButtonFormField<String>(
+                        value: _dropdownValues[field.id],
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: field.label,
+                          helperText: field.helperText,
+                          border: const OutlineInputBorder(),
+                        ),
+                        items: field.options
+                            .map((opt) => DropdownMenuItem(
+                                  value: opt,
+                                  child: Text(opt),
+                                ))
+                            .toList(),
+                        onChanged: (val) {
+                          setState(() {
+                            _dropdownValues[field.id] = val;
+                            // También actualizamos el controller para que
+                            // _handleSave lo recoja igual que los demás campos
+                            _controllers[field.id]?.text = val ?? '';
+                          });
+                        },
                       ),
-                    ),
-                    if (widget.integration.id == 'upcitemdb' &&
-                        field.id == 'apiKey')
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8, left: 4),
-                        child: Text(
-                          "Deja este campo vacío para usar el modo Gratuito (Limitado).",
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Colors.blueGrey[400],
-                            fontStyle: FontStyle.italic,
-                          ),
+                    ] else ...[
+                      TextFormField(
+                        controller: _controllers[field.id],
+                        obscureText: isPassword
+                            ? (_obscureTextMap[field.id] ?? true)
+                            : false,
+                        decoration: InputDecoration(
+                          labelText: field.label,
+                          helperText: field.helperText,
+                          border: const OutlineInputBorder(),
+                          suffixIcon: isPassword
+                              ? IconButton(
+                                  icon: Icon(
+                                    _obscureTextMap[field.id] == true
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureTextMap[field.id] =
+                                          !(_obscureTextMap[field.id] ?? true);
+                                    });
+                                  },
+                                )
+                              : null,
                         ),
                       ),
+                      if (widget.integration.id == 'upcitemdb' &&
+                          field.id == 'apiKey')
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, left: 4),
+                          child: Text(
+                            "Deja este campo vacío para usar el modo Gratuito (Limitado).",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blueGrey[400],
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                        ),
+                    ],
                   ],
                 ),
               );

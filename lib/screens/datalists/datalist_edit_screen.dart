@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/list_data.dart';
 import 'package:invenicum/providers/container_provider.dart';
@@ -95,7 +96,10 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
       if (!mounted) return;
 
       ToastService.success('Lista actualizada con éxito');
-      context.go('/container/${widget.containerId}/datalists');
+      context.goNamed(
+        RouteNames.dataLists,
+        pathParameters: {'containerId': widget.containerId},
+      );
     } catch (e) {
       if (!mounted) return;
       ToastService.error('Error al actualizar la lista: ${e.toString()}');
