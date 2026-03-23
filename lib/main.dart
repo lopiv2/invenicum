@@ -290,6 +290,15 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final preferencesProvider = context.watch<PreferencesProvider>();
+    // Determinamos el modo de tema
+    ThemeMode currentMode;
+    if (preferencesProvider.useSystemTheme) {
+      currentMode = ThemeMode.system;
+    } else {
+      currentMode = preferencesProvider.isDarkMode
+          ? ThemeMode.dark
+          : ThemeMode.light;
+    }
 
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
@@ -303,7 +312,9 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       title: 'Invenicum',
-      theme: themeProvider.themeData,
+      theme: themeProvider.lightTheme,
+      darkTheme: themeProvider.darkTheme,
+      themeMode: currentMode,
       routerConfig: _router,
       builder: (context, child) {
         return FToastBuilder()(context, child);

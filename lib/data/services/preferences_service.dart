@@ -58,6 +58,25 @@ class PreferencesService {
     }
   }
 
+  /// Actualiza el estado del modo oscuro y sistema (Configuración de comportamiento)
+Future<void> updateVisualStatus({
+  required bool useSystemTheme,
+  required bool isDarkMode,
+}) async {
+  try {
+    // Usamos PATCH al endpoint raíz o un sub-recurso de comportamiento
+    await _dio.patch(
+      '/preferences/visual-settings', 
+      data: {
+        'useSystemTheme': useSystemTheme,
+        'isDarkMode': isDarkMode,
+      },
+    );
+  } catch (e) {
+    rethrow;
+  }
+}
+
   /// Actualiza el proveedor de IA activo y el modelo seleccionado
   Future<void> updateAiProvider(String provider, String model) async {
     try {

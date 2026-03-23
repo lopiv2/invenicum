@@ -33,21 +33,84 @@ class PreferencesProvider with ChangeNotifier {
   NotificationSettings get notificationSettings => _prefs.notifications;
 
   /// Cambia si debemos seguir el tema del sistema operativo
+  /// Cambia si debemos seguir el tema del sistema operativo
   Future<void> setUseSystemTheme(bool value) async {
-    _useSystemTheme = value;
-    notifyListeners(); // Actualiza la UI inmediatamente
+    // 1. Guardamos el estado completo actual por si falla la red
+    final bool oldSystemValue = _useSystemTheme;
+    final bool oldDarkValue = _isDarkMode;
+    final UserPreferences oldPrefs = _prefs;
 
-    //final prefs = await SharedPreferences.getInstance();
-    //await prefs.setBool(_keySystemTheme, value);
+    // 2. Aplicamos la regla de negocio localmente de forma optimista
+    _useSystemTheme = value;
+
+    if (value == true) {
+      // REGLA: Si activamos automático, el modo oscuro manual DEBE ser false (0)
+      _isDarkMode = false;
+    }
+
+    // Sincronizamos el objeto UserPreferences principal
+    _prefs = _prefs.copyWith(
+      useSystemTheme: _useSystemTheme,
+      isDarkMode: _isDarkMode,
+    );
+
+    notifyListeners(); // La UI se actualiza al instante
+
+    try {
+      // 3. Persistimos en el backend
+      await _preferencesService.updateVisualStatus(
+        useSystemTheme: _useSystemTheme,
+        isDarkMode: _isDarkMode,
+      );
+    } catch (e) {
+      // 4. Si hay error, revertimos absolutamente todo al estado anterior
+      _useSystemTheme = oldSystemValue;
+      _isDarkMode = oldDarkValue;
+      _prefs = oldPrefs;
+      notifyListeners();
+      debugPrint('Error al persistir tema de sistema: $e');
+      rethrow;
+    }
   }
 
   /// Cambia manualmente entre modo claro y oscuro
   Future<void> setDarkMode(bool value) async {
+    // Guardamos estado para revertir
+    final bool oldSystemValue = _useSystemTheme;
+    final bool oldDarkValue = _isDarkMode;
+    final UserPreferences oldPrefs = _prefs;
+
+    // --- LÓGICA INVERSA ---
     _isDarkMode = value;
+    
+    // Si el usuario activa el modo oscuro manual, 
+    // asumimos que ya no quiere seguir al sistema.
+    if (value == true) {
+      _useSystemTheme = false;
+    }
+
+    // Actualizamos el objeto global
+    _prefs = _prefs.copyWith(
+      isDarkMode: _isDarkMode,
+      useSystemTheme: _useSystemTheme,
+    );
+    
     notifyListeners();
 
-    //final prefs = await SharedPreferences.getInstance();
-    //await prefs.setBool(_keyDarkMode, value);
+    try {
+      await _preferencesService.updateVisualStatus(
+        useSystemTheme: _useSystemTheme,
+        isDarkMode: _isDarkMode,
+      );
+    } catch (e) {
+      // Reversión
+      _isDarkMode = oldDarkValue;
+      _useSystemTheme = oldSystemValue;
+      _prefs = oldPrefs;
+      notifyListeners();
+      debugPrint('Error al persistir modo oscuro: $e');
+      rethrow;
+    }
   }
 
   /// Carga las preferencias completas y actualiza el estado
@@ -55,6 +118,11 @@ class PreferencesProvider with ChangeNotifier {
     try {
       final json = await _preferencesService.getPreferences();
       _prefs = UserPreferences.fromJson(json);
+      
+      // 🚩 SINCRONIZACIÓN CRÍTICA
+      _useSystemTheme = _prefs.useSystemTheme;
+      _isDarkMode = _prefs.isDarkMode;
+      
       _isInitialized = true;
       notifyListeners();
     } catch (e) {
@@ -67,7 +135,6 @@ class PreferencesProvider with ChangeNotifier {
   // En preferences_provider.dart
 
   // Lógica para el Drag and Drop
-  // Lógica para el Drag and Drop (Reordenar canales)
   void reorderChannels(int oldIndex, int newIndex) {
     if (newIndex > oldIndex) newIndex -= 1;
 

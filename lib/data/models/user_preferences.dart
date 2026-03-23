@@ -12,6 +12,10 @@ class UserPreferences {
   final Map<String, double>? exchangeRates;
   final NotificationSettings notifications;
 
+  // 🔔 NUEVOS CAMPOS
+  final bool useSystemTheme;
+  final bool isDarkMode;
+
   UserPreferences({
     this.id,
     this.language = 'es',
@@ -22,6 +26,8 @@ class UserPreferences {
     this.userId,
     this.updatedAt,
     this.exchangeRates,
+    this.useSystemTheme = true, // Por defecto sigue al sistema
+    this.isDarkMode = false,    // Solo aplica si useSystemTheme es false
     NotificationSettings? notifications,
   }) : this.notifications = notifications ?? NotificationSettings();
 
@@ -37,16 +43,19 @@ class UserPreferences {
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'es',
       currency: json['currency'] as String? ?? 'USD',
-      aiEnabled:  (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
+      aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       aiProvider: json['aiProvider'] as String?,
-      aiModel:    json['aiModel']    as String?,
+      aiModel: json['aiModel'] as String?,
       userId: json['userId'] as int?,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       exchangeRates: parsedRates,
-      // 🚀 CLAVE: Pasamos el JSON completo. NotificationSettings.fromJson
-      // ahora buscará 'alertStockLow', etc., directamente en la raíz.
+      
+      // 🔔 MAPEO DE NUEVOS CAMPOS (Vienen del DTO de Node)
+      useSystemTheme: json['useSystemTheme'] as bool? ?? true,
+      isDarkMode: json['isDarkMode'] as bool? ?? false,
+
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
           : NotificationSettings(),
@@ -58,23 +67,21 @@ class UserPreferences {
       'id': id,
       'language': language,
       'currency': currency,
-      'aiEnabled':  aiEnabled,
+      'aiEnabled': aiEnabled,
       'aiProvider': aiProvider,
-      'aiModel':    aiModel,
+      'aiModel': aiModel,
       'userId': userId,
-      // 🚀 Aplanamos las notificaciones para que el Backend las reciba
-      // como espera su DTO (UserPreferencesDTO.fromRequest).
+      'useSystemTheme': useSystemTheme,
+      'isDarkMode': isDarkMode,
       'notifications': notifications.toJson(),
     };
   }
 
-  Map<String, dynamic> toJsonForUpdate() {
+  /// Útil para el PATCH /visual-settings que creamos
+  Map<String, dynamic> toVisualSettingsJson() {
     return {
-      'language': language,
-      'currency': currency,
-      'aiEnabled': aiEnabled,
-      // 🚀 Incluimos las alertas en cada actualización de preferencias.
-      ...notifications.toJson(),
+      'useSystemTheme': useSystemTheme,
+      'isDarkMode': isDarkMode,
     };
   }
 
@@ -87,16 +94,21 @@ class UserPreferences {
     String? aiModel,
     Map<String, double>? exchangeRates,
     NotificationSettings? notifications,
+    bool? useSystemTheme,
+    bool? isDarkMode,
   }) {
     return UserPreferences(
       id: id ?? this.id,
       language: language ?? this.language,
       currency: currency ?? this.currency,
-      aiEnabled:  aiEnabled  ?? this.aiEnabled,
+      aiEnabled: aiEnabled ?? this.aiEnabled,
       aiProvider: aiProvider ?? this.aiProvider,
-      aiModel:    aiModel    ?? this.aiModel,
+      aiModel: aiModel ?? this.aiModel,
       exchangeRates: exchangeRates ?? this.exchangeRates,
       notifications: notifications ?? this.notifications,
+      // 🔔 NUEVOS
+      useSystemTheme: useSystemTheme ?? this.useSystemTheme,
+      isDarkMode: isDarkMode ?? this.isDarkMode,
     );
   }
 
@@ -105,6 +117,8 @@ class UserPreferences {
       language: 'es',
       currency: 'USD',
       aiEnabled: true,
+      useSystemTheme: true,
+      isDarkMode: false,
       exchangeRates: {},
       notifications: NotificationSettings(),
     );

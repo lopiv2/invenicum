@@ -76,11 +76,20 @@ class ThemeProvider with ChangeNotifier {
   CustomTheme get currentTheme => _currentTheme;
 
   // 2. Generación dinámica del ThemeData
-  ThemeData get themeData {
+  ThemeData get lightTheme {
+    return _buildTheme(Brightness.light);
+  }
+
+  ThemeData get darkTheme {
+    return _buildTheme(Brightness.dark);
+  }
+
+  // Método privado para no repetir código
+  ThemeData _buildTheme(Brightness brightness) {
     return ThemeData(
       useMaterial3: true,
       colorSchemeSeed: _currentTheme.primaryColor,
-      brightness: _currentTheme.brightness,
+      brightness: brightness,
       appBarTheme: const AppBarTheme(centerTitle: true),
     );
   }
