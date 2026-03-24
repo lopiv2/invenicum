@@ -28,8 +28,9 @@ class AssetCountersRow extends StatelessWidget {
     final items = inventoryItems ?? [];
     final bool isLoading = itemProvider.isLoading;
 
-    final int possessionCount =
-        _countField(items, assetType.possessionFieldId);
+    final double totalMarketValue = _calculateTotalMarketValue(items);
+
+    final int possessionCount = _countField(items, assetType.possessionFieldId);
     final int desiredCount = _countField(items, assetType.desiredFieldId);
 
     return Wrap(
@@ -37,6 +38,11 @@ class AssetCountersRow extends StatelessWidget {
       runSpacing: 12.0,
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
+        _buildMarketValueChip(
+          context,
+          totalMarketValue,
+          isLoading && items.isEmpty,
+        ),
         // 1. TOTAL ÍTEMS — usamos el total real de la caché, sin paginación
         _buildCustomHeightChip(
           context,
@@ -65,19 +71,26 @@ class AssetCountersRow extends StatelessWidget {
           ),
 
         // 4. SUMATORIOS DINÁMICOS
-        ...itemProvider.aggregationDefinitions.where((def) {
-          final isSum = def['isSummable'];
-          return isSum == true || isSum.toString() == 'true' || isSum == 1;
-        }).map((def) {
-          final fieldId = def['id'].toString();
-          final fieldName = def['name'] as String? ?? 'Suma';
-          final fieldType = def['type'];
-          final sumKey = 'sum_$fieldId';
-          final dynamic rawValue = itemProvider.aggregationResults[sumKey];
+        ...itemProvider.aggregationDefinitions
+            .where((def) {
+              final isSum = def['isSummable'];
+              return isSum == true || isSum.toString() == 'true' || isSum == 1;
+            })
+            .map((def) {
+              final fieldId = def['id'].toString();
+              final fieldName = def['name'] as String? ?? 'Suma';
+              final fieldType = def['type'];
+              final sumKey = 'sum_$fieldId';
+              final dynamic rawValue = itemProvider.aggregationResults[sumKey];
 
-          return _buildAggregationChip(
-              context, fieldName, fieldType, rawValue, isLoading);
-        }),
+              return _buildAggregationChip(
+                context,
+                fieldName,
+                fieldType,
+                rawValue,
+                isLoading,
+              );
+            }),
 
         // 5. INDICADOR DE CARGA
         if (isLoading)
@@ -92,10 +105,58 @@ class AssetCountersRow extends StatelessWidget {
     );
   }
 
-  Widget _buildAggregationChip(BuildContext context, String name,
-      dynamic type, dynamic value, bool loading) {
-    final bool isPrice =
-        type == 'price' || type == CustomFieldType.price.name;
+  // Widget específico para el valor de mercado con el PriceDisplayWidget
+  Widget _buildMarketValueChip(
+    BuildContext context,
+    double totalValue,
+    bool isSyncing,
+  ) {
+    return Chip(
+      elevation: 2,
+      shadowColor: Colors.black26,
+      avatar: Icon(Icons.analytics, size: 20, color: Colors.blueGrey),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+      backgroundColor: Colors.blueGrey.withValues(alpha: 0.1),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      label: Container(
+        constraints: const BoxConstraints(minHeight: 25),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'VALOR MERCADO TOTAL: ',
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
+            if (isSyncing)
+              const SizedBox(
+                width: 12,
+                height: 12,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: Colors.grey,
+                ),
+              )
+            else
+              PriceDisplayWidget(
+                value: totalValue,
+                fontSize: 14,
+                color: Colors.black,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAggregationChip(
+    BuildContext context,
+    String name,
+    dynamic type,
+    dynamic value,
+    bool loading,
+  ) {
+    final bool isPrice = type == 'price' || type == CustomFieldType.price.name;
 
     return Chip(
       elevation: 2,
@@ -107,20 +168,25 @@ class AssetCountersRow extends StatelessWidget {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-      backgroundColor:
-          Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+      backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       label: Container(
         constraints: const BoxConstraints(minHeight: 25),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('$name: ',
-                style: const TextStyle(fontWeight: FontWeight.w500)),
+            Text(
+              '$name: ',
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
             if (loading)
               const Text('...')
             else if (isPrice)
-              PriceDisplayWidget(value: value, fontSize: 14, color: Colors.black)
+              PriceDisplayWidget(
+                value: value,
+                fontSize: 14,
+                color: Colors.black,
+              )
             else
               Text(
                 (double.tryParse(value?.toString() ?? '0') ?? 0.0)
@@ -145,7 +211,7 @@ class AssetCountersRow extends StatelessWidget {
       shadowColor: Colors.black26,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
       labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-      backgroundColor: color.withOpacity(0.1),
+      backgroundColor: color.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       avatar: isLoading
           ? const SizedBox(
@@ -153,16 +219,26 @@ class AssetCountersRow extends StatelessWidget {
               height: 14,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-          : Icon(icon, size: 20, color: color.withOpacity(0.8)),
+          : Icon(icon, size: 20, color: color.withValues(alpha: 0.8)),
       label: Container(
         constraints: const BoxConstraints(minHeight: 25),
         child: Text(
           label,
           style: const TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold),
+            color: Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
+  }
+
+  // Función para sumar los precios de mercado
+  double _calculateTotalMarketValue(List<InventoryItem> items) {
+    return items.fold(0.0, (sum, item) {
+      // Usamos el campo marketPrice del modelo InventoryItem
+      return sum + (item.totalMarketValue);
+    });
   }
 
   int _countField(List<InventoryItem> items, String? fieldId) {

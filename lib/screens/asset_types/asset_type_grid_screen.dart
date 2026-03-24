@@ -157,7 +157,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 child: Text(
                   'Aún no hay Tipos de Activo definidos en este contenedor.',
                   style: TextStyle(
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                   ),
                 ),
               ),

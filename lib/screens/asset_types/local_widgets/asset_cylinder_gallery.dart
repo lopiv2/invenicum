@@ -184,7 +184,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
               ), // Bordes más redondeados para look premium
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withValues(alpha: 0.15),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -232,8 +232,8 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            Colors.black.withOpacity(0.8),
-                            Colors.black.withOpacity(0.4),
+                            Colors.black.withValues(alpha: 0.8),
+                            Colors.black.withValues(alpha: 0.4),
                             Colors.transparent,
                           ],
                         ),

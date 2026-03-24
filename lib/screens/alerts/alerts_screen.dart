@@ -154,7 +154,7 @@ class _AlertsScreenState extends State<AlertsScreen>
           },
           calendarStyle: CalendarStyle(
             todayDecoration: BoxDecoration(
-              color: Colors.indigo.withOpacity(0.5),
+              color: Colors.indigo.withValues(alpha: 0.5),
               shape: BoxShape.circle,
             ),
             selectedDecoration: const BoxDecoration(
@@ -213,7 +213,7 @@ class _AlertsScreenState extends State<AlertsScreen>
             borderRadius: BorderRadius.circular(12),
             side: alert.isRead
                 ? BorderSide.none
-                : BorderSide(color: Colors.indigo.withOpacity(0.2), width: 1),
+                : BorderSide(color: Colors.indigo.withValues(alpha: 0.2), width: 1),
           ),
           child: ListTile(
             onTap: () => _showDetailsDialog(context, alert),

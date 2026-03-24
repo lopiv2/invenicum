@@ -96,6 +96,18 @@ class _AssetListScreenState extends State<AssetListScreen>
     }
   }
 
+  void _refreshTable(BuildContext context) {
+    final provider = context.read<InventoryItemProvider>();
+    final cIdInt = int.tryParse(widget.containerId) ?? 0;
+    final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
+
+    provider.loadInventoryItems(
+      containerId: cIdInt,
+      assetTypeId: atIdInt,
+      forceReload: true, // Esto obliga a ignorar el caché y pedir al server
+    );
+  }
+
   void _goBack(BuildContext context) {
     context.goNamed(
       RouteNames.assetTypes,
@@ -218,7 +230,18 @@ class _AssetListScreenState extends State<AssetListScreen>
               onPressed: () => _goBack(context),
               tooltip: l10n.backToAssetTypes,
             ),
+            actions: [
+              if (!data.loading) // Opcional: ocultar si ya está cargando
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  tooltip:
+                      l10n.refresh, // Puedes usar l10n.refresh si lo tienes
+                  onPressed: () => _refreshTable(context),
+                ),
+              const SizedBox(width: 8),
+            ],
           ),
+
           body: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
@@ -316,7 +339,7 @@ class _AssetListScreenState extends State<AssetListScreen>
       context: context,
       barrierDismissible: true,
       builder: (context) => Dialog.fullscreen(
-        backgroundColor: Colors.black.withOpacity(0.9),
+        backgroundColor: Colors.black.withValues(alpha: 0.9),
         child: Stack(
           children: [
             AssetCylinderGallery(items: items),

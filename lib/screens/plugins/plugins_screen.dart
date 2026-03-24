@@ -107,7 +107,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
       height: 50,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withOpacity(0.3),
+        color: colorScheme.surfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(
@@ -119,7 +119,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
           color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 5,
               offset: const Offset(0, 2),
             )

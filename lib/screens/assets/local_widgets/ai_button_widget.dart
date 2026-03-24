@@ -28,7 +28,7 @@ class AiMagicBannerWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.3),
+            color: theme.colorScheme.primary.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

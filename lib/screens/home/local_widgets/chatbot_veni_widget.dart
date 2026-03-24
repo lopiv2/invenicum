@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/asset_template_model.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/services/veni_chatbot_service.dart';
-import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/screens/home/local_widgets/typing_bubbles_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -95,53 +95,114 @@ class _VeniChatbotState extends State<VeniChatbot> {
   }
 
   void _handleAction(String action, Map<String, dynamic> data) {
+    debugPrint(
+      "🎯 _handleAction → action: $action | data keys: ${data.keys.toList()}",
+    );
+
     if (action == 'NAVIGATE') {
       final path = data['path'];
       if (path != null && path is String) {
         final safePath = path.contains('default') ? '/dashboard' : path;
-        context.go(safePath); // Navega en el fondo sin cerrar el chat
+        context.go(safePath);
       }
     }
+
     if (action == 'CREATE_TEMPLATE') {
       try {
-        // 🚀 Convertimos los datos crudos de Gemini al modelo que entiende el Editor
-        final draft = _mapAiDataToTemplate(data);
-    
-        // Usamos push para que si el usuario cancela, vuelva a donde estaba
-        // o 'go' si prefieres sustituir la ruta de fondo
-        context.goNamed(RouteNames.templateCreate, extra: draft);
+        debugPrint("🧠 CREATE_TEMPLATE data bruta: $data");
 
-        // Opcional: Cerrar el chat automáticamente al navegar al editor
-        if (widget.onClose != null) widget.onClose!();
-      } catch (e) {
-        debugPrint("❌ Error parseando plantilla de IA: $e");
+        // El backend puede anidar los datos de la plantilla de distintas maneras:
+        // 1. data = { name, fields, ... }              → directo
+        // 2. data = { data: { name, fields, ... } }    → un nivel anidado
+        Map<String, dynamic> templateData = data;
+
+        if (!data.containsKey('name') && !data.containsKey('fields')) {
+          if (data['data'] is Map<String, dynamic>) {
+            templateData = data['data'] as Map<String, dynamic>;
+          } else if (data['template'] is Map<String, dynamic>) {
+            templateData = data['template'] as Map<String, dynamic>;
+          }
+        }
+
+        debugPrint(
+          "🧠 templateData resuelto: name=${templateData['name']} fields=${templateData['fields']?.length ?? 0}",
+        );
+
+        final draft = _mapAiDataToTemplate(templateData);
+        debugPrint("✅ Draft: ${draft.name} — ${draft.fields.length} campos");
+
+        // Delay para que Veni muestre su mensaje antes de navegar
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (!mounted) return;
+          context.goNamed(RouteNames.templateCreate, extra: draft);
+          if (widget.onClose != null) widget.onClose!();
+        });
+      } catch (e, stack) {
+        debugPrint("❌ Error en CREATE_TEMPLATE: $e$stack");
       }
     }
   }
 
   AssetTemplate _mapAiDataToTemplate(Map<String, dynamic> data) {
+    // 1. Extraemos la lista de campos que viene de la IA
+    final List<dynamic> rawFields = data['fields'] ?? [];
+
     return AssetTemplate(
-      id: '',
-      name: data['name'] ?? 'Nueva Plantilla Sugerida',
+      id: 'draft_${DateTime.now().millisecondsSinceEpoch}', // ID temporal para el UI
+      name: data['name'] ?? 'Nueva Colección',
       description: data['description'] ?? '',
-      category: data['category'] ?? '',
-      author: '',
-      fields: (data['fields'] as List? ?? []).asMap().entries.map((entry) {
-        final f = entry.value;
-        final index = entry.key;
+      category: data['category'] ?? 'General',
+      author: 'Veni AI',
+      tags: List<String>.from(data['tags'] ?? []),
+      // 2. Mapeamos a tu lista de fields con el modelo CustomFieldDefinition
+      fields: rawFields.map((f) {
+        final map = Map<String, dynamic>.from(f);
 
         return CustomFieldDefinition(
-          // 🚀 CRÍTICO: Asigna un ID temporal único.
-          // Si el ID está vacío, el CustomFieldEditor no se dibujará bien.
-          id: DateTime.now().millisecondsSinceEpoch + index,
-          name: f['name'] ?? 'Campo',
-          type: AppUtils.parseType(f['type']),
+          id: null, // Los campos nuevos no tienen ID de base de datos aún
+          name: map['name'] ?? 'Campo',
+          // 3. Convertimos el string de la IA al Enum CustomFieldType
+          type: _parseAiFieldType(map['type']),
+          // Soportamos 'isRequired' o 'required' por si la IA varía el nombre
+          isRequired: map['isRequired'] ?? map['required'] ?? false,
+          // Aprovechamos tus nuevos campos de sumatorios y moneda
+          isSummable: map['isSummable'] ?? map['is_summable'] ?? false,
+          isCountable: map['isCountable'] ?? map['is_countable'] ?? false,
+          isMonetary: map['isMonetary'] ?? map['is_monetary'] ?? false,
+          options: map['options'] != null
+              ? List<String>.from(map['options'])
+              : null,
         );
       }).toList(),
-      tags: [],
-      isPublic: true,
       isOfficial: false,
+      isPublic: false,
+      downloadCount: 0,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
     );
+  }
+
+  CustomFieldType _parseAiFieldType(dynamic type) {
+    final typeStr = type?.toString().toLowerCase() ?? 'text';
+    switch (typeStr) {
+      case 'number':
+      case 'numeric':
+      case 'decimal':
+      case 'double':
+        return CustomFieldType.number;
+      case 'date':
+      case 'datetime':
+        return CustomFieldType.date;
+      case 'boolean':
+      case 'bool':
+      case 'checkbox':
+        return CustomFieldType.boolean;
+      case 'dropdown':
+      case 'selection':
+        return CustomFieldType.dropdown;
+      default:
+        return CustomFieldType.text;
+    }
   }
 
   void _scrollToBottom() {
@@ -168,7 +229,7 @@ class _VeniChatbotState extends State<VeniChatbot> {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.dividerColor.withOpacity(0.1)),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.1)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),

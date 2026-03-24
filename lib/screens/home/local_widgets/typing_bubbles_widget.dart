@@ -52,7 +52,7 @@ class _TypingIndicatorState extends State<TypingIndicator> with TickerProviderSt
                   width: 6,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.onSurfaceVariant.withOpacity(
+                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 
                       (index + 1) * 0.2 + (_controller.value * 0.4),
                     ),
                     shape: BoxShape.circle,

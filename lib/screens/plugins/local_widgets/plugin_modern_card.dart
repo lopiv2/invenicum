@@ -26,7 +26,7 @@ class ModernPluginCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),
@@ -43,7 +43,7 @@ class ModernPluginCard extends StatelessWidget {
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withOpacity(0.05),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.05),
                     borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(24),
                     ),
@@ -230,7 +230,7 @@ class ModernPluginCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.orange.withOpacity(0.15),
+        color: Colors.orange.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(6),
         border: Border.all(color: Colors.orange.shade400, width: 0.5),
       ),
@@ -249,7 +249,7 @@ class ModernPluginCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
+        color: Colors.blue.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
@@ -289,10 +289,10 @@ class ModernPluginCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4),
         ],
       ),
       child: Text(
@@ -441,9 +441,9 @@ class ModernPluginCard extends StatelessWidget {
                 const SizedBox(height: 16),
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.red.withOpacity(0.05),
+                    color: Colors.red.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.withOpacity(0.1)),
+                    border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
                   ),
                   child: CheckboxListTile(
                     title: const Text(

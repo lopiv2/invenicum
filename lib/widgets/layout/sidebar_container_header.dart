@@ -22,7 +22,7 @@ class SidebarContainerHeader extends StatelessWidget {
             Text(
               AppLocalizations.of(context)!.containers.toUpperCase(),
               style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.1,
               ),

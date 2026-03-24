@@ -123,7 +123,7 @@ class BentoPrintTile extends StatelessWidget {
         onPressed: isPrinting ? null : onPrint,
         style: ElevatedButton.styleFrom(
           elevation: 0,
-          backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+          backgroundColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
           foregroundColor: Theme.of(context).primaryColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

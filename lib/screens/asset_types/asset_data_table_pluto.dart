@@ -328,7 +328,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                   isChecked ? Icons.check_box : Icons.check_box_outline_blank,
                   color: isChecked
                       ? Theme.of(context).primaryColor
-                      : Colors.grey.withOpacity(0.5),
+                      : Colors.grey.withValues(alpha: 0.5),
                 );
               }
             : field.type == CustomFieldType.price

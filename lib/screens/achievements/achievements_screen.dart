@@ -53,10 +53,10 @@ class AchievementsCardWidget extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.dividerColor.withOpacity(0.05)),
+        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -146,7 +146,7 @@ class AchievementsCardWidget extends StatelessWidget {
           child: CircularProgressIndicator(
             value: percentage,
             strokeWidth: 6,
-            backgroundColor: theme.colorScheme.primary.withOpacity(0.1),
+            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
             valueColor: AlwaysStoppedAnimation<Color>(
               theme.colorScheme.primary,
             ),
@@ -206,8 +206,8 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
 
     // Color de fondo del ítem: Vidrio esmerilado si está desbloqueado, sutil si no.
     final Color baseColor = widget.ach.unlocked
-        ? jewelColor.withOpacity(isDark ? 0.15 : 0.1)
-        : theme.colorScheme.surfaceContainerHighest.withOpacity(
+        ? jewelColor.withValues(alpha: isDark ? 0.15 : 0.1)
+        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
             isDark ? 0.3 : 0.5,
           );
 
@@ -239,15 +239,15 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                 ), // Bordes más redondeados
                 border: Border.all(
                   color: widget.ach.unlocked
-                      ? jewelColor.withOpacity(0.5)
-                      : theme.dividerColor.withOpacity(isDark ? 0.05 : 0.1),
+                      ? jewelColor.withValues(alpha: 0.5)
+                      : theme.dividerColor.withValues(alpha: isDark ? 0.05 : 0.1),
                   width: widget.ach.unlocked ? 1.5 : 1,
                 ),
                 // Efecto de brillo si está bloqueado y hover
                 boxShadow: (_isHovered && widget.ach.unlocked)
                     ? [
                         BoxShadow(
-                          color: jewelColor.withOpacity(0.3),
+                          color: jewelColor.withValues(alpha: 0.3),
                           blurRadius: 15,
                           spreadRadius: -2,
                         ),
@@ -265,7 +265,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                         size: 28,
                         color: widget.ach.unlocked
                             ? jewelColor
-                            : theme.hintColor.withOpacity(isDark ? 0.2 : 0.4),
+                            : theme.hintColor.withValues(alpha: isDark ? 0.2 : 0.4),
                       ),
                     ),
 
@@ -277,7 +277,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                         child: Icon(
                           Icons.star_rounded,
                           size: 12,
-                          color: Colors.amber.withOpacity(
+                          color: Colors.amber.withValues(alpha: 
                             widget.ach.unlocked ? 1 : 0.3,
                           ),
                         ),
@@ -293,7 +293,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Colors.white.withOpacity(isDark ? 0.05 : 0.2),
+                              Colors.white.withValues(alpha: isDark ? 0.05 : 0.2),
                               Colors.transparent,
                             ],
                           ),
@@ -327,9 +327,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withOpacity(isDark ? 0.8 : 0.95),
+            color: theme.colorScheme.surface.withValues(alpha: isDark ? 0.8 : 0.95),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            border: Border.all(color: theme.dividerColor.withOpacity(0.05)),
+            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
           ),
           padding: EdgeInsets.only(
             left: 24,
@@ -347,7 +347,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                 height: 4,
                 width: 40,
                 decoration: BoxDecoration(
-                  color: theme.dividerColor.withOpacity(0.2),
+                  color: theme.dividerColor.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -357,10 +357,10 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: jewelColor.withOpacity(0.1),
+                  color: jewelColor.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: jewelColor.withOpacity(0.2),
+                    color: jewelColor.withValues(alpha: 0.2),
                     width: 2,
                   ),
                 ),
@@ -369,7 +369,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                   size: 64,
                   color: widget.ach.unlocked
                       ? jewelColor
-                      : theme.hintColor.withOpacity(0.5),
+                      : theme.hintColor.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 24),
@@ -391,7 +391,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                     vertical: 2,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.amber.withOpacity(0.1),
+                    color: Colors.amber.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
                   child: const Text(
@@ -438,15 +438,15 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: widget.ach.unlocked
-                      ? Colors.green.withOpacity(isDark ? 0.1 : 0.05)
-                      : theme.colorScheme.primary.withOpacity(
+                      ? Colors.green.withValues(alpha: isDark ? 0.1 : 0.05)
+                      : theme.colorScheme.primary.withValues(alpha: 
                           isDark ? 0.1 : 0.05,
                         ),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: widget.ach.unlocked
-                        ? Colors.green.withOpacity(0.2)
-                        : theme.colorScheme.primary.withOpacity(0.1),
+                        ? Colors.green.withValues(alpha: 0.2)
+                        : theme.colorScheme.primary.withValues(alpha: 0.1),
                   ),
                 ),
                 child: Row(

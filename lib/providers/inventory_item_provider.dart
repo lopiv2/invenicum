@@ -157,10 +157,12 @@ class InventoryItemProvider with ChangeNotifier {
             aggregationFilters: aggregationFilters,
           );
 
-      _aggregationDefinitions =
-          List<dynamic>.from(loadedResponse.aggregationDefinitions);
-      _aggregationResults =
-          Map<String, dynamic>.from(loadedResponse.aggregationResults);
+      _aggregationDefinitions = List<dynamic>.from(
+        loadedResponse.aggregationDefinitions,
+      );
+      _aggregationResults = Map<String, dynamic>.from(
+        loadedResponse.aggregationResults,
+      );
       _itemsCache[key] = loadedResponse;
     } catch (e, stack) {
       debugPrint('❌ Error en Provider: $e');
@@ -170,6 +172,18 @@ class InventoryItemProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  List<InventoryItem> get allDownloadedItems {
+    final allItems =
+        <int, InventoryItem>{}; // Usamos mapa para evitar duplicados por ID
+
+    for (var response in _itemsCache.values) {
+      for (var item in response.items) {
+        allItems[item.id] = item;
+      }
+    }
+    return allItems.values.toList();
   }
 
   Future<void> loadAllItemsGlobal() async {
@@ -222,6 +236,27 @@ class InventoryItemProvider with ChangeNotifier {
   }
 
   Future<void> syncWithUPC(int itemId) async {
+    // 1. Buscar el ítem en el caché para verificar si tiene código de barras
+    InventoryItem? itemToSync;
+
+    // Recorremos el mapa de caché (key: storageKey, value: InventoryItemResponse)
+    for (var response in _itemsCache.values) {
+      try {
+        itemToSync = response.items.firstWhere((i) => i.id == itemId);
+        break; // Si lo encuentra, sale del bucle
+      } catch (_) {
+        // No está en este segmento del caché, sigue buscando
+      }
+    }
+
+    // 2. Validación: Si no existe o no tiene barcode, lanzamos el error
+    if (itemToSync == null ||
+        itemToSync.barcode == null ||
+        itemToSync.barcode!.trim().isEmpty) {
+      throw 'Item not found or barcode is empty.';
+    }
+
+    // 3. Proceso de sincronización normal
     _isSyncing = true;
     notifyListeners();
     try {
@@ -231,12 +266,13 @@ class InventoryItemProvider with ChangeNotifier {
         _itemHistory = updatedItem.priceHistory!;
       }
 
+      // Actualizar el caché con el nuevo objeto devuelto por el servidor
       _itemsCache.forEach((key, response) {
         final index = response.items.indexWhere((i) => i.id == itemId);
         if (index != -1) response.items[index] = updatedItem;
       });
     } catch (e) {
-      debugPrint('Error en syncWithUPC: $e');
+      debugPrint('Error in syncWithUPC: $e');
       rethrow;
     } finally {
       _isSyncing = false;
@@ -279,9 +315,9 @@ class InventoryItemProvider with ChangeNotifier {
   InventoryItem? getItemFromCache(int id) {
     for (var response in _itemsCache.values) {
       final item = response.items.cast<InventoryItem?>().firstWhere(
-            (i) => i?.id == id,
-            orElse: () => null,
-          );
+        (i) => i?.id == id,
+        orElse: () => null,
+      );
       if (item != null) return item;
     }
     return null;

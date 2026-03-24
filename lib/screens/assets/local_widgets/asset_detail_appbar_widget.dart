@@ -52,7 +52,7 @@ class AssetDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
           child: ActionChip(
             backgroundColor: Theme.of(
               context,
-            ).colorScheme.primaryContainer.withOpacity(0.4),
+            ).colorScheme.primaryContainer.withValues(alpha: 0.4),
             side: BorderSide.none,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20),

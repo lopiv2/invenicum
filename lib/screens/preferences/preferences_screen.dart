@@ -141,13 +141,13 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         VerticalDivider(
           width: 1,
           thickness: 1,
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
+          color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
         ),
 
         // Panel Derecho: Contenido dinámico
         Expanded(
           child: Container(
-            color: Theme.of(context).scaffoldBackgroundColor.withOpacity(0.5),
+            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(40.0),
               child: AnimatedSwitcher(
@@ -201,7 +201,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           ),
         ),
         selected: isSelected,
-        selectedTileColor: Theme.of(context).primaryColor.withOpacity(0.1),
+        selectedTileColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );

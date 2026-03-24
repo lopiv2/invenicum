@@ -179,7 +179,7 @@ class _AssetGridViewState extends State<AssetGridView> {
             Icon(
               Icons.inventory_2_outlined,
               size: 64,
-              color: theme.hintColor.withOpacity(0.3),
+              color: theme.hintColor.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
@@ -201,7 +201,7 @@ class _AssetGridViewState extends State<AssetGridView> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             decoration: BoxDecoration(
-              color: theme.primaryColor.withOpacity(0.05),
+              color: theme.primaryColor.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
@@ -330,7 +330,7 @@ class _AssetGridViewState extends State<AssetGridView> {
                                 end: Alignment.bottomCenter,
                                 colors: [
                                   Colors.transparent,
-                                  Colors.black.withOpacity(0.1),
+                                  Colors.black.withValues(alpha: 0.1),
                                 ],
                               ),
                             ),
@@ -494,10 +494,10 @@ class _AssetGridViewState extends State<AssetGridView> {
 
   Widget _buildPlaceholderIcon(ThemeData theme) {
     return Container(
-      color: theme.primaryColor.withOpacity(0.03),
+      color: theme.primaryColor.withValues(alpha: 0.03),
       child: Icon(
         Icons.inventory_2_outlined,
-        color: theme.primaryColor.withOpacity(0.1),
+        color: theme.primaryColor.withValues(alpha: 0.1),
         size: 32,
       ),
     );
@@ -534,7 +534,7 @@ class _AssetGridViewState extends State<AssetGridView> {
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.9),
+            color: color.withValues(alpha: 0.9),
             shape: BoxShape.circle,
             boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
           ),

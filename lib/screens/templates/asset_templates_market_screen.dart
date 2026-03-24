@@ -149,7 +149,7 @@ class _AssetTemplatesMarketScreenState
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primaryContainer.withOpacity(0.4),
+            Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.4),
             Theme.of(context).colorScheme.surface,
           ],
         ),
@@ -230,7 +230,7 @@ class _AssetTemplatesMarketScreenState
         borderRadius: BorderRadius.circular(27), // Forma de cápsula completa
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -257,7 +257,7 @@ class _AssetTemplatesMarketScreenState
           ),
 
           // Divisor vertical sutil
-          Container(height: 24, width: 1, color: Colors.grey.withOpacity(0.2)),
+          Container(height: 24, width: 1, color: Colors.grey.withValues(alpha: 0.2)),
 
           // --- SELECTOR DE ETIQUETAS (PopupMenu) ---
           PopupMenuButton<String>(
@@ -367,13 +367,13 @@ class _AssetTemplatesMarketScreenState
                     // Estética moderna
                     elevation: 0,
                     pressElevation: 2,
-                    backgroundColor: Colors.indigo.withOpacity(0.08),
-                    selectedColor: Colors.indigo.withOpacity(0.2),
+                    backgroundColor: Colors.indigo.withValues(alpha: 0.08),
+                    selectedColor: Colors.indigo.withValues(alpha: 0.2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     side: BorderSide(
-                      color: Colors.indigo.withOpacity(0.1),
+                      color: Colors.indigo.withValues(alpha: 0.1),
                       width: 1,
                     ),
                     padding: const EdgeInsets.symmetric(
@@ -427,8 +427,8 @@ class _TemplateCard extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     color: template.isOfficial
-                        ? Colors.indigo.withOpacity(0.1)
-                        : Colors.teal.withOpacity(0.1),
+                        ? Colors.indigo.withValues(alpha: 0.1)
+                        : Colors.teal.withValues(alpha: 0.1),
                     child: Center(
                       child: Icon(
                         template.isOfficial
@@ -451,7 +451,7 @@ class _TemplateCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.6),
+                        color: Colors.black.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(

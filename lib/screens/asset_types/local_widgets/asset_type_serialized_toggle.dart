@@ -38,7 +38,7 @@ class AssetTypeSerializedToggle extends StatelessWidget {
               child: Icon(
                 Icons.help_outline,
                 size: 18,
-                color: theme.primaryColor.withOpacity(0.7),
+                color: theme.primaryColor.withValues(alpha: 0.7),
               ),
             ),
           ],

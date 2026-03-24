@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
 import 'package:invenicum/widgets/ui/print_label_button_widget.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +25,6 @@ class AssetMarketStatusWidget extends StatelessWidget {
     final preferencesProvider = context.watch<PreferencesProvider>();
     final integrationProv = context.watch<IntegrationProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
-
     // --- LÓGICA DE TENDENCIA ---
     IconData? trendIcon;
     Color? trendColor;
@@ -63,7 +63,12 @@ class AssetMarketStatusWidget extends StatelessWidget {
           Icons.location_on_outlined,
           theme,
         ),
-        ConditionBadgeWidget(condition: item.condition),
+        _buildInfoRowCondition(
+          l10n.condition,
+          Icons.ballot_outlined,
+          theme,
+          ConditionBadgeWidget(condition: item.condition),
+        ),
 
         _buildInfoRow(
           l10n.minStock,
@@ -123,7 +128,14 @@ class AssetMarketStatusWidget extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: itemProvider.isSyncing
                   ? null
-                  : () => itemProvider.syncWithUPC(item.id),
+                  : () async {
+                      try {
+                        await itemProvider.syncWithUPC(item.id);
+                        ToastService.success(l10n.marketPriceObtained);
+                      } catch (e) {
+                        ToastService.error(l10n.errorNotBarCode);
+                      }
+                    },
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 shape: RoundedRectangleBorder(
@@ -165,6 +177,26 @@ class AssetMarketStatusWidget extends StatelessWidget {
           Text(label, style: const TextStyle(color: Colors.grey)),
           const Spacer(),
           Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRowCondition(
+    String label,
+    IconData icon,
+    ThemeData theme,
+    Widget conditionBadge,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 18, color: Colors.grey[600]),
+          const SizedBox(width: 12),
+          Text(label, style: const TextStyle(color: Colors.grey)),
+          const Spacer(),
+          conditionBadge,
         ],
       ),
     );

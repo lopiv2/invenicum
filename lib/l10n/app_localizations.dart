@@ -430,6 +430,12 @@ abstract class AppLocalizations {
   /// **'Collection fields configured.'**
   String get collectionFieldsConfigured;
 
+  /// No description provided for @condition.
+  ///
+  /// In en, this message translates to:
+  /// **'Condition'**
+  String get condition;
+
   /// No description provided for @condition_mint.
   ///
   /// In en, this message translates to:
@@ -808,6 +814,12 @@ abstract class AppLocalizations {
   /// **'No voucher template configured.'**
   String get errorNoVoucherTemplate;
 
+  /// No description provided for @errorNotBarCode.
+  ///
+  /// In en, this message translates to:
+  /// **'The article does not have a barcode or is invalid.'**
+  String get errorNotBarCode;
+
   /// No description provided for @errorReadingBytes.
   ///
   /// In en, this message translates to:
@@ -1138,6 +1150,24 @@ abstract class AppLocalizations {
   /// **'March'**
   String get march;
 
+  /// No description provided for @marketPriceObtained.
+  ///
+  /// In en, this message translates to:
+  /// **'Market price obtained successfully'**
+  String get marketPriceObtained;
+
+  /// No description provided for @marketValueEvolution.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Value Evolution'**
+  String get marketValueEvolution;
+
+  /// No description provided for @maxStock.
+  ///
+  /// In en, this message translates to:
+  /// **'Max stock'**
+  String get maxStock;
+
   /// No description provided for @may.
   ///
   /// In en, this message translates to:
@@ -1419,6 +1449,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Quantity'**
   String get quantity;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh data'**
+  String get refresh;
 
   /// No description provided for @registerNewLoan.
   ///

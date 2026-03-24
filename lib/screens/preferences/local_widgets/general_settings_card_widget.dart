@@ -105,7 +105,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.surfaceVariant.withOpacity(0.5),
+                    ).colorScheme.surfaceVariant.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: Theme.of(context).colorScheme.outlineVariant,
@@ -135,7 +135,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                           fontStyle: FontStyle.italic,
                           color: Theme.of(
                             context,
-                          ).colorScheme.onSurfaceVariant.withOpacity(0.7),
+                          ).colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                         ),
                       ),
                     ],

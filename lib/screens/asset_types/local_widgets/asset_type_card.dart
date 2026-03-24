@@ -231,7 +231,7 @@ class AssetTypeCard extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -309,7 +309,7 @@ class AssetTypeCard extends StatelessWidget {
     return Container(
       width: 110,
       height: double.infinity,
-      decoration: BoxDecoration(color: theme.primaryColor.withOpacity(0.05)),
+      decoration: BoxDecoration(color: theme.primaryColor.withValues(alpha: 0.05)),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -337,7 +337,7 @@ class AssetTypeCard extends StatelessWidget {
   Widget _buildPlaceholder(ThemeData theme) {
     return Icon(
       Icons.category_outlined,
-      color: theme.primaryColor.withOpacity(0.2),
+      color: theme.primaryColor.withValues(alpha: 0.2),
       size: 35,
     );
   }
@@ -346,7 +346,7 @@ class AssetTypeCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: theme.primaryColor.withOpacity(0.08),
+        color: theme.primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
@@ -463,7 +463,7 @@ class _CircleIconButton extends StatelessWidget {
               8,
             ), // Un poco más pequeño para dar aire al nombre
             decoration: BoxDecoration(
-              color: color.withOpacity(0.05),
+              color: color.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, size: 18, color: color),

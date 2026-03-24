@@ -46,14 +46,14 @@ class PriceHistoryChart extends StatelessWidget {
             ),
             child: LineChart(
               LineChartData(
-                backgroundColor: theme.colorScheme.primaryContainer.withOpacity(
+                backgroundColor: theme.colorScheme.primaryContainer.withValues(alpha: 
                   0.2,
                 ),
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: true,
                   getDrawingHorizontalLine: (value) => FlLine(
-                    color: theme.dividerColor.withOpacity(0.1),
+                    color: theme.dividerColor.withValues(alpha: 0.1),
                     strokeWidth: 1,
                   ),
                 ),
@@ -141,8 +141,8 @@ class PriceHistoryChart extends StatelessWidget {
                       show: true,
                       gradient: LinearGradient(
                         colors: [
-                          theme.colorScheme.primary.withOpacity(0.3),
-                          theme.colorScheme.primary.withOpacity(0.0),
+                          theme.colorScheme.primary.withValues(alpha: 0.3),
+                          theme.colorScheme.primary.withValues(alpha: 0.0),
                         ],
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,

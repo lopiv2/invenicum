@@ -308,7 +308,7 @@ class _HeaderState extends State<_Header> {
         color: colorScheme.surface,
         border: Border(
           bottom: BorderSide(
-            color: colorScheme.outlineVariant.withOpacity(0.5),
+            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
             width: 1,
           ),
         ),
@@ -383,7 +383,7 @@ class _HeaderState extends State<_Header> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: colorScheme.primary.withOpacity(0.2),
+                          color: colorScheme.primary.withValues(alpha: 0.2),
                           width: 2,
                         ),
                       ),

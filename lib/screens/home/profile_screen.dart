@@ -292,7 +292,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
               side: BorderSide(
-                color: colorScheme.outlineVariant.withOpacity(0.5),
+                color: colorScheme.outlineVariant.withValues(alpha: 0.5),
               ),
             ),
             child: Padding(
@@ -562,7 +562,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             style: ElevatedButton.styleFrom(
               // Si está vinculado, lo ponemos en un tono rojo/gris para indicar "acción de desconexión"
               backgroundColor: isLinked
-                  ? Colors.redAccent.withOpacity(0.8)
+                  ? Colors.redAccent.withValues(alpha: 0.8)
                   : Colors.black,
               foregroundColor: Colors.white,
               minimumSize: const Size(double.infinity, 40),

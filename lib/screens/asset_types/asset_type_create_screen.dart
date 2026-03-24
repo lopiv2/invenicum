@@ -214,7 +214,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: theme.colorScheme.primaryContainer
-                                      .withOpacity(0.3),
+                                      .withValues(alpha: 0.3),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
@@ -308,11 +308,11 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
           28,
         ), // Bordes muy redondeados (2026 style)
         border: Border.all(
-          color: theme.colorScheme.outlineVariant.withOpacity(0.5),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),

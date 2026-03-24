@@ -148,9 +148,9 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
               Container(
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
+                  color: Colors.blue.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
+                  border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Row(
@@ -293,9 +293,9 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
       margin: const EdgeInsets.only(top: 4, left: 8, right: 8),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.blueGrey.withOpacity(0.05),
+        color: Colors.blueGrey.withValues(alpha: 0.05),
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(12)),
-        border: Border.all(color: Colors.blueGrey.withOpacity(0.2)),
+        border: Border.all(color: Colors.blueGrey.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

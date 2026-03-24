@@ -62,7 +62,7 @@ class _SidebarTreeSectionState extends State<SidebarTreeSection> {
         child: Text(
           AppLocalizations.of(context)!.createFirstContainer,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12, color: Colors.grey.withOpacity(0.6)),
+          style: TextStyle(fontSize: 12, color: Colors.grey.withValues(alpha: 0.6)),
         ),
       ),
     );

@@ -29,7 +29,7 @@ class SaveAssetFloatingButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(35),
             boxShadow: [
               BoxShadow(
-                color: theme.colorScheme.primary.withOpacity(0.3),
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
                 blurRadius: 20,
                 offset: const Offset(0, 10),
               ),
@@ -41,10 +41,10 @@ class SaveAssetFloatingButton extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Container(
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.85),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.85),
                   borderRadius: BorderRadius.circular(35),
                   border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     width: 1.5,
                   ),
                 ),

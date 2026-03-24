@@ -50,7 +50,7 @@ class SidebarNavButton extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
           decoration: BoxDecoration(
             color: selected
-                ? colorScheme.primaryContainer.withOpacity(0.4)
+                ? colorScheme.primaryContainer.withValues(alpha: 0.4)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),

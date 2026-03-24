@@ -4,12 +4,13 @@ import 'package:invenicum/data/models/dashboard_stats.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/data/services/dashboard_service.dart';
+import 'package:invenicum/screens/home/local_widgets/charts/market_value_evolution_chart.dart';
 import 'package:invenicum/screens/home/local_widgets/expiring_loan_widget.dart';
 import 'package:invenicum/screens/home/local_widgets/low_stock_card.dart';
 import 'package:invenicum/widgets/ui/stac_slot.dart';
 import 'package:invenicum/widgets/ui/stat_card.dart';
 import 'package:invenicum/screens/home/local_widgets/top_demanded_items_widget.dart';
-import 'package:invenicum/screens/home/local_widgets/top_loaned_items_chart.dart';
+import 'package:invenicum/screens/home/local_widgets/charts/top_loaned_items_chart.dart';
 import 'package:invenicum/screens/home/local_widgets/total_market_value_widget.dart';
 import 'package:invenicum/screens/home/local_widgets/total_spending_widget.dart';
 import 'package:provider/provider.dart';
@@ -188,7 +189,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 24),
           const LowStockCard(),
           const SizedBox(height: 24),
-          const TopLoanedItemsChart(),
+          Row(
+            crossAxisAlignment:
+                CrossAxisAlignment.start, // Alinea las tarjetas arriba
+            children: [
+              const Expanded(child: TopLoanedItemsChart()),
+              const Expanded(child: MarketValueEvolutionChart()),
+            ],
+          ),
           const SizedBox(height: 32),
           const StacSlot(slotName: 'dashboard_bottom'),
         ],

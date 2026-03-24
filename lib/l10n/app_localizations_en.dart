@@ -180,6 +180,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionFieldsConfigured => 'Collection fields configured.';
 
   @override
+  String get condition => 'Condition';
+
+  @override
   String get condition_mint => 'Mint (Original box)';
 
   @override
@@ -401,6 +404,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorNoVoucherTemplate => 'No voucher template configured.';
 
   @override
+  String get errorNotBarCode =>
+      'The article does not have a barcode or is invalid.';
+
+  @override
   String get errorReadingBytes => 'Could not read file bytes.';
 
   @override
@@ -587,6 +594,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get march => 'March';
 
   @override
+  String get marketPriceObtained => 'Market price obtained successfully';
+
+  @override
+  String get marketValueEvolution => 'Market Value Evolution';
+
+  @override
+  String get maxStock => 'Max stock';
+
+  @override
   String get may => 'May';
 
   @override
@@ -729,6 +745,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quantity => 'Quantity';
+
+  @override
+  String get refresh => 'Refresh data';
 
   @override
   String get registerNewLoan => 'Register New Loan';

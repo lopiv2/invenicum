@@ -29,6 +29,29 @@ class AppUtils {
     return DateFormat.yMMMd(locale).format(date);
   }
 
+  /// Genera el nombre del mes localizado y con la primera letra en mayúscula
+  static String getLocalizedMonth(
+    int month,
+    String locale, {
+    bool short = false,
+  }) {
+    final DateTime date = DateTime(2000, month);
+
+    // Si short es true, usamos 'MMMMM' (que devuelve la inicial: E, F, M...)
+    // Si short es false, usamos 'MMM' (que devuelve la abreviatura: ene, feb...)
+    final String pattern = short ? 'MMMMM' : 'MMM';
+
+    String monthName = DateFormat(pattern, locale).format(date);
+
+    // Limpiamos puntos (común en 'ene.' o 'feb.')
+    monthName = monthName.replaceAll('.', '');
+
+    if (monthName.isEmpty) return "";
+
+    // Capitalizamos la primera letra
+    return monthName[0].toUpperCase() + (short ? "" : monthName.substring(1));
+  }
+
   /// 💰 Formatea moneda (ej: 1.500,00 €)
   static String formatCurrency(double amount) {
     return NumberFormat.currency(symbol: '€', locale: 'es_ES').format(amount);

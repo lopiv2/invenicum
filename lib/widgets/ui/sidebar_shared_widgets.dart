@@ -39,7 +39,7 @@ class ActionIconButton extends StatelessWidget {
       icon: Icon(
         icon,
         size: 18,
-        color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+        color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
       ),
       onPressed: onTap,
     );

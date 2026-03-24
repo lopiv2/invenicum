@@ -34,7 +34,7 @@ class NotificationSettingsCardWidget extends StatelessWidget {
             // Sección Drag & Drop
             Container(
               decoration: BoxDecoration(
-                color: Theme.of(context).dividerColor.withOpacity(0.05),
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: ReorderableListView.builder(

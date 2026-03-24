@@ -21,10 +21,10 @@ class SidebarLayout extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [colorScheme.surface, colorScheme.primary.withOpacity(0.05)],
+          colors: [colorScheme.surface, colorScheme.primary.withValues(alpha: 0.05)],
         ),
         border: Border(
-          right: BorderSide(color: colorScheme.outlineVariant.withOpacity(0.4)),
+          right: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
       ),
       child: SafeArea(
