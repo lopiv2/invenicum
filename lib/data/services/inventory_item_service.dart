@@ -373,10 +373,33 @@ class InventoryItemService {
 
   Future<void> toggleWishlist(int itemId, bool status) async {
     try {
-      // Usamos el nombre del campo 'wishlisted' tal cual lo tienes en tu lógica
       await _dio.patch('/items/$itemId/wishlist', data: {'wishlisted': status});
     } catch (e) {
       throw Exception('Error al comunicar con el servidor');
+    }
+  }
+
+  /// Sincroniza el valor de mercado de todos los ítems con barcode de un assetType.
+  /// Devuelve el resumen { total, updated, skipped, errors, details }.
+  Future<Map<String, dynamic>> syncAssetTypeMarketValues({
+    required int assetTypeId,
+    required int containerId,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/market/sync-asset-type',
+        data: {
+          'assetTypeId': assetTypeId,
+          'containerId': containerId,
+        },
+      );
+      final data = response.data as Map<String, dynamic>;
+      return data['summary'] as Map<String, dynamic>;
+    } on DioException catch (e) {
+      final msg = e.response?.data?['error'] ?? 'Error al sincronizar precios';
+      throw Exception(msg);
+    } catch (e) {
+      throw Exception('Error inesperado: $e');
     }
   }
 }

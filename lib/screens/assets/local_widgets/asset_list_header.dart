@@ -1,6 +1,8 @@
 // widgets/asset_list_header.dart
 
 import 'package:flutter/material.dart';
+import 'package:invenicum/providers/inventory_item_provider.dart';
+import 'package:provider/provider.dart';
 import '../../../data/models/asset_type_model.dart';
 
 class AssetListHeader extends StatelessWidget {
@@ -8,6 +10,7 @@ class AssetListHeader extends StatelessWidget {
   final VoidCallback onGoToCreateAsset;
   final VoidCallback onShowCountFilterDialog;
   final VoidCallback onImportCSV;
+  final VoidCallback onSyncPrices;
   final String? selectedCountFieldId;
 
   const AssetListHeader({
@@ -16,6 +19,7 @@ class AssetListHeader extends StatelessWidget {
     required this.onGoToCreateAsset,
     required this.onShowCountFilterDialog,
     required this.onImportCSV,
+    required this.onSyncPrices,
     this.selectedCountFieldId,
   });
 
@@ -66,6 +70,44 @@ class AssetListHeader extends StatelessWidget {
               color: Theme.of(context).colorScheme.surfaceVariant,
               isMobile: isMobile,
             ),
+            //Boton actualizar precios de mercado
+            // BOTÓN SINCRONIZAR CON BADGE Y SELECTOR
+            Selector<InventoryItemProvider, (bool, int)>(
+              // Escuchamos dos cosas: si está cargando y cuántos tienen barcode
+              selector: (_, prov) {
+                final count = prov.allInventoryItems
+                    .where(
+                      (item) =>
+                          item.barcode != null &&
+                          item.barcode!.trim().isNotEmpty,
+                    )
+                    .length;
+                return (prov.isSyncingPrices, count);
+              },
+              builder: (context, data, child) {
+                final isSyncing = data.$1;
+                final barcodeCount = data.$2;
+
+                return Badge(
+                  label: Text('$barcodeCount'),
+                  isLabelVisible:
+                      barcodeCount > 0 &&
+                      !isSyncing, // Ocultar si es 0 o está cargando
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                  child: _buildActionButton(
+                    context,
+                    onPressed: isSyncing ? () {} : onSyncPrices,
+                    icon: Icons.sync_alt_rounded,
+                    label: isSyncing
+                        ? 'Sincronizando...'
+                        : 'Sincronizar precios',
+                    color: Theme.of(context).colorScheme.surfaceVariant,
+                    isMobile: isMobile,
+                    isLoading: isSyncing,
+                  ),
+                );
+              },
+            ),
 
             // Botón Añadir (Botón de acción principal)
             _buildActionButton(
@@ -94,6 +136,7 @@ class AssetListHeader extends StatelessWidget {
     Color? textColor,
     required bool isMobile,
     bool isPrimary = false,
+    bool isLoading = false,
   }) {
     return ElevatedButton.icon(
       onPressed: onPressed,

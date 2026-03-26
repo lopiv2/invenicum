@@ -57,6 +57,13 @@ class UserData {
     );
   }
 
+  factory UserData.empty() => UserData(
+  id: 0,
+  name: '',
+  username: '',
+  email: '',
+);
+
   UserData copyWith({
     int? id,
     String? email,

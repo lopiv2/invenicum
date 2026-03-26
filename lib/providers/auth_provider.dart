@@ -62,20 +62,26 @@ class AuthProvider with ChangeNotifier {
             _user = userData;
             _token = _apiService.currentToken;
           } else {
-            // getMe() devolvió null sin lanzar excepción — caso raro,
-            // lo tratamos como error temporal y mantenemos el token.
+            // getMe() devolvió null sin excepción — error temporal.
+            // Mantenemos token Y creamos un usuario mínimo desde el token
+            // para que isAuthenticated = true y el router no redirija al login.
             debugPrint("⚠️ AuthProvider: getMe() sin datos, manteniendo sesión");
             _token = _apiService.currentToken;
+            // Si no tenemos _user, usamos el último conocido o uno vacío
+            // para que isAuthenticated no falle por _user == null.
+            _user ??= UserData.empty();
           }
         } on DioException catch (e) {
           if (e.response?.statusCode == 401) {
-            // 401 explícito del servidor → token inválido o expirado → logout
+            // 401 explícito → token inválido → logout
             debugPrint("⚠️ AuthProvider: token inválido (401) — cerrando sesión");
             await _apiService.logout();
           } else {
-            // Error de red, timeout, 5xx, etc. → no cerramos sesión
+            // Error de red, 404, 5xx, timeout → no cerramos sesión.
+            // Mantenemos token Y _user para que isAuthenticated siga siendo true.
             debugPrint("⚠️ AuthProvider: error de red (${e.response?.statusCode}) — manteniendo sesión");
             _token = _apiService.currentToken;
+            _user ??= UserData.empty();
           }
         }
       }
@@ -160,26 +166,37 @@ class AuthProvider with ChangeNotifier {
   /// Verifica si hay una sesión guardada al abrir la app
   Future<void> checkAuthStatus() async {
     _isLoading = true;
-    // Importante: No notificamos aquí para evitar parpadeos innecesarios en el splash
-
     try {
-      // 1. Cargamos el token del storage a la memoria del ApiService inmediatamente
       await _apiService.initializeToken();
-
       final savedToken = _apiService.currentToken;
 
       if (savedToken != null) {
-        // 2. Si hay token, intentamos recuperar el perfil del usuario
-        final userData = await _apiService.getMe();
+        try {
+          final userData = await _apiService.getMe().timeout(
+            const Duration(seconds: 15),
+            onTimeout: () => null,
+          );
 
-        if (userData != null) {
-          _token = savedToken;
-          _user = userData;
-        } else {
-          // Token expirado o inválido: limpieza total
-          await _apiService.logout();
-          _token = null;
-          _user = null;
+          if (userData != null) {
+            _token = savedToken;
+            _user = userData;
+          } else {
+            await _apiService.logout();
+            _token = null;
+            _user = null;
+          }
+        } on DioException catch (e) {
+          if (e.response?.statusCode == 401) {
+            debugPrint("⚠️ checkAuthStatus: 401 — token expirado, cerrando sesión");
+            await _apiService.logout();
+            _token = null;
+            _user = null;
+          } else {
+            // Error de red o servidor → mantenemos sesión con usuario vacío
+            debugPrint("⚠️ checkAuthStatus: error de red (${e.response?.statusCode}) — manteniendo sesión");
+            _token = savedToken;
+            _user ??= UserData.empty();
+          }
         }
       }
     } catch (e) {

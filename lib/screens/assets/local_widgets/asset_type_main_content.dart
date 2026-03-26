@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/screens/asset_types/asset_data_table_pluto.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_grid_view.dart';
-import 'package:invenicum/screens/asset_types/local_widgets/asset_cylinder_gallery.dart';
+import 'package:invenicum/screens/assets/local_widgets/asset_cylinder_gallery.dart';
 
 class AssetTypeMainContent extends StatelessWidget {
   const AssetTypeMainContent({

@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/async_task_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_search_bar.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_type_main_content.dart';
-import 'package:invenicum/screens/asset_types/local_widgets/asset_cylinder_gallery.dart';
+import 'package:invenicum/screens/assets/local_widgets/asset_cylinder_gallery.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/assets_counters_row.dart';
 import 'package:invenicum/screens/assets/local_widgets/possession_progress_bar.dart';
+import 'package:invenicum/screens/assets/local_widgets/sync_result_row_widget.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/models/container_node.dart';
 import '../../data/models/asset_type_model.dart';
 import '../../providers/container_provider.dart';
 import '../../providers/inventory_item_provider.dart';
-import '../asset_types/local_widgets/asset_list_header.dart';
+import 'local_widgets/asset_list_header.dart';
 
 // ---------------------------------------------------------------------------
 // Data class para el Selector
@@ -34,7 +36,8 @@ class _PageStateData {
     if (items.length != other.items.length) return false;
     for (int i = 0; i < items.length; i++) {
       if (items[i].id != other.items[i].id ||
-          items[i].updatedAt != other.items[i].updatedAt) {
+          items[i].updatedAt != other.items[i].updatedAt ||
+          items[i].marketValue != other.items[i].marketValue) {
         return false;
       }
     }
@@ -107,6 +110,91 @@ class _AssetListScreenState extends State<AssetListScreen>
       forceReload: true, // Esto obliga a ignorar el caché y pedir al server
     );
   }
+
+Future<void> _syncMarketPrices(BuildContext context) async {
+  final provider = context.read<InventoryItemProvider>();
+  final cIdInt = int.tryParse(widget.containerId) ?? 0;
+  final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
+
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Sincronizar precios'),
+      content: const Text(
+        'Se consultará la API para actualizar el valor de mercado.',
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx, false),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(ctx, true),
+          child: const Text('Sincronizar'),
+        ),
+      ],
+    ),
+  );
+
+  if (confirmed != true) return;
+
+  try {
+    final summary = await runAsyncTask(
+      context,
+      () => provider.syncAssetTypeMarketValues(
+        assetTypeId: atIdInt,
+        containerId: cIdInt,
+      ),
+      loadingMessage: "Sincronizando precios de mercado...",
+      errorMessage: "No se pudieron sincronizar los precios",
+    );
+
+    if (!context.mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sincronización completada'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SyncResultRow(
+              icon: Icons.trending_up,
+              color: Colors.green,
+              label: 'Actualizados',
+              value: summary['updated'] ?? 0,
+            ),
+            SyncResultRow(
+              icon: Icons.remove_circle_outline,
+              color: Colors.orange,
+              label: 'Sin precio en API',
+              value: summary['skipped'] ?? 0,
+            ),
+            SyncResultRow(
+              icon: Icons.error_outline,
+              color: Colors.red,
+              label: 'Errores',
+              value: summary['errors'] ?? 0,
+            ),
+            const Divider(),
+            SyncResultRow(
+              icon: Icons.inventory_2_outlined,
+              color: Colors.grey,
+              label: 'Total procesados',
+              value: summary['total'] ?? 0,
+            ),
+          ],
+        ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cerrar'),
+          ),
+        ],
+      ),
+    );
+  } catch (_) {}
+}
 
   void _goBack(BuildContext context) {
     context.goNamed(
@@ -231,11 +319,10 @@ class _AssetListScreenState extends State<AssetListScreen>
               tooltip: l10n.backToAssetTypes,
             ),
             actions: [
-              if (!data.loading) // Opcional: ocultar si ya está cargando
+              if (!data.loading)
                 IconButton(
                   icon: const Icon(Icons.refresh),
-                  tooltip:
-                      l10n.refresh, // Puedes usar l10n.refresh si lo tienes
+                  tooltip: l10n.refresh,
                   onPressed: () => _refreshTable(context),
                 ),
               const SizedBox(width: 8),
@@ -248,6 +335,7 @@ class _AssetListScreenState extends State<AssetListScreen>
               children: [
                 AssetListHeader(
                   assetType: assetType,
+                  onSyncPrices: () => _syncMarketPrices(context),
                   onGoToCreateAsset: () => context.goNamed(
                     RouteNames.assetCreate,
                     pathParameters: {
@@ -302,6 +390,7 @@ class _AssetListScreenState extends State<AssetListScreen>
                   child: data.loading
                       ? const Center(child: CircularProgressIndicator())
                       : AssetTypeMainContent(
+                          key: ValueKey('content_${data.items.hashCode}'),
                           isListView: _isListView,
                           isCurrentRoute: isCurrentRoute,
                           assetType: assetType,

@@ -460,4 +460,37 @@ class InventoryItemProvider with ChangeNotifier {
     _currentAssetTypeId = 0;
     notifyListeners();
   }
+
+  // ----------------------------------------------------------------------
+  // SYNC DE PRECIOS POR ASSET TYPE
+  // ----------------------------------------------------------------------
+
+  bool _isSyncingPrices = false;
+  bool get isSyncingPrices => _isSyncingPrices;
+
+  /// Llama al backend para actualizar el marketValue de todos los ítems
+  /// con barcode del assetType actual. Refresca el caché al terminar.
+  Future<Map<String, dynamic>> syncAssetTypeMarketValues({
+    required int assetTypeId,
+    required int containerId,
+  }) async {
+    _isSyncingPrices = true;
+    notifyListeners();
+    try {
+      final summary = await _itemService.syncAssetTypeMarketValues(
+        assetTypeId: assetTypeId,
+        containerId: containerId,
+      );
+      // Refrescar caché para que los nuevos marketValue se reflejen en la UI
+      await loadInventoryItems(
+        containerId: containerId,
+        assetTypeId: assetTypeId,
+        forceReload: true,
+      );
+      return summary;
+    } finally {
+      _isSyncingPrices = false;
+      notifyListeners();
+    }
+  }
 }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/user_data_model.dart';
 import 'package:invenicum/data/services/veni_chatbot_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -266,6 +267,11 @@ class ApiService {
     try {
       final response = await dio.get('/auth/me');
       return UserData.fromJson(response.data['user'] ?? response.data);
+    } on DioException catch (e) {
+      debugPrint(e.toString());
+      // Propagamos para que AuthProvider distinga 401 (token inválido)
+      // de errores de red/timeout (mantener sesión)
+      rethrow;
     } catch (_) {
       return null;
     }

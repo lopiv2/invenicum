@@ -13,6 +13,7 @@ class TopLoanedBarChartContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final itemNames = topItems.keys.toList();
     final itemCounts = topItems.values.toList();
     final maxCount = itemCounts.isEmpty
@@ -20,7 +21,7 @@ class TopLoanedBarChartContent extends StatelessWidget {
         : itemCounts.reduce((a, b) => a > b ? a : b);
 
     return SizedBox(
-      height: 320,
+      height: MediaQuery.of(context).size.height * 0.2,
       child: BarChart(
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
@@ -32,7 +33,9 @@ class TopLoanedBarChartContent extends StatelessWidget {
             drawVerticalLine: false,
             horizontalInterval: (maxCount / 4).clamp(1, 100).toDouble(),
             getDrawingHorizontalLine: (value) => FlLine(
-              color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.05),
+              color: (isDark ? Colors.white : Colors.black).withValues(
+                alpha: 0.05,
+              ),
               strokeWidth: 1,
               dashArray: [5, 5], // Líneas punteadas para un look más técnico
             ),
@@ -40,41 +43,47 @@ class TopLoanedBarChartContent extends StatelessWidget {
           borderData: FlBorderData(
             show: true,
             border: Border(
-              bottom: BorderSide(color: Colors.grey.withValues(alpha: 0.2), width: 1),
-              left: BorderSide(color: Colors.grey.withValues(alpha: 0.2), width: 1),
+              bottom: BorderSide(
+                color: Colors.grey.withValues(alpha: 0.2),
+                width: 1,
+              ),
+              left: BorderSide(
+                color: Colors.grey.withValues(alpha: 0.2),
+                width: 1,
+              ),
             ),
           ),
-          barGroups: _buildBarGroups(itemCounts, isDark),
+          barGroups: _buildBarGroups(itemCounts, isDark, colorScheme),
         ),
       ),
     );
   }
 }
 
-  BarTouchData _buildBarTouchData(List<String> names, bool isDark) {
-    return BarTouchData(
-      touchTooltipData: BarTouchTooltipData(
-        getTooltipColor: (_) =>
-            isDark ? Colors.indigoAccent : Colors.blueGrey.shade900,
-        getTooltipItem: (group, groupIndex, rod, rodIndex) {
-          return BarTooltipItem(
-            '${names[groupIndex]}\n',
-            const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-            children: [
-              TextSpan(
-                text: '${rod.toY.toInt()} préstamos',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontWeight: FontWeight.normal,
-                  fontSize: 11,
-                ),
+BarTouchData _buildBarTouchData(List<String> names, bool isDark) {
+  return BarTouchData(
+    touchTooltipData: BarTouchTooltipData(
+      getTooltipColor: (_) =>
+          isDark ? Colors.indigoAccent : Colors.blueGrey.shade900,
+      getTooltipItem: (group, groupIndex, rod, rodIndex) {
+        return BarTooltipItem(
+          '${names[groupIndex]}\n',
+          const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          children: [
+            TextSpan(
+              text: '${rod.toY.toInt()} préstamos',
+              style: TextStyle(
+                color: Colors.white.withValues(alpha: 0.8),
+                fontWeight: FontWeight.normal,
+                fontSize: 11,
               ),
-            ],
-          );
-        },
-      ),
-    );
-  }
+            ),
+          ],
+        );
+      },
+    ),
+  );
+}
 
 FlTitlesData _buildTitlesData(List<String> names, bool isDark) {
   return FlTitlesData(
@@ -142,7 +151,11 @@ String _truncateName(String name) {
   return name.length > 10 ? '${name.substring(0, 8)}..' : name;
 }
 
-List<BarChartGroupData> _buildBarGroups(List<int> counts, bool isDark) {
+List<BarChartGroupData> _buildBarGroups(
+  List<int> counts,
+  bool isDark,
+  ColorScheme colorScheme,
+) {
   return List.generate(counts.length, (i) {
     return BarChartGroupData(
       x: i,
@@ -152,7 +165,10 @@ List<BarChartGroupData> _buildBarGroups(List<int> counts, bool isDark) {
           gradient: LinearGradient(
             begin: Alignment.bottomCenter,
             end: Alignment.topCenter,
-            colors: [_getBarColor(i).withValues(alpha: 0.4), _getBarColor(i)],
+            colors: [
+              _getBarColor(i, colorScheme).withValues(alpha: 0.4),
+              _getBarColor(i, colorScheme),
+            ],
           ),
           width: 16,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
@@ -170,11 +186,11 @@ List<BarChartGroupData> _buildBarGroups(List<int> counts, bool isDark) {
   });
 }
 
-Color _getBarColor(int index) {
+Color _getBarColor(int index, ColorScheme colorScheme) {
   return [
-    const Color(0xFF6366F1), // Indigo
-    const Color(0xFF06B6D4), // Cyan
-    const Color(0xFF8B5CF6), // Violet
-    const Color(0xFFEC4899), // Pink
+    colorScheme.primary,
+    colorScheme.secondary,
+    colorScheme.surfaceBright,
+    colorScheme.primaryContainer,
   ][index % 4];
 }

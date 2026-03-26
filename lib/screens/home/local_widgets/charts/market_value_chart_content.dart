@@ -6,12 +6,14 @@ class MarketValueLineChartContent extends StatelessWidget {
   final Map<int, double> monthlyValues; // Mes (1-12) -> Valor Total
   final bool isDark;
   final String currencySymbol;
+  final int selectedYear;
 
   const MarketValueLineChartContent({
     super.key,
     required this.monthlyValues,
     required this.isDark,
     required this.currencySymbol,
+    required this.selectedYear,
   });
 
   @override
@@ -39,7 +41,7 @@ class MarketValueLineChartContent extends StatelessWidget {
     );
     final Color lightPrimary = Theme.of(context).colorScheme.primaryContainer;
     return SizedBox(
-      height: 320,
+      height: MediaQuery.of(context).size.height * 0.3,
       child: LineChart(
         LineChartData(
           lineTouchData: LineTouchData(
@@ -154,11 +156,20 @@ class MarketValueLineChartContent extends StatelessWidget {
   }
 
   List<FlSpot> _generateSpots() {
-    return List.generate(12, (index) {
-      final month = index + 1;
-      return FlSpot(month.toDouble(), monthlyValues[month] ?? 0.0);
-    });
-  }
+  final now = DateTime.now();
+  // Determinamos hasta qué mes debemos dibujar
+  // Si el año de la gráfica es el actual, paramos en el mes actual.
+  // Si es un año pasado, dibujamos los 12 meses.
+  final int maxMonthToShow = (selectedYear == now.year) ? now.month : 12;
+
+  return List.generate(maxMonthToShow, (index) {
+    final month = index + 1;
+    return FlSpot(
+      month.toDouble(), 
+      monthlyValues[month] ?? 0.0,
+    );
+  });
+}
 
   FlTitlesData _buildTitlesData(String locale) {
     return FlTitlesData(
@@ -167,7 +178,7 @@ class MarketValueLineChartContent extends StatelessWidget {
       leftTitles: AxisTitles(
         sideTitles: SideTitles(
           showTitles: true,
-          reservedSize: 60,
+          reservedSize: 80,
           getTitlesWidget: (value, meta) {
             // Aplicamos la misma lógica que tu PriceDisplayWidget:
             // 1. Símbolo de moneda
@@ -177,6 +188,7 @@ class MarketValueLineChartContent extends StatelessWidget {
 
             return SideTitleWidget(
               meta: meta,
+              space:20,
               child: Text(
                 formattedValue,
                 style: const TextStyle(

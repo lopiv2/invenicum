@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,8 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
       if (field.type == IntegrationFieldType.password) {
         _obscureTextMap[field.id] = true;
       }
-      if (field.type == IntegrationFieldType.dropdown && field.options.isNotEmpty) {
+      if (field.type == IntegrationFieldType.dropdown &&
+          field.options.isNotEmpty) {
         _dropdownValues[field.id] = field.options.first;
       }
     }
@@ -110,6 +112,10 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
+              InkWell(
+                onTap: () => AppUtils.launchUrlWeb('https://boardgamegeek.com'),
+                child: widget.integration.image ?? Container(),
+              ),
               if (_isIdLoading)
                 const SizedBox(
                   width: 20,
@@ -132,8 +138,10 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
             )
           else
             ...widget.integration.fields.map((field) {
-              final bool isPassword = field.type == IntegrationFieldType.password;
-              final bool isDropdown = field.type == IntegrationFieldType.dropdown;
+              final bool isPassword =
+                  field.type == IntegrationFieldType.password;
+              final bool isDropdown =
+                  field.type == IntegrationFieldType.dropdown;
 
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
@@ -150,10 +158,12 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                           border: const OutlineInputBorder(),
                         ),
                         items: field.options
-                            .map((opt) => DropdownMenuItem(
-                                  value: opt,
-                                  child: Text(opt),
-                                ))
+                            .map(
+                              (opt) => DropdownMenuItem(
+                                value: opt,
+                                child: Text(opt),
+                              ),
+                            )
                             .toList(),
                         onChanged: (val) {
                           setState(() {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/screens/integrations/local_widgets/integration_config_card.dart';
 import 'package:invenicum/screens/integrations/local_widgets/integration_config_sheet.dart';
 import 'package:provider/provider.dart';
 
@@ -56,8 +57,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
         children: [
           // --- INTELIGENCIA ARTIFICIAL ---
           _buildSectionHeader("Inteligencia Artificial"),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "Google Gemini",
             subtitle: "Asistente inteligente con los modelos Gemini de Google.",
             icon: AppIntegrations.getAvailableIntegrations(context)
@@ -66,8 +66,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             isLinked: integrationProv.isLinked(AppIntegrations.gemini),
             onTap: () => _openConfig(context, AppIntegrations.gemini),
           ),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "OpenAI (ChatGPT)",
             subtitle: "Usa GPT-4o y otros modelos de OpenAI.",
             icon: AppIntegrations.getAvailableIntegrations(context)
@@ -77,8 +76,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             isLinked: integrationProv.isLinked(AppIntegrations.openai),
             onTap: () => _openConfig(context, AppIntegrations.openai),
           ),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "Anthropic Claude",
             subtitle: "Usa Claude Sonnet, Opus y Haiku.",
             icon: AppIntegrations.getAvailableIntegrations(context)
@@ -91,8 +89,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
 
           // --- MENSAJERÍA ---
           _buildSectionHeader("Mensajería y Notificaciones"),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "Telegram Bot",
             subtitle: "Configura alertas y bots de chat.",
             icon: FaIcon(FontAwesomeIcons.telegram, color: Color(0xFF26A5E4)),
@@ -100,8 +97,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             isLinked: integrationProv.isLinked(AppIntegrations.telegram),
             onTap: () => _openConfig(context, AppIntegrations.telegram),
           ),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "E-Mail (A través de Resend)",
             subtitle: "Envío de reportes y alertas profesionales.",
             icon: Icon(Icons.mail_outline_rounded, color: Color(0xFF3CE426)),
@@ -112,17 +108,14 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
 
           // --- Data APIs ---
           _buildSectionHeader("Miscellaneous Data APIs"),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "BoardGameGeek",
             subtitle: "Obtain data from BoardGameGeek.com",
             icon: FaIcon(FontAwesomeIcons.boardGameGeek, color: Colors.red),
             isLinked: integrationProv.isLinked(AppIntegrations.bgg),
             onTap: () => _openConfig(context, AppIntegrations.bgg),
           ),
-          const SizedBox(height: 24),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "PokeApi",
             subtitle: "Obtain data from PokeApi.co",
             icon: Icon(Icons.catching_pokemon, color: Colors.red),
@@ -132,16 +125,14 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
           const SizedBox(height: 24),
           // --- HERRAMIENTAS ---
           _buildSectionHeader("Herramientas de Valoración"),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "PriceCharting",
             subtitle: "Historial de precios de videojuegos.",
             icon: FaIcon(FontAwesomeIcons.chartArea, color: Colors.orange),
             isLinked: integrationProv.isLinked(AppIntegrations.priceCharting),
             onTap: () => _openConfig(context, AppIntegrations.priceCharting),
           ),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "UPCitemdb",
             subtitle: "Valoración por código de barras y EAN.",
             icon: FaIcon(FontAwesomeIcons.barcode, color: Colors.blueAccent),
@@ -152,8 +143,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
 
           // --- HARDWARE Y ETIQUETAS ---
           _buildSectionHeader("Hardware y Etiquetas"),
-          _buildIntegrationCard(
-            context,
+          IntegrationCard(
             title: "Generador de QR",
             subtitle: "Configura el formato de impresión.",
             icon: FaIcon(FontAwesomeIcons.qrcode, color: Colors.blueGrey),
@@ -175,49 +165,6 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
           fontWeight: FontWeight.bold,
           letterSpacing: 1.1,
           color: Colors.grey,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildIntegrationCard(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required Widget icon,
-    required bool isLinked,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Card(
-        margin: EdgeInsets.zero,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: Theme.of(context).dividerColor.withValues(alpha: 0.08),
-          ),
-        ),
-        child: ListTile(
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 8,
-          ),
-          leading: Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
-            child: SizedBox(child: icon),
-          ),
-          title: Text(
-            title,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          subtitle: Text(subtitle, style: const TextStyle(fontSize: 13)),
-          trailing: isLinked
-              ? const Icon(Icons.check_circle, color: Colors.green, size: 24)
-              : const Icon(Icons.chevron_right, color: Colors.grey),
-          onTap: onTap,
         ),
       ),
     );

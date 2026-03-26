@@ -60,6 +60,49 @@ class _MarketValueEvolutionChartState extends State<MarketValueEvolutionChart> {
         }
         // 1. Calculamos los valores en la moneda base (USD)
         final rawMonthlyData = _calculateMonthlyValue(allItems, effectiveYear);
+        IconData? trendIcon;
+        Color? trendColor;
+        String? percentageText;
+
+        // Determinamos qué mes comparar
+        final now = DateTime.now();
+        final int currentMonth = (effectiveYear == now.year) ? now.month : 12;
+
+        if (currentMonth > 1) {
+          final double currentVal = rawMonthlyData[currentMonth] ?? 0;
+          final double previousVal = rawMonthlyData[currentMonth - 1] ?? 0;
+
+          if (previousVal > 0) {
+            final double change =
+                ((currentVal - previousVal) / previousVal) * 100;
+
+            // Solo mostramos tendencia si el cambio es significativo (mayor al 0.1%)
+            if (change.abs() > 0.1) {
+              percentageText =
+                  "${change > 0 ? '+' : ''}${change.toStringAsFixed(1)}%";
+              trendIcon = change > 0 ? Icons.trending_up : Icons.trending_down;
+              trendColor = change > 0 ? Colors.greenAccent : Colors.redAccent;
+            }
+          }
+        } else if (currentMonth == 1 && effectiveYear > 2000) {
+          // CASO ESPECIAL: Si es Enero, comparamos contra Diciembre del año anterior
+          final pastYearData = _calculateMonthlyValue(
+            allItems,
+            effectiveYear - 1,
+          );
+          final double decVal = pastYearData[12] ?? 0;
+          final double janVal = rawMonthlyData[1] ?? 0;
+
+          if (decVal > 0) {
+            final double change = ((janVal - decVal) / decVal) * 100;
+            if (change.abs() > 0.1) {
+              percentageText =
+                  "${change > 0 ? '+' : ''}${change.toStringAsFixed(1)}%";
+              trendIcon = change > 0 ? Icons.trending_up : Icons.trending_down;
+              trendColor = change > 0 ? Colors.greenAccent : Colors.redAccent;
+            }
+          }
+        }
 
         // 2. CONVERSIÓN: Creamos un nuevo mapa con los valores convertidos
         final Map<int, double> convertedData = rawMonthlyData.map((
@@ -74,7 +117,7 @@ class _MarketValueEvolutionChartState extends State<MarketValueEvolutionChart> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildHeader(context),
+              _buildHeader(context, trendIcon, trendColor, percentageText),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -99,11 +142,14 @@ class _MarketValueEvolutionChartState extends State<MarketValueEvolutionChart> {
               ),
               const SizedBox(height: 32),
               SizedBox(
-                height: 220,
+                height: MediaQuery.of(context).size.height * 0.2,
                 child: MarketValueLineChartContent(
+                  selectedYear:_selectedYear,
                   monthlyValues: convertedData,
                   isDark: isDark,
-                  currencySymbol: preferences.getSymbolForCurrency(preferences.selectedCurrency),
+                  currencySymbol: preferences.getSymbolForCurrency(
+                    preferences.selectedCurrency,
+                  ),
                 ),
               ),
             ],
@@ -170,13 +216,15 @@ class _MarketValueEvolutionChartState extends State<MarketValueEvolutionChart> {
     return result;
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(
+    BuildContext context,
+    IconData? icon,
+    Color? color,
+    String? text,
+  ) {
     return Row(
       children: [
-        const IconBadge(
-          icon: Icons.show_chart_rounded,
-          color: Colors.greenAccent,
-        ),
+        const IconBadge(icon: Icons.show_chart_rounded, color: Colors.green),
         const SizedBox(width: 12),
         Expanded(
           child: Text(
@@ -189,6 +237,30 @@ class _MarketValueEvolutionChartState extends State<MarketValueEvolutionChart> {
             ),
           ),
         ),
+        // --- INDICADOR DE TENDENCIA ---
+        if (text != null)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: color!.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(icon, color: color, size: 14),
+                const SizedBox(width: 4),
+                Text(
+                  text,
+                  style: TextStyle(
+                    color: color,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
       ],
     );
   }

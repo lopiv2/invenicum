@@ -7,6 +7,7 @@ class IntegrationField {
   final String label;
   final IntegrationFieldType type;
   final String? helperText;
+
   // Solo relevante cuando type == IntegrationFieldType.dropdown
   final List<String> options;
 
@@ -26,6 +27,7 @@ class IntegrationModel {
   final String description;
   final List<IntegrationField> fields;
   final bool isDataSource;
+  final Image? image;
 
   const IntegrationModel({
     required this.id,
@@ -34,5 +36,6 @@ class IntegrationModel {
     required this.description,
     required this.fields,
     this.isDataSource = false,
+    this.image,
   });
 }

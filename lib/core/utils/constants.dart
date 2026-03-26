@@ -6,12 +6,12 @@ import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 
 enum ItemCondition {
-  mint,       // Impecable, en caja original
-  loose,      // Sin caja, pero completo
+  mint, // Impecable, en caja original
+  loose, // Sin caja, pero completo
   incomplete, // Le faltan piezas
-  damaged,    // Roto o con marcas claras
-  new_,       // Nuevo de tienda
-  digital,    // Bien no tangible
+  damaged, // Roto o con marcas claras
+  new_, // Nuevo de tienda
+  digital, // Bien no tangible
 }
 
 extension ItemConditionExtension on ItemCondition {
@@ -20,36 +20,54 @@ extension ItemConditionExtension on ItemCondition {
     final l10n = AppLocalizations.of(context)!;
 
     switch (this) {
-      case ItemCondition.mint:       return l10n.condition_mint;
-      case ItemCondition.loose:      return l10n.condition_loose;
-      case ItemCondition.incomplete: return l10n.condition_incomplete;
-      case ItemCondition.damaged:    return l10n.condition_damaged;
-      case ItemCondition.new_:       return l10n.condition_new;
-      case ItemCondition.digital:    return l10n.condition_digital;
+      case ItemCondition.mint:
+        return l10n.condition_mint;
+      case ItemCondition.loose:
+        return l10n.condition_loose;
+      case ItemCondition.incomplete:
+        return l10n.condition_incomplete;
+      case ItemCondition.damaged:
+        return l10n.condition_damaged;
+      case ItemCondition.new_:
+        return l10n.condition_new;
+      case ItemCondition.digital:
+        return l10n.condition_digital;
     }
   }
 
   /// Icono representativo de cada estado
   IconData get icon {
     switch (this) {
-      case ItemCondition.mint:       return Icons.archive_outlined;
-      case ItemCondition.loose:      return Icons.inventory_2_outlined;
-      case ItemCondition.incomplete: return Icons.incomplete_circle_outlined;
-      case ItemCondition.damaged:    return Icons.heart_broken_outlined;
-      case ItemCondition.new_:       return Icons.new_releases_outlined;
-      case ItemCondition.digital:    return Icons.cloud_queue;
+      case ItemCondition.mint:
+        return Icons.archive_outlined;
+      case ItemCondition.loose:
+        return Icons.inventory_2_outlined;
+      case ItemCondition.incomplete:
+        return Icons.incomplete_circle_outlined;
+      case ItemCondition.damaged:
+        return Icons.heart_broken_outlined;
+      case ItemCondition.new_:
+        return Icons.new_releases_outlined;
+      case ItemCondition.digital:
+        return Icons.cloud_queue;
     }
   }
 
   /// Color temático asociado al estado
   Color get color {
     switch (this) {
-      case ItemCondition.mint:       return Colors.green;
-      case ItemCondition.new_:       return Colors.blue;
-      case ItemCondition.loose:      return Colors.orange;
-      case ItemCondition.incomplete: return Colors.deepOrange;
-      case ItemCondition.damaged:    return Colors.red;
-      case ItemCondition.digital:    return Colors.purple;
+      case ItemCondition.mint:
+        return Colors.green;
+      case ItemCondition.new_:
+        return Colors.blue;
+      case ItemCondition.loose:
+        return Colors.orange;
+      case ItemCondition.incomplete:
+        return Colors.deepOrange;
+      case ItemCondition.damaged:
+        return Colors.red;
+      case ItemCondition.digital:
+        return Colors.purple;
     }
   }
 
@@ -58,7 +76,7 @@ extension ItemConditionExtension on ItemCondition {
     if (value == null) return ItemCondition.loose;
     // Manejo especial para 'new' ya que el enum usa 'new_' por ser palabra reservada
     if (value == 'new' || value == 'new_') return ItemCondition.new_;
-    
+
     return ItemCondition.values.firstWhere(
       (e) => e.name == value,
       orElse: () => ItemCondition.loose,
@@ -89,7 +107,7 @@ class AppIntegrations {
         id: gemini,
         name: 'Google Gemini AI',
         isDataSource: false,
-        icon: Icon(Icons.auto_awesome, color: Colors.deepPurpleAccent,),
+        icon: Icon(Icons.auto_awesome, color: Colors.deepPurpleAccent),
         description: l10n.integrationGeminiDesc,
         fields: [
           IntegrationField(
@@ -113,7 +131,8 @@ class AppIntegrations {
         isDataSource: false,
         icon: FaIcon(FontAwesomeIcons.openai),
         //icon: Icon(Icons.auto_awesome_mosaic_outlined),
-        description: 'Usa GPT-4o y otros modelos de OpenAI como asistente inteligente.',
+        description:
+            'Usa GPT-4o y otros modelos de OpenAI como asistente inteligente.',
         fields: [
           IntegrationField(
             id: 'apiKey',
@@ -134,8 +153,9 @@ class AppIntegrations {
         id: claude,
         name: 'Anthropic Claude',
         isDataSource: false,
-        icon: FaIcon(FontAwesomeIcons.claude, color: Colors.orange[900],),
-        description: 'Usa Claude Sonnet, Opus y Haiku como asistente inteligente.',
+        icon: FaIcon(FontAwesomeIcons.claude, color: Colors.orange[900]),
+        description:
+            'Usa Claude Sonnet, Opus y Haiku como asistente inteligente.',
         fields: [
           IntegrationField(
             id: 'apiKey',
@@ -202,6 +222,10 @@ class AppIntegrations {
         id: 'bgg',
         name: 'BoardGameGeek',
         isDataSource: true,
+        image: Image.asset(
+          'assets/images/powered_by_BGG_02_MED.png', // Tu ruta de asset
+          height: 35,
+        ),
         icon: const FaIcon(FontAwesomeIcons.boardGameGeek, color: Colors.red),
         description:
             'Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.',
@@ -303,60 +327,68 @@ class AiProviderInfo {
 class AiModels {
   // ── Listas de modelos ─────────────────────────────────────────────────────
   static const List<AiModelInfo> gemini = [
-    AiModelInfo(id: 'gemini-3-flash-preview',     label: 'Gemini 3.0 Flash Preview'),
-    AiModelInfo(id: 'gemini-2.0-flash',           label: 'Gemini 2.0 Flash'),
-    AiModelInfo(id: 'gemini-2.0-flash-thinking',  label: 'Gemini 2.0 Flash Thinking'),
-    AiModelInfo(id: 'gemini-1.5-pro',             label: 'Gemini 1.5 Pro'),
+    AiModelInfo(
+      id: 'gemini-3-flash-preview',
+      label: 'Gemini 3.0 Flash Preview',
+    ),
+    AiModelInfo(id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash'),
+    AiModelInfo(
+      id: 'gemini-2.0-flash-thinking',
+      label: 'Gemini 2.0 Flash Thinking',
+    ),
+    AiModelInfo(id: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro'),
   ];
 
   static const List<AiModelInfo> openai = [
-    AiModelInfo(id: 'gpt-4o',      label: 'GPT-4o'),
+    AiModelInfo(id: 'gpt-4o', label: 'GPT-4o'),
     AiModelInfo(id: 'gpt-4o-mini', label: 'GPT-4o Mini'),
     AiModelInfo(id: 'gpt-4-turbo', label: 'GPT-4 Turbo'),
   ];
 
   static const List<AiModelInfo> claude = [
-    AiModelInfo(id: 'claude-sonnet-4-6',         label: 'Claude Sonnet 4.6'),
-    AiModelInfo(id: 'claude-opus-4-6',           label: 'Claude Opus 4.6'),
+    AiModelInfo(id: 'claude-sonnet-4-6', label: 'Claude Sonnet 4.6'),
+    AiModelInfo(id: 'claude-opus-4-6', label: 'Claude Opus 4.6'),
     AiModelInfo(id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5'),
   ];
 
   // ── Metadata visual de proveedores ────────────────────────────────────────
   static const List<AiProviderInfo> providers = [
     AiProviderInfo(
-      id:    AppIntegrations.gemini,
+      id: AppIntegrations.gemini,
       label: 'Google Gemini',
-      icon:  Icon(Icons.auto_awesome),
+      icon: Icon(Icons.auto_awesome),
       color: Color(0xFF8B5CF6),
     ),
     AiProviderInfo(
-      id:    AppIntegrations.openai,
+      id: AppIntegrations.openai,
       label: 'OpenAI (ChatGPT)',
-      icon:  FaIcon(FontAwesomeIcons.openai),
+      icon: FaIcon(FontAwesomeIcons.openai),
       color: Color(0xFF10A37F),
     ),
     AiProviderInfo(
-      id:    AppIntegrations.claude,
+      id: AppIntegrations.claude,
       label: 'Anthropic Claude',
-      icon:  FaIcon(FontAwesomeIcons.claude),
+      icon: FaIcon(FontAwesomeIcons.claude),
       color: Color(0xFFD4A27F),
     ),
   ];
 
   /// Devuelve el AiProviderInfo de un proveedor por su ID
-  static AiProviderInfo providerInfo(String providerId) =>
-      providers.firstWhere(
-        (p) => p.id == providerId,
-        orElse: () => providers.first,
-      );
+  static AiProviderInfo providerInfo(String providerId) => providers.firstWhere(
+    (p) => p.id == providerId,
+    orElse: () => providers.first,
+  );
 
   /// Todos los modelos de un proveedor dado por su ID string
   static List<AiModelInfo> forProvider(String provider) {
     switch (provider) {
-      case 'openai': return openai;
-      case 'claude': return claude;
+      case 'openai':
+        return openai;
+      case 'claude':
+        return claude;
       case 'gemini':
-      default:       return gemini;
+      default:
+        return gemini;
     }
   }
 
