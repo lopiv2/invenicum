@@ -127,6 +127,46 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     return true;
   }
 
+  Future<void> _reloadItems() async {
+    try {
+      await context.read<InventoryItemProvider>().loadInventoryItems(
+        containerId: widget.containerId,
+        assetTypeId: widget.assetTypeId,
+        forceReload: true,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ToastService.error('No se pudo recargar la lista');
+    }
+  }
+
+  Future<void> _openAssetDetail(InventoryItem item) async {
+    await context.pushNamed(
+      RouteNames.assetDetail,
+      pathParameters: {
+        'containerId': widget.containerId.toString(),
+        'assetTypeId': widget.assetTypeId.toString(),
+        'assetId': item.id.toString(),
+      },
+    );
+    if (!mounted) return;
+    await _reloadItems();
+  }
+
+  Future<void> _openAssetEdit(InventoryItem item) async {
+    await context.pushNamed(
+      RouteNames.assetEdit,
+      pathParameters: {
+        'containerId': widget.containerId.toString(),
+        'assetTypeId': widget.assetTypeId.toString(),
+        'assetId': item.id.toString(),
+      },
+      extra: item,
+    );
+    if (!mounted) return;
+    await _reloadItems();
+  }
+
   void _copyAsset(InventoryItem item) async {
     final itemCopy = item.copyWith(
       id: 0,
@@ -372,15 +412,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
             children: [
               IconButton(
                 icon: const Icon(Icons.edit, size: 18, color: Colors.blue),
-                onPressed: () => context.goNamed(
-                  RouteNames.assetEdit,
-                  pathParameters: {
-                    'containerId': widget.containerId.toString(),
-                    'assetTypeId': widget.assetTypeId.toString(),
-                    'assetId': item.id.toString(),
-                  },
-                  extra: item,
-                ),
+                onPressed: () => _openAssetEdit(item),
               ),
               IconButton(
                 icon: const Icon(Icons.copy, size: 18, color: Colors.orange),
@@ -519,14 +551,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       },
       onRowDoubleTap: (event) {
         final item = event.row.cells['item_object']!.value as InventoryItem;
-        context.goNamed(
-          RouteNames.assetDetail,
-          pathParameters: {
-            'containerId': widget.containerId.toString(),
-            'assetTypeId': widget.assetTypeId.toString(),
-            'assetId': item.id.toString(),
-          },
-        );
+        _openAssetDetail(item);
       },
       configuration: PlutoGridConfiguration(
         style: PlutoGridStyleConfig(

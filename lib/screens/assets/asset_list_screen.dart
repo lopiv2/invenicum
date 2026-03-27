@@ -14,6 +14,7 @@ import 'package:provider/provider.dart';
 
 import '../../data/models/container_node.dart';
 import '../../data/models/asset_type_model.dart';
+import '../../data/services/toast_service.dart';
 import '../../providers/container_provider.dart';
 import '../../providers/inventory_item_provider.dart';
 import 'local_widgets/asset_list_header.dart';
@@ -72,9 +73,13 @@ class _AssetListScreenState extends State<AssetListScreen>
   bool get wantKeepAlive => true;
 
   bool _isListView = true;
+  bool _showRefreshDone = false;
   String? _selectedCountFieldId;
   String? _selectedCountValue;
   final TextEditingController _searchController = TextEditingController();
+
+  int get _cIdInt => int.tryParse(widget.containerId) ?? 0;
+  int get _atIdInt => int.tryParse(widget.assetTypeId) ?? 0;
 
   @override
   void dispose() {
@@ -87,8 +92,8 @@ class _AssetListScreenState extends State<AssetListScreen>
     super.didChangeDependencies();
 
     final provider = context.read<InventoryItemProvider>();
-    final cIdInt = int.tryParse(widget.containerId) ?? 0;
-    final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
+    final cIdInt = _cIdInt;
+    final atIdInt = _atIdInt;
 
     if (provider.currentContainerId != cIdInt ||
         provider.currentAssetTypeId != atIdInt) {
@@ -96,19 +101,38 @@ class _AssetListScreenState extends State<AssetListScreen>
       Future(() {
         provider.loadInventoryItems(containerId: cIdInt, assetTypeId: atIdInt);
       });
+      return;
+    }
+
+    if (provider.allInventoryItems.isEmpty && !provider.isLoading) {
+      Future(() {
+        provider.loadInventoryItems(containerId: cIdInt, assetTypeId: atIdInt);
+      });
     }
   }
 
-  void _refreshTable(BuildContext context) {
+  Future<void> _refreshTable(BuildContext context) async {
     final provider = context.read<InventoryItemProvider>();
-    final cIdInt = int.tryParse(widget.containerId) ?? 0;
-    final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
+    try {
+      await provider.loadInventoryItems(
+        containerId: _cIdInt,
+        assetTypeId: _atIdInt,
+        forceReload: true, // Esto obliga a ignorar el caché y pedir al server
+      );
+      _showRefreshDoneAnimation();
+    } catch (_) {
+      if (!context.mounted) return;
+      ToastService.error("No se pudo recargar la lista");
+    }
+  }
 
-    provider.loadInventoryItems(
-      containerId: cIdInt,
-      assetTypeId: atIdInt,
-      forceReload: true, // Esto obliga a ignorar el caché y pedir al server
-    );
+  void _showRefreshDoneAnimation() {
+    if (!mounted) return;
+    setState(() => _showRefreshDone = true);
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (!mounted) return;
+      setState(() => _showRefreshDone = false);
+    });
   }
 
 Future<void> _syncMarketPrices(BuildContext context) async {
@@ -275,8 +299,8 @@ Future<void> _syncMarketPrices(BuildContext context) async {
     super.build(context);
 
     final l10n = AppLocalizations.of(context)!;
-    final cIdInt = int.tryParse(widget.containerId) ?? 0;
-    final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
+    final cIdInt = _cIdInt;
+    final atIdInt = _atIdInt;
 
     return Selector<InventoryItemProvider, _PageStateData>(
       selector: (_, prov) => _PageStateData(
@@ -321,9 +345,26 @@ Future<void> _syncMarketPrices(BuildContext context) async {
             actions: [
               if (!data.loading)
                 IconButton(
-                  icon: const Icon(Icons.refresh),
                   tooltip: l10n.refresh,
                   onPressed: () => _refreshTable(context),
+                  icon: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 280),
+                    switchInCurve: Curves.easeOutBack,
+                    switchOutCurve: Curves.easeIn,
+                    transitionBuilder: (child, animation) {
+                      return ScaleTransition(scale: animation, child: child);
+                    },
+                    child: _showRefreshDone
+                        ? const Icon(
+                            Icons.check_circle_rounded,
+                            key: ValueKey('refresh_done'),
+                            color: Colors.green,
+                          )
+                        : const Icon(
+                            Icons.refresh,
+                            key: ValueKey('refresh_idle'),
+                          ),
+                  ),
                 ),
               const SizedBox(width: 8),
             ],
@@ -336,20 +377,28 @@ Future<void> _syncMarketPrices(BuildContext context) async {
                 AssetListHeader(
                   assetType: assetType,
                   onSyncPrices: () => _syncMarketPrices(context),
-                  onGoToCreateAsset: () => context.goNamed(
-                    RouteNames.assetCreate,
-                    pathParameters: {
-                      'containerId': widget.containerId,
-                      'assetTypeId': widget.assetTypeId,
-                    },
-                  ),
-                  onImportCSV: () => context.goNamed(
-                    RouteNames.assetImport,
-                    pathParameters: {
-                      'containerId': widget.containerId,
-                      'assetTypeId': widget.assetTypeId,
-                    },
-                  ),
+                  onGoToCreateAsset: () async {
+                    await context.pushNamed(
+                      RouteNames.assetCreate,
+                      pathParameters: {
+                        'containerId': widget.containerId,
+                        'assetTypeId': widget.assetTypeId,
+                      },
+                    );
+                    if (!context.mounted) return;
+                    await _refreshTable(context);
+                  },
+                  onImportCSV: () async {
+                    await context.pushNamed(
+                      RouteNames.assetImport,
+                      pathParameters: {
+                        'containerId': widget.containerId,
+                        'assetTypeId': widget.assetTypeId,
+                      },
+                    );
+                    if (!context.mounted) return;
+                    await _refreshTable(context);
+                  },
                   onShowCountFilterDialog: () =>
                       _showCountFilterDialog(context, assetType),
                   selectedCountFieldId: _selectedCountFieldId,

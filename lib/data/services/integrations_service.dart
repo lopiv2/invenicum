@@ -98,6 +98,34 @@ class IntegrationService {
     }
   }
 
+  /// Procesa un candidato concreto cuando /enrich devuelve múltiples resultados
+  Future<Map<String, dynamic>?> enrichSelectedItem({
+    required String source,
+    required String itemId,
+    String locale = "es",
+  }) async {
+    try {
+      final response = await _dio.get(
+        '/integrations/enrich/select',
+        queryParameters: {'source': source, 'itemId': itemId, 'locale': locale},
+      );
+
+      if (response.data['success'] == true && response.data['data'] != null) {
+        return response.data['data'] as Map<String, dynamic>;
+      }
+
+      return null;
+    } on DioException catch (e) {
+      final errorMessage =
+          e.response?.data['error'] ?? 'Error al procesar el resultado seleccionado';
+      debugPrint("[ENRICH-SELECT-SERVICE-ERROR]: $errorMessage");
+      throw Exception(errorMessage);
+    } catch (e) {
+      debugPrint("[ENRICH-SELECT-SERVICE-FATAL]: $e");
+      return null;
+    }
+  }
+
   Future<InventoryItem?> lookupBarcode(String barcode) async {
     try {
       final response = await _dio.get('/integrations/barcode/lookup/$barcode');

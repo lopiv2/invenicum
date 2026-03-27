@@ -230,12 +230,6 @@ class AppIntegrations {
         description:
             'Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.',
         fields: [
-          IntegrationField(
-            id: 'bgg_username',
-            label: 'BGG Username',
-            type: IntegrationFieldType.text,
-            // Esto es lo único que necesitamos del usuario para identificar su colección
-          ),
         ],
       ),
       IntegrationModel(

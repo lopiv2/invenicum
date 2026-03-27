@@ -231,11 +231,41 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
     setState(() => _isEnrichLoading = true);
     try {
-      final Map<String, dynamic>? enrichedData = await _integrationService
-          .enrichItem(query: query, source: _selectedSource!);
+      final locale = Localizations.localeOf(context).languageCode;
+      Map<String, dynamic>? enrichedData = await _integrationService.enrichItem(
+        query: query,
+        source: _selectedSource!,
+        locale: locale,
+      );
+
+      if (enrichedData != null && enrichedData['multipleResults'] == true) {
+        final candidates = _normalizeCandidates(enrichedData['candidates']);
+        if (candidates.isEmpty) {
+          throw Exception('La búsqueda devolvió múltiples resultados sin candidatos.');
+        }
+
+        final selectedCandidate = await _showCandidateSelectionDialog(candidates);
+        if (selectedCandidate == null) {
+          ToastService.error('Importación cancelada.');
+          return;
+        }
+
+        final selectedId = selectedCandidate['id']?.toString();
+        if (selectedId == null || selectedId.isEmpty) {
+          throw Exception('El candidato seleccionado no tiene un ID válido.');
+        }
+
+        final selectedSource = enrichedData['source']?.toString() ?? _selectedSource!;
+        enrichedData = await _integrationService.enrichSelectedItem(
+          source: selectedSource,
+          itemId: selectedId,
+          locale: locale,
+        );
+      }
+
       if (enrichedData != null && mounted) {
         setState(() {
-          _nameController.text = enrichedData['name'] ?? _nameController.text;
+          _nameController.text = enrichedData!['name'] ?? _nameController.text;
           String baseDescription = enrichedData['description'] ?? '';
           if (enrichedData['images'] != null &&
               (enrichedData['images'] as List).isNotEmpty) {
@@ -299,6 +329,66 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         });
       }
     }
+  }
+
+  List<Map<String, dynamic>> _normalizeCandidates(dynamic rawCandidates) {
+    if (rawCandidates is! List) return [];
+    return rawCandidates
+        .whereType<Map>()
+        .map((candidate) => Map<String, dynamic>.from(candidate))
+        .toList();
+  }
+
+  String _buildCandidateSubtitle(Map<String, dynamic> candidate) {
+    final parts = <String>[];
+    final year = candidate['yearPublished']?.toString();
+    final author = candidate['author']?.toString();
+    if (year != null && year.isNotEmpty) {
+      parts.add('Año: $year');
+    }
+    if (author != null && author.isNotEmpty) {
+      parts.add('Autor: $author');
+    }
+    return parts.join(' • ');
+  }
+
+  Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
+    List<Map<String, dynamic>> candidates,
+  ) {
+    return showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Selecciona un resultado'),
+          content: SizedBox(
+            width: 520,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 420),
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: candidates.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final candidate = candidates[index];
+                  final subtitle = _buildCandidateSubtitle(candidate);
+                  return ListTile(
+                    title: Text(candidate['name']?.toString() ?? 'Sin nombre'),
+                    subtitle: subtitle.isEmpty ? null : Text(subtitle),
+                    onTap: () => Navigator.of(dialogContext).pop(candidate),
+                  );
+                },
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(),
+              child: const Text('Cancelar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Future<void> _runMagicAI(String url) async {
@@ -437,13 +527,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           containerId: _containerId!,
           assetTypeId: _assetTypeId!,
         );
-        context.goNamed(
-          RouteNames.assetList,
-          pathParameters: {
-            'containerId': widget.containerId,
-            'assetTypeId': widget.assetTypeId.toString(),
-          },
-        );
+        if (context.canPop()) {
+          context.pop(true);
+        } else {
+          context.goNamed(
+            RouteNames.assetList,
+            pathParameters: {
+              'containerId': widget.containerId,
+              'assetTypeId': widget.assetTypeId.toString(),
+            },
+          );
+        }
       }
     } catch (e) {
       ToastService.error('Error: $e');

@@ -68,8 +68,8 @@ class _AssetGridViewState extends State<AssetGridView> {
 
   void _onSearchChanged() => setState(() {});
 
-  void _viewAssetDetails(BuildContext context, InventoryItem item) {
-    context.goNamed(
+  Future<void> _viewAssetDetails(BuildContext context, InventoryItem item) async {
+    await context.pushNamed(
       RouteNames.assetDetail,
       pathParameters: {
         'containerId': widget.containerId.toString(),
@@ -77,6 +77,16 @@ class _AssetGridViewState extends State<AssetGridView> {
         'assetId': item.id.toString(),
       },
     );
+    if (!mounted) return;
+    try {
+      await context.read<InventoryItemProvider>().loadInventoryItems(
+        containerId: widget.containerId,
+        assetTypeId: widget.assetTypeId,
+        forceReload: true,
+      );
+    } catch (_) {
+      ToastService.error('No se pudo recargar la lista');
+    }
   }
 
   void _showFullImage(BuildContext context, String url, String title) {
@@ -111,8 +121,8 @@ class _AssetGridViewState extends State<AssetGridView> {
     );
   }
 
-  void _editAsset(BuildContext context, InventoryItem item) {
-    context.goNamed(
+  Future<void> _editAsset(BuildContext context, InventoryItem item) async {
+    await context.pushNamed(
       RouteNames.assetEdit,
       pathParameters: {
         'containerId': widget.containerId.toString(),
@@ -121,6 +131,16 @@ class _AssetGridViewState extends State<AssetGridView> {
       },
       extra: item,
     );
+    if (!mounted) return;
+    try {
+      await context.read<InventoryItemProvider>().loadInventoryItems(
+        containerId: widget.containerId,
+        assetTypeId: widget.assetTypeId,
+        forceReload: true,
+      );
+    } catch (_) {
+      ToastService.error('No se pudo recargar la lista');
+    }
   }
 
   void _deleteAsset(BuildContext context, InventoryItem item) {

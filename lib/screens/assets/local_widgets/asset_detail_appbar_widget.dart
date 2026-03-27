@@ -66,7 +66,7 @@ class AssetDetailAppBar extends StatelessWidget implements PreferredSizeWidget {
               size: 18,
               color: Theme.of(context).colorScheme.primary,
             ),
-            onPressed: () => context.goNamed(
+            onPressed: () => context.pushNamed(
               RouteNames.assetEdit,
               pathParameters: {
                 'containerId': containerId,
