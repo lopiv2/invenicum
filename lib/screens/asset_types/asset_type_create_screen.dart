@@ -227,7 +227,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "Este contenedor es una Colección. Los activos serán seriados automáticamente.",
+                                        "Este contenedor es una colección. Puedes crear tipos seriados o no seriados, pero los campos de posesión y deseados solo se podrán configurar en tipos no seriados.",
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                               color: theme
@@ -242,20 +242,10 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                               ),
                               const SizedBox(height: 12),
                             ],
-                            IgnorePointer(
-                              ignoring:
-                                  _isCollection, // Bloquea la interacción si es colección
-                              child: Opacity(
-                                opacity: _isCollection
-                                    ? 0.6
-                                    : 1.0, // Visualmente parece bloqueado
-                                child: AssetTypeSerializedToggle(
-                                  isSerialized: _isSerialized,
-                                  onChanged: (_isCollection) {
-                                    (v) => setState(() => _isSerialized = v);
-                                  },
-                                ),
-                              ),
+                            AssetTypeSerializedToggle(
+                              isSerialized: _isSerialized,
+                              onChanged: (value) =>
+                                  setState(() => _isSerialized = value),
                             ),
                           ],
                         ),

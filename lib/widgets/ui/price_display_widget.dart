@@ -19,26 +19,31 @@ class PriceDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final preferences = context.watch<PreferencesProvider>();
-    
+
     // 1. Convertir el valor de la DB (USD) a número
     final double dbValue = double.tryParse(value?.toString() ?? '0') ?? 0.0;
-    
+
     // 2. Convertir a moneda local según preferencias
     final double localPrice = preferences.convertPrice(dbValue);
-    
+
     // 3. Formatear el texto
-    final String formattedPrice = 
-        '${preferences.getSymbolForCurrency(preferences.selectedCurrency)} ${localPrice.toStringAsFixed(2)}';
+    final String formattedPrice = preferences.formatPrice(localPrice);
+    final String originalUsdText = preferences.formatPrice(
+      dbValue,
+      currencyCode: 'USD',
+    );
 
     return Tooltip(
-      message: 'Original: \$${dbValue.toStringAsFixed(2)} USD',
+      message: 'Original: $originalUsdText USD',
       child: Text(
         formattedPrice,
-        style: style ?? TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.bold,
-          color: color,
-        ),
+        style:
+            style ??
+            TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
         overflow: TextOverflow.ellipsis,
       ),
     );

@@ -40,10 +40,15 @@ class InventoryItemProvider with ChangeNotifier {
 
   // --- Caché ---
   final Map<String, InventoryResponse> _itemsCache = {};
+  final Map<String, DateTime> _itemsCacheTimestamps = {};
+  static const Duration _itemsCacheTtl = Duration(seconds: 45);
+  bool _disableItemsCacheForDebug = false;
   bool _isLoading = false;
   bool get isLoading => _isLoading;
   bool _isSyncing = false;
   bool get isSyncing => _isSyncing;
+
+  bool get isItemsCacheDisabledForDebug => _disableItemsCacheForDebug;
 
   InventoryItemProvider(this._itemService, this._printService);
 
@@ -73,6 +78,44 @@ class InventoryItemProvider with ChangeNotifier {
         ? '&agg=${sortedAggFilters.map((e) => '${e.key}:${e.value}').join(',')}'
         : '';
     return '$containerId-$assetTypeId$aggString';
+  }
+
+  bool _isCacheEntryFresh(String key) {
+    final ts = _itemsCacheTimestamps[key];
+    if (ts == null) return false;
+    return DateTime.now().difference(ts) <= _itemsCacheTtl;
+  }
+
+  void _removeCacheEntry(String key) {
+    _itemsCache.remove(key);
+    _itemsCacheTimestamps.remove(key);
+  }
+
+  void _setCacheEntry(String key, InventoryResponse response) {
+    _itemsCache[key] = response;
+    _itemsCacheTimestamps[key] = DateTime.now();
+  }
+
+  void invalidateItemsCacheForContext({
+    required int containerId,
+    required int assetTypeId,
+  }) {
+    final prefix = '$containerId-$assetTypeId';
+    final keysToRemove = _itemsCache.keys
+        .where((k) => k.startsWith(prefix))
+        .toList();
+    for (final k in keysToRemove) {
+      _removeCacheEntry(k);
+    }
+  }
+
+  void setItemsCacheDisabledForDebug(bool disabled) {
+    _disableItemsCacheForDebug = disabled;
+    if (disabled) {
+      _itemsCache.clear();
+      _itemsCacheTimestamps.clear();
+    }
+    notifyListeners();
   }
 
   // ----------------------------------------------------------------------
@@ -136,12 +179,19 @@ class InventoryItemProvider with ChangeNotifier {
       aggFilters: aggregationFilters,
     );
 
-    if (forceReload) _itemsCache.remove(key);
+    if (forceReload || _disableItemsCacheForDebug) {
+      _removeCacheEntry(key);
+    }
 
-    if (_itemsCache.containsKey(key)) {
+    final hasCachedValue = _itemsCache.containsKey(key);
+    if (hasCachedValue && _isCacheEntryFresh(key)) {
       _isLoading = false;
       notifyListeners();
       return;
+    }
+
+    if (hasCachedValue) {
+      _removeCacheEntry(key);
     }
 
     if (!_isLoading) {
@@ -163,7 +213,7 @@ class InventoryItemProvider with ChangeNotifier {
       _aggregationResults = Map<String, dynamic>.from(
         loadedResponse.aggregationResults,
       );
-      _itemsCache[key] = loadedResponse;
+      _setCacheEntry(key, loadedResponse);
     } catch (e, stack) {
       debugPrint('❌ Error en Provider: $e');
       debugPrint('Stack: $stack');
@@ -199,7 +249,7 @@ class InventoryItemProvider with ChangeNotifier {
         assetTypeId: null,
       );
       if (_isDisposed) return;
-      _itemsCache[_getCacheKey(0, 0)] = response;
+      _setCacheEntry(_getCacheKey(0, 0), response);
     } catch (e) {
       debugPrint('Error en carga global: $e');
     } finally {
@@ -269,7 +319,10 @@ class InventoryItemProvider with ChangeNotifier {
       // Actualizar el caché con el nuevo objeto devuelto por el servidor
       _itemsCache.forEach((key, response) {
         final index = response.items.indexWhere((i) => i.id == itemId);
-        if (index != -1) response.items[index] = updatedItem;
+        if (index != -1) {
+          response.items[index] = updatedItem;
+          _itemsCacheTimestamps[key] = DateTime.now();
+        }
       });
     } catch (e) {
       debugPrint('Error in syncWithUPC: $e');
@@ -456,6 +509,7 @@ class InventoryItemProvider with ChangeNotifier {
 
   void resetState() {
     _itemsCache.clear();
+    _itemsCacheTimestamps.clear();
     _currentContainerId = 0;
     _currentAssetTypeId = 0;
     notifyListeners();

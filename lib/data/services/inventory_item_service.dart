@@ -117,6 +117,7 @@ class InventoryItemService {
       formData.fields.add(
         MapEntry('minStock', item.minStock.toString()),
       ); // 🔑 NUEVA: minStock
+      formData.fields.add(MapEntry('marketValue', item.marketValue.toString()));
 
       // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
       if (item.locationId != null) {
@@ -140,7 +141,6 @@ class InventoryItemService {
 
       // 3. Enviar la petición POST con FormData
       final response = await _dio.post('/items', data: formData);
-
       if (response.statusCode == 201) {
         // El backend devuelve una estructura anidada: { data: { data: InventoryItemJson } }
         final responseData = response.data;
@@ -195,6 +195,7 @@ class InventoryItemService {
       formData.fields.add(
         MapEntry('minStock', item.minStock.toString()),
       ); // 🔑 NUEVA: minStock
+      formData.fields.add(MapEntry('marketValue', item.marketValue.toString()));
 
       // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
       if (item.locationId != null) {
@@ -388,10 +389,7 @@ class InventoryItemService {
     try {
       final response = await _dio.post(
         '/market/sync-asset-type',
-        data: {
-          'assetTypeId': assetTypeId,
-          'containerId': containerId,
-        },
+        data: {'assetTypeId': assetTypeId, 'containerId': containerId},
       );
       final data = response.data as Map<String, dynamic>;
       return data['summary'] as Map<String, dynamic>;

@@ -96,6 +96,7 @@ class AppIntegrations {
   static const String upcitemdb = 'upcitemdb';
   static const String bgg = 'bgg';
   static const String pokemon = 'pokemon';
+  static const String tcgdex = 'tcgdex';
 
   /// Retorna la lista de modelos completa para la UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {
@@ -229,8 +230,7 @@ class AppIntegrations {
         icon: const FaIcon(FontAwesomeIcons.boardGameGeek, color: Colors.red),
         description:
             'Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.',
-        fields: [
-        ],
+        fields: [],
       ),
       IntegrationModel(
         id: 'pokemon',
@@ -239,6 +239,15 @@ class AppIntegrations {
         icon: const Icon(Icons.catching_pokemon, color: Colors.red),
         description:
             'Conectate a la Api de Pokemon para sincronizar tu colección y enriquecer tus datos automáticamente.',
+        fields: [],
+      ),
+      IntegrationModel(
+        id: tcgdex,
+        name: 'TCGdex',
+        isDataSource: true,
+        icon: const Icon(Icons.style_outlined, color: Colors.deepOrange),
+        description:
+            'Consulta cartas y expansiones de juegos de cartas coleccionables para enriquecer tu inventario automáticamente.',
         fields: [],
       ),
 

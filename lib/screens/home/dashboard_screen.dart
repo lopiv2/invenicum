@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/dashboard_stats.dart';
+import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/data/services/dashboard_service.dart';
 import 'package:invenicum/screens/home/local_widgets/charts/market_value_evolution_chart.dart';
 import 'package:invenicum/screens/home/local_widgets/expiring_loan_widget.dart';
+import 'package:invenicum/screens/home/local_widgets/location_value_heatmap.dart';
 import 'package:invenicum/screens/home/local_widgets/low_stock_card.dart';
 import 'package:invenicum/widgets/ui/stac_slot.dart';
 import 'package:invenicum/widgets/ui/stat_card.dart';
@@ -42,7 +44,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<InventoryItemProvider>().loadTotalMarketValue();
-      // También podrías cargar la inversión económica aquí
+      context.read<InventoryItemProvider>().loadAllItemsGlobal();
+      if (context.read<ContainerProvider>().containers.isEmpty) {
+        context.read<ContainerProvider>().loadContainers();
+      }
     });
   }
 
@@ -151,6 +156,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       );
                     },
                   ),
+
+                  const SizedBox(height: 24),
+
+                  const LocationValueHeatmap(),
 
                   const SizedBox(height: 24),
 

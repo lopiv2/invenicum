@@ -122,7 +122,19 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   bool _areItemListsEqual(List<InventoryItem> a, List<InventoryItem> b) {
     if (a.length != b.length) return false;
     for (int i = 0; i < a.length; i++) {
-      if (a[i].id != b[i].id || a[i].updatedAt != b[i].updatedAt) return false;
+      final ai = a[i];
+      final bi = b[i];
+      if (ai.id != bi.id ||
+          ai.updatedAt != bi.updatedAt ||
+          ai.name != bi.name ||
+          ai.description != bi.description ||
+          ai.quantity != bi.quantity ||
+          ai.minStock != bi.minStock ||
+          ai.locationId != bi.locationId ||
+          ai.marketValue != bi.marketValue ||
+          ai.customFieldValues.toString() != bi.customFieldValues.toString()) {
+        return false;
+      }
     }
     return true;
   }

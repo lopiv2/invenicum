@@ -67,6 +67,20 @@ class AssetTypeCard extends StatelessWidget {
   }
 
   void _showConfigureCollectionDialog(BuildContext context) async {
+    if (!isCollection) {
+      ToastService.error(
+        'Los campos de posesión y deseados solo se configuran dentro de contenedores de colección.',
+      );
+      return;
+    }
+
+    if (assetType.isSerialized) {
+      ToastService.error(
+        'Los campos de colección solo pueden asignarse a tipos no seriados. Cambia este tipo a no seriado antes de configurarlos.',
+      );
+      return;
+    }
+
     String? possessionFieldId = assetType.possessionFieldId;
     String? desiredFieldId = assetType.desiredFieldId;
 
@@ -250,7 +264,7 @@ class AssetTypeCard extends StatelessWidget {
                 children: [
                   // Imagen lateral
                   _buildHeroImage(fullImageUrl, theme),
-            
+
                   // Contenido Principal
                   Expanded(
                     child: Padding(
@@ -272,8 +286,7 @@ class AssetTypeCard extends StatelessWidget {
                           const Spacer(), // Empuja el resto hacia abajo
                           // 2. FILA INFERIOR: Badge + Botones
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Flexible(
                                 flex: 2,
@@ -309,7 +322,9 @@ class AssetTypeCard extends StatelessWidget {
     return Container(
       width: 110,
       height: double.infinity,
-      decoration: BoxDecoration(color: theme.primaryColor.withValues(alpha: 0.05)),
+      decoration: BoxDecoration(
+        color: theme.primaryColor.withValues(alpha: 0.05),
+      ),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -364,12 +379,13 @@ class AssetTypeCard extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _CircleIconButton(
-          icon: Icons.tune_rounded,
-          color: Colors.orange,
-          onPressed: () => _showConfigureCollectionDialog(context),
-          tooltip: 'Configurar',
-        ),
+        if (isCollection)
+          _CircleIconButton(
+            icon: Icons.tune_rounded,
+            color: Colors.orange,
+            onPressed: () => _showConfigureCollectionDialog(context),
+            tooltip: 'Campos de colección',
+          ),
         _CircleIconButton(
           icon: Icons.edit_rounded,
           color: theme.primaryColor,

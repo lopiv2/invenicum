@@ -20,52 +20,74 @@ class AssetSearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final isCompact = MediaQuery.of(context).size.width < 920;
 
     return Row(
       children: [
         Expanded(
-          child: Padding(
-            padding: const EdgeInsets.only(right: 15.0),
+          child: Container(
+            margin: const EdgeInsets.only(right: 10),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: colorScheme.outlineVariant.withValues(alpha: 0.45),
+              ),
+            ),
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
                 labelText: l10n.globalSearch,
-                hintText: l10n.searchInAllColumns, 
-                prefixIcon: const Icon(Icons.search),
+                hintText: l10n.searchInAllColumns,
+                prefixIcon: const Icon(Icons.search_rounded),
                 suffixIcon: searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: const Icon(Icons.close_rounded),
                         onPressed: () => searchController.clear(),
                       )
                     : null,
-                border: const OutlineInputBorder(),
+                border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 10,
-                  horizontal: 15,
+                  horizontal: 12,
                 ),
               ),
             ),
           ),
         ),
-        // Botón de alternar vista
-        IconButton(
-          icon: Icon(isListView ? Icons.grid_view : Icons.list, size: 30),
-          tooltip: isListView
-              ? l10n.showAsGrid
-              : l10n.showAsList, // 🔑 Traducido
+        FilledButton.tonalIcon(
           onPressed: onToggleView,
-        ),
-        IconButton(
-          icon: const Icon(
-            Icons.play_circle_fill_rounded,
-            size: 30,
-            // 🎯 CAMBIO: Ahora usamos un color fijo o el color primario del tema,
-            // ya que no es un interruptor on/off de la pantalla, sino un botón que lanza el Dialog.
-            color: Colors.blueAccent,
+          icon: Icon(isListView ? Icons.grid_view_rounded : Icons.list_rounded),
+          label: Text(
+            isCompact
+                ? 'Vista'
+                : (isListView ? l10n.showAsGrid : l10n.showAsList),
           ),
-          tooltip:
-              'Abrir Presentación 3D', // Un nombre más descriptivo para el modo Dialog
+          style: FilledButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            padding: EdgeInsets.symmetric(
+              horizontal: isCompact ? 12 : 14,
+              vertical: 10,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        FilledButton.tonalIcon(
           onPressed: onToggleGallery,
+          icon: const Icon(Icons.play_circle_fill_rounded),
+          label: const Text('3D'),
+          style: FilledButton.styleFrom(
+            foregroundColor: Colors.blueAccent,
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
         ),
       ],
     );

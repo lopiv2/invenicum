@@ -32,9 +32,8 @@ class AssetTypeSerializedToggle extends StatelessWidget {
               showDuration: const Duration(seconds: 5),
               triggerMode: TooltipTriggerMode.longPress,
               message:
-                  'Los artículos seriados tienen cantidad fija de 1 (ej: número de serie).\n\n'
-                  'Los no seriados pueden tener cantidades variables (ej: consumibles), '
-                  'y añaden campos de "Cantidad" y "Stock Mínimo" en la creación de elementos.',
+                  'Un tipo seriado gestiona cada unidad como un registro independiente. No implica necesariamente que exista un número de serie real de fábrica.\n\n'
+                  'Un tipo no seriado permite agrupar cantidades en un mismo registro. En contenedores de colección, los campos de posesión y deseados solo se pueden configurar sobre tipos no seriados.',
               child: Icon(
                 Icons.help_outline,
                 size: 18,
@@ -45,8 +44,8 @@ class AssetTypeSerializedToggle extends StatelessWidget {
         ),
         subtitle: Text(
           isSerialized
-              ? 'Cantidad fija (1 unidad).'
-              : 'Cantidad variable y control de stock.',
+              ? 'Cada unidad se gestiona como un registro independiente.'
+              : 'Permite agrupar cantidades en un mismo registro.',
           style: const TextStyle(fontSize: 12),
         ),
       ),

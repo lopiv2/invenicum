@@ -68,7 +68,10 @@ class _AssetGridViewState extends State<AssetGridView> {
 
   void _onSearchChanged() => setState(() {});
 
-  Future<void> _viewAssetDetails(BuildContext context, InventoryItem item) async {
+  Future<void> _viewAssetDetails(
+    BuildContext context,
+    InventoryItem item,
+  ) async {
     await context.pushNamed(
       RouteNames.assetDetail,
       pathParameters: {
@@ -308,15 +311,21 @@ class _AssetGridViewState extends State<AssetGridView> {
     String url,
     ThemeData theme,
   ) {
+    final colorScheme = theme.colorScheme;
+
     return Container(
       decoration: BoxDecoration(
-        color: theme.cardColor,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colorScheme.outlineVariant.withValues(alpha: 0.45),
+          width: 1.1,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            blurRadius: 12,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
@@ -368,22 +377,23 @@ class _AssetGridViewState extends State<AssetGridView> {
                     flex: 4,
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isCompactCard = constraints.maxHeight < 175;
+                          final showExtraFields = _columnsCount < 6;
+
+                          return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Center(
-                                child: Text(
-                                  item.name,
-                                  style: theme.textTheme.titleSmall?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: _columnsCount > 6 ? 11 : 15,
-                                  ),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
+                              Text(
+                                item.name,
+                                textAlign: TextAlign.center,
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: _columnsCount > 6 ? 11 : 15,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
                               Text(
@@ -392,57 +402,114 @@ class _AssetGridViewState extends State<AssetGridView> {
                                   color: theme.hintColor,
                                   fontSize: 10,
                                 ),
-                                maxLines: 3,
+                                maxLines: isCompactCard ? 2 : 3,
                                 overflow: TextOverflow.ellipsis,
                               ),
-                            ],
-                          ),
-                          if (_columnsCount < 6)
-                            Padding(
-                              padding: const EdgeInsets.only(left: 20, top: 20),
-                              child: Wrap(
-                                spacing: 20,
-                                runSpacing: 10,
-                                children: widget.assetType.fieldDefinitions
-                                    .take(6)
-                                    .map((def) {
-                                      final raw =
-                                          item.customFieldValues?[def.id
-                                              .toString()];
-                                      return Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 4,
-                                          vertical: 1,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: theme.primaryColor.withValues(
-                                            alpha: 0.05,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Text(
-                                              '${def.name}: ',
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w600,
-                                                color: theme.primaryColor,
-                                                height: 1.1,
-                                              ),
+                              const SizedBox(height: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primaryContainer
+                                      .withValues(alpha: 0.55),
+                                  borderRadius: BorderRadius.circular(9),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.analytics_outlined,
+                                      size: 14,
+                                      color: colorScheme.onPrimaryContainer,
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Flexible(
+                                      child: item.marketValue > 0
+                                          ? PriceDisplayWidget(
+                                              value: item.marketValue,
+                                              fontSize: 12,
+                                              color: colorScheme
+                                                  .onPrimaryContainer,
+                                            )
+                                          : Text(
+                                              'Sin valorar',
+                                              style: theme.textTheme.bodySmall
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                    color: colorScheme
+                                                        .onPrimaryContainer,
+                                                  ),
                                             ),
-                                            _buildFieldValue(def, raw, theme),
-                                          ],
-                                        ),
-                                      );
-                                    })
-                                    .toList(),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                        ],
+                              if (showExtraFields) ...[
+                                SizedBox(height: isCompactCard ? 8 : 12),
+                                Expanded(
+                                  child: SingleChildScrollView(
+                                    child: Padding(
+                                      padding: EdgeInsets.only(
+                                        left: isCompactCard ? 0 : 8,
+                                      ),
+                                      child: Wrap(
+                                        spacing: isCompactCard ? 8 : 12,
+                                        runSpacing: isCompactCard ? 6 : 8,
+                                        children: widget
+                                            .assetType
+                                            .fieldDefinitions
+                                            .take(6)
+                                            .map((def) {
+                                              final raw =
+                                                  item.customFieldValues?[def.id
+                                                      .toString()];
+                                              return Container(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 4,
+                                                      vertical: 1,
+                                                    ),
+                                                decoration: BoxDecoration(
+                                                  color: theme.primaryColor
+                                                      .withValues(alpha: 0.05),
+                                                  borderRadius:
+                                                      BorderRadius.circular(4),
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Text(
+                                                      '${def.name}: ',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color:
+                                                            theme.primaryColor,
+                                                        height: 1.1,
+                                                      ),
+                                                    ),
+                                                    _buildFieldValue(
+                                                      def,
+                                                      raw,
+                                                      theme,
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            })
+                                            .toList(),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          );
+                        },
                       ),
                     ),
                   ),

@@ -33,75 +33,73 @@ class AssetCountersRow extends StatelessWidget {
     final int possessionCount = _countField(items, assetType.possessionFieldId);
     final int desiredCount = _countField(items, assetType.desiredFieldId);
 
-    return Wrap(
-      spacing: 12.0,
-      runSpacing: 12.0,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        _buildMarketValueChip(
-          context,
-          totalMarketValue,
-          isLoading && items.isEmpty,
-        ),
-        // 1. TOTAL ÍTEMS — usamos el total real de la caché, sin paginación
+    final chips = <Widget>[
+      _buildMarketValueChip(
+        context,
+        totalMarketValue,
+        isLoading && items.isEmpty,
+      ),
+      _buildCustomHeightChip(
+        context,
+        label: 'TOTAL: ${items.length}',
+        icon: Icons.inventory,
+        color: Theme.of(context).colorScheme.primary,
+        isLoading: isLoading && items.isEmpty,
+      ),
+      if (assetType.possessionFieldId != null)
         _buildCustomHeightChip(
           context,
-          label: 'TOTAL ÍTEMS: ${items.length}',
-          icon: Icons.inventory,
-          color: Theme.of(context).colorScheme.primary,
-          isLoading: isLoading && items.isEmpty,
+          label: 'POSESIÓN: $possessionCount',
+          icon: Icons.check_circle_outline,
+          color: Colors.green,
         ),
+      if (assetType.desiredFieldId != null)
+        _buildCustomHeightChip(
+          context,
+          label: 'DESEADOS: $desiredCount',
+          icon: Icons.favorite_outline,
+          color: Colors.pink,
+        ),
+      ...itemProvider.aggregationDefinitions
+          .where((def) {
+            final isSum = def['isSummable'];
+            return isSum == true || isSum.toString() == 'true' || isSum == 1;
+          })
+          .map((def) {
+            final fieldId = def['id'].toString();
+            final fieldName = def['name'] as String? ?? 'Suma';
+            final fieldType = def['type'];
+            final sumKey = 'sum_$fieldId';
+            final dynamic rawValue = itemProvider.aggregationResults[sumKey];
 
-        // 2. EN POSESIÓN
-        if (assetType.possessionFieldId != null)
-          _buildCustomHeightChip(
-            context,
-            label: 'EN POSESIÓN: $possessionCount',
-            icon: Icons.check_circle_outline,
-            color: Colors.green,
-          ),
+            return _buildAggregationChip(
+              context,
+              fieldName,
+              fieldType,
+              rawValue,
+              isLoading,
+            );
+          }),
+      if (isLoading)
+        _buildCustomHeightChip(
+          context,
+          label: 'Calculando...',
+          icon: Icons.refresh,
+          color: Colors.grey,
+          isLoading: true,
+        ),
+    ];
 
-        // 3. DESEADOS
-        if (assetType.desiredFieldId != null)
-          _buildCustomHeightChip(
-            context,
-            label: 'DESEADOS: $desiredCount',
-            icon: Icons.favorite_outline,
-            color: Colors.pink,
-          ),
-
-        // 4. SUMATORIOS DINÁMICOS
-        ...itemProvider.aggregationDefinitions
-            .where((def) {
-              final isSum = def['isSummable'];
-              return isSum == true || isSum.toString() == 'true' || isSum == 1;
-            })
-            .map((def) {
-              final fieldId = def['id'].toString();
-              final fieldName = def['name'] as String? ?? 'Suma';
-              final fieldType = def['type'];
-              final sumKey = 'sum_$fieldId';
-              final dynamic rawValue = itemProvider.aggregationResults[sumKey];
-
-              return _buildAggregationChip(
-                context,
-                fieldName,
-                fieldType,
-                rawValue,
-                isLoading,
-              );
-            }),
-
-        // 5. INDICADOR DE CARGA
-        if (isLoading)
-          _buildCustomHeightChip(
-            context,
-            label: 'Cargando cálculos...',
-            icon: Icons.refresh,
-            color: Colors.grey,
-            isLoading: true,
-          ),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (int i = 0; i < chips.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            chips[i],
+          ],
+        ],
+      ),
     );
   }
 
@@ -112,21 +110,21 @@ class AssetCountersRow extends StatelessWidget {
     bool isSyncing,
   ) {
     return Chip(
-      elevation: 2,
-      shadowColor: Colors.black26,
-      avatar: Icon(Icons.analytics, size: 20, color: Colors.blueGrey),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      avatar: Icon(Icons.analytics, size: 16, color: Colors.blueGrey),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 6),
       backgroundColor: Colors.blueGrey.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       label: Container(
-        constraints: const BoxConstraints(minHeight: 25),
+        constraints: const BoxConstraints(minHeight: 18),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text(
-              'VALOR MERCADO TOTAL: ',
-              style: TextStyle(fontWeight: FontWeight.w500),
+              'MERCADO: ',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
             ),
             if (isSyncing)
               const SizedBox(
@@ -140,7 +138,7 @@ class AssetCountersRow extends StatelessWidget {
             else
               PriceDisplayWidget(
                 value: totalValue,
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.black,
               ),
           ],
@@ -159,39 +157,44 @@ class AssetCountersRow extends StatelessWidget {
     final bool isPrice = type == 'price' || type == CustomFieldType.price.name;
 
     return Chip(
-      elevation: 2,
-      shadowColor: Colors.black26,
+      elevation: 0,
+      shadowColor: Colors.transparent,
       avatar: Icon(
         isPrice ? Icons.monetization_on : Icons.calculate,
-        size: 20,
+        size: 16,
         color: Theme.of(context).colorScheme.secondary,
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
-      backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 6),
+      backgroundColor: Theme.of(
+        context,
+      ).colorScheme.secondary.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       label: Container(
-        constraints: const BoxConstraints(minHeight: 25),
+        constraints: const BoxConstraints(minHeight: 18),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               '$name: ',
-              style: const TextStyle(fontWeight: FontWeight.w500),
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
             ),
             if (loading)
               const Text('...')
             else if (isPrice)
               PriceDisplayWidget(
                 value: value,
-                fontSize: 14,
+                fontSize: 12,
                 color: Colors.black,
               )
             else
               Text(
                 (double.tryParse(value?.toString() ?? '0') ?? 0.0)
                     .toStringAsFixed(2),
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
               ),
           ],
         ),
@@ -207,10 +210,10 @@ class AssetCountersRow extends StatelessWidget {
     bool isLoading = false,
   }) {
     return Chip(
-      elevation: 2,
-      shadowColor: Colors.black26,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      labelPadding: const EdgeInsets.symmetric(horizontal: 8),
+      elevation: 0,
+      shadowColor: Colors.transparent,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 6),
       backgroundColor: color.withValues(alpha: 0.1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       avatar: isLoading
@@ -219,14 +222,15 @@ class AssetCountersRow extends StatelessWidget {
               height: 14,
               child: CircularProgressIndicator(strokeWidth: 2),
             )
-          : Icon(icon, size: 20, color: color.withValues(alpha: 0.8)),
+          : Icon(icon, size: 16, color: color.withValues(alpha: 0.8)),
       label: Container(
-        constraints: const BoxConstraints(minHeight: 25),
+        constraints: const BoxConstraints(minHeight: 18),
         child: Text(
           label,
           style: const TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
+            fontSize: 12,
           ),
         ),
       ),

@@ -77,6 +77,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   final Map<int, List<String>> _listFieldValues = {};
   final Map<int, String?> _selectedListValues = {};
   final Map<int, bool> _booleanFieldValues = {};
+  double _marketValue = 0.0;
   List<IntegrationModel> _availableDataSources = [];
   String? _selectedSource;
   late AIService _aiService;
@@ -204,6 +205,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         setState(() {
           _nameController.text = suggestedItem.name;
           _descriptionController.text = suggestedItem.description ?? '';
+          _marketValue = suggestedItem.marketValue;
           if (suggestedItem.images.isNotEmpty) {
             _imagePreviewUrls = suggestedItem.images
                 .map((img) => img.url)
@@ -241,10 +243,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       if (enrichedData != null && enrichedData['multipleResults'] == true) {
         final candidates = _normalizeCandidates(enrichedData['candidates']);
         if (candidates.isEmpty) {
-          throw Exception('La búsqueda devolvió múltiples resultados sin candidatos.');
+          throw Exception(
+            'La búsqueda devolvió múltiples resultados sin candidatos.',
+          );
         }
 
-        final selectedCandidate = await _showCandidateSelectionDialog(candidates);
+        final selectedCandidate = await _showCandidateSelectionDialog(
+          candidates,
+        );
         if (selectedCandidate == null) {
           ToastService.error('Importación cancelada.');
           return;
@@ -255,7 +261,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           throw Exception('El candidato seleccionado no tiene un ID válido.');
         }
 
-        final selectedSource = enrichedData['source']?.toString() ?? _selectedSource!;
+        final selectedSource =
+            enrichedData['source']?.toString() ?? _selectedSource!;
         enrichedData = await _integrationService.enrichSelectedItem(
           source: selectedSource,
           itemId: selectedId,
@@ -266,6 +273,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       if (enrichedData != null && mounted) {
         setState(() {
           _nameController.text = enrichedData!['name'] ?? _nameController.text;
+          final enrichedMarketValue = _extractMarketValue(enrichedData);
+          if (enrichedMarketValue != null) {
+            _marketValue = enrichedMarketValue;
+          }
           String baseDescription = enrichedData['description'] ?? '';
           if (enrichedData['images'] != null &&
               (enrichedData['images'] as List).isNotEmpty) {
@@ -352,6 +363,30 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     return parts.join(' • ');
   }
 
+  Widget? _buildCandidateLeading(Map<String, dynamic> candidate) {
+    final image = candidate['image']?.toString();
+    if (image == null || image.isEmpty) {
+      return null;
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(8),
+      child: Image.network(
+        image,
+        width: 48,
+        height: 48,
+        fit: BoxFit.cover,
+        errorBuilder: (_, __, ___) => Container(
+          width: 48,
+          height: 48,
+          color: Colors.grey.shade200,
+          alignment: Alignment.center,
+          child: Icon(Icons.image_not_supported, color: Colors.grey.shade500),
+        ),
+      ),
+    );
+  }
+
   Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
     List<Map<String, dynamic>> candidates,
   ) {
@@ -372,6 +407,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                   final candidate = candidates[index];
                   final subtitle = _buildCandidateSubtitle(candidate);
                   return ListTile(
+                    leading: _buildCandidateLeading(candidate),
                     title: Text(candidate['name']?.toString() ?? 'Sin nombre'),
                     subtitle: subtitle.isEmpty ? null : Text(subtitle),
                     onTap: () => Navigator.of(dialogContext).pop(candidate),
@@ -465,6 +501,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
   }
 
+  double? _extractMarketValue(Map<String, dynamic> data) {
+    final rawValue = data['marketValue'] ?? data['market_value'];
+    if (rawValue is num) {
+      return rawValue.toDouble();
+    }
+    if (rawValue is String) {
+      return double.tryParse(rawValue.replaceAll(',', '.'));
+    }
+    return null;
+  }
+
   Future<void> _saveAsset() async {
     final itemProvider = context.read<InventoryItemProvider>();
     if (!AssetFormUtils.validateForm(_formKey) ||
@@ -515,6 +562,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         name: _nameController.text.trim(),
         condition: _selectedCondition,
         description: _descriptionController.text.trim(),
+        marketValue: _marketValue,
         customFieldValues: customFieldValues,
       );
       await context.read<InventoryItemProvider>().createInventoryItem(

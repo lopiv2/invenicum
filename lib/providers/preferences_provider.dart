@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:intl/intl.dart';
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
 import 'package:invenicum/data/models/user_preferences.dart';
 import 'package:invenicum/data/services/preferences_service.dart';
@@ -82,8 +83,8 @@ class PreferencesProvider with ChangeNotifier {
 
     // --- LÓGICA INVERSA ---
     _isDarkMode = value;
-    
-    // Si el usuario activa el modo oscuro manual, 
+
+    // Si el usuario activa el modo oscuro manual,
     // asumimos que ya no quiere seguir al sistema.
     if (value == true) {
       _useSystemTheme = false;
@@ -94,7 +95,7 @@ class PreferencesProvider with ChangeNotifier {
       isDarkMode: _isDarkMode,
       useSystemTheme: _useSystemTheme,
     );
-    
+
     notifyListeners();
 
     try {
@@ -118,11 +119,11 @@ class PreferencesProvider with ChangeNotifier {
     try {
       final json = await _preferencesService.getPreferences();
       _prefs = UserPreferences.fromJson(json);
-      
+
       // 🚩 SINCRONIZACIÓN CRÍTICA
       _useSystemTheme = _prefs.useSystemTheme;
       _isDarkMode = _prefs.isDarkMode;
-      
+
       _isInitialized = true;
       notifyListeners();
     } catch (e) {
@@ -327,5 +328,48 @@ class PreferencesProvider with ChangeNotifier {
       default:
         return '\$';
     }
+  }
+
+  bool usesTrailingCurrencySymbol(String currencyCode) {
+    switch (currencyCode) {
+      case 'EUR':
+        return true;
+      case 'GBP':
+      case 'JPY':
+      case 'MXN':
+      case 'USD':
+      default:
+        return false;
+    }
+  }
+
+  int getDecimalDigitsForCurrency(String currencyCode) {
+    switch (currencyCode) {
+      case 'JPY':
+        return 0;
+      case 'EUR':
+      case 'GBP':
+      case 'MXN':
+      case 'USD':
+      default:
+        return 2;
+    }
+  }
+
+  String formatPrice(double amount, {String? currencyCode}) {
+    final targetCurrency = currencyCode ?? selectedCurrency;
+    final symbol = getSymbolForCurrency(targetCurrency);
+    final useTrailingSymbol = usesTrailingCurrencySymbol(targetCurrency);
+    final decimalDigits = getDecimalDigitsForCurrency(targetCurrency);
+
+    final formatter = NumberFormat.decimalPattern(locale.toLanguageTag())
+      ..minimumFractionDigits = decimalDigits
+      ..maximumFractionDigits = decimalDigits;
+
+    final formattedAmount = formatter.format(amount);
+
+    return useTrailingSymbol
+        ? '$formattedAmount $symbol'
+        : '$symbol$formattedAmount';
   }
 }

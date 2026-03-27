@@ -52,10 +52,12 @@ class ContainerProvider with ChangeNotifier {
         // reflejen siempre el estado real después de cualquier F5.
         final updatedContainers = await Future.wait(
           loadedContainers.map((apiContainer) async {
-            final locations =
-                await _locationService.getLocations(apiContainer.id);
-            final dataLists =
-                await _containerService.getDataLists(apiContainer.id);
+            final locations = await _locationService.getLocations(
+              apiContainer.id,
+            );
+            final dataLists = await _containerService.getDataLists(
+              apiContainer.id,
+            );
 
             return apiContainer.copyWith(
               locations: locations,
@@ -216,6 +218,8 @@ class ContainerProvider with ChangeNotifier {
     }
 
     // --- INICIO DE LA LÓGICA PRINCIPAL ---
+    late final AssetType oldAssetType;
+
     try {
       // 1. PASO OPTIMISTA: Actualizar el estado local inmediatamente
       print(
@@ -223,7 +227,7 @@ class ContainerProvider with ChangeNotifier {
       );
 
       final container = _containers.firstWhere((c) => c.id == containerId);
-      final oldAssetType = container.assetTypes.firstWhere(
+      oldAssetType = container.assetTypes.firstWhere(
         (at) => at.id == assetTypeId,
       );
 
@@ -253,6 +257,8 @@ class ContainerProvider with ChangeNotifier {
       print('✅ Actualización de campos de colección finalizada con éxito.');
     } catch (e) {
       print('🚨 Error al actualizar campos de colección: $e');
+
+      _updateLocalAssetType(newAssetType: oldAssetType);
 
       // ⚠️ OPCIONAL pero RECOMENDADO: Si falla el servidor, deberías revertir
       // el estado optimista a los valores ANTERIORES.
@@ -303,12 +309,18 @@ class ContainerProvider with ChangeNotifier {
       // Recuperamos el AssetType original para preservar los campos de colección
       // (possessionFieldId, desiredFieldId) que el endpoint de edición general
       // no gestiona y que el backend devuelve como null si no los recibe.
-      final originalAssetType = originalContainer.assetTypes
-          .firstWhere((at) => at.id == assetTypeId, orElse: () => updatedAssetTypeFromApi);
+      final originalAssetType = originalContainer.assetTypes.firstWhere(
+        (at) => at.id == assetTypeId,
+        orElse: () => updatedAssetTypeFromApi,
+      );
 
       final mergedAssetType = updatedAssetTypeFromApi.copyWith(
-        possessionFieldId: updatedAssetTypeFromApi.possessionFieldId ?? originalAssetType.possessionFieldId,
-        desiredFieldId: updatedAssetTypeFromApi.desiredFieldId ?? originalAssetType.desiredFieldId,
+        possessionFieldId:
+            updatedAssetTypeFromApi.possessionFieldId ??
+            originalAssetType.possessionFieldId,
+        desiredFieldId:
+            updatedAssetTypeFromApi.desiredFieldId ??
+            originalAssetType.desiredFieldId,
       );
 
       // a. Eliminar el AssetType antiguo y añadir el nuevo (con campos preservados)
