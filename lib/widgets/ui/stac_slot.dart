@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stac/stac.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class StacSlot extends StatelessWidget {
   final String slotName;
@@ -10,6 +11,7 @@ class StacSlot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Consumer<PluginProvider>(
       builder: (context, provider, child) {
         final slotPlugins = provider.installed
@@ -43,8 +45,8 @@ class StacSlot extends StatelessWidget {
                     height: isActive ? null : 0,
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: uiToRender != null 
-                        ? (Stac.fromJson(uiToRender, context) ?? const Text("Error de renderizado"))
-                        : const Text("Formato de UI no válido"),
+                        ? (Stac.fromJson(uiToRender, context) ?? Text(l10n.pluginRenderError))
+                        : Text(l10n.invalidUiFormat),
                   ),
                 ),
               ),

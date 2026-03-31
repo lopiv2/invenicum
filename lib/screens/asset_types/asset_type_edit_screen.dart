@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 import '../../data/models/list_data.dart';
 import '../../data/models/asset_type_model.dart';
@@ -75,7 +76,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
     final assetTypeIdInt = int.tryParse(widget.assetTypeId);
 
     if (containerIdInt == null || assetTypeIdInt == null) {
-      ToastService.error('ID inválido.');
+      ToastService.error(AppLocalizations.of(context)!.invalidIdError);
       setState(() => _isLoading = false);
       return;
     }
@@ -101,7 +102,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
 
       setState(() => _isLoading = false);
     } catch (e) {
-      ToastService.error('Error al cargar datos: ${e.toString()}');
+      ToastService.error(AppLocalizations.of(context)!.assetTypeLoadError(e.toString()));
       setState(() => _isLoading = false);
     }
   }
@@ -184,7 +185,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         imageName: newImageName,
         removeExistingImage: _imageWasRemoved && !_isNewImageBase64,
       );
-      ToastService.success('Tipo de activo actualizado con éxito.');
+      ToastService.success(AppLocalizations.of(context)!.assetTypeUpdateSuccess);
       if (mounted) {
         context.goNamed(
           RouteNames.assetTypes,
@@ -192,13 +193,14 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         );
       }
     } catch (e) {
-      ToastService.error('Error al actualizar: ${e.toString()}');
+      ToastService.error(AppLocalizations.of(context)!.assetTypeUpdateError(e.toString()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (_isLoading) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -216,7 +218,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
               child: Column(
                 children: [
                   AssetTypeFormTitle(
-                    title: 'Editar: ${_currentAssetType?.name ?? ""}',
+                    title: l10n.editAssetTypeTitle(_currentAssetType?.name ?? ''),
                   ),
                   const SizedBox(height: 32),
 
@@ -243,7 +245,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Configuración General",
+                              l10n.configurationGeneralSection,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -271,7 +273,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "Este contenedor es una colección. Puedes crear tipos seriados o no seriados, pero los campos de posesión y deseados solo se podrán configurar en tipos no seriados.",
+                                        l10n.assetTypeCollectionWarning,
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                               color: theme
@@ -322,7 +324,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
 
                   AssetTypeActionButtons(
                     onSave: _saveAssetType,
-                    saveLabel: 'Actualizar Tipo de Activo',
+                    saveLabel: l10n.updateAssetTypeButton,
                   ),
                 ],
               ),

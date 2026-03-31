@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/models/list_data.dart';
-import 'package:invenicum/screens/asset_types/local_widgets/custom_field_editor.dart';
-
+import 'package:invenicum/screens/asset_types/local_widgets/custom_field_editor.dart';import 'package:invenicum/l10n/app_localizations.dart';
 /// Widget para la sección de campos personalizados
 class AssetTypeCustomFieldsSection extends StatelessWidget {
   final List<CustomFieldDefinition> fieldDefinitions;
@@ -56,7 +55,7 @@ class AssetTypeCustomFieldsSection extends StatelessWidget {
         TextButton.icon(
           onPressed: onAddField,
           icon: const Icon(Icons.add_box),
-          label: const Text('Añadir Nuevo Campo'),
+          label: Text(AppLocalizations.of(context)!.addNewFieldButton),
         ),
       ],
     );

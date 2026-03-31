@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/list_data.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class DataListEditScreen extends StatefulWidget {
   final String containerId;
@@ -77,10 +78,11 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
   }
 
   Future<void> _saveChanges() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
     if (_items.isEmpty) {
-      ToastService.error('La lista debe tener al menos un elemento');
+      ToastService.error(l10n.dataListNeedsAtLeastOneElement);
       return;
     }
 
@@ -95,19 +97,20 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
 
       if (!mounted) return;
 
-      ToastService.success('Lista actualizada con éxito');
+      ToastService.success(l10n.dataListUpdatedSuccessfully);
       context.goNamed(
         RouteNames.dataLists,
         pathParameters: {'containerId': widget.containerId},
       );
     } catch (e) {
       if (!mounted) return;
-      ToastService.error('Error al actualizar la lista: ${e.toString()}');
+      ToastService.error(l10n.errorUpdatingDataList(e.toString()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(32.0),
       child: Form(
@@ -120,7 +123,7 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Editar Lista: ${widget.initialData.name}',
+                  l10n.editListWithName(widget.initialData.name),
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -131,13 +134,13 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                     FilledButton.icon(
                       onPressed: _saveChanges,
                       icon: const Icon(Icons.save),
-                      label: const Text('Guardar Cambios'),
+                      label: Text(l10n.saveChanges),
                     ),
                     SizedBox(width: 16),
                     FilledButton.icon(
                       onPressed: () => _goBack(context),
                       icon: const Icon(Icons.cancel),
-                      label: const Text('Cancelar'),
+                      label: Text(l10n.cancel),
                     ),
                   ],
                 ),
@@ -154,13 +157,13 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                     // Nombre
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre de la Lista',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.dataListNameLabel,
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor introduce un nombre';
+                          return l10n.pleaseEnterAName;
                         }
                         return null;
                       },
@@ -170,17 +173,17 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                     // Descripción
                     TextFormField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descripción (Opcional)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.description,
+                        border: const OutlineInputBorder(),
                       ),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 32),
 
                     // Sección de elementos
-                    const Text(
-                      'Elementos de la Lista',
+                    Text(
+                      l10n.dataListElementsTitle,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -194,9 +197,9 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _newItemController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nuevo Elemento',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.newElementLabel,
+                              border: const OutlineInputBorder(),
                             ),
                             onFieldSubmitted: (_) => _addItem(),
                           ),
@@ -205,7 +208,7 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                         ElevatedButton.icon(
                           onPressed: _addItem,
                           icon: const Icon(Icons.add),
-                          label: const Text('Agregar'),
+                          label: Text(l10n.addLabel),
                         ),
                       ],
                     ),
@@ -213,8 +216,8 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
 
                     // Lista de elementos
                     if (_items.isEmpty)
-                      const Text(
-                        'Agrega elementos a la lista',
+                      Text(
+                        l10n.addElementsToListHint,
                         style: TextStyle(fontStyle: FontStyle.italic),
                       )
                     else

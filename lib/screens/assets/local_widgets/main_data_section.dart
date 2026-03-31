@@ -36,7 +36,7 @@ class MainDataSectionWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeaderWidget(
-            title: 'Datos Principales',
+            title: l10n.mainDataTitle,
             icon: Icons.inventory_2_outlined,
           ),
           CommonFormField(
@@ -46,7 +46,7 @@ class MainDataSectionWidget extends StatelessWidget {
             highlighted: highlightedFields.contains('name'),
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Por favor introduce un nombre.';
+                return l10n.pleaseEnterAName;
               }
               return null;
             },
@@ -54,7 +54,7 @@ class MainDataSectionWidget extends StatelessWidget {
           const SizedBox(height: 16),
           CommonFormField(
             controller: descriptionController,
-            label: '${l10n.description} (Opcional)',
+            label: l10n.description,
             icon: Icons.notes_outlined,
             maxLines: 3,
             highlighted: highlightedFields.contains('description'),
@@ -66,8 +66,6 @@ class MainDataSectionWidget extends StatelessWidget {
             onChanged: onLocationChanged,
             containerId: containerId,
           ),
-
-
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Widget para mostrar la advertencia cuando el artículo es seriado,
 /// junto con el campo de número de serie.
@@ -12,6 +13,7 @@ class SerializedAssetWarningWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -35,7 +37,7 @@ class SerializedAssetWarningWidget extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'Este es un artículo seriado. La cantidad es fija a 1.',
+                  l10n.serializedItemFixedQuantity,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colorScheme.onSecondaryContainer,
                   ),
@@ -51,8 +53,8 @@ class SerializedAssetWarningWidget extends StatelessWidget {
           TextFormField(
             controller: serialNumberController,
             decoration: InputDecoration(
-              labelText: 'Número de serie',
-              hintText: 'Ej: SN-2024-00123',
+              labelText: l10n.serialNumberLabel,
+              hintText: l10n.serialNumberHint,
               prefixIcon: Icon(
                 Icons.tag_rounded,
                 color: colorScheme.secondary,

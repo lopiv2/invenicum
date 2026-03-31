@@ -44,7 +44,7 @@ class IntegrationProvider with ChangeNotifier {
       if (result['success'] == true) {
         return true;
       } else {
-        _lastErrorMessage = result['message'] ?? "Error desconocido";
+        _lastErrorMessage = result['message'] ?? "Unknown error";
         return false;
       }
     } catch (e) {

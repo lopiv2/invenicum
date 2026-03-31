@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 
 /// Footer de paginación personalizado para PlutoGrid.
@@ -74,7 +75,7 @@ class _PlutoPaginationFooterState extends State<PlutoPaginationFooter> {
             color: theme.dividerColor,
             margin: const EdgeInsets.symmetric(horizontal: 16),
           ),
-          Text('Ir a página:', style: theme.textTheme.bodySmall),
+          Text(AppLocalizations.of(context)!.goToPageLabel, style: theme.textTheme.bodySmall),
           const SizedBox(width: 8),
           SizedBox(
             width: 56,

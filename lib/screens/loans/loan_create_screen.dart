@@ -12,6 +12,7 @@ import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/data/services/inventory_item_service.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class LoanCreateScreen extends StatefulWidget {
@@ -63,6 +64,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
   }
 
   void _selectItem() async {
+    final l10n = AppLocalizations.of(context)!;
     final containerProvider = context.read<ContainerProvider>();
     final containerIdInt = int.parse(widget.containerId);
 
@@ -84,7 +86,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           );
           allItems.addAll(response.items);
         } catch (e) {
-          debugPrint('Error cargando items de ${assetType.name}');
+          debugPrint('Error loading items for ${assetType.name}');
         }
       }
 
@@ -92,18 +94,20 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: const Text('Seleccionar Objeto'),
+            title: Text(l10n.selectObjectTitle),
             content: SizedBox(
               width: double.maxFinite,
               child: allItems.isEmpty
-                  ? const Center(child: Text('No hay objetos disponibles'))
+                  ? Center(child: Text(l10n.noObjectsAvailable))
                   : ListView.builder(
                       itemCount: allItems.length,
                       itemBuilder: (context, index) {
                         final item = allItems[index];
                         return ListTile(
                           title: Text(item.name),
-                          subtitle: Text('Disponible: ${item.quantity}'),
+                          subtitle: Text(
+                            l10n.availableQuantity(item.quantity),
+                          ),
                           onTap: () {
                             setState(() {
                               _selectedItem = item;
@@ -123,15 +127,16 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error('Error al seleccionar objeto: ${e.toString()}');
+        ToastService.error(l10n.errorSelectingObject(e.toString()));
       }
     }
   }
 
   void _saveLoan() async {
+    final l10n = AppLocalizations.of(context)!;
     if (_formKey.currentState!.validate()) {
       if (_selectedItem == null) {
-        ToastService.error('Debes seleccionar un objeto');
+        ToastService.error(l10n.mustSelectAnObject);
         return;
       }
 
@@ -170,7 +175,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
         );
 
         if (mounted) {
-          ToastService.success('Préstamo registrado exitosamente');
+          ToastService.success(l10n.loanRegisteredSuccessfully);
 
           context.goNamed(
             RouteNames.loans,
@@ -179,7 +184,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
         }
       } catch (e) {
         if (mounted) {
-          ToastService.error('Error al registrar préstamo: ${e.toString()}');
+          ToastService.error(l10n.errorRegisteringLoan(e.toString()));
         }
       }
     }
@@ -197,6 +202,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SingleChildScrollView(
       padding: const EdgeInsets.all(32.0),
       child: Form(
@@ -205,7 +211,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Registrar Nuevo Préstamo',
+              l10n.registerNewLoan,
               style: Theme.of(
                 context,
               ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -213,7 +219,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
             const SizedBox(height: 30),
 
             Text(
-              'Objeto a Prestar',
+              l10n.loanObject,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
@@ -228,7 +234,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 children: [
                   Expanded(
                     child: Text(
-                      _selectedItem?.name ?? 'Selecciona un objeto',
+                      _selectedItem?.name ?? l10n.selectAnObject,
                       style: TextStyle(
                         fontSize: 16,
                         color: _selectedItem != null
@@ -239,7 +245,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                   ),
                   ElevatedButton(
                     onPressed: _selectItem,
-                    child: const Text('Seleccionar'),
+                    child: Text(l10n.selectLabel),
                   ),
                 ],
               ),
@@ -248,13 +254,13 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
             TextFormField(
               controller: _borrowerNameController,
-              decoration: const InputDecoration(
-                labelText: 'Nombre del Prestatario',
-                hintText: 'Ej: Juan Pérez',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.borrowerName,
+                hintText: l10n.borrowerNameHint,
+                border: const OutlineInputBorder(),
               ),
               validator: (value) => (value == null || value.isEmpty)
-                  ? 'El nombre es obligatorio'
+                  ? l10n.borrowerNameRequired
                   : null,
             ),
             const SizedBox(height: 20),
@@ -262,17 +268,17 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
             TextFormField(
               controller: _quantityController,
               decoration: InputDecoration(
-                labelText: 'Cantidad a prestar (Disponible: $_currentStock)',
+                labelText: l10n.loanQuantityAvailable(_currentStock),
                 border: const OutlineInputBorder(),
                 prefixIcon: const Icon(Icons.numbers),
               ),
               keyboardType: TextInputType.number,
               validator: (value) {
                 if (value == null || value.isEmpty)
-                  return 'Ingresa una cantidad';
+                  return l10n.enterQuantity;
                 final n = int.tryParse(value);
-                if (n == null || n <= 0) return 'Cantidad no válida';
-                if (n > _currentStock) return 'No hay suficiente stock';
+                if (n == null || n <= 0) return l10n.invalidQuantity;
+                if (n > _currentStock) return l10n.notEnoughStock;
                 return null;
               },
             ),
@@ -280,14 +286,14 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
             TextFormField(
               controller: _borrowerEmailController,
-              decoration: const InputDecoration(
-                labelText: 'Correo Electrónico',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.borrowerEmail,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
                 if (value != null && value.isNotEmpty && !value.contains('@')) {
-                  return 'Correo inválido';
+                  return l10n.invalidEmail;
                 }
                 return null;
               },
@@ -296,9 +302,9 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
             TextFormField(
               controller: _borrowerPhoneController,
-              decoration: const InputDecoration(
-                labelText: 'Teléfono',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.borrowerPhone,
+                border: const OutlineInputBorder(),
               ),
               keyboardType: TextInputType.phone,
             ),
@@ -317,8 +323,13 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                   children: [
                     Text(
                       _expectedReturnDate != null
-                          ? 'Devolución esperada: ${_expectedReturnDate!.toLocal().toString().split(' ')[0]}'
-                          : 'Selecciona fecha de devolución',
+                          ? l10n.expectedReturnDateLabel(
+                              _expectedReturnDate!
+                                  .toLocal()
+                                  .toString()
+                                  .split(' ')[0],
+                            )
+                          : l10n.selectReturnDate,
                       style: TextStyle(
                         fontSize: 16,
                         color: _expectedReturnDate != null
@@ -335,9 +346,9 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
 
             TextFormField(
               controller: _notesController,
-              decoration: const InputDecoration(
-                labelText: 'Notas Adicionales',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: l10n.additionalNotes,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -348,8 +359,8 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 ElevatedButton.icon(
                   onPressed: _saveLoan,
                   icon: const Icon(Icons.save),
-                  label: const Text(
-                    'Registrar Préstamo',
+                  label: Text(
+                    l10n.registerLoanLabel,
                     style: TextStyle(fontSize: 16),
                   ),
                   style: ElevatedButton.styleFrom(
@@ -363,7 +374,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
                 OutlinedButton.icon(
                   onPressed: () => context.pop(),
                   icon: const Icon(Icons.cancel),
-                  label: const Text('Cancelar', style: TextStyle(fontSize: 16)),
+                  label: Text(l10n.cancel, style: const TextStyle(fontSize: 16)),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 30,

@@ -485,6 +485,528 @@
   "upload": "Upload",
   "uploadImage": "Upload Image",
   "username": "Username",
+  "copiedToClipboard": "Copied to clipboard",
+  "connectionTestFailed": "Connection test failed",
+  "connectionVerified": "Connection verified successfully",
+  "errorSavingConfiguration": "Error saving configuration",
+  "integrationsAndConnectionsTitle": "Integrations and connections",
+  "integrationsSectionAiTitle": "Artificial intelligence",
+  "integrationsSectionAiSubtitle": "Conversational engines and assistants to enhance workflows and automations.",
+  "integrationsSectionMessagingTitle": "Messaging and notifications",
+  "integrationsSectionMessagingSubtitle": "Output channels for alerts, bots, reports, and automated deliveries.",
+  "integrationsSectionDataApisTitle": "Data APIs",
+  "integrationsSectionDataApisSubtitle": "External sources to enrich cards, games, and catalog references.",
+  "integrationsSectionValuationTitle": "Valuation and market",
+  "integrationsSectionValuationSubtitle": "Connectors for pricing, barcodes, and up-to-date value estimation.",
+  "integrationsSectionHardwareTitle": "Hardware and labels",
+  "integrationsSectionHardwareSubtitle": "Physical tools and utilities for printing, coding, and operations.",
+  "integrationsActiveConnections": "{count} active connections",
+  "@integrationsActiveConnections": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "integrationsModularDesign": "Modular design by categories",
+  "integrationsCheckingStatuses": "Checking statuses",
+  "integrationsStatusSynced": "Status synchronized",
+  "integrationConfiguredSuccess": "{name} configured successfully",
+  "@integrationConfiguredSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "integrationUnlinkedWithName": "{name} has been unlinked",
+  "@integrationUnlinkedWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidUiFormat": "Invalid UI format",
+  "loadingConfiguration": "Loading configuration...",
+  "pageNotFoundUri": "Page not found: {uri}",
+  "@pageNotFoundUri": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginLoadError": "Error loading plugin UI",
+  "pluginRenderError": "Render error",
+  "testConnection": "Test connection",
+  "testingConnection": "Testing...",
+  "unableToUnlinkAccount": "Could not unlink account",
+  "unlinkIntegrationUpper": "UNLINK INTEGRATION",
+  "upcFreeModeHint": "Leave this field empty to use Free mode (Limited).",
+  "alertsTabLabel": "Alerts",
+  "alertMarkedAsRead": "Marked as read",
+  "calendarTabLabel": "Calendar",
+  "closeLabel": "Close",
+  "closeLabelUpper": "CLOSE",
+  "configureReminderLabel": "Configure reminder:",
+  "cannotFormatInvalidJson": "Cannot format an invalid JSON",
+  "createAlertOrEventTitle": "Create alert/event",
+  "createdSuccessfully": "Created successfully",
+  "createPluginTitle": "Create plugin",
+  "editPluginTitle": "Edit plugin",
+  "deleteFromGithubLabel": "Delete from GitHub",
+  "deleteFromGithubSubtitle": "Removes the file from the public market",
+  "deletePluginQuestion": "Delete plugin?",
+  "deletePluginLocalWarning": "It will be removed from your local database.",
+  "deleteUpper": "DELETE",
+  "editEventTitle": "Edit event",
+  "editLabel": "Edit",
+  "eventDataSection": "Event data",
+  "eventReminderAtTime": "At event time",
+  "eventUpdated": "Event updated",
+  "firstVersionHint": "The first version will always be 1.0.0",
+  "fixJsonBeforeSave": "Fix the JSON before saving",
+  "formatJson": "Format JSON",
+  "goToProfileUpper": "GO TO PROFILE",
+  "installPluginLabel": "Install plugin",
+  "invalidVersionFormat": "Invalid format (e.g., 1.0.1)",
+  "isEventQuestion": "Is this an event?",
+  "jsonErrorGeneric": "JSON error",
+  "makePublicLabel": "Make public",
+  "markAsReadLabel": "Mark as read",
+  "messageWithColon": "Message:",
+  "minutesBeforeLabel": "{minutes} minutes before",
+  "@minutesBeforeLabel": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "newLabel": "New",
+  "newPluginLabel": "New plugin",
+  "noActiveAlerts": "No active alerts",
+  "noDescriptionAvailable": "No description available.",
+  "noEventsForDay": "No events for this day",
+  "noPluginsAvailable": "No plugins",
+  "notificationDeleted": "Notification deleted successfully",
+  "oneHourBeforeLabel": "1 hour before",
+  "pluginPrivateDescription": "Only you can see this plugin in your list.",
+  "pluginPublicDescription": "Other users will be able to see and install this plugin.",
+  "pluginTabLibrary": "Library",
+  "pluginTabMarket": "Market",
+  "pluginTabMine": "Mine",
+  "previewLabel": "Preview",
+  "remindMeLabel": "Remind me:",
+  "requiredField": "Required",
+  "requiresGithubDescription": "To publish plugins in the community, you need to link your GitHub account to get author credit.",
+  "requiresGithubTitle": "GitHub required",
+  "slotLocationLabel": "Location (slot)",
+  "stacDocumentation": "Stac documentation",
+  "stacJsonInterfaceLabel": "Stac JSON (interface)",
+  "uninstallLabel": "Uninstall",
+  "unrecognizedStacStructure": "Unrecognized Stac structure",
+  "updateLabelUpper": "UPDATE",
+  "updateToVersion": "Update to v{version}",
+  "@updateToVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "versionLabel": "Version",
+  "incrementVersionHint": "Increase the version for your proposal (e.g., 1.1.0)",
+  "cancelUpper": "CANCEL",
+  "mustLinkGithubToPublishTemplate": "You must link GitHub in your profile to publish.",
+  "templateNeedsAtLeastOneField": "The template must have at least one defined field.",
+  "templatePullRequestCreated": "Proposal sent. A Pull Request has been created on GitHub.",
+  "errorPublishingTemplate": "Error publishing: {error}",
+  "@errorPublishingTemplate": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "createGlobalTemplateTitle": "Create global template",
+  "githubVerifiedLabel": "GitHub verified",
+  "githubNotLinkedLabel": "GitHub not linked",
+  "veniDesignedTemplateBanner": "Veni designed this structure based on your request. Review and adjust it before publishing.",
+  "templateNameLabel": "Template name",
+  "templateNameHint": "E.g.: My comics collection",
+  "githubUserLabel": "GitHub user",
+  "categoryLabel": "Category",
+  "categoryHint": "E.g.: Books, Electronics...",
+  "templatePurposeDescription": "Purpose description",
+  "definedFieldsTitle": "Defined fields",
+  "addFieldButton": "Add field",
+  "clickAddFieldToStart": "Click 'Add field' to start designing.",
+  "configureOptionsUpper": "CONFIGURE OPTIONS",
+  "writeOptionAndPressEnter": "Type an option and press Enter",
+  "publishOnGithubUpper": "PUBLISH ON GITHUB",
+  "templateDetailFetchError": "Could not fetch template details",
+  "templateNotAvailable": "The template does not exist or is not available",
+  "backLabel": "Back",
+  "templateDetailTitle": "Template detail",
+  "saveToLibraryTooltip": "Save to library",
+  "templateByAuthor": "by @{name}",
+  "@templateByAuthor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "officialVerifiedTemplate": "Official verified template",
+  "dataStructureFieldsUpper": "DATA STRUCTURE ({count} FIELDS)",
+  "@dataStructureFieldsUpper": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "installInMyInventoryUpper": "INSTALL IN MY INVENTORY",
+  "addedToPersonalLibrary": "Added to your personal library",
+  "whereDoYouWantToInstall": "Where do you want to install it?",
+  "noContainersCreateFirst": "You have no containers. Create one first.",
+  "autoGeneratedListFromTemplate": "Auto-generated list from template",
+  "installationSuccessAutoLists": "Installation successful. Lists configured automatically.",
+  "errorInstallingTemplate": "Error installing: {error}",
+  "@errorInstallingTemplate": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "publishTemplateLabel": "Publish template",
+  "retryLabel": "Retry",
+  "noTemplatesFoundInMarket": "No templates were found in the market.",
+  "invenicumCommunity": "Invenicum Community",
+  "refreshMarketTooltip": "Refresh market",
+  "exploreCommunityConfigurations": "Explore and download community configurations",
+  "searchByTemplateName": "Search by template name...",
+  "filterByTagTooltip": "Filter by tag",
+  "noMoreTags": "No more tags",
+  "confirmDeleteDataList": "Are you sure you want to delete list \"{name}\"? This action is irreversible.",
+  "@confirmDeleteDataList": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dataListDeletedSuccess": "List \"{name}\" deleted successfully.",
+  "@dataListDeletedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeletingDataList": "Error deleting list: {error}",
+  "@errorDeletingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "customListsWithContainer": "Custom lists - {name}",
+  "@customListsWithContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newDataListLabel": "New list",
+  "noCustomListsCreateOne": "There are no custom lists. Create a new one.",
+  "elementsCount": "{count} elements",
+  "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataListNeedsAtLeastOneElement": "The list must have at least one element",
+  "customDataListCreated": "Custom list created successfully",
+  "errorCreatingDataList": "Error creating list: {error}",
+  "@errorCreatingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "newCustomDataListTitle": "New custom list",
+  "dataListNameLabel": "List name",
+  "pleaseEnterAName": "Please enter a name",
+  "dataListElementsTitle": "List elements",
+  "newElementLabel": "New element",
+  "addLabel": "Add",
+  "addElementsToListHint": "Add elements to the list",
+  "saveListLabel": "Save list",
+  "dataListUpdatedSuccessfully": "List updated successfully",
+  "errorUpdatingDataList": "Error updating list: {error}",
+  "@errorUpdatingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editListWithName": "Edit list: {name}",
+  "@editListWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewLocationTitle": "Create New Location",
+  "locationNameLabel": "Location Name",
+  "locationNameHint": "E.g.: Shelf B3, Server Room",
+  "locationDescriptionHint": "Access details, content type, etc.",
+  "parentLocationLabel": "Parent Location (Contains this one)",
+  "noParentRootLocation": "No parent (Root Location)",
+  "noneRootScheme": "None (Scheme Root)",
+  "savingLabel": "Saving...",
+  "saveLocationLabel": "Save Location",
+  "locationCreatedSuccessfully": "Location \"{name}\" created successfully.",
+  "@locationCreatedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreatingLocation": "Error creating location: {error}",
+  "@errorCreatingLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "locationCannotBeItsOwnParent": "A location cannot be its own parent.",
+  "locationUpdatedSuccessfully": "Location \"{name}\" updated.",
+  "@locationUpdatedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdatingLocation": "Error updating location: {error}",
+  "@errorUpdatingLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editLocationTitle": "Edit: {name}",
+  "@editLocationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "updateLocationLabel": "Update Location",
+  "selectObjectTitle": "Select Object",
+  "noObjectsAvailable": "No objects available",
+  "availableQuantity": "Available: {quantity}",
+  "@availableQuantity": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "errorSelectingObject": "Error selecting object: {error}",
+  "@errorSelectingObject": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mustSelectAnObject": "You must select an object",
+  "loanRegisteredSuccessfully": "Loan registered successfully",
+  "selectAnObject": "Select an object",
+  "selectLabel": "Select",
+  "borrowerNameHint": "E.g.: John Doe",
+  "borrowerNameRequired": "Name is required",
+  "loanQuantityAvailable": "Quantity to loan (Available: {quantity})",
+  "@loanQuantityAvailable": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "enterQuantity": "Enter a quantity",
+  "invalidQuantity": "Invalid quantity",
+  "notEnoughStock": "Not enough stock",
+  "invalidEmail": "Invalid email",
+  "expectedReturnDateLabel": "Expected return: {date}",
+  "@expectedReturnDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "selectReturnDate": "Select return date",
+  "additionalNotes": "Additional Notes",
+  "registerLoanLabel": "Register Loan",
+  "totalLabel": "Total",
+  "newLocationLabel": "New location",
+  "newLocationHint": "E.g.: Shelf A1, Cabinet 3...",
+  "parentLocationOptionalLabel": "Parent location (optional)",
+  "noneRootLabel": "None (root)",
+  "locationCreatedShort": "Location \"{name}\" created",
+  "@locationCreatedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newLocationEllipsis": "New location...",
+  "couldNotReloadList": "Could not reload the list",
+  "deleteAssetTitle": "Delete Asset",
+  "confirmDeleteAssetItem": "Do you confirm deleting \"{name}\"?",
+  "@confirmDeleteAssetItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDeletedShort": "Asset deleted.",
+  "viewColumnsLabel": "View: {count} col.",
+  "@viewColumnsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notValuedLabel": "Not valued",
+  "manageSearchSyncAssets": "Manage, search and sync your assets from a single panel.",
+  "filterLabel": "Filter",
+  "activeFilterLabel": "Active filter",
+  "importLabel": "Import",
+  "syncLabel": "Sync",
+  "syncingLabel": "Syncing...",
+  "newAssetLabel": "New asset",
+  "statusAndPreferences": "Status and Preferences",
+  "itemStatusLabel": "Item status",
+  "availableLabel": "Available",
+  "mustBeGreaterThanZero": "Must be greater than 0.",
+  "alertThresholdLabel": "Alert threshold",
+  "enterMinimumStock": "Enter a minimum stock",
+  "serializedItemFixedQuantity": "This is a serialized item. Quantity is fixed at 1.",
+  "serialNumberLabel": "Serial number",
+  "serialNumberHint": "E.g.: SN-2024-00123",
+  "mainDataTitle": "Main Data",
+  "currentMarketValueLabel": "CURRENT MARKET VALUE",
+  "updatePriceLabel": "Update Price",
+  "viewLabel": "View",
+  "visualGalleryTitle": "Visual Gallery",
+  "statusAndMarketTitle": "Status and Market",
+  "valuationHistoryTitle": "Valuation History",
+  "specificationsTitle": "Specifications",
+  "traceabilityTitle": "Traceability",
+  "stockLabel": "Stock",
+  "internalReferenceLabel": "Internal Reference",
+  "noSpecificationsAvailable": "No specifications available",
+  "trueLabel": "True",
+  "falseLabel": "False",
+  "openLinkLabel": "Open link",
+  "scannerFocusTip": "Tip: If it does not focus, move the product about 30 cm away from the camera.",
+  "scanCodeTitle": "Scan Code",
+  "scanOrEnterProductCode": "Scan or enter the product code",
+  "possessionProgressLabel": "Progress of {name}",
+  "@possessionProgressLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "externalImportTitle": "Import from External Source",
+  "galleryTitle": "Gallery",
+  "stockAndCodingTitle": "Stock and Coding",
+  "cameraPermissionRequired": "Camera permission is required to scan",
+  "cloudDataFound": "Data found in the cloud!",
+  "typeSomethingToSearch": "Type something to search",
+  "importCancelled": "Import cancelled.",
+  "couldNotCompleteImport": "Could not complete the import",
+  "yearLabel": "Year",
+  "authorLabel": "Author",
+  "selectResultTitle": "Select a result",
+  "unnamedLabel": "Unnamed",
+  "completeRequiredFields": "Please complete the required fields.",
+  "assetCreatedSuccess": "Asset created!",
+  "errorCreatingAsset": "Error creating asset: {error}",
+  "@errorCreatingAsset": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "technicalDetailsTitle": "Technical Details",
+  "itemImportedSuccessfully": "{name} imported successfully!",
+  "@itemImportedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newImagesSelected": "{count} new images were selected.",
+  "@newImagesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newFileRemoved": "New file removed.",
+  "imageMarkedForDeletion": "Image marked for deletion when saving.",
+  "couldNotIdentifyImage": "Could not identify the image.",
+  "editAssetTitle": "Edit: {name}",
+  "@editAssetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncPricesTitle": "Sync prices",
+  "syncPricesDescription": "The API will be queried to update the market value.",
+  "syncingMarketPrices": "Syncing market prices...",
+  "couldNotSyncPrices": "Could not sync prices",
+  "syncCompletedTitle": "Synchronization completed",
+  "updatedLabel": "Updated",
+  "noApiPriceLabel": "No price in API",
+  "errorsLabel": "Errors",
+  "totalProcessedLabel": "Total processed",
+  "noAssetsToShow": "No assets to display",
+  "noImageLabel": "No image",
+  "aiMagicQuestion": "Do you have a link?",
+  "aiAutocompleteAsset": "Autocomplete this asset with AI",
+  "magicLabel": "MAGIC",
+  "skuBarcodeLabel": "SKU / EAN / UPC",
   "veniChatPlaceholder": "Ask me something...",
   "veniChatPoweredBy": "Powered by ",
   "veniChatProcessing": "I'm processing your query about \"{query}\"...",
@@ -500,5 +1022,318 @@
   "veniCmdUnknown": "I don't recognize that command. Type help to see what I can do.",
   "version": "Version {name}",
   "yes": "Yes",
-  "zoomToFit": "Zoom to Fit"
+  "zoomToFit": "Zoom to Fit",
+  "generalSettingsMenuLabel": "General Settings",
+  "aiAssistantMenuLabel": "AI Assistant",
+  "notificationsMenuLabel": "Notifications",
+  "loanManagementMenuLabel": "Loan Management",
+  "aboutMenuLabel": "About",
+  "automaticDarkModeLabel": "Automatic dark mode",
+  "syncWithSystemLabel": "Sync with system",
+  "manualDarkModeLabel": "Manual dark mode",
+  "disableAutomaticToChange": "Disable automatic mode to change it",
+  "changeLightDark": "Switch between light and dark",
+  "enableAiAndChatbot": "Enable Artificial Intelligence and Chatbot",
+  "requiresGeminiLinking": "Requires linking with Gemini in Integrations",
+  "aiOrganizeInventory": "Use AI to organize your inventory intelligently",
+  "aiAssistantTitle": "Artificial Intelligence Assistant",
+  "selectAiProvider": "Choose which AI provider Veni will use. Make sure you have the API Key configured in Integrations.",
+  "aiProviderLabel": "Provider",
+  "aiModelLabel": "Model",
+  "aiProviderUpdated": "AI Provider updated",
+  "notificationSettingsTitle": "Notification Management",
+  "channelPriorityLabel": "Channel Priority (Drag to reorder)",
+  "telegramBotLabel": "Telegram Bot",
+  "resendEmailLabel": "Resend Email",
+  "lowStockLabel": "Low Stock",
+  "lowStockHint": "Alert when a product falls below the minimum.",
+  "newPresalesLabel": "New Pre-sales",
+  "newPresalesHint": "Notify launches detected by AI.",
+  "loanReminderLabel": "Loan Reminder",
+  "loanReminderHint": "Alert before the return date.",
+  "overdueLoansLabel": "Overdue Loans",
+  "overdueLoansHint": "Critical alert if an object is not returned on time.",
+  "maintenanceLabel": "Maintenance",
+  "maintenanceHint": "Alert when an asset needs review.",
+  "priceChangeLabel": "Price Changes",
+  "priceChangeHint": "Notify market value variations.",
+  "unlinkGithubTitle": "Disconnect GitHub",
+  "unlinkGithubMessage": "Are you sure you want to unlink your GitHub account?",
+  "updatePasswordButton": "UPDATE PASSWORD",
+  "newContainerDialog": "New Container",
+  "descriptionField": "Description",
+  "isCollectionQuestion": "Is it a collection?",
+  "createContainerButton": "Create Container",
+  "selectContainerHint": "Select a container",
+  "newAssetTypeTitle": "New Asset Type",
+  "generalConfiguration": "General Configuration",
+  "collectionContainerWarning": "This container is a collection. You can create serialized or non-serialized types, but possession and desired fields can only be configured on non-serialized types.",
+  "createAssetTypeButton": "Create Asset Type",
+  "assetTypesInContainer": "Asset Types in \"{name}\"",
+  "@assetTypesInContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewTypeButton": "Create New Type",
+  "isSerializedQuestion": "Is it a serialized item?",
+  "addNewFieldButton": "Add New Field",
+  "deleteFieldTooltip": "Delete field",
+  "fieldsOptions": "Options:",
+  "isRequiredField": "Is Required",
+  "isSummativeFieldLabel": "Is Summative (Added to type total)",
+  "isMonetaryValueLabel": "Is Monetary Value",
+  "monetaryValueDescription": "Will be used to calculate total investment in Dashboard",
+  "noDataListsAvailable": "⚠️ No data lists available in this container.",
+  "selectDataList": "Select Data List",
+  "chooseList": "Choose a list",
+  "goToPageLabel": "Go to page:",
+  "conditionLabel": "Condition",
+  "actionsLabel": "Actions",
+  "editButtonLabel": "Edit",
+  "deleteButtonLabel": "Delete",
+  "collectionFieldsTooltip": "Collection Fields",
+  "totalLocations": "{count} locations",
+  "@totalLocations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "withoutLocationLabel": "{count} without location · ",
+  "@withoutLocationLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "objectIdColumn": "Object ID",
+  "containerNotFoundError": "Container with ID {id} not found.",
+  "@containerNotFoundError": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidContainerIdError": "Error: Invalid container ID.",
+  "startConfigurationButton": "Start configuration",
+  "fullNameField": "Full name",
+  "emailField": "Email address",
+  "passwordField": "Password",
+  "confirmPasswordField": "Confirm password",
+  "goBackButton": "Go back",
+  "createAccountButton": "Create account",
+  "goToLoginButton": "Go to login",
+  "deleteConfirmationTitle": "Confirm Deletion",
+  "deleteItemMessage": "Do you wish to delete \"{name}\"?",
+  "@deleteItemMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "elementDeletedSuccess": "Element deleted successfully",
+  "enterYourNameValidation": "Enter your name.",
+  "minTwoCharactersValidation": "Minimum 2 characters.",
+  "enterEmailValidation": "Enter an email.",
+  "invalidEmailValidation": "Invalid email.",
+  "enterPasswordValidation": "Enter a password.",
+  "minEightCharactersValidation": "Minimum 8 characters.",
+  "threeDbuttonLabel": "3D",
+  "barcodeCount": "{count}",
+  "@barcodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "rotationSpeedLabel": "{count}s",
+  "@rotationSpeedLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tagLabel": "#{tag}",
+  "@tagLabel": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "@invalidIdError": {},
+  "invalidIdError": "Invalid ID",
+  "@assetTypeLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeLoadError": "Error loading data: {error}",
+  "@assetTypeUpdateSuccess": {},
+  "assetTypeUpdateSuccess": "Asset type updated successfully",
+  "@assetTypeUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeUpdateError": "Error updating: {error}",
+  "@editAssetTypeTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editAssetTypeTitle": "Edit: {name}",
+  "@achievementCollectionTitle": {
+    "description": "Title for achievement collection section"
+  },
+  "achievementCollectionTitle": "Achievement Collection",
+  "@achievementSubtitle": {
+    "description": "Subtitle for achievements screen"
+  },
+  "achievementSubtitle": "Unlock milestones using Invenicum",
+  "@legendaryAchievementLabel": {
+    "description": "Label for legendary achievements"
+  },
+  "legendaryAchievementLabel": "LEGENDARY ACHIEVEMENT",
+  "@achievementCompleted": {
+    "description": "Status label for completed achievements"
+  },
+  "achievementCompleted": "Completed",
+  "@achievementLocked": {
+    "description": "Status label for locked achievements"
+  },
+  "achievementLocked": "Locked",
+  "@achievementUnlockedDate": {
+    "description": "Shows the date when achievement was unlocked",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementUnlockedDate": "Unlocked on {date}",
+  "@achievementLockedMessage": {
+    "description": "Message explaining how to unlock an achievement"
+  },
+  "achievementLockedMessage": "Fulfill the objective to unlock",
+  "@closeButtonLabel": {
+    "description": "Label for close button in dialogs"
+  },
+  "closeButtonLabel": "Got it",
+  "@configurationGeneralSection": {},
+  "configurationGeneralSection": "General Configuration",
+  "@assetTypeCollectionWarning": {},
+  "assetTypeCollectionWarning": "This container is a collection. You can create serialized or non-serialized types, but possession and desired fields can only be configured in non-serialized types.",
+  "@updateAssetTypeButton": {},
+  "updateAssetTypeButton": "Update Asset Type",
+  "@createAssetTypeButtonDefault": {},
+  "createAssetTypeButtonDefault": "Create Asset Type",
+  "@noAssetTypesMessage": {},
+  "noAssetTypesMessage": "No Asset Types defined yet in this container.",
+  "@totalCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "totalCountLabel": "Total: {count}",
+  "@possessionCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "possessionCountLabel": "Possession: {count}",
+  "@desiredCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "desiredCountLabel": "Desired: {count}",
+  "marketValueLabel": "Market: ",
+  "defaultSumFieldName": "Sum",
+  "calculatingLabel": "Calculating...",
+  "@unknownError": {},
+  "unknownError": "Unknown error",
+  "@noNameItem": {},
+  "noNameItem": "No name",
+  "@loadingContainers": {},
+  "loadingContainers": "Loading containers...",
+  "@fieldNameRequired": {},
+  "fieldNameRequired": "Field name is required",
+  "@selectImageButton": {},
+  "selectImageButton": "Select Image",
+  "@assetTypeDeletedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeDeletedSuccess": "{name} deleted",
+  "@noLocationValueData": {},
+  "noLocationValueData": "No assets with location and sufficient value yet to display this chart.",
+  "@requiredFieldValidation": {},
+  "requiredFieldValidation": "This field is required",
+  "@oceanTheme": {},
+  "oceanTheme": "Indian Ocean",
+  "@cherryBlossomTheme": {},
+  "cherryBlossomTheme": "Cherry Blossom",
+  "@loginSuccess": {},
+  "loginSuccess": "Login successful",
+  "reloadListError": "Failed to reload the list",
+  "copyItemSuffix": "Copy",
+  "@itemCopiedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemCopiedSuccess": "Item copied: {name}",
+  "copyError": "Error copying item",
+  "imageColumnLabel": "Image",
+  "viewImageTooltip": "View image",
+  "currentStockLabel": "Current Stock",
+  "minimumStockLabel": "Minimum Stock",
+  "locationColumnLabel": "Location",
+  "serialNumberColumnLabel": "Serial Number",
+  "marketPriceLabel": "Market Price",
+  "conditionColumnLabel": "Condition",
+  "actionsColumnLabel": "Actions",
+  "imageLoadError": "Failed to load image",
+  "imageUrlHint": "Make sure the URL is correct and the server is active",
+  "@assetTypeNameHint": {},
+  "assetTypeNameHint": "E.g: Laptop, Chemical Substance",
+  "@assetTypeNameLabel": {},
+  "assetTypeNameLabel": "Asset Type Name",
+  "@underConstruction": {},
+  "underConstruction": "Under Construction",
+  "@comingSoon": {},
+  "comingSoon": "Coming Soon",
+  "@constructionSubtitle": {},
+  "constructionSubtitle": "This feature is being developed",
+  "@selectColor": {
+    "description": "Label for color selection button or dialog"
+  },
+  "selectColor": "Select Color"
 }

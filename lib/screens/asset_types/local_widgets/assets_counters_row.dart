@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import '../../../data/models/asset_type_model.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../data/models/custom_field_definition.dart';
@@ -27,6 +28,7 @@ class AssetCountersRow extends StatelessWidget {
     final itemProvider = context.watch<InventoryItemProvider>();
     final items = inventoryItems ?? [];
     final bool isLoading = itemProvider.isLoading;
+    final l10n = AppLocalizations.of(context)!;
 
     final double totalMarketValue = _calculateTotalMarketValue(items);
 
@@ -38,10 +40,11 @@ class AssetCountersRow extends StatelessWidget {
         context,
         totalMarketValue,
         isLoading && items.isEmpty,
+        l10n,
       ),
       _buildCustomHeightChip(
         context,
-        label: 'TOTAL: ${items.length}',
+        label: l10n.totalCountLabel(items.length),
         icon: Icons.inventory,
         color: Theme.of(context).colorScheme.primary,
         isLoading: isLoading && items.isEmpty,
@@ -49,14 +52,14 @@ class AssetCountersRow extends StatelessWidget {
       if (assetType.possessionFieldId != null)
         _buildCustomHeightChip(
           context,
-          label: 'POSESIÓN: $possessionCount',
+          label: l10n.possessionCountLabel(possessionCount),
           icon: Icons.check_circle_outline,
           color: Colors.green,
         ),
       if (assetType.desiredFieldId != null)
         _buildCustomHeightChip(
           context,
-          label: 'DESEADOS: $desiredCount',
+          label: l10n.desiredCountLabel(desiredCount),
           icon: Icons.favorite_outline,
           color: Colors.pink,
         ),
@@ -67,7 +70,7 @@ class AssetCountersRow extends StatelessWidget {
           })
           .map((def) {
             final fieldId = def['id'].toString();
-            final fieldName = def['name'] as String? ?? 'Suma';
+            final fieldName = def['name'] as String? ?? l10n.defaultSumFieldName;
             final fieldType = def['type'];
             final sumKey = 'sum_$fieldId';
             final dynamic rawValue = itemProvider.aggregationResults[sumKey];
@@ -83,7 +86,7 @@ class AssetCountersRow extends StatelessWidget {
       if (isLoading)
         _buildCustomHeightChip(
           context,
-          label: 'Calculando...',
+          label: l10n.calculatingLabel,
           icon: Icons.refresh,
           color: Colors.grey,
           isLoading: true,
@@ -108,6 +111,7 @@ class AssetCountersRow extends StatelessWidget {
     BuildContext context,
     double totalValue,
     bool isSyncing,
+    AppLocalizations l10n,
   ) {
     return Chip(
       elevation: 0,
@@ -122,9 +126,9 @@ class AssetCountersRow extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'MERCADO: ',
-              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
+            Text(
+              l10n.marketValueLabel,
+              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
             ),
             if (isSyncing)
               const SizedBox(

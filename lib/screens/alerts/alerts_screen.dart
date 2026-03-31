@@ -39,6 +39,7 @@ class _AlertsScreenState extends State<AlertsScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final alertProvider = context.watch<AlertProvider>();
 
     // Separación de listas
@@ -75,7 +76,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                     child: const Icon(Icons.warning_amber_rounded),
                   ),
                   const SizedBox(width: 8),
-                  const Text("Alertas"),
+                  Text(l10n.alertsTabLabel),
                 ],
               ),
             ),
@@ -98,7 +99,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                     child: const Icon(Icons.event_note_rounded),
                   ),
                   const SizedBox(width: 8),
-                  const Text("Calendario"),
+                  Text(l10n.calendarTabLabel),
                 ],
               ),
             ),
@@ -120,7 +121,7 @@ class _AlertsScreenState extends State<AlertsScreen>
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showUnifiedCreateDialog(context),
         icon: const Icon(Icons.add),
-        label: const Text("Nuevo"),
+        label: Text(l10n.newLabel),
       ),
     );
   }
@@ -194,10 +195,11 @@ class _AlertsScreenState extends State<AlertsScreen>
     AlertProvider provider, {
     bool isEvent = false,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     if (items.isEmpty) {
       return Center(
         child: Text(
-          isEvent ? "Sin eventos para este día" : "No hay alertas activas",
+          isEvent ? l10n.noEventsForDay : l10n.noActiveAlerts,
         ),
       );
     }
@@ -243,10 +245,10 @@ class _AlertsScreenState extends State<AlertsScreen>
                       Icons.check_circle_outline,
                       color: Colors.green,
                     ),
-                    tooltip: "Marcar como leído",
+                    tooltip: l10n.markAsReadLabel,
                     onPressed: () {
                       provider.markAsRead(alert.id);
-                      ToastService.info("Marcada como leída");
+                      ToastService.info(l10n.alertMarkedAsRead);
                     },
                   ),
                 // Botón de Eliminar
@@ -255,14 +257,14 @@ class _AlertsScreenState extends State<AlertsScreen>
                     Icons.delete_sweep_outlined,
                     color: Colors.redAccent,
                   ),
-                  tooltip: "Eliminar",
+                  tooltip: l10n.delete,
                   onPressed: () async {
                     // 1. Llamamos al borrado en el backend/estado
                     await provider.deleteAlert(alert.id);
 
                     // 2. Mostramos el mensaje de confirmación
                     ToastService.success(
-                      "Notificación eliminada correctamente",
+                      l10n.notificationDeleted,
                     );
                   },
                 ),
@@ -275,6 +277,7 @@ class _AlertsScreenState extends State<AlertsScreen>
   }
 
   void _showEditEventDialog(BuildContext context, dynamic alert) {
+    final l10n = AppLocalizations.of(context)!;
     final titleCtrl = TextEditingController(text: alert.title);
     final msgCtrl = TextEditingController(text: alert.message);
 
@@ -299,14 +302,14 @@ class _AlertsScreenState extends State<AlertsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text("Editar Evento"),
+          title: Text(l10n.editEventTitle),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Datos del evento",
+                Text(
+                  l10n.eventDataSection,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
                 ListTile(
@@ -345,31 +348,34 @@ class _AlertsScreenState extends State<AlertsScreen>
                   },
                 ),
                 const SizedBox(height: 10),
-                const Text(
-                  "Configurar Aviso:",
+                Text(
+                  l10n.configureReminderLabel,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 ),
                 DropdownButton<String>(
                   value: advanceNotice,
                   isExpanded: true,
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: "0",
-                      child: Text("A la hora del evento"),
+                      child: Text(l10n.eventReminderAtTime),
                     ),
                     DropdownMenuItem(
                       value: "5",
-                      child: Text("5 minutos antes"),
+                      child: Text(l10n.minutesBeforeLabel(5)),
                     ),
                     DropdownMenuItem(
                       value: "15",
-                      child: Text("15 minutos antes"),
+                      child: Text(l10n.minutesBeforeLabel(15)),
                     ),
                     DropdownMenuItem(
                       value: "30",
-                      child: Text("30 minutos antes"),
+                      child: Text(l10n.minutesBeforeLabel(30)),
                     ),
-                    DropdownMenuItem(value: "60", child: Text("1 hora antes")),
+                    DropdownMenuItem(
+                      value: "60",
+                      child: Text(l10n.oneHourBeforeLabel),
+                    ),
                   ],
                   onChanged: (val) =>
                       setDialogState(() => advanceNotice = val!),
@@ -377,11 +383,11 @@ class _AlertsScreenState extends State<AlertsScreen>
                 const Divider(),
                 TextField(
                   controller: titleCtrl,
-                  decoration: const InputDecoration(labelText: "Título"),
+                  decoration: InputDecoration(labelText: l10n.alertTitle),
                 ),
                 TextField(
                   controller: msgCtrl,
-                  decoration: const InputDecoration(labelText: "Mensaje"),
+                  decoration: InputDecoration(labelText: l10n.alertMessage),
                   maxLines: 2,
                 ),
               ],
@@ -390,7 +396,7 @@ class _AlertsScreenState extends State<AlertsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancelar"),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -413,9 +419,9 @@ class _AlertsScreenState extends State<AlertsScreen>
                 });
 
                 Navigator.pop(context);
-                ToastService.success("Evento actualizado");
+                ToastService.success(l10n.eventUpdated);
               },
-              child: const Text("Guardar Cambios"),
+              child: Text(l10n.saveChanges),
             ),
           ],
         ),
@@ -424,6 +430,7 @@ class _AlertsScreenState extends State<AlertsScreen>
   }
 
   void _showDetailsDialog(BuildContext context, dynamic alert) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -456,8 +463,8 @@ class _AlertsScreenState extends State<AlertsScreen>
               ),
               const Divider(),
             ],
-            const Text(
-              "Mensaje:",
+            Text(
+              l10n.messageWithColon,
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
             ),
             const SizedBox(height: 5),
@@ -467,7 +474,7 @@ class _AlertsScreenState extends State<AlertsScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Cerrar"),
+            child: Text(l10n.closeLabel),
           ),
         ],
       ),
@@ -498,6 +505,7 @@ class _AlertsScreenState extends State<AlertsScreen>
   // --- LÓGICA DE CREACIÓN ---
 
   void _showUnifiedCreateDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     bool isEvent = false;
     DateTime selectedDate = DateTime.now();
     final titleCtrl = TextEditingController();
@@ -508,13 +516,13 @@ class _AlertsScreenState extends State<AlertsScreen>
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          title: const Text("Crear Alerta/Evento"),
+          title: Text(l10n.createAlertOrEventTitle),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 SwitchListTile(
-                  title: const Text("¿Es un evento?"),
+                  title: Text(l10n.isEventQuestion),
                   value: isEvent,
                   onChanged: (v) => setDialogState(() => isEvent = v),
                 ),
@@ -562,33 +570,33 @@ class _AlertsScreenState extends State<AlertsScreen>
                     },
                   ),
                   const SizedBox(height: 10),
-                  const Text(
-                    "Avisarme:",
+                  Text(
+                    l10n.remindMeLabel,
                     style: TextStyle(fontWeight: FontWeight.bold),
                   ),
                   DropdownButton<String>(
                     value: advanceNotice,
                     isExpanded: true,
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: "0",
-                        child: Text("A la hora del evento"),
+                        child: Text(l10n.eventReminderAtTime),
                       ),
                       DropdownMenuItem(
                         value: "5",
-                        child: Text("5 minutos antes"),
+                        child: Text(l10n.minutesBeforeLabel(5)),
                       ),
                       DropdownMenuItem(
                         value: "15",
-                        child: Text("15 minutos antes"),
+                        child: Text(l10n.minutesBeforeLabel(15)),
                       ),
                       DropdownMenuItem(
                         value: "30",
-                        child: Text("30 minutos antes"),
+                        child: Text(l10n.minutesBeforeLabel(30)),
                       ),
                       DropdownMenuItem(
                         value: "60",
-                        child: Text("1 hora antes"),
+                        child: Text(l10n.oneHourBeforeLabel),
                       ),
                     ],
                     onChanged: (val) =>
@@ -597,11 +605,11 @@ class _AlertsScreenState extends State<AlertsScreen>
                 ],
                 TextField(
                   controller: titleCtrl,
-                  decoration: const InputDecoration(labelText: "Título"),
+                  decoration: InputDecoration(labelText: l10n.alertTitle),
                 ),
                 TextField(
                   controller: msgCtrl,
-                  decoration: const InputDecoration(labelText: "Mensaje"),
+                  decoration: InputDecoration(labelText: l10n.alertMessage),
                 ),
               ],
             ),
@@ -609,7 +617,7 @@ class _AlertsScreenState extends State<AlertsScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text("Cancelar"),
+              child: Text(l10n.cancel),
             ),
             ElevatedButton(
               onPressed: () {
@@ -627,9 +635,9 @@ class _AlertsScreenState extends State<AlertsScreen>
                   notifyAt: isEvent ? notificationDate : null,
                 );
                 Navigator.pop(context);
-                ToastService.success("Creado correctamente");
+                ToastService.success(l10n.createdSuccessfully);
               },
-              child: const Text("Guardar"),
+              child: Text(l10n.save),
             ),
           ],
         ),

@@ -5,6 +5,7 @@ import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/providers/location_provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class LocationDropdownField extends StatelessWidget {
@@ -28,6 +29,7 @@ class LocationDropdownField extends StatelessWidget {
   static const int _kCreateNew = -1;
 
   Future<void> _handleCreateNew(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final formKey = GlobalKey<FormState>();
     String? newName;
     int? selectedParentId;
@@ -41,11 +43,11 @@ class LocationDropdownField extends StatelessWidget {
         return StatefulBuilder(
           builder: (ctx, setDialogState) {
             return AlertDialog(
-              title: const Row(
+              title: Row(
                 children: [
-                  Icon(Icons.location_on_outlined, color: Colors.teal),
-                  SizedBox(width: 8),
-                  Text('Nueva ubicación'),
+                  const Icon(Icons.location_on_outlined, color: Colors.teal),
+                  const SizedBox(width: 8),
+                  Text(l10n.newLocationLabel),
                 ],
               ),
               content: Form(
@@ -56,13 +58,13 @@ class LocationDropdownField extends StatelessWidget {
                     TextFormField(
                       controller: nameCtrl,
                       autofocus: true,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre',
-                        hintText: 'Ej: Estantería A1, Armario 3...',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.name,
+                        hintText: l10n.newLocationHint,
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (v) => (v == null || v.trim().isEmpty)
-                          ? 'Introduce un nombre'
+                          ? l10n.pleaseEnterAName
                           : null,
                       onFieldSubmitted: (_) {
                         if (formKey.currentState!.validate()) {
@@ -76,15 +78,15 @@ class LocationDropdownField extends StatelessWidget {
                     // que el dropdown principal (deduplicadas por id).
                     DropdownButtonFormField<int>(
                       value: selectedParentId,
-                      decoration: const InputDecoration(
-                        labelText: 'Ubicación padre (opcional)',
-                        border: OutlineInputBorder(),
-                        prefixIcon: Icon(Icons.account_tree_outlined, size: 18),
+                      decoration: InputDecoration(
+                        labelText: l10n.parentLocationOptionalLabel,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.account_tree_outlined, size: 18),
                       ),
                       items: [
-                        const DropdownMenuItem<int>(
+                        DropdownMenuItem<int>(
                           value: null,
-                          child: Text('Ninguna (raíz)'),
+                          child: Text(l10n.noneRootLabel),
                         ),
                         ...{ for (final loc in availableLocations) loc.id: loc }
                             .values
@@ -102,7 +104,7 @@ class LocationDropdownField extends StatelessWidget {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Cancelar'),
+                  child: Text(l10n.cancel),
                 ),
                 FilledButton(
                   onPressed: () {
@@ -111,7 +113,7 @@ class LocationDropdownField extends StatelessWidget {
                       Navigator.pop(ctx);
                     }
                   },
-                  child: const Text('Crear'),
+                  child: Text(l10n.create),
                 ),
               ],
             );
@@ -139,15 +141,16 @@ class LocationDropdownField extends StatelessWidget {
         // availableLocations ya la incluye y no hay crash por item faltante.
         containerProvider.addLocationToContainer(containerId!, created);
         onChanged(created.id);
-        ToastService.success('Ubicación "$newName" creada');
+        ToastService.success(l10n.locationCreatedShort(newName!));
       }
     } catch (e) {
-      ToastService.error('Error al crear ubicación: $e');
+      ToastService.error(l10n.errorCreatingLocation(e.toString()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Deduplicamos la lista por id para evitar el assert de Flutter
     // "There should be exactly one item with value X".
     final uniqueLocations = { for (final loc in availableLocations) loc.id: loc }.values.toList();
@@ -161,10 +164,10 @@ class LocationDropdownField extends StatelessWidget {
 
     return DropdownButtonFormField<int>(
       value: safeValue,
-      decoration: const InputDecoration(
-        labelText: 'Ubicación',
-        border: OutlineInputBorder(),
-        helperText: 'Obligatorio',
+      decoration: InputDecoration(
+        labelText: l10n.location,
+        border: const OutlineInputBorder(),
+        helperText: l10n.obligatory,
       ),
       items: [
         ...uniqueLocations.map((location) => DropdownMenuItem<int>(
@@ -172,15 +175,15 @@ class LocationDropdownField extends StatelessWidget {
               child: Text(location.name),
             )),
         // Opción fija al final para crear nueva ubicación
-        const DropdownMenuItem<int>(
+        DropdownMenuItem<int>(
           value: _kCreateNew,
           child: Row(
             children: [
-              Icon(Icons.add_circle_outline, size: 18, color: Colors.teal),
-              SizedBox(width: 8),
+              const Icon(Icons.add_circle_outline, size: 18, color: Colors.teal),
+              const SizedBox(width: 8),
               Text(
-                'Nueva ubicación...',
-                style: TextStyle(
+                l10n.newLocationEllipsis,
+                style: const TextStyle(
                   color: Colors.teal,
                   fontWeight: FontWeight.w500,
                 ),
@@ -199,7 +202,7 @@ class LocationDropdownField extends StatelessWidget {
       validator: validator ??
           (value) {
             if (value == null || value == _kCreateNew) {
-              return 'Por favor, selecciona una ubicación.';
+              return l10n.pleaseSelectLocation;
             }
             return null;
           },

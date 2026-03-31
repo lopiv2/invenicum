@@ -193,7 +193,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
         },
         validator: (value) {
           if (fieldDef.isRequired && value == null) {
-            return 'Este campo es obligatorio.';
+            return AppLocalizations.of(context)!.requiredFieldValidation;
           }
           return null;
         },
@@ -228,7 +228,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
         highlighted: highlightedFields.contains(fieldDef.name),
         validator: (value) {
           if (fieldDef.isRequired && (value == null || value.isEmpty)) {
-            return 'Este campo es obligatorio.';
+            return AppLocalizations.of(context)!.requiredFieldValidation;
           }
           return fieldDef.type.validateValue(value);
         },

@@ -23,6 +23,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final prefsProvider = context.watch<PreferencesProvider>();
     final integrationProvider = context.watch<IntegrationProvider>();
+    final l10n = AppLocalizations.of(context)!;
     final bool isGeminiConnected = integrationProvider.isLinked('gemini');
     final bool isAutoDark = prefsProvider.useSystemTheme;
     final bool isManualDark = prefsProvider.isDarkMode;
@@ -33,7 +34,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              AppLocalizations.of(context)!.generalSettings,
+              l10n.generalSettings,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -50,8 +51,8 @@ class GeneralSettingsCardWidget extends StatelessWidget {
             // --- MODO OSCURO AUTOMÁTICO ---
             SwitchListTile(
               secondary: const Icon(Icons.brightness_auto),
-              title: const Text("Modo oscuro automático"),
-              subtitle: const Text("Sincronizar con el sistema"),
+              title: Text(l10n.automaticDarkModeLabel),
+              subtitle: Text(l10n.syncWithSystemLabel),
               value: isAutoDark,
               onChanged: (bool value) {
                 prefsProvider.setUseSystemTheme(value);
@@ -61,10 +62,10 @@ class GeneralSettingsCardWidget extends StatelessWidget {
             // --- MODO OSCURO MANUAL (Se deshabilita si el automático está activo) ---
             SwitchListTile(
               secondary: const Icon(Icons.dark_mode_outlined),
-              title: const Text("Modo oscuro manual"),
+              title: Text(l10n.manualDarkModeLabel),
               subtitle: isAutoDark
-                  ? const Text("Desactiva el modo automático para cambiarlo")
-                  : const Text("Cambiar entre claro y oscuro"),
+                  ? Text(l10n.disableAutomaticToChange)
+                  : Text(l10n.changeLightDark),
               value: isManualDark,
               // 🚀 CRÍTICO: Si isAutoDark es true, el switch se ve gris y no responde
               onChanged: prefsProvider.useSystemTheme
@@ -143,16 +144,14 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                 ),
               ),
             SwitchListTile(
-              title: const Text("Habilitar Inteligencia Artificial y Chatbot"),
+              title: Text(l10n.enableAiAndChatbot),
               // Mostramos un subtítulo de advertencia solo si no está conectado
               subtitle: !isGeminiConnected
-                  ? const Text(
-                      "Requiere vinculación con Gemini en Integraciones",
-                      style: TextStyle(color: Colors.orange, fontSize: 12),
+                  ? Text(
+                      l10n.requiresGeminiLinking,
+                      style: const TextStyle(color: Colors.orange, fontSize: 12),
                     )
-                  : const Text(
-                      "Usa IA para organizar tu inventario de manera inteligente",
-                    ),
+                  : Text(l10n.aiOrganizeInventory),
               secondary: Icon(
                 Icons.auto_awesome,
                 // Cambiamos el color del icono según la disponibilidad
@@ -167,7 +166,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                 if (!isGeminiConnected) {
                   // Si intenta activarlo sin estar vinculado, avisamos
                   ToastService.info(
-                    "Primero debes configurar la integración de Gemini",
+                    l10n.requiresGeminiLinking,
                   );
                   return;
                 }
@@ -176,7 +175,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                 try {
                   await prefsProvider.setAiEnabled(value);
                   ToastService.success(
-                    value ? "IA Activada" : "IA Desactivada",
+                    value ? l10n.aiProviderUpdated : l10n.aiProviderUpdated,
                   );
                 } catch (e) {
                   ToastService.error("Error al actualizar la preferencia");

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Widget para la sección de imagen del tipo de activo
 class AssetTypeImageSection extends StatelessWidget {
@@ -69,7 +70,7 @@ class AssetTypeImageSection extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: onAddImage,
                         icon: const Icon(Icons.add_photo_alternate),
-                        label: const Text('Seleccionar Imagen'),
+                        label: Text(AppLocalizations.of(context)!.selectImageButton),
                       ),
                     ],
                   ),

@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Widget para los botones de acción (Guardar/Cancelar)
 class AssetTypeActionButtons extends StatelessWidget {
   final VoidCallback onSave;
-  final String saveLabel;
+  final String? saveLabel;
   final bool isLoading;
 
   const AssetTypeActionButtons({
     super.key,
     required this.onSave,
-    this.saveLabel = 'Crear Tipo de Activo',
+    this.saveLabel,
     this.isLoading = false,
   });
 
   @override
   Widget build(BuildContext context) {
+    final displayLabel = saveLabel ?? AppLocalizations.of(context)!.createAssetTypeButtonDefault;
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -29,7 +31,7 @@ class AssetTypeActionButtons extends StatelessWidget {
                 )
               : const Icon(Icons.save),
           label: Text(
-            saveLabel,
+            displayLabel,
             style: const TextStyle(fontSize: 16),
           ),
           style: ElevatedButton.styleFrom(
@@ -43,7 +45,7 @@ class AssetTypeActionButtons extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: isLoading ? null : () => context.pop(),
           icon: const Icon(Icons.cancel),
-          label: const Text('Cancelar', style: TextStyle(fontSize: 16)),
+          label: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(fontSize: 16)),
           style: OutlinedButton.styleFrom(
             padding: const EdgeInsets.symmetric(
               horizontal: 30,

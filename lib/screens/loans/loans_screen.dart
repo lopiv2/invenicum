@@ -142,6 +142,7 @@ class _LoansScreenState extends State<LoansScreen> {
   }
 
   Future<void> _generateVoucher(Loan loan) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final voucherService = context.read<VoucherService>();
       final config = await voucherService.getVoucherConfig();
@@ -199,7 +200,7 @@ class _LoansScreenState extends State<LoansScreen> {
                       crossAxisAlignment: pw.CrossAxisAlignment.end,
                       children: [
                         pw.Text(
-                          'DELIVERY VOUCHER', // O usar una traducción específica para el PDF
+                          l10n.deliveryVoucher,
                           style: pw.TextStyle(
                             fontWeight: pw.FontWeight.bold,
                             fontSize: 18,
@@ -443,7 +444,7 @@ class _LoansScreenState extends State<LoansScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _statItem("Total", stats['totalLoans']),
+          _statItem(l10n.totalLabel, stats['totalLoans']),
           _statItem(l10n.actives, stats['activeLoans'], color: Colors.orange),
           _statItem(l10n.overdue, stats['overdueLoans'], color: Colors.red),
         ],

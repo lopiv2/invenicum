@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetDetailTitleHeader extends StatelessWidget {
   const AssetDetailTitleHeader({
@@ -13,6 +14,7 @@ class AssetDetailTitleHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,7 +35,7 @@ class AssetDetailTitleHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                "SKU / EAN / UPC: ${item.barcode}",
+                '${l10n.skuBarcodeLabel}: ${item.barcode}',
                 style: TextStyle(
                   color: theme.colorScheme.onPrimaryContainer,
                   fontWeight: FontWeight.bold,

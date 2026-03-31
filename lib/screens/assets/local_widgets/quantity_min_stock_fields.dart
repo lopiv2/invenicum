@@ -25,16 +25,16 @@ class QuantityMinStockFieldsWidget extends StatelessWidget {
             controller: quantityController,
             label: l10n.quantity,
             icon: Icons.layers_outlined,
-            helper: 'Disponible',
+            helper: l10n.availableLabel,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Introduce una cantidad.';
+                return l10n.enterQuantity;
               }
               final q = int.tryParse(value);
               if (q == null || q < 1) {
-                return 'Debe ser mayor a 0.';
+                return l10n.mustBeGreaterThanZero;
               }
               return null;
             },
@@ -46,16 +46,16 @@ class QuantityMinStockFieldsWidget extends StatelessWidget {
             controller: minStockController,
             label: l10n.minStock,
             icon: Icons.warning_amber_outlined,
-            helper: 'Umbral de alerta',
+            helper: l10n.alertThresholdLabel,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (value) {
               if (value == null || value.isEmpty) {
-                return 'Introduce un stock mínimo.';
+                return l10n.enterMinimumStock;
               }
               final m = int.tryParse(value);
               if (m == null || m < 1) {
-                return 'Debe ser mayor a 0.';
+                return l10n.mustBeGreaterThanZero;
               }
               return null;
             },

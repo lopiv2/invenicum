@@ -39,6 +39,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final containerProvider = context.watch<ContainerProvider>();
@@ -90,7 +91,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Cargando contenedores...',
+                      l10n.loadingContainers,
                       style: textTheme.bodyMedium?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
@@ -194,7 +195,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               setState(() => _selectedContainerId = newValue);
             }
           },
-          hint: const Text('Selecciona un contenedor'),
+          hint: Text(AppLocalizations.of(context)!.selectContainerHint),
           underline: Container(
             height: 2,
             color: colorScheme.primary,

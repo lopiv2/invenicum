@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Widget para el campo de nombre del tipo de activo
 class AssetTypeNameField extends StatelessWidget {
@@ -10,18 +11,19 @@ class AssetTypeNameField extends StatelessWidget {
   const AssetTypeNameField({
     super.key,
     required this.controller,
-    this.hintText = 'Ej: Ordenador Portátil, Sustancia Química',
-    this.labelText = 'Nombre del Tipo de Activo',
+    this.hintText,
+    this.labelText,
     this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return TextFormField(
       controller: controller,
       decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
+        labelText: labelText ?? l10n.assetTypeNameLabel,
+        hintText: hintText ?? l10n.assetTypeNameHint,
         border: const OutlineInputBorder(),
       ),
       validator: validator,

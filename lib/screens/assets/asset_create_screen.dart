@@ -172,7 +172,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         });
       }
     } catch (e) {
-      if (mounted) ToastService.error('Error al cargar listas: $e');
+      if (mounted) {
+        ToastService.error(
+          AppLocalizations.of(context)!.errorLoadingListValues(e.toString()),
+        );
+      }
     }
   }
 
@@ -182,7 +186,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     if (status.isGranted) {
       _handleBarcodeScan();
     } else {
-      ToastService.error("Se requiere permiso de cámara para escanear");
+      ToastService.error(AppLocalizations.of(context)!.cameraPermissionRequired);
     }
   }
 
@@ -213,7 +217,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           }
           _highlightedFields.addAll(['name', 'description', 'barcode']);
         });
-        ToastService.success("¡Datos encontrados en la nube!");
+        ToastService.success(AppLocalizations.of(context)!.cloudDataFound);
       }
     } catch (e) {
       debugPrint("Error procesando sugerencia: $e");
@@ -226,9 +230,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   Future<void> _handleEnrichSearch() async {
+    final l10n = AppLocalizations.of(context)!;
     final query = _aiSearchController.text.trim();
     if (query.isEmpty) {
-      ToastService.error("Escribe algo para buscar");
+      ToastService.error(l10n.typeSomethingToSearch);
       return;
     }
     setState(() => _isEnrichLoading = true);
@@ -252,7 +257,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           candidates,
         );
         if (selectedCandidate == null) {
-          ToastService.error('Importación cancelada.');
+          ToastService.error(l10n.importCancelled);
           return;
         }
 
@@ -322,16 +327,18 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           });
           if (unusedDataLines.isNotEmpty) {
             _descriptionController.text =
-                "$baseDescription\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}";
+                "$baseDescription\n\n--- ${l10n.technicalDetailsTitle} ---\n${unusedDataLines.join('\n')}";
           } else {
             _descriptionController.text = baseDescription;
           }
           _highlightedFields.addAll(['name', 'description']);
         });
-        ToastService.success("¡${enrichedData['name']} importado con éxito!");
+        ToastService.success(
+          l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''),
+        );
       }
     } catch (e) {
-      ToastService.error("No se pudo completar la importación");
+      ToastService.error(l10n.couldNotCompleteImport);
     } finally {
       if (mounted) {
         setState(() => _isEnrichLoading = false);
@@ -351,14 +358,15 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   String _buildCandidateSubtitle(Map<String, dynamic> candidate) {
+    final l10n = AppLocalizations.of(context)!;
     final parts = <String>[];
     final year = candidate['yearPublished']?.toString();
     final author = candidate['author']?.toString();
     if (year != null && year.isNotEmpty) {
-      parts.add('Año: $year');
+      parts.add('${l10n.yearLabel}: $year');
     }
     if (author != null && author.isNotEmpty) {
-      parts.add('Autor: $author');
+      parts.add('${l10n.authorLabel}: $author');
     }
     return parts.join(' • ');
   }
@@ -390,11 +398,12 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
     List<Map<String, dynamic>> candidates,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Selecciona un resultado'),
+          title: Text(l10n.selectResultTitle),
           content: SizedBox(
             width: 520,
             child: ConstrainedBox(
@@ -408,7 +417,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                   final subtitle = _buildCandidateSubtitle(candidate);
                   return ListTile(
                     leading: _buildCandidateLeading(candidate),
-                    title: Text(candidate['name']?.toString() ?? 'Sin nombre'),
+                    title: Text(candidate['name']?.toString() ?? l10n.unnamedLabel),
                     subtitle: subtitle.isEmpty ? null : Text(subtitle),
                     onTap: () => Navigator.of(dialogContext).pop(candidate),
                   );
@@ -419,7 +428,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
           ],
         );
@@ -513,16 +522,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   Future<void> _saveAsset() async {
+    final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
     if (!AssetFormUtils.validateForm(_formKey) ||
         _assetType == null ||
         _selectedLocationId == null) {
       if (_selectedLocationId == null) {
-        ToastService.error('Seleccione una ubicación.');
+        ToastService.error(l10n.selectLocationRequired);
       } else {
-        ToastService.error('Por favor, complete los campos obligatorios.');
-        return;
+        ToastService.error(l10n.completeRequiredFields);
       }
+      return;
     }
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
@@ -570,7 +580,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         filesData: AssetFormUtils.processImages(_imagePreviewUrls),
       );
       if (mounted) {
-        ToastService.success('Activo creado!');
+        ToastService.success(l10n.assetCreatedSuccess);
         await itemProvider.loadInventoryItems(
           containerId: _containerId!,
           assetTypeId: _assetTypeId!,
@@ -588,7 +598,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         }
       }
     } catch (e) {
-      ToastService.error('Error: $e');
+      ToastService.error(l10n.errorCreatingAsset(e.toString()));
     }
   }
 
@@ -628,6 +638,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _serialController.dispose();
     _quantityController.dispose();
     _minStockController.dispose();
+    _aiSearchController.dispose();
     _scrollController.dispose();
     _customControllers.forEach((_, c) => c.dispose());
     super.dispose();
@@ -639,6 +650,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
 
@@ -687,7 +699,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
                       // ── Fila 1: Importar desde fuente externa ──
                       importBento: BentoBoxWidget(
-                        title: "Importar desde Fuente Externa",
+                        title: l10n.externalImportTitle,
                         icon: Icons.auto_awesome,
                         child: ExternalImportWidget(
                           selectedSource: _selectedSource,
@@ -702,7 +714,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
                       // ── Fila 2a: Datos principales ──
                       mainDataBento: BentoBoxWidget(
-                        title: "Datos Principales",
+                        title: l10n.mainDataTitle,
                         icon: Icons.info_outline,
                         child: MainDataSectionWidget(
                           nameController: _nameController,
@@ -718,7 +730,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
                       // ── Fila 2b: Galería ──
                       galleryBento: BentoBoxWidget(
-                        title: "Galería",
+                        title: l10n.galleryTitle,
                         icon: Icons.camera_alt_outlined,
                         child: ImagesSectionWidget(
                           imageUrls: _imagePreviewUrls,
@@ -737,7 +749,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
                       // ── Fila 3b: Stock y Codificación ──
                       stockBento: BentoBoxWidget(
-                        title: "Stock y Codificación",
+                        title: l10n.stockAndCodingTitle,
                         icon: Icons.qr_code_scanner,
                         child: InventorySectionWidget(
                           barcodeController: _barcodeController,
@@ -753,7 +765,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       // ── Fila 4: Especificaciones (full width si hay campos) ──
                       specsBento: _assetType!.fieldDefinitions.isNotEmpty
                           ? BentoBoxWidget(
-                              title: "Especificaciones",
+                            title: l10n.specificationsTitle,
                               icon: Icons.list_alt,
                               child: CustomFieldsSectionWidget(
                                 fieldDefinitions: _assetType!.fieldDefinitions,

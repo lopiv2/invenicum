@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 
 class AssetDetailHeader extends StatefulWidget {
@@ -29,6 +30,7 @@ class _AssetDetailHeaderState extends State<AssetDetailHeader> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final hasImage = widget.item.images.isNotEmpty;
     final imageUrls = hasImage
         ? widget.item.images
@@ -178,14 +180,14 @@ class _AssetDetailHeaderState extends State<AssetDetailHeader> {
                     const SizedBox(height: 16),
                     _buildInfoChip(
                       Icons.inventory_2,
-                      'Stock',
+                      l10n.stockLabel,
                       widget.item.quantity.toString(),
                       context,
                     ),
                     const SizedBox(height: 8),
                     _buildInfoChip(
                       Icons.warning_amber,
-                      'Stock Mín.',
+                      l10n.minStock,
                       widget.item.minStock.toString(),
                       context,
                     ),
@@ -193,7 +195,7 @@ class _AssetDetailHeaderState extends State<AssetDetailHeader> {
                       const SizedBox(height: 8),
                       _buildInfoChip(
                         Icons.location_on,
-                        'Ubicación',
+                        l10n.location,
                         widget.item.location!.name,
                         context,
                       ),
@@ -202,7 +204,7 @@ class _AssetDetailHeaderState extends State<AssetDetailHeader> {
                       const SizedBox(height: 8),
                       _buildInfoChip(
                         Icons.qr_code,
-                        'Código',
+                        l10n.barCode,
                         widget.item.barcode!,
                         context,
                       ),

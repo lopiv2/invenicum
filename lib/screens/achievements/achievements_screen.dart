@@ -6,12 +6,23 @@ import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/providers/achievement_provider.dart';
 // Asegúrate de tener estas constantes o cámbialas por tus valores de diseño
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/widgets/ui/under_construction_overlay.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
-class AchievementsCardWidget extends StatelessWidget {
+class AchievementsCardWidget extends StatefulWidget {
   const AchievementsCardWidget({super.key});
 
   @override
+  State<AchievementsCardWidget> createState() => _AchievementsCardWidgetState();
+}
+
+class _AchievementsCardWidgetState extends State<AchievementsCardWidget> {
+  // Cambiar a 'true' para mostrar el overlay, 'false' para ocultarlo
+  bool _showUnderConstruction = true;
+
+  @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final achProv = context.watch<AchievementProvider>();
     // Supongamos que AppAchievements devuelve la lista de definiciones base.
     final baseDefinitions = AppAchievements.getDefinitions(context);
@@ -48,84 +59,95 @@ class AchievementsCardWidget extends StatelessWidget {
         ? unlockedCount / totalCount
         : 0.0;
 
-    return Container(
-      // Contenedor principal elegante
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // CABECERA MODERNA
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Logros de Colección",
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      "Desbloquea hitos usando Invenicum",
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.hintColor,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              _buildModernProgressCircle(
-                context,
-                progressPercentage,
-                unlockedCount,
-                totalCount,
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        Container(
+          // Contenedor principal elegante
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.03),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
               ),
             ],
           ),
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // CABECERA MODERNA
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.achievementCollectionTitle,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          l10n.achievementSubtitle,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.hintColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  _buildModernProgressCircle(
+                    context,
+                    progressPercentage,
+                    unlockedCount,
+                    totalCount,
+                  ),
+                ],
+              ),
 
-          const SizedBox(height: 32),
+              const SizedBox(height: 32),
 
-          // REJILLA DE LOGROS ANIMADA
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const double spacing = 12.0;
-              // Calculamos para 5 columnas
-              final double itemWidth =
-                  (constraints.maxWidth - (spacing * 4)) / 5;
+              // REJILLA DE LOGROS ANIMADA
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  const double spacing = 12.0;
+                  // Calculamos para 5 columnas
+                  final double itemWidth =
+                      (constraints.maxWidth - (spacing * 4)) / 5;
 
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: finalAchievements.map((ach) {
-                  return SizedBox(
-                    width: itemWidth,
-                    height: itemWidth,
-                    child: _ModernAchievementItem(ach: ach),
+                  return Wrap(
+                    spacing: spacing,
+                    runSpacing: spacing,
+                    children: finalAchievements.map((ach) {
+                      return SizedBox(
+                        width: itemWidth,
+                        height: itemWidth,
+                        child: _ModernAchievementItem(ach: ach, l10n: l10n),
+                      );
+                    }).toList(),
                   );
-                }).toList(),
-              );
-            },
+                },
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+        if (_showUnderConstruction)
+          Positioned.fill(
+            child: AbsorbPointer(
+              child: const UnderConstructionOverlay(),
+            ),
+          ),
+      ],
     );
   }
 
@@ -185,7 +207,8 @@ class AchievementsCardWidget extends StatelessWidget {
 
 class _ModernAchievementItem extends StatefulWidget {
   final AchievementDefinition ach;
-  const _ModernAchievementItem({required this.ach});
+  final AppLocalizations l10n;
+  const _ModernAchievementItem({required this.ach, required this.l10n});
 
   @override
   State<_ModernAchievementItem> createState() => _ModernAchievementItemState();
@@ -224,7 +247,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
           borderRadius: BorderRadius.circular(8),
         ),
         child: GestureDetector(
-          onTap: () => _showModernAchievementSheet(context),
+          onTap: () => _showModernAchievementSheet(context, widget.l10n),
           // Animación de escala al pasar el ratón
           child: AnimatedScale(
             scale: _isHovered ? 1.05 : 1.0,
@@ -311,7 +334,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
   }
 
   // MODAL MODERNO ESTILO "BOTTOM SHEET" (En lugar de un Dialog central)
-  void _showModernAchievementSheet(BuildContext context) {
+  void _showModernAchievementSheet(BuildContext context, AppLocalizations l10n) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final jewelColor = widget.ach.isLegendary
@@ -394,9 +417,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                     color: Colors.amber.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text(
-                    "LOGRO LEGENDARIO",
-                    style: TextStyle(
+                  child: Text(
+                    l10n.legendaryAchievementLabel,
+                    style: const TextStyle(
                       color: Colors.amber,
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -465,7 +488,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.ach.unlocked ? "Completado" : "Bloqueado",
+                            widget.ach.unlocked
+                                ? l10n.achievementCompleted
+                                : l10n.achievementLocked,
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               color: widget.ach.unlocked
@@ -475,8 +500,11 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                           ),
                           Text(
                             widget.ach.unlocked && widget.ach.unlockedAt != null
-                                ? "Conseguido el ${DateFormat('d MMMM, yyyy').format(widget.ach.unlockedAt!)}"
-                                : "Cumple el objetivo para desbloquear",
+                                ? l10n.achievementUnlockedDate(
+                                    DateFormat('d MMMM, yyyy')
+                                        .format(widget.ach.unlockedAt!),
+                                  )
+                                : l10n.achievementLockedMessage,
                             style: theme.textTheme.bodySmall?.copyWith(
                               color: theme.hintColor,
                             ),
@@ -502,9 +530,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                       borderRadius: BorderRadius.circular(16),
                     ),
                   ),
-                  child: const Text(
-                    "Entendido",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  child: Text(
+                    l10n.closeButtonLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ),
               ),

@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 import 'package:invenicum/data/models/asset_type_model.dart';
@@ -92,6 +93,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     // ✅ watch() aquí es correcto para reaccionar a cambios de datos,
     // siempre que no disparemos lógica de carga aquí dentro.
@@ -100,7 +102,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
 
     final containerIdInt = int.tryParse(widget.containerId);
     if (containerIdInt == null) {
-      return const Center(child: Text('Error: ID de contenedor inválido.'));
+      return Center(child: Text(l10n.invalidContainerIdError));
     }
 
     // Buscar el contenedor de forma segura
@@ -116,7 +118,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
       }
       return Center(
         child: Text(
-          'Contenedor con ID ${widget.containerId} no encontrado.',
+          l10n.containerNotFoundError(widget.containerId),
           style: TextStyle(color: theme.colorScheme.error),
         ),
       );
@@ -133,7 +135,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Tipos de Activo en "${container.name}"',
+                l10n.assetTypesInContainer(container.name),
                 style: theme.textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: theme.colorScheme.onSurface,
@@ -142,7 +144,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
               ElevatedButton.icon(
                 onPressed: () => _goToCreateAssetType(context),
                 icon: const Icon(Icons.add_circle_outline),
-                label: const Text('Crear Nuevo Tipo'),
+                label: Text(l10n.createNewTypeButton),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.surfaceContainer,
                   foregroundColor: theme.colorScheme.onSurface,
@@ -155,7 +157,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             Expanded(
               child: Center(
                 child: Text(
-                  'Aún no hay Tipos de Activo definidos en este contenedor.',
+                  l10n.noAssetTypesMessage,
                   style: TextStyle(
                     color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                   ),

@@ -4,6 +4,7 @@ import 'package:invenicum/data/models/store_plugin_model.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/plugins/local_widgets/plugin_editor_dialog.dart';
 import 'package:invenicum/screens/plugins/local_widgets/plugin_modern_card.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class PluginAdminScreen extends StatefulWidget {
@@ -32,6 +33,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -49,7 +51,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsetsDirectional.only(start: 20, bottom: 95),
               title: Text(
-                "Plugins",
+                l10n.plugins,
                 style: TextStyle(
                   color: colorScheme.onSurface,
                   fontWeight: FontWeight.w900,
@@ -96,12 +98,13 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
           builder: (context) => const PluginEditorDialog(),
         ),
         icon: const Icon(Icons.add_rounded),
-        label: const Text("Nuevo Plugin"),
+        label: Text(l10n.newPluginLabel),
       ).animate().scale(delay: 300.ms, curve: Curves.bounceInOut),
     );
   }
 
   Widget _buildModernTabBar(ColorScheme colorScheme) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       height: 50,
@@ -128,7 +131,11 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
         labelColor: colorScheme.primary,
         unselectedLabelColor: colorScheme.onSurfaceVariant,
         labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-        tabs: const [Tab(text: "Librería"), Tab(text: "Míos"), Tab(text: "Market")],
+        tabs: [
+          Tab(text: l10n.pluginTabLibrary),
+          Tab(text: l10n.pluginTabMine),
+          Tab(text: l10n.pluginTabMarket),
+        ],
       ),
     );
   }
@@ -143,6 +150,7 @@ class _PluginGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (plugins.isEmpty) {
       return Center(
         child: Column(
@@ -150,7 +158,7 @@ class _PluginGrid extends StatelessWidget {
           children: [
             Icon(Icons.extension_off_rounded, size: 60, color: Colors.grey.shade300),
             const SizedBox(height: 12),
-            Text("No hay plugins", style: TextStyle(color: Colors.grey.shade400)),
+            Text(l10n.noPluginsAvailable, style: TextStyle(color: Colors.grey.shade400)),
           ],
         ),
       );

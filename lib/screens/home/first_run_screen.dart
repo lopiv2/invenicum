@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/data/services/api_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/first_run_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -133,6 +134,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Container(
@@ -281,7 +283,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
                               ],
                             ),
                             padding: const EdgeInsets.all(32),
-                            child: _buildCurrentStep(isDarkMode),
+                            child: _buildCurrentStep(isDarkMode, l10n),
                           ),
                         ),
                       ),
@@ -305,14 +307,14 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
     );
   }
 
-  Widget _buildCurrentStep(bool isDarkMode) {
+  Widget _buildCurrentStep(bool isDarkMode, AppLocalizations l10n) {
     switch (_currentStep) {
       case 0:
-        return _buildWelcomeStep(isDarkMode);
+        return _buildWelcomeStep(isDarkMode, l10n);
       case 1:
-        return _buildFormStep(isDarkMode);
+        return _buildFormStep(isDarkMode, l10n);
       case 2:
-        return _buildSuccessStep(isDarkMode);
+        return _buildSuccessStep(isDarkMode, l10n);
       default:
         return const SizedBox.shrink();
     }
@@ -320,7 +322,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
   // ── STEP 0: Bienvenida ───────────────────────────────────────────────────────
 
-  Widget _buildWelcomeStep(bool isDarkMode) {
+  Widget _buildWelcomeStep(bool isDarkMode, AppLocalizations l10n) {
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final subtitleColor = isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
 
@@ -380,7 +382,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
         const SizedBox(height: 12),
         _PrimaryButton(
-          label: 'Comenzar configuración',
+          label: l10n.startConfigurationButton,
           icon: Icons.arrow_forward_rounded,
           onPressed: () => _goToStep(1),
         ),
@@ -390,7 +392,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
   // ── STEP 1: Formulario ───────────────────────────────────────────────────────
 
-  Widget _buildFormStep(bool isDarkMode) {
+  Widget _buildFormStep(bool isDarkMode, AppLocalizations l10n) {
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final subtitleColor = isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
 
@@ -419,14 +421,14 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
           _LoginStyleField(
             controller: _nameController,
-            label: 'Nombre completo',
+            label: l10n.fullNameField,
             icon: Icons.person_outline_rounded,
             isDarkMode: isDarkMode,
             enabled: !_isLoading,
             textCapitalization: TextCapitalization.words,
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'Introduce tu nombre.';
-              if (v.trim().length < 2) return 'Mínimo 2 caracteres.';
+              if (v == null || v.trim().isEmpty) return l10n.enterYourNameValidation;
+              if (v.trim().length < 2) return l10n.minTwoCharactersValidation;
               return null;
             },
           ),
@@ -434,15 +436,15 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
           _LoginStyleField(
             controller: _emailController,
-            label: 'Correo electrónico',
+            label: l10n.emailField,
             icon: Icons.email_outlined,
             isDarkMode: isDarkMode,
             enabled: !_isLoading,
             keyboardType: TextInputType.emailAddress,
             validator: (v) {
-              if (v == null || v.trim().isEmpty) return 'Introduce un email.';
+              if (v == null || v.trim().isEmpty) return l10n.enterEmailValidation;
               if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(v.trim())) {
-                return 'Email no válido.';
+                return l10n.invalidEmailValidation;
               }
               return null;
             },
@@ -451,7 +453,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
           _LoginStyleField(
             controller: _passwordController,
-            label: 'Contraseña',
+            label: l10n.passwordField,
             icon: Icons.lock_outline_rounded,
             isDarkMode: isDarkMode,
             enabled: !_isLoading,
@@ -468,8 +470,8 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
               ),
             ),
             validator: (v) {
-              if (v == null || v.isEmpty) return 'Introduce una contraseña.';
-              if (v.length < 8) return 'Mínimo 8 caracteres.';
+              if (v == null || v.isEmpty) return l10n.enterPasswordValidation;
+              if (v.length < 8) return l10n.minEightCharactersValidation;
               return null;
             },
           ),
@@ -477,7 +479,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
           _LoginStyleField(
             controller: _confirmController,
-            label: 'Confirmar contraseña',
+            label: l10n.confirmPasswordField,
             icon: Icons.lock_outline_rounded,
             isDarkMode: isDarkMode,
             enabled: !_isLoading,
@@ -539,7 +541,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
                 child: OutlinedButton.icon(
                   onPressed: _isLoading ? null : () => _goToStep(0),
                   icon: const Icon(Icons.arrow_back_rounded, size: 18),
-                  label: const Text('Volver'),
+                  label: Text(l10n.goBackButton),
                   style: OutlinedButton.styleFrom(
                     padding:
                         const EdgeInsets.symmetric(horizontal: 16),
@@ -560,7 +562,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
               const SizedBox(width: 12),
               Expanded(
                 child: _PrimaryButton(
-                  label: 'Crear cuenta',
+                  label: l10n.createAccountButton,
                   icon: Icons.check_rounded,
                   isLoading: _isLoading,
                   onPressed: _createAdmin,
@@ -575,7 +577,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
   // ── STEP 2: Confirmación ─────────────────────────────────────────────────────
 
-  Widget _buildSuccessStep(bool isDarkMode) {
+  Widget _buildSuccessStep(bool isDarkMode, AppLocalizations l10n) {
     final textColor = isDarkMode ? Colors.white : Colors.black87;
     final subtitleColor = isDarkMode ? Colors.grey[400]! : Colors.grey[600]!;
     final cardBg = isDarkMode
@@ -682,7 +684,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
         const SizedBox(height: 24),
         _PrimaryButton(
-          label: 'Ir al inicio de sesión',
+          label: l10n.goToLoginButton,
           icon: Icons.login_rounded,
           onPressed: () => context.goNamed(RouteNames.login),
         ),

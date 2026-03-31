@@ -22,7 +22,7 @@ class ThemeProvider with ChangeNotifier {
   static final List<CustomTheme> predefinedThemes = [
     CustomTheme(id: 'emerald', name: 'Esmeralda', primaryColor: Colors.teal),
     CustomTheme(id: 'sunset', name: 'Atardecer', primaryColor: Colors.orange),
-    CustomTheme(id: 'ocean', name: 'Océano Índico', primaryColor: Colors.blue),
+    CustomTheme(id: 'ocean', name: 'Indian Ocean', primaryColor: Colors.blue),
     CustomTheme(
       id: 'lavender',
       name: 'Lavanda Dulce',
@@ -42,7 +42,7 @@ class ThemeProvider with ChangeNotifier {
     CustomTheme(id: 'amber', name: 'Oro Ámbar', primaryColor: Colors.amber),
     CustomTheme(
       id: 'sakura',
-      name: 'Flor de Cerezo',
+      name: 'Cherry Blossom',
       primaryColor: Colors.pink.shade200,
     ),
     CustomTheme(

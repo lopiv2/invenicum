@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class AiProviderCardWidget extends StatefulWidget {
@@ -19,11 +20,12 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
     PreferencesProvider prov,
     String provider,
     String model,
+    AppLocalizations l10n,
   ) async {
     setState(() => _isSaving = true);
     try {
       await prov.updateAiProvider(provider, model);
-      if (mounted) ToastService.success('Proveedor de IA actualizado');
+      if (mounted) ToastService.success(l10n.aiProviderUpdated);
     } catch (e) {
       if (mounted) ToastService.error('Error al guardar: $e');
     } finally {
@@ -34,6 +36,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final prov = context.watch<PreferencesProvider>();
 
     final currentProvider = prov.aiProvider ?? AppIntegrations.gemini;
@@ -66,7 +69,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                     color: theme.colorScheme.primary, size: 22),
                 const SizedBox(width: 10),
                 Text(
-                  'Asistente de Inteligencia Artificial',
+                  l10n.aiAssistantTitle,
                   style: theme.textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold),
                 ),
@@ -74,15 +77,14 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Elige qué proveedor de IA usará Veni. '
-              'Asegúrate de tener la API Key configurada en Integraciones.',
+              l10n.selectAiProvider,
               style: theme.textTheme.bodySmall
                   ?.copyWith(color: theme.hintColor),
             ),
             const SizedBox(height: 24),
 
             // ── Selector de proveedor ─────────────────────────────────────
-            Text('Proveedor',
+            Text(l10n.aiProviderLabel,
                 style: theme.textTheme.labelMedium
                     ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
@@ -109,7 +111,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                   ),
                   onSelected: (_) {
                     final defaultModel = AiModels.defaultFor(opt.id);
-                    _save(prov, opt.id, defaultModel);
+                    _save(prov, opt.id, defaultModel, l10n);
                   },
                 );
               }).toList(),
@@ -117,7 +119,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
             const SizedBox(height: 20),
 
             // ── Selector de modelo ────────────────────────────────────────
-            Text('Modelo',
+            Text(l10n.aiModelLabel,
                 style: theme.textTheme.labelMedium
                     ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
@@ -138,7 +140,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                       ))
                   .toList(),
               onChanged: (model) {
-                if (model != null) _save(prov, currentProvider, model);
+                if (model != null) _save(prov, currentProvider, model, l10n);
               },
             ),
             const SizedBox(height: 16),
@@ -163,7 +165,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                     const SizedBox(width: 8),
                     Flexible(
                       child: Text(
-                        'Activo: ${AiModels.providerInfo(currentProvider).label} · $validModel',
+                        '${l10n.active}: ${AiModels.providerInfo(currentProvider).label} · $validModel',
                         style: theme.textTheme.bodySmall,
                         overflow: TextOverflow.ellipsis,
                       ),

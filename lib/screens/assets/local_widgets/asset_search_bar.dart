@@ -61,7 +61,7 @@ class AssetSearchBar extends StatelessWidget {
           icon: Icon(isListView ? Icons.grid_view_rounded : Icons.list_rounded),
           label: Text(
             isCompact
-                ? 'Vista'
+                ? l10n.viewLabel
                 : (isListView ? l10n.showAsGrid : l10n.showAsList),
           ),
           style: FilledButton.styleFrom(
@@ -79,7 +79,7 @@ class AssetSearchBar extends StatelessWidget {
         FilledButton.tonalIcon(
           onPressed: onToggleGallery,
           icon: const Icon(Icons.play_circle_fill_rounded),
-          label: const Text('3D'),
+          label: Text(AppLocalizations.of(context)!.threeDbuttonLabel),
           style: FilledButton.styleFrom(
             foregroundColor: Colors.blueAccent,
             visualDensity: VisualDensity.compact,

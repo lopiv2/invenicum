@@ -277,7 +277,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     if (status.isGranted) {
       _handleBarcodeScan();
     } else {
-      ToastService.error("Se requiere permiso de cámara para escanear");
+      ToastService.error(AppLocalizations.of(context)!.cameraPermissionRequired);
     }
   }
 
@@ -310,7 +310,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           }
           _highlightedFields.addAll(['name', 'description', 'barcode']);
         });
-        ToastService.success("¡Datos encontrados en la nube!");
+        ToastService.success(AppLocalizations.of(context)!.cloudDataFound);
       }
     } catch (e) {
       debugPrint("Error procesando sugerencia: $e");
@@ -327,9 +327,10 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // ---------------------------------------------------------------------------
 
   Future<void> _handleEnrichSearch() async {
+    final l10n = AppLocalizations.of(context)!;
     final query = _aiSearchController.text.trim();
     if (query.isEmpty) {
-      ToastService.error("Escribe algo para buscar");
+      ToastService.error(l10n.typeSomethingToSearch);
       return;
     }
     setState(() => _isEnrichLoading = true);
@@ -353,7 +354,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           candidates,
         );
         if (selectedCandidate == null) {
-          ToastService.error('Importación cancelada.');
+          ToastService.error(l10n.importCancelled);
           return;
         }
 
@@ -369,11 +370,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           itemId: selectedId,
           locale: locale,
         );
-      }
+        ToastService.success(l10n.itemImportedSuccessfully(enrichedData!['name']?.toString() ?? ''));
 
-      if (enrichedData != null && mounted) {
-        setState(() {
-          _nameController.text = enrichedData!['name'] ?? _nameController.text;
+      if (mounted) {
+      ToastService.error(l10n.couldNotCompleteImport);
+          _nameController.text = enrichedData['name'] ?? _nameController.text;
           final enrichedMarketValue = _extractMarketValue(enrichedData);
           if (enrichedMarketValue != null) {
             _marketValue = enrichedMarketValue;
@@ -426,18 +427,20 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
           if (unusedDataLines.isNotEmpty) {
             final extraInfo =
-                '\n\n--- Detalles Técnicos ---\n${unusedDataLines.join('\n')}';
+                '\n\n--- ${l10n.technicalDetailsTitle} ---\n${unusedDataLines.join('\n')}';
             _descriptionController.text = baseDescription + extraInfo;
           } else {
             _descriptionController.text = baseDescription;
           }
 
           _highlightedFields.addAll(['name', 'description']);
-        });
-        ToastService.success("¡${enrichedData['name']} importado con éxito!");
+        };
+        ToastService.success(
+          l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''),
+        );
       }
     } catch (e) {
-      ToastService.error("No se pudo completar la importación");
+      ToastService.error(l10n.couldNotCompleteImport);
     } finally {
       if (mounted) {
         setState(() => _isEnrichLoading = false);
@@ -457,14 +460,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   }
 
   String _buildCandidateSubtitle(Map<String, dynamic> candidate) {
+    final l10n = AppLocalizations.of(context)!;
     final parts = <String>[];
     final year = candidate['yearPublished']?.toString();
     final author = candidate['author']?.toString();
     if (year != null && year.isNotEmpty) {
-      parts.add('Año: $year');
+      parts.add('${l10n.yearLabel}: $year');
     }
     if (author != null && author.isNotEmpty) {
-      parts.add('Autor: $author');
+      parts.add('${l10n.authorLabel}: $author');
     }
     return parts.join(' • ');
   }
@@ -496,11 +500,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
     List<Map<String, dynamic>> candidates,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return showDialog<Map<String, dynamic>>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Selecciona un resultado'),
+          title: Text(l10n.selectResultTitle),
           content: SizedBox(
             width: 520,
             child: ConstrainedBox(
@@ -514,7 +519,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                   final subtitle = _buildCandidateSubtitle(candidate);
                   return ListTile(
                     leading: _buildCandidateLeading(candidate),
-                    title: Text(candidate['name']?.toString() ?? 'Sin nombre'),
+                    title: Text(candidate['name']?.toString() ?? l10n.unnamedLabel),
                     subtitle: subtitle.isEmpty ? null : Text(subtitle),
                     onTap: () => Navigator.of(dialogContext).pop(candidate),
                   );
@@ -525,7 +530,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
           ],
         );
@@ -646,7 +651,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       if (newImageUrls.isNotEmpty) {
         setState(() => _newImagePreviewUrls.addAll(newImageUrls));
         ToastService.info(
-          'Se seleccionaron ${newImageUrls.length} nuevas imágenes.',
+          AppLocalizations.of(context)!.newImagesSelected(newImageUrls.length),
         );
       }
     }
@@ -655,7 +660,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   void _handleRemoveImage(String url) {
     if (url.startsWith('data:')) {
       setState(() => _newImagePreviewUrls.remove(url));
-      ToastService.info('Archivo nuevo removido.');
+      ToastService.info(AppLocalizations.of(context)!.newFileRemoved);
     } else {
       final String apiUrl = Environment.apiUrl;
       final String relativeUrl = url.replaceAll(apiUrl, '');
@@ -668,9 +673,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           _currentImages.removeWhere((img) => img.id == existingImage.id);
           _imageIdsToDelete.add(existingImage.id);
         });
-        ToastService.info('Imagen marcada para eliminación al guardar.');
+        ToastService.info(AppLocalizations.of(context)!.imageMarkedForDeletion);
       } else {
-        ToastService.error('No se pudo identificar la imagen.');
+        ToastService.error(AppLocalizations.of(context)!.couldNotIdentifyImage);
       }
     }
   }
@@ -810,7 +815,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         }
       }
     } catch (e) {
-      if (mounted) ToastService.error('Error: ${e.toString()}');
+      if (mounted) {
+        ToastService.error(
+          AppLocalizations.of(context)!.errorUpdatingAsset(e.toString()),
+        );
+      }
     }
   }
 
@@ -820,6 +829,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     context.watch<ContainerProvider>();
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
     final theme = Theme.of(context);
@@ -830,7 +840,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surfaceContainerLowest,
-      appBar: AppBar(title: Text('Editar: ${currentItem!.name}')),
+      appBar: AppBar(title: Text(l10n.editAssetTitle(currentItem!.name))),
       body: Stack(
         children: [
           Center(
@@ -852,7 +862,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
                     // ── Importar desde fuente externa ──
                     importBento: BentoBoxWidget(
-                      title: "Importar desde Fuente Externa",
+                      title: l10n.externalImportTitle,
                       icon: Icons.auto_awesome,
                       child: ExternalImportWidget(
                         selectedSource: _selectedSource,
@@ -867,7 +877,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
                     // ── Datos Principales ──
                     mainDataBento: BentoBoxWidget(
-                      title: "Datos Principales",
+                      title: l10n.mainDataTitle,
                       icon: Icons.info_outline,
                       child: MainDataSectionWidget(
                         nameController: _nameController,
@@ -882,7 +892,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
                     // ── Galería ──
                     galleryBento: BentoBoxWidget(
-                      title: "Galería",
+                      title: l10n.galleryTitle,
                       icon: Icons.camera_alt_outlined,
                       child: ImagesSectionWidget(
                         imageUrls: _allImageUrls,
@@ -900,7 +910,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
                     // ── Stock y Codificación ──
                     stockBento: BentoBoxWidget(
-                      title: "Stock y Codificación",
+                      title: l10n.stockAndCodingTitle,
                       icon: Icons.qr_code_scanner,
                       child: InventorySectionWidget(
                         barcodeController: _barcodeController,
@@ -916,7 +926,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     // ── Especificaciones ──
                     specsBento: _assetType!.fieldDefinitions.isNotEmpty
                         ? BentoBoxWidget(
-                            title: "Especificaciones",
+                        title: l10n.specificationsTitle,
                             icon: Icons.list_alt,
                             child: CustomFieldsSectionWidget(
                               fieldDefinitions: _assetType!.fieldDefinitions,

@@ -69,7 +69,7 @@ class ContainerProvider with ChangeNotifier {
 
         _containers = updatedContainers;
       } catch (e) {
-        print('Error al cargar contenedores: $e');
+        print('Error loading containers: $e');
       } finally {
         _isLoading = false;
         notifyListeners(); // 🔑 Notificamos que la carga terminó
@@ -95,7 +95,7 @@ class ContainerProvider with ChangeNotifier {
 
       return newContainer;
     } catch (e) {
-      print('Error al crear contenedor: $e');
+      print('Error creating container: $e');
       rethrow;
     }
   }
@@ -107,7 +107,7 @@ class ContainerProvider with ChangeNotifier {
       _containers = _containers.where((c) => c.id != containerId).toList();
       notifyListeners();
     } catch (e) {
-      print('Error al eliminar contenedor $containerId: $e');
+      print('Error deleting container $containerId: $e');
       rethrow;
     }
   }
@@ -123,7 +123,7 @@ class ContainerProvider with ChangeNotifier {
 
       if (index == -1) {
         throw Exception(
-          'Contenedor con ID $containerId no encontrado en el estado local.',
+          'Container with ID $containerId not found in local state.',
         );
       }
 
@@ -142,7 +142,7 @@ class ContainerProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print('Error al renombrar contenedor $containerId a "$newName": $e');
+      print('Error renaming container $containerId to "$newName": $e');
       rethrow;
     }
   }
@@ -173,7 +173,7 @@ class ContainerProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error al eliminar el tipo de activo $assetTypeId: $e');
+      print('Error deleting asset type $assetTypeId: $e');
       rethrow;
     }
   }
@@ -223,7 +223,7 @@ class ContainerProvider with ChangeNotifier {
     try {
       // 1. PASO OPTIMISTA: Actualizar el estado local inmediatamente
       print(
-        '🔄 Actualizando estado local sin esperar al servidor (Optimista)...',
+        '🔄 Updating local state without waiting for server (Optimistic)...',
       );
 
       final container = _containers.firstWhere((c) => c.id == containerId);
@@ -239,10 +239,10 @@ class ContainerProvider with ChangeNotifier {
 
       _updateLocalAssetType(newAssetType: updatedAssetTypeOptimistic);
 
-      print('✅ Estado local optimista actualizado.');
+      print('✅ Local optimistic state updated.');
 
       // 2. LLAMADA AL SERVIDOR: Intentar persistir en el servidor
-      print('📡 Intentando persistir en el servidor...');
+      print('📡 Attempting to persist to server...');
       final updatedAssetTypeFromApi = await _assetTypeService
           .updateAssetTypeCollectionFields(
             assetTypeId: assetTypeId,
@@ -251,12 +251,12 @@ class ContainerProvider with ChangeNotifier {
           );
 
       // 3. PASO DE CONFIRMACIÓN: Actualizar con la respuesta del servidor (si es diferente o por seguridad)
-      print('🔄 Actualizando con respuesta del servidor (Confirmación)...');
+      print('🔄 Updating with server response (Confirmation)...');
       _updateLocalAssetType(newAssetType: updatedAssetTypeFromApi);
 
-      print('✅ Actualización de campos de colección finalizada con éxito.');
+      print('✅ Collection fields update completed successfully.');
     } catch (e) {
-      print('🚨 Error al actualizar campos de colección: $e');
+      print('🚨 Error updating collection fields: $e');
 
       _updateLocalAssetType(newAssetType: oldAssetType);
 
@@ -301,7 +301,7 @@ class ContainerProvider with ChangeNotifier {
       final containerIndex = _containers.indexWhere((c) => c.id == containerId);
 
       if (containerIndex == -1) {
-        throw Exception('Contenedor con ID $containerId no encontrado.');
+        throw Exception('Container with ID $containerId not found.');
       }
 
       final originalContainer = _containers[containerIndex];
@@ -389,8 +389,8 @@ class ContainerProvider with ChangeNotifier {
         for (var item in apiItems) {
           // Mapeamos la respuesta de la API al fordadmato del desplegable
           results.add({
-            'name': item['name'] ?? 'Sin nombre',
-            'subtitle': 'Activo en ${item['container_name']}',
+            'name': item['name'] ?? 'No name',
+            'subtitle': 'Activo en ${item['container_name']}',  
             'icon': Icons.precision_manufacturing_outlined,
             // Construimos la ruta dinámica según tu estructura de GoRouter
             'route':
@@ -398,7 +398,7 @@ class ContainerProvider with ChangeNotifier {
           });
         }
       } catch (e) {
-        print('Error en búsqueda híbrida: $e');
+        print('Error in hybrid search: $e');
         // No lanzamos el error para que al menos se vean los resultados locales
       }
     }
@@ -434,7 +434,7 @@ class ContainerProvider with ChangeNotifier {
       // 2. Actualizar el estado local
       final index = _containers.indexWhere((c) => c.id == containerId);
       if (index == -1) {
-        throw Exception('Contenedor con ID $containerId no encontrado.');
+        throw Exception('Container with ID $containerId not found.');
       }
 
       final originalContainer = _containers[index];
@@ -524,7 +524,7 @@ class ContainerProvider with ChangeNotifier {
 
       return newList;
     } catch (e) {
-      print('Error al crear lista personalizada: $e');
+      print('Error creating data list: $e');
       rethrow;
     }
   }
@@ -567,7 +567,7 @@ class ContainerProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      print('Error al actualizar lista personalizada: $e');
+      print('Error updating data list: $e');
       rethrow;
     }
   }
@@ -601,7 +601,7 @@ class ContainerProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      print('Error al eliminar lista personalizada: $e');
+      print('Error deleting data list: $e');
       rethrow;
     }
   }
@@ -655,7 +655,7 @@ class ContainerProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error al cargar listas y ubicaciones: $e');
+      print('Error loading lists and locations: $e');
       rethrow;
     }
   }
@@ -665,7 +665,7 @@ class ContainerProvider with ChangeNotifier {
     try {
       return await _containerService.getDataList(dataListId);
     } catch (e) {
-      print('Error al obtener la lista personalizada: $e');
+      print('Error getting data list: $e');
       rethrow;
     }
   }

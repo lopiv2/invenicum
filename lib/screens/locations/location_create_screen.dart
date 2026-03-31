@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
@@ -44,6 +45,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
 
   // --- Lógica de Guardado (Integración con Provider) ---
   void _saveLocation() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -71,7 +73,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
       // Mostrar éxito
       if (mounted) {
         ToastService.success(
-          'Ubicación "${newLocation?.name}" creada exitosamente.',
+          l10n.locationCreatedSuccessfully(newLocation?.name ?? ''),
         );
         // Volver a la pantalla anterior
         context.pop();
@@ -79,7 +81,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
     } catch (e) {
       // Mostrar error
       if (mounted) {
-        ToastService.error('Error al crear ubicación: ${e.toString()}');
+        ToastService.error(l10n.errorCreatingLocation(e.toString()));
       }
     } finally {
       if (mounted) {
@@ -92,6 +94,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // 🔑 USAMOS CONTEXT.WATCH para obtener la lista de ubicaciones disponibles
     final locationProvider = context.watch<LocationProvider>();
     final allLocations = locationProvider.locations;
@@ -101,7 +104,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
     if (isLoading && allLocations.isEmpty) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Crear Nueva Ubicación'),
+          title: Text(l10n.createNewLocationTitle),
           backgroundColor: Colors.teal,
         ),
         body: Center(child: CircularProgressIndicator()),
@@ -114,7 +117,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear Nueva Ubicación'),
+        title: Text(l10n.createNewLocationTitle),
         backgroundColor: Colors.teal,
       ),
       body: SingleChildScrollView(
@@ -127,14 +130,14 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
               // --- Campo Nombre ---
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de la Ubicación',
-                  hintText: 'Ej: Estantería B3, Sala de Servidores',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.locationNameLabel,
+                  hintText: l10n.locationNameHint,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, introduce un nombre.';
+                    return l10n.pleaseEnterAName;
                   }
                   return null;
                 },
@@ -144,10 +147,10 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
               // --- Campo Descripción ---
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Descripción (Opcional)',
-                  hintText: 'Detalles de acceso, tipo de contenido, etc.',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.description,
+                  hintText: l10n.locationDescriptionHint,
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 3,
               ),
@@ -155,18 +158,18 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
 
               // --- Campo Ubicación Padre (Dropdown) ---
               DropdownButtonFormField<int>(
-                decoration: const InputDecoration(
-                  labelText: 'Ubicación Padre (Contiene a esta)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.parentLocationLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 value: _selectedParentId,
-                hint: const Text('Ningún padre (Ubicación Raíz)'),
+                hint: Text(l10n.noParentRootLocation),
                 // 🔑 Usamos la lista 'allLocations' obtenida del Provider
                 items: [
                   // Opción para no tener padre (Raíz)
-                  const DropdownMenuItem<int>(
+                  DropdownMenuItem<int>(
                     value: null,
-                    child: Text('Ninguno (Raíz del Esquema)'),
+                    child: Text(l10n.noneRootScheme),
                   ),
                   // Lista de ubicaciones existentes
                   ...allLocations.map((loc) {
@@ -200,7 +203,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
                       )
                     : const Icon(Icons.save),
                 label: Text(
-                  _isSaving ? 'Guardando...' : 'Guardar Ubicación',
+                  _isSaving ? l10n.savingLabel : l10n.saveLocationLabel,
                   style: const TextStyle(fontSize: 18),
                 ),
                 style: ElevatedButton.styleFrom(

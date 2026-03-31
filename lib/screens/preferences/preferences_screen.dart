@@ -109,27 +109,22 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               _buildHeader(context),
               const SizedBox(height: 40),
               _buildCategoryItem(
-                title: "Ajustes Generales",
                 icon: Icons.settings_outlined,
                 category: PreferenceCategory.general,
               ),
               _buildCategoryItem(
-                title: "Asistente IA",
                 icon: Icons.psychology_outlined,
                 category: PreferenceCategory.ai,
               ),
               _buildCategoryItem(
-                title: "Notificaciones",
                 icon: Icons.notifications_none_outlined,
                 category: PreferenceCategory.notifications,
               ),
               _buildCategoryItem(
-                title: "Gestión Préstamos",
                 icon: Icons.handshake_outlined,
                 category: PreferenceCategory.loans,
               ),
               _buildCategoryItem(
-                title: "Información",
                 icon: Icons.info_outline,
                 category: PreferenceCategory.about,
               ),
@@ -177,7 +172,6 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   }
 
   Widget _buildCategoryItem({
-    required String title,
     required IconData icon,
     required PreferenceCategory category,
   }) {
@@ -186,13 +180,22 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         ? Theme.of(context).primaryColor
         : Theme.of(context).hintColor;
 
+    final l10n = AppLocalizations.of(context)!;
+    final categoryTitle = switch (category) {
+      PreferenceCategory.general => l10n.generalSettingsMenuLabel,
+      PreferenceCategory.ai => l10n.aiAssistantMenuLabel,
+      PreferenceCategory.notifications => l10n.notificationsMenuLabel,
+      PreferenceCategory.loans => l10n.loanManagementMenuLabel,
+      PreferenceCategory.about => l10n.aboutMenuLabel,
+    };
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: ListTile(
         onTap: () => setState(() => _selectedCategory = category),
         leading: Icon(icon, color: color),
         title: Text(
-          title,
+          categoryTitle,
           style: TextStyle(
             color: isSelected
                 ? Theme.of(context).textTheme.bodyLarge?.color

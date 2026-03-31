@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/store_plugin_model.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/plugins/local_widgets/plugin_editor_dialog.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:stac/stac.dart';
 
@@ -17,6 +18,7 @@ class ModernPluginCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final provider = context.watch<PluginProvider>();
 
@@ -101,7 +103,7 @@ class ModernPluginCard extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 2),
                     child: Row(
                       children: [
-                        if (plugin.hasUpdate) _buildUpdateIndicator(),
+                        if (plugin.hasUpdate) _buildUpdateIndicator(context),
                       ],
                     ),
                   ),
@@ -112,7 +114,7 @@ class ModernPluginCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       plugin.description.isEmpty
-                          ? "Sin descripción disponible."
+                          ? l10n.noDescriptionAvailable
                           : plugin.description,
                       style: TextStyle(
                         fontSize: 11, // Bajamos un poco para ganar espacio
@@ -132,9 +134,9 @@ class ModernPluginCard extends StatelessWidget {
                   // ACCIONES (Switch / Botones)
                   // Usamos un bloque que ocupe solo lo necesario
                   if (!isMarket)
-                    _buildLibraryActions(provider)
+                    _buildLibraryActions(context, provider)
                   else
-                    _buildMarketActions(theme, provider),
+                    _buildMarketActions(context, theme, provider),
                 ],
               ),
             ),
@@ -146,14 +148,15 @@ class ModernPluginCard extends StatelessWidget {
 
   // --- WIDGETS DE ACCIÓN ---
 
-  Widget _buildLibraryActions(PluginProvider provider) {
+  Widget _buildLibraryActions(BuildContext context, PluginProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Estado",
+            Text(
+              l10n.status,
               style: TextStyle(
                 fontSize: 10,
                 color: Colors.grey,
@@ -181,7 +184,9 @@ class ModernPluginCard extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () => provider.updateFromStore(plugin),
                 icon: const Icon(Icons.system_update_alt, size: 14),
-                label: Text("Actualizar a v${plugin.latestVersion}"),
+                label: Text(
+                  l10n.updateToVersion(plugin.latestVersion),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange.shade700,
                   foregroundColor: Colors.white,
@@ -201,7 +206,12 @@ class ModernPluginCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMarketActions(ThemeData theme, PluginProvider provider) {
+  Widget _buildMarketActions(
+    BuildContext context,
+    ThemeData theme,
+    PluginProvider provider,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 32,
@@ -215,8 +225,8 @@ class ModernPluginCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          "Instalar Plugin",
+        child: Text(
+          l10n.installPluginLabel,
           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
         ),
       ),
@@ -225,7 +235,8 @@ class ModernPluginCard extends StatelessWidget {
 
   // --- WIDGETS DE INFORMACIÓN Y ESTILO ---
 
-  Widget _buildUpdateIndicator() {
+  Widget _buildUpdateIndicator(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (!plugin.hasUpdate) return const SizedBox.shrink();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -235,7 +246,7 @@ class ModernPluginCard extends StatelessWidget {
         border: Border.all(color: Colors.orange.shade400, width: 0.5),
       ),
       child: Text(
-        "UPDATE",
+        l10n.updateLabelUpper,
         style: TextStyle(
           fontSize: 8,
           color: Colors.orange.shade900,
@@ -340,6 +351,7 @@ class ModernPluginCard extends StatelessWidget {
   }
 
   Widget _buildContextMenu(BuildContext context, PluginProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -352,30 +364,30 @@ class ModernPluginCard extends StatelessWidget {
         onSelected: (value) => _handleAction(context, provider, value),
         itemBuilder: (context) => [
           if (plugin.isMine)
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'edit',
               child: ListTile(
                 leading: Icon(Icons.edit_outlined, size: 20),
-                title: Text("Editar"),
+                title: Text(l10n.editLabel),
                 contentPadding: EdgeInsets.zero,
                 visualDensity: VisualDensity.compact,
               ),
             ),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'uninstall',
             child: ListTile(
               leading: Icon(Icons.download_for_offline_outlined, size: 20),
-              title: Text("Desinstalar"),
+              title: Text(l10n.uninstallLabel),
               contentPadding: EdgeInsets.zero,
               visualDensity: VisualDensity.compact,
             ),
           ),
           const PopupMenuDivider(),
-          const PopupMenuItem(
+          PopupMenuItem(
             value: 'delete',
             child: ListTile(
               leading: Icon(Icons.delete_outline, color: Colors.red, size: 20),
-              title: Text("Eliminar", style: TextStyle(color: Colors.red)),
+              title: Text(l10n.delete, style: TextStyle(color: Colors.red)),
               contentPadding: EdgeInsets.zero,
               visualDensity: VisualDensity.compact,
             ),
@@ -424,6 +436,7 @@ class ModernPluginCard extends StatelessWidget {
   }
 
   void _showDeleteDialog(BuildContext context, PluginProvider provider) {
+    final l10n = AppLocalizations.of(context)!;
     bool deleteFromGitHub = false;
     showDialog(
       context: context,
@@ -432,11 +445,11 @@ class ModernPluginCard extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: const Text("¿Eliminar plugin?"),
+          title: Text(l10n.deletePluginQuestion),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text("Se eliminará de tu base de datos local."),
+              Text(l10n.deletePluginLocalWarning),
               if (plugin.isPublic && plugin.isMine) ...[
                 const SizedBox(height: 16),
                 Container(
@@ -446,16 +459,16 @@ class ModernPluginCard extends StatelessWidget {
                     border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
                   ),
                   child: CheckboxListTile(
-                    title: const Text(
-                      "Borrar de GitHub",
+                    title: Text(
+                      l10n.deleteFromGithubLabel,
                       style: TextStyle(
                         color: Colors.red,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
                     ),
-                    subtitle: const Text(
-                      "Elimina el archivo del market público",
+                    subtitle: Text(
+                      l10n.deleteFromGithubSubtitle,
                       style: TextStyle(fontSize: 11),
                     ),
                     value: deleteFromGitHub,
@@ -471,8 +484,8 @@ class ModernPluginCard extends StatelessWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text(
-                "CANCELAR",
+              child: Text(
+                l10n.cancelUpper,
                 style: TextStyle(color: Colors.grey),
               ),
             ),
@@ -490,8 +503,8 @@ class ModernPluginCard extends StatelessWidget {
                 );
                 Navigator.pop(ctx);
               },
-              child: const Text(
-                "BORRAR",
+              child: Text(
+                l10n.deleteUpper,
                 style: TextStyle(color: Colors.white),
               ),
             ),

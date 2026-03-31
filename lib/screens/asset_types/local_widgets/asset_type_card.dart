@@ -183,10 +183,10 @@ class AssetTypeCard extends StatelessWidget {
           assetType.id,
         );
         if (context.mounted) {
-          ToastService.success('"${assetType.name}" eliminado.');
+          ToastService.success(AppLocalizations.of(context)!.assetTypeDeletedSuccess(assetType.name));
         }
       } catch (e) {
-        if (context.mounted) ToastService.error('Error: $e');
+        if (context.mounted) ToastService.error(AppLocalizations.of(context)!.unknownError);
       }
     }
   }

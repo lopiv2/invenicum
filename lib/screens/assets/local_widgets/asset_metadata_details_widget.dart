@@ -30,7 +30,7 @@ class AssetMetadataWidget extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         _buildMetaRow(
-          "Referencia Interna", 
+          l10n.internalReferenceLabel,
           "#${item.id}",
           Icons.fingerprint_rounded,
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Widget para el toggle de artículo seriado/no seriado
 class AssetTypeSerializedToggle extends StatelessWidget {
@@ -24,7 +25,7 @@ class AssetTypeSerializedToggle extends StatelessWidget {
         },
         title: Row(
           children: [
-            const Text('¿Es un artículo seriado?'),
+            Text(AppLocalizations.of(context)!.isSerializedQuestion),
             const SizedBox(width: 8),
             Tooltip(
               padding: const EdgeInsets.all(12),

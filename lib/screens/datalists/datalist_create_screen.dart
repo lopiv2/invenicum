@@ -4,6 +4,7 @@ import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class DataListCreateScreen extends StatefulWidget {
   final String containerId;
@@ -46,10 +47,11 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
   }
 
   Future<void> _saveList() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
 
     if (_items.isEmpty) {
-      ToastService.error('La lista debe tener al menos un elemento');
+      ToastService.error(l10n.dataListNeedsAtLeastOneElement);
       return;
     }
 
@@ -65,19 +67,20 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
 
       if (!mounted) return;
 
-      ToastService.success('Lista personalizada creada con éxito');
+      ToastService.success(l10n.customDataListCreated);
       context.goNamed(
         RouteNames.dataLists,
         pathParameters: {'containerId': widget.containerId},
       );
     } catch (e) {
       if (!mounted) return;
-      ToastService.error('Error al crear la lista: ${e.toString()}');
+      ToastService.error(l10n.errorCreatingDataList(e.toString()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.all(32.0),
       child: Form(
@@ -87,7 +90,7 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
           children: [
             // --- TÍTULO ---
             Text(
-              'Nueva Lista Personalizada',
+              l10n.newCustomDataListTitle,
               style: Theme.of(
                 context,
               ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
@@ -103,13 +106,13 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                     // Nombre
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre de la Lista',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.dataListNameLabel,
+                        border: const OutlineInputBorder(),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Por favor introduce un nombre';
+                          return l10n.pleaseEnterAName;
                         }
                         return null;
                       },
@@ -119,17 +122,17 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                     // Descripción
                     TextFormField(
                       controller: _descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Descripción (Opcional)',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: l10n.description,
+                        border: const OutlineInputBorder(),
                       ),
                       maxLines: 3,
                     ),
                     const SizedBox(height: 32),
 
                     // Sección de elementos
-                    const Text(
-                      'Elementos de la Lista',
+                    Text(
+                      l10n.dataListElementsTitle,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -143,9 +146,9 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _newItemController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nuevo Elemento',
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.newElementLabel,
+                              border: const OutlineInputBorder(),
                             ),
                             onFieldSubmitted: (_) => _addItem(),
                           ),
@@ -154,7 +157,7 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                         ElevatedButton.icon(
                           onPressed: _addItem,
                           icon: const Icon(Icons.add),
-                          label: const Text('Agregar'),
+                          label: Text(l10n.addLabel),
                         ),
                       ],
                     ),
@@ -162,8 +165,8 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
 
                     // Lista de elementos
                     if (_items.isEmpty)
-                      const Text(
-                        'Agrega elementos a la lista',
+                      Text(
+                        l10n.addElementsToListHint,
                         style: TextStyle(fontStyle: FontStyle.italic),
                       )
                     else
@@ -199,13 +202,13 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                     RouteNames.dataLists,
                     pathParameters: {'containerId': widget.containerId},
                   ),
-                  child: const Text('Cancelar'),
+                  child: Text(l10n.cancel),
                 ),
                 const SizedBox(width: 16),
                 FilledButton.icon(
                   onPressed: _saveList,
                   icon: const Icon(Icons.save),
-                  label: const Text('Guardar Lista'),
+                  label: Text(l10n.saveListLabel),
                 ),
               ],
             ),

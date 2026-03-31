@@ -8,6 +8,7 @@ import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/providers/auth_provider.dart';
 import 'package:invenicum/providers/template_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/custom_field_editor.dart';
 import 'package:provider/provider.dart';
 
@@ -64,18 +65,19 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
   }
 
   Future<void> _handlePublish() async {
+    final l10n = AppLocalizations.of(context)!;
     final authProvider = context.read<AuthProvider>();
     final templateProvider = context.read<TemplateProvider>();
 
     if (!authProvider.isGitHubLinked) {
-      ToastService.error("Debes vincular GitHub en tu perfil para publicar.");
+      ToastService.error(l10n.mustLinkGithubToPublishTemplate);
       return;
     }
 
     if (!_formKey.currentState!.validate()) return;
 
     if (_fieldDefinitions.isEmpty) {
-      ToastService.error("La plantilla debe tener al menos un campo definido.");
+      ToastService.error(l10n.templateNeedsAtLeastOneField);
       return;
     }
 
@@ -102,23 +104,24 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
 
       if (success && mounted) {
         ToastService.success(
-          "¡Propuesta enviada! Se ha creado un Pull Request en GitHub.",
+          l10n.templatePullRequestCreated,
         );
         context.pop();
       }
     } catch (e) {
-      ToastService.error("Error al publicar: $e");
+      ToastService.error(l10n.errorPublishingTemplate(e.toString()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final authProvider = context.watch<AuthProvider>();
     final bool isLinked = authProvider.isGitHubLinked;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear Plantilla Global'),
+        title: Text(l10n.createGlobalTemplateTitle),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
@@ -130,7 +133,9 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
                   size: 16,
                 ),
                 label: Text(
-                  isLinked ? "GitHub Verificado" : "GitHub No Vinculado",
+                  isLinked
+                      ? l10n.githubVerifiedLabel
+                      : l10n.githubNotLinkedLabel,
                 ),
                 onPressed: () => context.pushNamed(RouteNames.myProfile),
               ),
@@ -157,9 +162,9 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
                   children: [
                     const Icon(Icons.auto_awesome, color: Colors.blue),
                     const SizedBox(width: 16),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        "Veni ha diseñado esta estructura basándose en tu solicitud. Revísala y ajústala antes de publicar.",
+                        l10n.veniDesignedTemplateBanner,
                         style: TextStyle(
                           color: Colors.blue,
                           fontWeight: FontWeight.w500,
@@ -181,25 +186,26 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
   }
 
   Widget _buildMainInfoSection(bool isLinked) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextFormField(
           controller: _nameController,
-          decoration: const InputDecoration(
-            labelText: 'Nombre de la Plantilla',
-            hintText: 'Ej: Mi Colección de Cómics',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.templateNameLabel,
+            hintText: l10n.templateNameHint,
+            border: const OutlineInputBorder(),
             prefixIcon: Icon(Icons.title),
           ),
-          validator: (v) => v!.isEmpty ? "Campo obligatorio" : null,
+          validator: (v) => v!.isEmpty ? l10n.requiredField : null,
         ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _githubController,
           readOnly: true, // 🚩 NO EDITABLE SIEMPRE (Se rellena por Auth)
           decoration: InputDecoration(
-            labelText: 'Usuario de GitHub',
+            labelText: l10n.githubUserLabel,
             prefixText: '@ ',
             filled: true,
             fillColor: Colors.grey[100],
@@ -211,19 +217,19 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
         const SizedBox(height: 16),
         TextFormField(
           controller: _categoryController,
-          decoration: const InputDecoration(
-            labelText: 'Categoría',
-            hintText: 'Ej: Libros, Electrónica...',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.categoryLabel,
+            hintText: l10n.categoryHint,
+            border: const OutlineInputBorder(),
           ),
         ),
         const SizedBox(height: 16),
         TextFormField(
           controller: _descController,
           maxLines: 3,
-          decoration: const InputDecoration(
-            labelText: 'Descripción del propósito',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            labelText: l10n.templatePurposeDescription,
+            border: const OutlineInputBorder(),
             alignLabelWithHint: true,
           ),
         ),
@@ -232,27 +238,28 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
   }
 
   Widget _buildFieldsSection() {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              'Campos Definidos',
+            Text(
+              l10n.definedFieldsTitle,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             FilledButton.icon(
               onPressed: _addNewField,
               icon: const Icon(Icons.add),
-              label: const Text('Añadir Campo'),
+              label: Text(l10n.addFieldButton),
             ),
           ],
         ),
         const SizedBox(height: 16),
         if (_fieldDefinitions.isEmpty)
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(vertical: 32),
-            child: Text("Haz clic en 'Añadir Campo' para empezar a diseñar."),
+            child: Text(l10n.clickAddFieldToStart),
           ),
         ..._fieldDefinitions.asMap().entries.map((entry) {
           final index = entry.key;
@@ -287,6 +294,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
   }
 
   Widget _buildOptionsEditor(int fieldIndex, CustomFieldDefinition field) {
+    final l10n = AppLocalizations.of(context)!;
     final TextEditingController _optionController = TextEditingController();
 
     return Container(
@@ -300,12 +308,12 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
               Icon(Icons.list, size: 16, color: Colors.blueGrey),
               SizedBox(width: 8),
               Text(
-                "CONFIGURAR OPCIONES",
+                l10n.configureOptionsUpper,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 11,
@@ -350,10 +358,10 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
                   child: TextField(
                     controller: _optionController,
                     style: const TextStyle(fontSize: 14),
-                    decoration: const InputDecoration(
-                      hintText: "Escribe una opción y pulsa Intro",
-                      contentPadding: EdgeInsets.symmetric(horizontal: 12),
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      hintText: l10n.writeOptionAndPressEnter,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                      border: const OutlineInputBorder(),
                       filled: true,
                       fillColor: Colors.white,
                     ),
@@ -399,6 +407,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
   }
 
   Widget _buildSaveButtons(bool isLinked) {
+    final l10n = AppLocalizations.of(context)!;
     return Row(
       children: [
         Expanded(
@@ -407,7 +416,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
             ),
-            child: const Text("CANCELAR"),
+            child: Text(l10n.cancelUpper),
           ),
         ),
         const SizedBox(width: 16),
@@ -419,7 +428,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
               backgroundColor: isLinked ? Colors.black : Colors.grey,
             ),
             icon: const FaIcon(FontAwesomeIcons.github, size: 18),
-            label: const Text("PUBLICAR EN GITHUB"),
+            label: Text(l10n.publishOnGithubUpper),
           ),
         ),
       ],

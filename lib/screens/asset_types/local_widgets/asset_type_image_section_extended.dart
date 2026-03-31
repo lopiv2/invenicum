@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Widget para la sección de imagen del tipo de activo (versión extendida para edición)
 /// Soporta tanto imágenes remotas como Base64
@@ -19,6 +20,7 @@ class AssetTypeImageSectionExtended extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -87,7 +89,7 @@ class AssetTypeImageSectionExtended extends StatelessWidget {
                       ElevatedButton.icon(
                         onPressed: onAddImage,
                         icon: const Icon(Icons.add_photo_alternate),
-                        label: const Text('Seleccionar Imagen'),
+                        label: Text(l10n.selectImageButton),
                       ),
                     ],
                   ),

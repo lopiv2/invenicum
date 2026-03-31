@@ -112,7 +112,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                   children: [
                     BentoBoxWidget(
                       width: 780,
-                      title: "Galería Visual",
+                      title: l10n.visualGalleryTitle,
                       icon: Icons.photo_library_outlined,
                       child: SizedBox(
                         height: 400,
@@ -126,14 +126,14 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
 
                     BentoBoxWidget(
                       width: 400,
-                      title: "Estado y Mercado",
+                      title: l10n.statusAndMarketTitle,
                       icon: Icons.analytics_outlined,
                       child: AssetMarketStatusWidget(item: item, l10n: l10n),
                     ),
 
                     BentoBoxWidget(
                       width: 1200,
-                      title: "Historial de Valoración",
+                      title: l10n.valuationHistoryTitle,
                       icon: Icons.insights_rounded,
                       child: Consumer<InventoryItemProvider>(
                         builder: (context, provider, _) {
@@ -153,7 +153,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
 
                     BentoBoxWidget(
                       width: 720,
-                      title: "Especificaciones",
+                      title: l10n.specificationsTitle,
                       icon: Icons.fact_check_outlined,
                       child: AssetTechnicalSpecsWidget(
                         item: item,
@@ -164,7 +164,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
 
                     BentoBoxWidget(
                       width: 460,
-                      title: "Trazabilidad",
+                      title: l10n.traceabilityTitle,
                       icon: Icons.history_toggle_off_rounded,
                       child: AssetMetadataWidget(item: item, l10n: l10n),
                     ),

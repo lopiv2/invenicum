@@ -11,6 +11,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/asset_type_action_buttons.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/asset_type_custom_fields_section.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/asset_type_form_title.dart';
@@ -157,6 +158,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       // Fondo sutilmente coloreado para dar profundidad
@@ -199,7 +201,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Configuración General",
+                              l10n.generalConfiguration,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.bold,
                               ),
@@ -227,7 +229,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        "Este contenedor es una colección. Puedes crear tipos seriados o no seriados, pero los campos de posesión y deseados solo se podrán configurar en tipos no seriados.",
+                                      l10n.collectionContainerWarning,
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                               color: theme
@@ -275,7 +277,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                   // 3. Botones de Acción (Flotantes o fijos al final)
                   AssetTypeActionButtons(
                     onSave: _saveAssetType,
-                    saveLabel: 'Crear Tipo de Activo',
+                  saveLabel: l10n.createAssetTypeButton,
                   ),
                 ],
               ),

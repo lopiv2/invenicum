@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class NotificationSettingsCardWidget extends StatelessWidget {
   const NotificationSettingsCardWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final prefsProv = context.watch<PreferencesProvider>();
 
     // 🔔 Accedemos a través de la nueva estructura
@@ -20,14 +22,14 @@ class NotificationSettingsCardWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Gestión de Notificaciones",
+              l10n.notificationSettingsTitle,
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
 
-            const Text(
-              "Prioridad de Canales (Arrastra para ordenar)",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            Text(
+              l10n.channelPriorityLabel,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 12),
 
@@ -55,7 +57,7 @@ class NotificationSettingsCardWidget extends StatelessWidget {
                       color: channel == 'telegram' ? Colors.blue : Colors.green,
                     ),
                     title: Text(
-                      channel == 'telegram' ? 'Telegram Bot' : 'Resend Email',
+                      channel == 'telegram' ? l10n.telegramBotLabel : l10n.resendEmailLabel,
                       style: const TextStyle(fontSize: 14),
                     ),
                     trailing: const Icon(Icons.drag_indicator_rounded),
@@ -72,44 +74,43 @@ class NotificationSettingsCardWidget extends StatelessWidget {
             // 🔔 Switches vinculados a los nuevos nombres del Modelo y Provider
             _buildSwitch(
               context,
-              "Stock Bajo",
-              "Avisar cuando un producto baje del mínimo.",
+              l10n.lowStockLabel,
+              l10n.lowStockHint,
               settings.alertStockLow,
               (val) => prefsProv.setNotificationAlert('stock', val),
             ),
             _buildSwitch(
               context,
-              "Nuevas Preventas",
-              "Notificar lanzamientos detectados por la IA.",
-              settings.alertPreSales, // 🚀 CORREGIDO: coincide con el modelo
+              l10n.newPresalesLabel,
+              l10n.newPresalesHint,
+              settings.alertPreSales,
               (val) => prefsProv.setNotificationAlert('preorder', val),
             ),
             _buildSwitch(
               context,
-              "Recordatorio de Préstamos",
-              "Avisar antes de la fecha de devolución.",
+              l10n.loanReminderLabel,
+              l10n.loanReminderHint,
               settings.alertLoanReminders,
               (val) => prefsProv.setNotificationAlert('loan', val),
             ),
-            // 🚀 NUEVA ALERTA: Préstamos Vencidos
             _buildSwitch(
               context,
-              "Préstamos Vencidos",
-              "Alerta crítica si un objeto no se devuelve a tiempo.",
-              settings.alertOverdueLoans, // 🚀 AÑADIDO
+              l10n.overdueLoansLabel,
+              l10n.overdueLoansHint,
+              settings.alertOverdueLoans,
               (val) => prefsProv.setNotificationAlert('overdue', val),
             ),
             _buildSwitch(
               context,
-              "Mantenimiento",
-              "Avisar cuando toque revisar un activo.",
+              l10n.maintenanceLabel,
+              l10n.maintenanceHint,
               settings.alertMaintenance,
               (val) => prefsProv.setNotificationAlert('maintenance', val),
             ),
             _buildSwitch(
               context,
-              "Cambios de Precio",
-              "Notificar variaciones de valor en el mercado.",
+              l10n.priceChangeLabel,
+              l10n.priceChangeHint,
               settings.alertPriceChange,
               (val) => prefsProv.setNotificationAlert('price', val),
             ),

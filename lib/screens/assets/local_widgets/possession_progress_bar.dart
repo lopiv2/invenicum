@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/asset_type_model.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class PossessionProgressBar extends StatelessWidget {
   final AssetType assetType;
@@ -14,6 +15,7 @@ class PossessionProgressBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Si no hay campo de posesión configurado, no mostrar nada
     if (assetType.possessionFieldId == null ||
         assetType.possessionFieldId!.isEmpty) {
@@ -44,7 +46,7 @@ class PossessionProgressBar extends StatelessWidget {
     final percentageText = (percentage * 100).toStringAsFixed(1);
 
     // Obtener el nombre del campo de posesión
-    String possessionFieldName = 'En Posesión';
+    String possessionFieldName = l10n.possessionFieldName;
     try {
       final field = assetType.fieldDefinitions.firstWhere(
         (field) => field.id.toString() == assetType.possessionFieldId,
@@ -52,7 +54,7 @@ class PossessionProgressBar extends StatelessWidget {
       possessionFieldName = field.name;
     } catch (e) {
       // Si no encuentra el campo, usar el nombre por defecto
-      possessionFieldName = 'En Posesión';
+      possessionFieldName = l10n.possessionFieldName;
     }
 
     return Column(
@@ -62,7 +64,7 @@ class PossessionProgressBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Progreso de $possessionFieldName',
+              l10n.possessionProgressLabel(possessionFieldName),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,

@@ -47,6 +47,7 @@ import 'package:invenicum/screens/locations/locations_screen.dart';
 import 'package:invenicum/screens/home/login_screen.dart';
 import 'package:invenicum/screens/preferences/preferences_screen.dart';
 import 'package:invenicum/screens/reports/reports_screen.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 // Layout
 import 'package:invenicum/widgets/layout/main_layout.dart';
@@ -288,11 +289,11 @@ GoRouter createAppRouter(
                 ),
               );
               final processedUi = provider.getProcessedUi(plugin.ui!);
+              final l10n = AppLocalizations.of(context)!;
               return Scaffold(
                 appBar: AppBar(title: Text(plugin.name)),
                 body: Stac.fromJson(processedUi, context) ??
-                    const Center(
-                        child: Text("Error al cargar la interfaz del plugin")),
+                    Center(child: Text(l10n.pluginLoadError)),
               );
             },
           ),
@@ -437,8 +438,11 @@ GoRouter createAppRouter(
         ],
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(child: Text('Página no encontrada: ${state.uri}')),
-    ),
+    errorBuilder: (context, state) {
+      final l10n = AppLocalizations.of(context)!;
+      return Scaffold(
+        body: Center(child: Text(l10n.pageNotFoundUri(state.uri.toString()))),
+      );
+    },
   );
 }

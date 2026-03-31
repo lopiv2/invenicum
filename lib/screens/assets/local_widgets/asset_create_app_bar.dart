@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Widget para el AppBar personalizado de la pantalla de crear activo
 class AssetCreateAppBarWidget extends StatelessWidget implements PreferredSizeWidget {
@@ -11,6 +12,7 @@ class AssetCreateAppBarWidget extends StatelessWidget implements PreferredSizeWi
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
 
@@ -27,7 +29,7 @@ class AssetCreateAppBarWidget extends StatelessWidget implements PreferredSizeWi
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Nuevo Activo',
+              l10n.newAssetLabel,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.5,

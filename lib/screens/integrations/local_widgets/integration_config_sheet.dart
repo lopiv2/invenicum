@@ -80,6 +80,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final isLinked = context.watch<IntegrationProvider>().isLinked(
       widget.integration.id,
     );
@@ -132,9 +133,9 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
           const Divider(height: 32),
           // --- Campos Dinámicos ---
           if (_isIdLoading)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: Text("Cargando configuración...")),
+              child: Center(child: Text(l10n.loadingConfiguration)),
             )
           else
             ...widget.integration.fields.map((field) {
@@ -206,7 +207,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                         Padding(
                           padding: const EdgeInsets.only(top: 8, left: 4),
                           child: Text(
-                            "Deja este campo vacío para usar el modo Gratuito (Limitado).",
+                            l10n.upcFreeModeHint,
                             style: TextStyle(
                               fontSize: 12,
                               color: Colors.blueGrey[400],
@@ -244,14 +245,14 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                             // 3. Feedback visual (Los Toasts ya se disparan en el Provider según tu lógica anterior)
                             if (success) {
                               ToastService.success(
-                                "¡Conexión verificada con éxito!",
+                                l10n.connectionVerified,
                               );
                             } else {
                               // Aquí usamos el mensaje específico que capturamos en el Provider
                               ToastService.error(
                                 provider.lastErrorMessage.isNotEmpty
                                     ? provider.lastErrorMessage
-                                    : "La prueba de conexión falló",
+                                    : l10n.connectionTestFailed,
                               );
                             }
                           },
@@ -263,7 +264,9 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                           )
                         : const Icon(Icons.bolt_outlined),
                     label: Text(
-                      provider.isTesting ? "Probando..." : "Probar Conexión",
+                      provider.isTesting
+                          ? l10n.testingConnection
+                          : l10n.testConnection,
                     ),
                     style: OutlinedButton.styleFrom(
                       minimumSize: const Size(
@@ -295,8 +298,8 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                   Icons.delete_forever_outlined,
                   color: Colors.red,
                 ),
-                label: const Text(
-                  "DESVINCULAR INTEGRACIÓN",
+                label: Text(
+                  l10n.unlinkIntegrationUpper,
                   style: TextStyle(
                     color: Colors.red,
                     fontWeight: FontWeight.bold,
@@ -312,6 +315,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
   }
 
   Future<void> _handleUnlink() async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<IntegrationProvider>();
 
     // Opcional: Podrías añadir un diálogo de confirmación aquí
@@ -320,14 +324,17 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
     if (mounted) {
       if (success) {
         Navigator.pop(context);
-        ToastService.success("Se ha desvinculado ${widget.integration.name}");
+        ToastService.success(
+          l10n.integrationUnlinkedWithName(widget.integration.name),
+        );
       } else {
-        ToastService.error("No se pudo desvincular la cuenta");
+        ToastService.error(l10n.unableToUnlinkAccount);
       }
     }
   }
 
   Future<void> _handleSave() async {
+    final l10n = AppLocalizations.of(context)!;
     // 1. Extraemos los valores de los controladores
     final Map<String, dynamic> configToSave = {};
     _controllers.forEach((key, controller) {
@@ -345,10 +352,10 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
       if (success) {
         Navigator.pop(context);
         ToastService.success(
-          "${widget.integration.name} configurado con éxito",
+          l10n.integrationConfiguredSuccess(widget.integration.name),
         );
       } else {
-        ToastService.error("Error al guardar la configuración");
+        ToastService.error(l10n.errorSavingConfiguration);
       }
     }
   }

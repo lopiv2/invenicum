@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/location.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/location_provider.dart';
 
 class LocationEditScreen extends StatefulWidget {
@@ -50,13 +51,14 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
 
   // --- Lógica de Edición (Integración con Provider) ---
   void _saveLocation() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     // Prevención de auto-parenting: No puedes ser tu propio padre
     if (_selectedParentId == widget.location.id) {
-      ToastService.error('Una ubicación no puede ser su propia padre.');
+      ToastService.error(l10n.locationCannotBeItsOwnParent);
       return;
     }
 
@@ -77,14 +79,16 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
 
       // Mostrar éxito
       if (mounted) {
-        ToastService.success('Ubicación "${updatedLocation?.name}" actualizada.');
+        ToastService.success(
+          l10n.locationUpdatedSuccessfully(updatedLocation?.name ?? ''),
+        );
         // Volver a la pantalla anterior
         context.pop();
       }
     } catch (e) {
       // Mostrar error
       if (mounted) {
-        ToastService.error('Error al actualizar ubicación: ${e.toString()}');
+        ToastService.error(l10n.errorUpdatingLocation(e.toString()));
       }
     } finally {
       if (mounted) {
@@ -97,6 +101,7 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // 🔑 OBTENER UBICACIONES EXISTENTES DEL PROVIDER PARA EL DROPDOWN
     final locationProvider = context.watch<LocationProvider>();
     final allLocations = locationProvider.locations;
@@ -105,7 +110,7 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Editar: ${widget.location.name}'),
+        title: Text(l10n.editLocationTitle(widget.location.name)),
         backgroundColor: Colors.orange,
       ),
       body: SingleChildScrollView(
@@ -118,13 +123,13 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
               // --- Campo Nombre ---
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de la Ubicación',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.locationNameLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Por favor, introduce un nombre.';
+                    return l10n.pleaseEnterAName;
                   }
                   return null;
                 },
@@ -134,9 +139,9 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
               // --- Campo Descripción ---
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Descripción (Opcional)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.description,
+                  border: const OutlineInputBorder(),
                 ),
                 maxLines: 3,
               ),
@@ -144,17 +149,17 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
 
               // --- Campo Ubicación Padre (Dropdown) ---
               DropdownButtonFormField<int>(
-                decoration: const InputDecoration(
-                  labelText: 'Ubicación Padre (Contiene a esta)',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.parentLocationLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 value: _selectedParentId,
-                hint: const Text('Ningún padre (Ubicación Raíz)'),
+                hint: Text(l10n.noParentRootLocation),
                 items: [
                   // Opción para no tener padre (Raíz)
-                  const DropdownMenuItem<int>(
+                  DropdownMenuItem<int>(
                     value: null,
-                    child: Text('Ninguno (Raíz del Esquema)'),
+                    child: Text(l10n.noneRootScheme),
                   ),
                   // Lista de ubicaciones existentes (filtradas)
                   ...parentOptions.map((loc) {
@@ -188,7 +193,7 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
                       )
                     : const Icon(Icons.save),
                 label: Text(
-                  _isSaving ? 'Guardando...' : 'Actualizar Ubicación',
+                  _isSaving ? l10n.savingLabel : l10n.updateLocationLabel,
                   style: const TextStyle(fontSize: 18),
                 ),
                 style: ElevatedButton.styleFrom(

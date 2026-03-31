@@ -7,6 +7,7 @@ import 'package:invenicum/screens/integrations/local_widgets/hero_pill.dart';
 import 'package:invenicum/screens/integrations/local_widgets/hero_text_block.dart';
 import 'package:invenicum/screens/integrations/local_widgets/integration_section.dart';
 import 'package:invenicum/screens/integrations/local_widgets/integration_section_data.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class IntegrationsScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
     final integration = availableIntegrations.firstWhere(
       (element) => element.id == integrationId,
       orElse: () =>
-          throw Exception('Integración no encontrada: $integrationId'),
+          throw Exception('Integration not found: $integrationId'),
     );
 
     showModalBottomSheet(
@@ -46,15 +47,15 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final integrations = AppIntegrations.getAvailableIntegrations(context);
     final integrationProv = context.watch<IntegrationProvider>();
     final theme = Theme.of(context);
 
     final sections = <IntegrationSectionData>[
       IntegrationSectionData(
-        title: 'Inteligencia artificial',
-        subtitle:
-            'Motores conversacionales y asistentes para enriquecer flujos y automatizaciones.',
+        title: l10n.integrationsSectionAiTitle,
+        subtitle: l10n.integrationsSectionAiSubtitle,
         icon: Icons.auto_awesome_rounded,
         accent: const Color(0xFFE16A3D),
         integrations: integrations
@@ -67,9 +68,8 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             .toList(),
       ),
       IntegrationSectionData(
-        title: 'Mensajería y notificaciones',
-        subtitle:
-            'Canales de salida para avisos, bots, reportes y entregas automáticas.',
+        title: l10n.integrationsSectionMessagingTitle,
+        subtitle: l10n.integrationsSectionMessagingSubtitle,
         icon: Icons.notifications_active_outlined,
         accent: const Color(0xFF2E6F95),
         integrations: integrations
@@ -81,9 +81,8 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             .toList(),
       ),
       IntegrationSectionData(
-        title: 'APIs de datos',
-        subtitle:
-            'Fuentes externas para enriquecer fichas, cartas, juegos y referencias de catálogo.',
+        title: l10n.integrationsSectionDataApisTitle,
+        subtitle: l10n.integrationsSectionDataApisSubtitle,
         icon: Icons.hub_outlined,
         accent: const Color(0xFF4E8B57),
         integrations: integrations
@@ -96,9 +95,8 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             .toList(),
       ),
       IntegrationSectionData(
-        title: 'Valoración y mercado',
-        subtitle:
-            'Conectores para precios, códigos de barras y estimación de valor actualizado.',
+        title: l10n.integrationsSectionValuationTitle,
+        subtitle: l10n.integrationsSectionValuationSubtitle,
         icon: Icons.query_stats_rounded,
         accent: const Color(0xFF8B5CF6),
         integrations: integrations
@@ -110,9 +108,8 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             .toList(),
       ),
       IntegrationSectionData(
-        title: 'Hardware y etiquetas',
-        subtitle:
-            'Herramientas físicas y utilidades para impresión, codificación y operación.',
+        title: l10n.integrationsSectionHardwareTitle,
+        subtitle: l10n.integrationsSectionHardwareSubtitle,
         icon: Icons.qr_code_2_rounded,
         accent: const Color(0xFF245C4A),
         integrations: integrations
@@ -124,7 +121,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF5EFE6),
       appBar: AppBar(
-        title: const Text('Integraciones y conexiones'),
+        title: Text(l10n.integrationsAndConnectionsTitle),
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
@@ -153,6 +150,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
   }
 
   Widget _buildHero(ThemeData theme, IntegrationProvider integrationProv) {
+    final l10n = AppLocalizations.of(context)!;
     final connectedCount = integrationProv.statuses.values
         .where((v) => v)
         .length;
@@ -189,19 +187,19 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
             children: [
               HeroPill(
                 icon: Icons.link_rounded,
-                label: '$connectedCount conexiones activas',
+                label: l10n.integrationsActiveConnections(connectedCount),
               ),
-              const HeroPill(
+              HeroPill(
                 icon: Icons.dashboard_customize_outlined,
-                label: 'Diseño modular por categorías',
+                label: l10n.integrationsModularDesign,
               ),
               HeroPill(
                 icon: integrationProv.isLoading
                     ? Icons.sync_rounded
                     : Icons.verified_outlined,
                 label: integrationProv.isLoading
-                    ? 'Comprobando estados'
-                    : 'Estado sincronizado',
+                    ? l10n.integrationsCheckingStatuses
+                    : l10n.integrationsStatusSynced,
               ),
             ],
           );

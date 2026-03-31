@@ -950,6 +950,944 @@ class AppLocalizationsEs extends AppLocalizations {
   String get username => 'Usuario';
 
   @override
+  String get copiedToClipboard => 'Copiado al portapapeles';
+
+  @override
+  String get connectionTestFailed => 'La prueba de conexión falló';
+
+  @override
+  String get connectionVerified => 'Conexión verificada con éxito';
+
+  @override
+  String get errorSavingConfiguration => 'Error al guardar la configuración';
+
+  @override
+  String get integrationsAndConnectionsTitle => 'Integraciones y conexiones';
+
+  @override
+  String get integrationsSectionAiTitle => 'Inteligencia artificial';
+
+  @override
+  String get integrationsSectionAiSubtitle =>
+      'Motores conversacionales y asistentes para enriquecer flujos y automatizaciones.';
+
+  @override
+  String get integrationsSectionMessagingTitle => 'Mensajería y notificaciones';
+
+  @override
+  String get integrationsSectionMessagingSubtitle =>
+      'Canales de salida para avisos, bots, reportes y entregas automáticas.';
+
+  @override
+  String get integrationsSectionDataApisTitle => 'APIs de datos';
+
+  @override
+  String get integrationsSectionDataApisSubtitle =>
+      'Fuentes externas para enriquecer fichas, cartas, juegos y referencias de catálogo.';
+
+  @override
+  String get integrationsSectionValuationTitle => 'Valoración y mercado';
+
+  @override
+  String get integrationsSectionValuationSubtitle =>
+      'Conectores para precios, códigos de barras y estimación de valor actualizado.';
+
+  @override
+  String get integrationsSectionHardwareTitle => 'Hardware y etiquetas';
+
+  @override
+  String get integrationsSectionHardwareSubtitle =>
+      'Herramientas físicas y utilidades para impresión, codificación y operación.';
+
+  @override
+  String integrationsActiveConnections(int count) {
+    return '$count conexiones activas';
+  }
+
+  @override
+  String get integrationsModularDesign => 'Diseño modular por categorías';
+
+  @override
+  String get integrationsCheckingStatuses => 'Comprobando estados';
+
+  @override
+  String get integrationsStatusSynced => 'Estado sincronizado';
+
+  @override
+  String integrationConfiguredSuccess(String name) {
+    return '$name configurado con éxito';
+  }
+
+  @override
+  String integrationUnlinkedWithName(String name) {
+    return 'Se ha desvinculado $name';
+  }
+
+  @override
+  String get invalidUiFormat => 'Formato de UI no válido';
+
+  @override
+  String get loadingConfiguration => 'Cargando configuración...';
+
+  @override
+  String pageNotFoundUri(String uri) {
+    return 'Página no encontrada: $uri';
+  }
+
+  @override
+  String get pluginLoadError => 'Error al cargar la interfaz del plugin';
+
+  @override
+  String get pluginRenderError => 'Error de renderizado';
+
+  @override
+  String get testConnection => 'Probar conexión';
+
+  @override
+  String get testingConnection => 'Probando...';
+
+  @override
+  String get unableToUnlinkAccount => 'No se pudo desvincular la cuenta';
+
+  @override
+  String get unlinkIntegrationUpper => 'DESVINCULAR INTEGRACIÓN';
+
+  @override
+  String get upcFreeModeHint =>
+      'Deja este campo vacío para usar el modo Gratuito (Limitado).';
+
+  @override
+  String get alertsTabLabel => 'Alertas';
+
+  @override
+  String get alertMarkedAsRead => 'Marcada como leída';
+
+  @override
+  String get calendarTabLabel => 'Calendario';
+
+  @override
+  String get closeLabel => 'Cerrar';
+
+  @override
+  String get closeLabelUpper => 'CERRAR';
+
+  @override
+  String get configureReminderLabel => 'Configurar aviso:';
+
+  @override
+  String get cannotFormatInvalidJson =>
+      'No se puede formatear un JSON inválido';
+
+  @override
+  String get createAlertOrEventTitle => 'Crear alerta/evento';
+
+  @override
+  String get createdSuccessfully => 'Creado correctamente';
+
+  @override
+  String get createPluginTitle => 'Crear plugin';
+
+  @override
+  String get editPluginTitle => 'Editar plugin';
+
+  @override
+  String get deleteFromGithubLabel => 'Borrar de GitHub';
+
+  @override
+  String get deleteFromGithubSubtitle =>
+      'Elimina el archivo del market público';
+
+  @override
+  String get deletePluginQuestion => '¿Eliminar plugin?';
+
+  @override
+  String get deletePluginLocalWarning =>
+      'Se eliminará de tu base de datos local.';
+
+  @override
+  String get deleteUpper => 'BORRAR';
+
+  @override
+  String get editEventTitle => 'Editar evento';
+
+  @override
+  String get editLabel => 'Editar';
+
+  @override
+  String get eventDataSection => 'Datos del evento';
+
+  @override
+  String get eventReminderAtTime => 'A la hora del evento';
+
+  @override
+  String get eventUpdated => 'Evento actualizado';
+
+  @override
+  String get firstVersionHint => 'La primera versión será siempre 1.0.0';
+
+  @override
+  String get fixJsonBeforeSave => 'Corrige el JSON antes de guardar';
+
+  @override
+  String get formatJson => 'Formatear JSON';
+
+  @override
+  String get goToProfileUpper => 'IR AL PERFIL';
+
+  @override
+  String get installPluginLabel => 'Instalar plugin';
+
+  @override
+  String get invalidVersionFormat => 'Formato inválido (ej: 1.0.1)';
+
+  @override
+  String get isEventQuestion => '¿Es un evento?';
+
+  @override
+  String get jsonErrorGeneric => 'Error en el JSON';
+
+  @override
+  String get makePublicLabel => 'Hacer público';
+
+  @override
+  String get markAsReadLabel => 'Marcar como leído';
+
+  @override
+  String get messageWithColon => 'Mensaje:';
+
+  @override
+  String minutesBeforeLabel(int minutes) {
+    return '$minutes minutos antes';
+  }
+
+  @override
+  String get newLabel => 'Nuevo';
+
+  @override
+  String get newPluginLabel => 'Nuevo plugin';
+
+  @override
+  String get noActiveAlerts => 'No hay alertas activas';
+
+  @override
+  String get noDescriptionAvailable => 'Sin descripción disponible.';
+
+  @override
+  String get noEventsForDay => 'Sin eventos para este día';
+
+  @override
+  String get noPluginsAvailable => 'No hay plugins';
+
+  @override
+  String get notificationDeleted => 'Notificación eliminada correctamente';
+
+  @override
+  String get oneHourBeforeLabel => '1 hora antes';
+
+  @override
+  String get pluginPrivateDescription =>
+      'Solo tú podrás ver este plugin en tu lista.';
+
+  @override
+  String get pluginPublicDescription =>
+      'Otros usuarios podrán ver e instalar este plugin.';
+
+  @override
+  String get pluginTabLibrary => 'Librería';
+
+  @override
+  String get pluginTabMarket => 'Market';
+
+  @override
+  String get pluginTabMine => 'Míos';
+
+  @override
+  String get previewLabel => 'Vista previa';
+
+  @override
+  String get remindMeLabel => 'Avisarme:';
+
+  @override
+  String get requiredField => 'Requerido';
+
+  @override
+  String get requiresGithubDescription =>
+      'Para publicar plugins en la comunidad, debes vincular tu cuenta de GitHub para darte crédito como autor.';
+
+  @override
+  String get requiresGithubTitle => 'Requiere GitHub';
+
+  @override
+  String get slotLocationLabel => 'Ubicación (slot)';
+
+  @override
+  String get stacDocumentation => 'Documentación de Stac';
+
+  @override
+  String get stacJsonInterfaceLabel => 'JSON Stac (interfaz)';
+
+  @override
+  String get uninstallLabel => 'Desinstalar';
+
+  @override
+  String get unrecognizedStacStructure => 'Estructura Stac no reconocida';
+
+  @override
+  String get updateLabelUpper => 'UPDATE';
+
+  @override
+  String updateToVersion(String version) {
+    return 'Actualizar a v$version';
+  }
+
+  @override
+  String get versionLabel => 'Versión';
+
+  @override
+  String get incrementVersionHint =>
+      'Incrementa la versión para tu propuesta (ej: 1.1.0)';
+
+  @override
+  String get cancelUpper => 'CANCELAR';
+
+  @override
+  String get mustLinkGithubToPublishTemplate =>
+      'Debes vincular GitHub en tu perfil para publicar.';
+
+  @override
+  String get templateNeedsAtLeastOneField =>
+      'La plantilla debe tener al menos un campo definido.';
+
+  @override
+  String get templatePullRequestCreated =>
+      'Propuesta enviada. Se ha creado un Pull Request en GitHub.';
+
+  @override
+  String errorPublishingTemplate(String error) {
+    return 'Error al publicar: $error';
+  }
+
+  @override
+  String get createGlobalTemplateTitle => 'Crear plantilla global';
+
+  @override
+  String get githubVerifiedLabel => 'GitHub verificado';
+
+  @override
+  String get githubNotLinkedLabel => 'GitHub no vinculado';
+
+  @override
+  String get veniDesignedTemplateBanner =>
+      'Veni ha diseñado esta estructura basándose en tu solicitud. Revísala y ajústala antes de publicar.';
+
+  @override
+  String get templateNameLabel => 'Nombre de la plantilla';
+
+  @override
+  String get templateNameHint => 'Ej: Mi colección de cómics';
+
+  @override
+  String get githubUserLabel => 'Usuario de GitHub';
+
+  @override
+  String get categoryLabel => 'Categoría';
+
+  @override
+  String get categoryHint => 'Ej: Libros, Electrónica...';
+
+  @override
+  String get templatePurposeDescription => 'Descripción del propósito';
+
+  @override
+  String get definedFieldsTitle => 'Campos definidos';
+
+  @override
+  String get addFieldButton => 'Añadir campo';
+
+  @override
+  String get clickAddFieldToStart =>
+      'Haz clic en \'Añadir campo\' para empezar a diseñar.';
+
+  @override
+  String get configureOptionsUpper => 'CONFIGURAR OPCIONES';
+
+  @override
+  String get writeOptionAndPressEnter => 'Escribe una opción y pulsa Intro';
+
+  @override
+  String get publishOnGithubUpper => 'PUBLICAR EN GITHUB';
+
+  @override
+  String get templateDetailFetchError =>
+      'No se pudo obtener el detalle de la plantilla';
+
+  @override
+  String get templateNotAvailable =>
+      'La plantilla no existe o no está disponible';
+
+  @override
+  String get backLabel => 'Volver';
+
+  @override
+  String get templateDetailTitle => 'Detalle de plantilla';
+
+  @override
+  String get saveToLibraryTooltip => 'Guardar en biblioteca';
+
+  @override
+  String templateByAuthor(String name) {
+    return 'por @$name';
+  }
+
+  @override
+  String get officialVerifiedTemplate => 'Plantilla oficial verificada';
+
+  @override
+  String dataStructureFieldsUpper(int count) {
+    return 'ESTRUCTURA DE DATOS ($count CAMPOS)';
+  }
+
+  @override
+  String get installInMyInventoryUpper => 'INSTALAR EN MI INVENTARIO';
+
+  @override
+  String get addedToPersonalLibrary => 'Añadida a tu biblioteca personal';
+
+  @override
+  String get whereDoYouWantToInstall => '¿Dónde quieres instalarlo?';
+
+  @override
+  String get noContainersCreateFirst =>
+      'No tienes contenedores. Crea uno primero.';
+
+  @override
+  String get autoGeneratedListFromTemplate =>
+      'Lista generada automáticamente desde plantilla';
+
+  @override
+  String get installationSuccessAutoLists =>
+      'Instalación exitosa. Listas configuradas automáticamente.';
+
+  @override
+  String errorInstallingTemplate(String error) {
+    return 'Error al instalar: $error';
+  }
+
+  @override
+  String get publishTemplateLabel => 'Publicar plantilla';
+
+  @override
+  String get retryLabel => 'Reintentar';
+
+  @override
+  String get noTemplatesFoundInMarket =>
+      'No se encontraron plantillas en el mercado.';
+
+  @override
+  String get invenicumCommunity => 'Comunidad Invenicum';
+
+  @override
+  String get refreshMarketTooltip => 'Actualizar mercado';
+
+  @override
+  String get exploreCommunityConfigurations =>
+      'Explora y descarga configuraciones de la comunidad';
+
+  @override
+  String get searchByTemplateName => 'Buscar por nombre de plantilla...';
+
+  @override
+  String get filterByTagTooltip => 'Filtrar por etiqueta';
+
+  @override
+  String get noMoreTags => 'No hay más etiquetas';
+
+  @override
+  String confirmDeleteDataList(String name) {
+    return '¿Estás seguro de que quieres eliminar la lista \"$name\"? Esta acción es irreversible.';
+  }
+
+  @override
+  String dataListDeletedSuccess(String name) {
+    return 'Lista \"$name\" eliminada con éxito.';
+  }
+
+  @override
+  String errorDeletingDataList(String error) {
+    return 'Error al eliminar la lista: $error';
+  }
+
+  @override
+  String customListsWithContainer(String name) {
+    return 'Listas personalizadas - $name';
+  }
+
+  @override
+  String get newDataListLabel => 'Nueva lista';
+
+  @override
+  String get noCustomListsCreateOne =>
+      'No hay listas personalizadas. Crea una nueva.';
+
+  @override
+  String elementsCount(int count) {
+    return '$count elementos';
+  }
+
+  @override
+  String get dataListNeedsAtLeastOneElement =>
+      'La lista debe tener al menos un elemento';
+
+  @override
+  String get customDataListCreated => 'Lista personalizada creada con éxito';
+
+  @override
+  String errorCreatingDataList(String error) {
+    return 'Error al crear la lista: $error';
+  }
+
+  @override
+  String get newCustomDataListTitle => 'Nueva lista personalizada';
+
+  @override
+  String get dataListNameLabel => 'Nombre de la lista';
+
+  @override
+  String get pleaseEnterAName => 'Por favor introduce un nombre';
+
+  @override
+  String get dataListElementsTitle => 'Elementos de la lista';
+
+  @override
+  String get newElementLabel => 'Nuevo elemento';
+
+  @override
+  String get addLabel => 'Agregar';
+
+  @override
+  String get addElementsToListHint => 'Agrega elementos a la lista';
+
+  @override
+  String get saveListLabel => 'Guardar lista';
+
+  @override
+  String get dataListUpdatedSuccessfully => 'Lista actualizada con éxito';
+
+  @override
+  String errorUpdatingDataList(String error) {
+    return 'Error al actualizar la lista: $error';
+  }
+
+  @override
+  String editListWithName(String name) {
+    return 'Editar lista: $name';
+  }
+
+  @override
+  String get createNewLocationTitle => 'Crear Nueva Ubicación';
+
+  @override
+  String get locationNameLabel => 'Nombre de la Ubicación';
+
+  @override
+  String get locationNameHint => 'Ej: Estantería B3, Sala de Servidores';
+
+  @override
+  String get locationDescriptionHint =>
+      'Detalles de acceso, tipo de contenido, etc.';
+
+  @override
+  String get parentLocationLabel => 'Ubicación Padre (Contiene a esta)';
+
+  @override
+  String get noParentRootLocation => 'Ningún padre (Ubicación Raíz)';
+
+  @override
+  String get noneRootScheme => 'Ninguno (Raíz del Esquema)';
+
+  @override
+  String get savingLabel => 'Guardando...';
+
+  @override
+  String get saveLocationLabel => 'Guardar Ubicación';
+
+  @override
+  String locationCreatedSuccessfully(String name) {
+    return 'Ubicación \"$name\" creada exitosamente.';
+  }
+
+  @override
+  String errorCreatingLocation(String error) {
+    return 'Error al crear ubicación: $error';
+  }
+
+  @override
+  String get locationCannotBeItsOwnParent =>
+      'Una ubicación no puede ser su propio padre.';
+
+  @override
+  String locationUpdatedSuccessfully(String name) {
+    return 'Ubicación \"$name\" actualizada.';
+  }
+
+  @override
+  String errorUpdatingLocation(String error) {
+    return 'Error al actualizar ubicación: $error';
+  }
+
+  @override
+  String editLocationTitle(String name) {
+    return 'Editar: $name';
+  }
+
+  @override
+  String get updateLocationLabel => 'Actualizar Ubicación';
+
+  @override
+  String get selectObjectTitle => 'Seleccionar Objeto';
+
+  @override
+  String get noObjectsAvailable => 'No hay objetos disponibles';
+
+  @override
+  String availableQuantity(int quantity) {
+    return 'Disponible: $quantity';
+  }
+
+  @override
+  String errorSelectingObject(String error) {
+    return 'Error al seleccionar objeto: $error';
+  }
+
+  @override
+  String get mustSelectAnObject => 'Debes seleccionar un objeto';
+
+  @override
+  String get loanRegisteredSuccessfully => 'Préstamo registrado exitosamente';
+
+  @override
+  String get selectAnObject => 'Selecciona un objeto';
+
+  @override
+  String get selectLabel => 'Seleccionar';
+
+  @override
+  String get borrowerNameHint => 'Ej: Juan Perez';
+
+  @override
+  String get borrowerNameRequired => 'El nombre es obligatorio';
+
+  @override
+  String loanQuantityAvailable(int quantity) {
+    return 'Cantidad a prestar (Disponible: $quantity)';
+  }
+
+  @override
+  String get enterQuantity => 'Ingresa una cantidad';
+
+  @override
+  String get invalidQuantity => 'Cantidad no válida';
+
+  @override
+  String get notEnoughStock => 'No hay suficiente stock';
+
+  @override
+  String get invalidEmail => 'Correo inválido';
+
+  @override
+  String expectedReturnDateLabel(String date) {
+    return 'Devolución esperada: $date';
+  }
+
+  @override
+  String get selectReturnDate => 'Selecciona fecha de devolución';
+
+  @override
+  String get additionalNotes => 'Notas Adicionales';
+
+  @override
+  String get registerLoanLabel => 'Registrar Préstamo';
+
+  @override
+  String get totalLabel => 'Total';
+
+  @override
+  String get newLocationLabel => 'Nueva ubicación';
+
+  @override
+  String get newLocationHint => 'Ej: Estantería A1, Armario 3...';
+
+  @override
+  String get parentLocationOptionalLabel => 'Ubicación padre (opcional)';
+
+  @override
+  String get noneRootLabel => 'Ninguna (raíz)';
+
+  @override
+  String locationCreatedShort(String name) {
+    return 'Ubicación \"$name\" creada';
+  }
+
+  @override
+  String get newLocationEllipsis => 'Nueva ubicación...';
+
+  @override
+  String get couldNotReloadList => 'No se pudo recargar la lista';
+
+  @override
+  String get deleteAssetTitle => 'Eliminar Activo';
+
+  @override
+  String confirmDeleteAssetItem(String name) {
+    return '¿Confirmas que deseas eliminar \"$name\"?';
+  }
+
+  @override
+  String get assetDeletedShort => 'Activo eliminado.';
+
+  @override
+  String viewColumnsLabel(int count) {
+    return 'Vista: $count col.';
+  }
+
+  @override
+  String get notValuedLabel => 'Sin valorar';
+
+  @override
+  String get manageSearchSyncAssets =>
+      'Gestiona, busca y sincroniza tus activos desde un solo panel.';
+
+  @override
+  String get filterLabel => 'Filtro';
+
+  @override
+  String get activeFilterLabel => 'Filtro activo';
+
+  @override
+  String get importLabel => 'Importar';
+
+  @override
+  String get syncLabel => 'Sincronizar';
+
+  @override
+  String get syncingLabel => 'Sincronizando...';
+
+  @override
+  String get newAssetLabel => 'Nuevo activo';
+
+  @override
+  String get statusAndPreferences => 'Estado y Preferencias';
+
+  @override
+  String get itemStatusLabel => 'Estado del ítem';
+
+  @override
+  String get availableLabel => 'Disponible';
+
+  @override
+  String get mustBeGreaterThanZero => 'Debe ser mayor a 0.';
+
+  @override
+  String get alertThresholdLabel => 'Umbral de alerta';
+
+  @override
+  String get enterMinimumStock => 'Introduce un stock mínimo.';
+
+  @override
+  String get serializedItemFixedQuantity =>
+      'Este es un artículo seriado. La cantidad es fija a 1.';
+
+  @override
+  String get serialNumberLabel => 'Número de serie';
+
+  @override
+  String get serialNumberHint => 'Ej: SN-2024-00123';
+
+  @override
+  String get mainDataTitle => 'Datos Principales';
+
+  @override
+  String get currentMarketValueLabel => 'VALOR DE MERCADO ACTUAL';
+
+  @override
+  String get updatePriceLabel => 'Actualizar Precio';
+
+  @override
+  String get viewLabel => 'Vista';
+
+  @override
+  String get visualGalleryTitle => 'Galería Visual';
+
+  @override
+  String get statusAndMarketTitle => 'Estado y Mercado';
+
+  @override
+  String get valuationHistoryTitle => 'Historial de Valoración';
+
+  @override
+  String get specificationsTitle => 'Especificaciones';
+
+  @override
+  String get traceabilityTitle => 'Trazabilidad';
+
+  @override
+  String get stockLabel => 'Stock';
+
+  @override
+  String get internalReferenceLabel => 'Referencia Interna';
+
+  @override
+  String get noSpecificationsAvailable => 'No hay especificaciones disponibles';
+
+  @override
+  String get trueLabel => 'Verdadero';
+
+  @override
+  String get falseLabel => 'Falso';
+
+  @override
+  String get openLinkLabel => 'Abrir enlace';
+
+  @override
+  String get scannerFocusTip =>
+      'Consejo: Si no enfoca, aleje el producto unos 30 cm de la cámara.';
+
+  @override
+  String get scanCodeTitle => 'Escanear Código';
+
+  @override
+  String get scanOrEnterProductCode =>
+      'Escanee o introduzca el código del producto';
+
+  @override
+  String possessionProgressLabel(String name) {
+    return 'Progreso de $name';
+  }
+
+  @override
+  String get externalImportTitle => 'Importar desde Fuente Externa';
+
+  @override
+  String get galleryTitle => 'Galería';
+
+  @override
+  String get stockAndCodingTitle => 'Stock y Codificación';
+
+  @override
+  String get cameraPermissionRequired =>
+      'Se requiere permiso de cámara para escanear';
+
+  @override
+  String get cloudDataFound => '¡Datos encontrados en la nube!';
+
+  @override
+  String get typeSomethingToSearch => 'Escribe algo para buscar';
+
+  @override
+  String get importCancelled => 'Importación cancelada.';
+
+  @override
+  String get couldNotCompleteImport => 'No se pudo completar la importación';
+
+  @override
+  String get yearLabel => 'Año';
+
+  @override
+  String get authorLabel => 'Autor';
+
+  @override
+  String get selectResultTitle => 'Selecciona un resultado';
+
+  @override
+  String get unnamedLabel => 'Sin nombre';
+
+  @override
+  String get completeRequiredFields =>
+      'Por favor, complete los campos obligatorios.';
+
+  @override
+  String get assetCreatedSuccess => 'Activo creado!';
+
+  @override
+  String errorCreatingAsset(String error) {
+    return 'Error al crear activo: $error';
+  }
+
+  @override
+  String get technicalDetailsTitle => 'Detalles Técnicos';
+
+  @override
+  String itemImportedSuccessfully(String name) {
+    return '¡$name importado con éxito!';
+  }
+
+  @override
+  String newImagesSelected(int count) {
+    return 'Se seleccionaron $count nuevas imágenes.';
+  }
+
+  @override
+  String get newFileRemoved => 'Archivo nuevo removido.';
+
+  @override
+  String get imageMarkedForDeletion =>
+      'Imagen marcada para eliminación al guardar.';
+
+  @override
+  String get couldNotIdentifyImage => 'No se pudo identificar la imagen.';
+
+  @override
+  String editAssetTitle(String name) {
+    return 'Editar: $name';
+  }
+
+  @override
+  String get syncPricesTitle => 'Sincronizar precios';
+
+  @override
+  String get syncPricesDescription =>
+      'Se consultará la API para actualizar el valor de mercado.';
+
+  @override
+  String get syncingMarketPrices => 'Sincronizando precios de mercado...';
+
+  @override
+  String get couldNotSyncPrices => 'No se pudieron sincronizar los precios';
+
+  @override
+  String get syncCompletedTitle => 'Sincronización completada';
+
+  @override
+  String get updatedLabel => 'Actualizados';
+
+  @override
+  String get noApiPriceLabel => 'Sin precio en API';
+
+  @override
+  String get errorsLabel => 'Errores';
+
+  @override
+  String get totalProcessedLabel => 'Total procesados';
+
+  @override
+  String get noAssetsToShow => 'No hay activos para mostrar';
+
+  @override
+  String get noImageLabel => 'Sin imagen';
+
+  @override
+  String get aiMagicQuestion => '¿Tienes un link?';
+
+  @override
+  String get aiAutocompleteAsset => 'Autocompleta este activo con IA';
+
+  @override
+  String get magicLabel => 'MAGIA';
+
+  @override
+  String get skuBarcodeLabel => 'SKU / EAN / UPC';
+
+  @override
   String get veniChatPlaceholder => 'Pregúntame algo...';
 
   @override
@@ -1002,4 +1940,495 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get zoomToFit => 'Ajustar Vista';
+
+  @override
+  String get generalSettingsMenuLabel => 'Ajustes Generales';
+
+  @override
+  String get aiAssistantMenuLabel => 'Asistente IA';
+
+  @override
+  String get notificationsMenuLabel => 'Notificaciones';
+
+  @override
+  String get loanManagementMenuLabel => 'Gestión Préstamos';
+
+  @override
+  String get aboutMenuLabel => 'Información';
+
+  @override
+  String get automaticDarkModeLabel => 'Modo oscuro automático';
+
+  @override
+  String get syncWithSystemLabel => 'Sincronizar con el sistema';
+
+  @override
+  String get manualDarkModeLabel => 'Modo oscuro manual';
+
+  @override
+  String get disableAutomaticToChange =>
+      'Desactiva el modo automático para cambiarlo';
+
+  @override
+  String get changeLightDark => 'Cambiar entre claro y oscuro';
+
+  @override
+  String get enableAiAndChatbot =>
+      'Habilitar Inteligencia Artificial y Chatbot';
+
+  @override
+  String get requiresGeminiLinking =>
+      'Requiere vinculación con Gemini en Integraciones';
+
+  @override
+  String get aiOrganizeInventory =>
+      'Usa IA para organizar tu inventario de manera inteligente';
+
+  @override
+  String get aiAssistantTitle => 'Asistente de Inteligencia Artificial';
+
+  @override
+  String get selectAiProvider =>
+      'Elige qué proveedor de IA usará Veni. Asegúrate de tener la API Key configurada en Integraciones.';
+
+  @override
+  String get aiProviderLabel => 'Proveedor';
+
+  @override
+  String get aiModelLabel => 'Modelo';
+
+  @override
+  String get aiProviderUpdated => 'Proveedor de IA actualizado';
+
+  @override
+  String get notificationSettingsTitle => 'Gestión de Notificaciones';
+
+  @override
+  String get channelPriorityLabel =>
+      'Prioridad de Canales (Arrastra para ordenar)';
+
+  @override
+  String get telegramBotLabel => 'Telegram Bot';
+
+  @override
+  String get resendEmailLabel => 'Resend Email';
+
+  @override
+  String get lowStockLabel => 'Stock Bajo';
+
+  @override
+  String get lowStockHint => 'Avisar cuando un producto baje del mínimo.';
+
+  @override
+  String get newPresalesLabel => 'Nuevas Preventas';
+
+  @override
+  String get newPresalesHint => 'Notificar lanzamientos detectados por la IA.';
+
+  @override
+  String get loanReminderLabel => 'Recordatorio de Préstamos';
+
+  @override
+  String get loanReminderHint => 'Avisar antes de la fecha de devolución.';
+
+  @override
+  String get overdueLoansLabel => 'Préstamos Vencidos';
+
+  @override
+  String get overdueLoansHint =>
+      'Alerta crítica si un objeto no se devuelve a tiempo.';
+
+  @override
+  String get maintenanceLabel => 'Mantenimiento';
+
+  @override
+  String get maintenanceHint => 'Avisar cuando toque revisar un activo.';
+
+  @override
+  String get priceChangeLabel => 'Cambios de Precio';
+
+  @override
+  String get priceChangeHint => 'Notificar variaciones de valor en el mercado.';
+
+  @override
+  String get unlinkGithubTitle => 'Desconectar GitHub';
+
+  @override
+  String get unlinkGithubMessage =>
+      '¿Estás seguro de que quieres desvincular tu cuenta de GitHub?';
+
+  @override
+  String get updatePasswordButton => 'ACTUALIZAR CONTRASEÑA';
+
+  @override
+  String get newContainerDialog => 'Nuevo Contenedor';
+
+  @override
+  String get descriptionField => 'Descripción';
+
+  @override
+  String get isCollectionQuestion => '¿Es una colección?';
+
+  @override
+  String get createContainerButton => 'Crear Contenedor';
+
+  @override
+  String get selectContainerHint => 'Selecciona un contenedor';
+
+  @override
+  String get newAssetTypeTitle => 'Nuevo Tipo de Activo';
+
+  @override
+  String get generalConfiguration => 'Configuración General';
+
+  @override
+  String get collectionContainerWarning =>
+      'Este contenedor es una colección. Puedes crear tipos seriados o no seriados, pero los campos de posesión y deseados solo se podrán configurar en tipos no seriados.';
+
+  @override
+  String get createAssetTypeButton => 'Crear Tipo de Activo';
+
+  @override
+  String assetTypesInContainer(String name) {
+    return 'Tipos de Activo en \"$name\"';
+  }
+
+  @override
+  String get createNewTypeButton => 'Crear Nuevo Tipo';
+
+  @override
+  String get isSerializedQuestion => '¿Es un artículo seriado?';
+
+  @override
+  String get addNewFieldButton => 'Añadir Nuevo Campo';
+
+  @override
+  String get deleteFieldTooltip => 'Eliminar campo';
+
+  @override
+  String get fieldsOptions => 'Opciones:';
+
+  @override
+  String get isRequiredField => 'Es Requerido';
+
+  @override
+  String get isSummativeFieldLabel =>
+      'Es Sumatorio (Se suma en el total del tipo)';
+
+  @override
+  String get isMonetaryValueLabel => 'Es Valor Monetario';
+
+  @override
+  String get monetaryValueDescription =>
+      'Se usará para calcular la inversión total en el Dashboard';
+
+  @override
+  String get noDataListsAvailable =>
+      '⚠️ No hay listas de datos disponibles en este contenedor.';
+
+  @override
+  String get selectDataList => 'Seleccionar Lista de Datos';
+
+  @override
+  String get chooseList => 'Elija una lista';
+
+  @override
+  String get goToPageLabel => 'Ir a página:';
+
+  @override
+  String get conditionLabel => 'Condición';
+
+  @override
+  String get actionsLabel => 'Acciones';
+
+  @override
+  String get editButtonLabel => 'Editar';
+
+  @override
+  String get deleteButtonLabel => 'Eliminar';
+
+  @override
+  String get collectionFieldsTooltip => 'Campos de colección';
+
+  @override
+  String totalLocations(int count) {
+    return '$count ubicaciones';
+  }
+
+  @override
+  String withoutLocationLabel(int count) {
+    return '$count sin ubicación · ';
+  }
+
+  @override
+  String get objectIdColumn => 'ID Obj';
+
+  @override
+  String containerNotFoundError(String id) {
+    return 'Contenedor con ID $id no encontrado.';
+  }
+
+  @override
+  String get invalidContainerIdError => 'Error: ID de contenedor inválido.';
+
+  @override
+  String get startConfigurationButton => 'Comenzar configuración';
+
+  @override
+  String get fullNameField => 'Nombre completo';
+
+  @override
+  String get emailField => 'Correo electrónico';
+
+  @override
+  String get passwordField => 'Contraseña';
+
+  @override
+  String get confirmPasswordField => 'Confirmar contraseña';
+
+  @override
+  String get goBackButton => 'Volver';
+
+  @override
+  String get createAccountButton => 'Crear cuenta';
+
+  @override
+  String get goToLoginButton => 'Ir al inicio de sesión';
+
+  @override
+  String get deleteConfirmationTitle => 'Confirmar Eliminación';
+
+  @override
+  String deleteItemMessage(String name) {
+    return '¿Deseas eliminar \"$name\"?';
+  }
+
+  @override
+  String get elementDeletedSuccess => 'Elemento eliminado correctamente';
+
+  @override
+  String get enterYourNameValidation => 'Introduce tu nombre.';
+
+  @override
+  String get minTwoCharactersValidation => 'Mínimo 2 caracteres.';
+
+  @override
+  String get enterEmailValidation => 'Introduce un email.';
+
+  @override
+  String get invalidEmailValidation => 'Email no válido.';
+
+  @override
+  String get enterPasswordValidation => 'Introduce una contraseña.';
+
+  @override
+  String get minEightCharactersValidation => 'Mínimo 8 caracteres.';
+
+  @override
+  String get threeDbuttonLabel => '3D';
+
+  @override
+  String barcodeCount(String count) {
+    return '$count';
+  }
+
+  @override
+  String rotationSpeedLabel(String count) {
+    return '${count}s';
+  }
+
+  @override
+  String tagLabel(String tag) {
+    return '#$tag';
+  }
+
+  @override
+  String get invalidIdError => 'ID inválido';
+
+  @override
+  String assetTypeLoadError(String error) {
+    return 'Error al cargar datos: $error';
+  }
+
+  @override
+  String get assetTypeUpdateSuccess => 'Tipo de activo actualizado con éxito';
+
+  @override
+  String assetTypeUpdateError(String error) {
+    return 'Error al actualizar: $error';
+  }
+
+  @override
+  String editAssetTypeTitle(String name) {
+    return 'Editar: $name';
+  }
+
+  @override
+  String get achievementCollectionTitle => 'Logros de Colección';
+
+  @override
+  String get achievementSubtitle => 'Desbloquea hitos usando Invenicum';
+
+  @override
+  String get legendaryAchievementLabel => 'LOGRO LEGENDARIO';
+
+  @override
+  String get achievementCompleted => 'Completado';
+
+  @override
+  String get achievementLocked => 'Bloqueado';
+
+  @override
+  String achievementUnlockedDate(String date) {
+    return 'Conseguido el $date';
+  }
+
+  @override
+  String get achievementLockedMessage => 'Cumple el objetivo para desbloquear';
+
+  @override
+  String get closeButtonLabel => 'Entendido';
+
+  @override
+  String get configurationGeneralSection => 'Configuración General';
+
+  @override
+  String get assetTypeCollectionWarning =>
+      'Este contenedor es una colección. Puedes crear tipos seriados o no seriados, pero los campos de posesión y deseados solo se podrán configurar en tipos no seriados.';
+
+  @override
+  String get updateAssetTypeButton => 'Actualizar Tipo de Activo';
+
+  @override
+  String get createAssetTypeButtonDefault => 'Crear Tipo de Activo';
+
+  @override
+  String get noAssetTypesMessage =>
+      'Aún no hay Tipos de Activo definidos en este contenedor.';
+
+  @override
+  String totalCountLabel(int count) {
+    return 'Total: $count';
+  }
+
+  @override
+  String possessionCountLabel(int count) {
+    return 'Posesión: $count';
+  }
+
+  @override
+  String desiredCountLabel(int count) {
+    return 'Deseados: $count';
+  }
+
+  @override
+  String get marketValueLabel => 'Mercado: ';
+
+  @override
+  String get defaultSumFieldName => 'Suma';
+
+  @override
+  String get calculatingLabel => 'Calculando...';
+
+  @override
+  String get unknownError => 'Error desconocido';
+
+  @override
+  String get noNameItem => 'Sin nombre';
+
+  @override
+  String get loadingContainers => 'Cargando contenedores...';
+
+  @override
+  String get fieldNameRequired => 'El nombre del campo es obligatorio';
+
+  @override
+  String get selectImageButton => 'Seleccionar Imagen';
+
+  @override
+  String assetTypeDeletedSuccess(String name) {
+    return '$name eliminado';
+  }
+
+  @override
+  String get noLocationValueData =>
+      'Aún no hay activos con ubicación y valor suficiente para dibujar esta gráfica.';
+
+  @override
+  String get requiredFieldValidation => 'Este campo es obligatorio';
+
+  @override
+  String get oceanTheme => 'Océano Índico';
+
+  @override
+  String get cherryBlossomTheme => 'Flor de Cerezo';
+
+  @override
+  String get loginSuccess => 'Inicio de sesión exitoso';
+
+  @override
+  String get reloadListError => 'No se pudo recargar la lista';
+
+  @override
+  String get copyItemSuffix => 'Copia';
+
+  @override
+  String itemCopiedSuccess(String name) {
+    return 'Elemento copiado: $name';
+  }
+
+  @override
+  String get copyError => 'Error al copiar';
+
+  @override
+  String get imageColumnLabel => 'Imagen';
+
+  @override
+  String get viewImageTooltip => 'Ver imagen';
+
+  @override
+  String get currentStockLabel => 'Stock actual';
+
+  @override
+  String get minimumStockLabel => 'Stock mínimo';
+
+  @override
+  String get locationColumnLabel => 'Ubicación';
+
+  @override
+  String get serialNumberColumnLabel => 'Numero de serie';
+
+  @override
+  String get marketPriceLabel => 'Precio de mercado';
+
+  @override
+  String get conditionColumnLabel => 'Condición';
+
+  @override
+  String get actionsColumnLabel => 'Acciones';
+
+  @override
+  String get imageLoadError => 'No se pudo cargar la imagen';
+
+  @override
+  String get imageUrlHint =>
+      'Asegúrate de que la URL es correcta y el servidor está activo';
+
+  @override
+  String get assetTypeNameHint => 'Ej: Ordenador Portátil, Sustancia Química';
+
+  @override
+  String get assetTypeNameLabel => 'Nombre del Tipo de Activo';
+
+  @override
+  String get underConstruction => 'En Construcción';
+
+  @override
+  String get comingSoon => 'Próximamente';
+
+  @override
+  String get constructionSubtitle => 'Esta funcionalidad se está desarrollando';
+
+  @override
+  String get selectColor => 'Seleccionar Color';
 }

@@ -1,21 +1,23 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class SaveAssetFloatingButton extends StatelessWidget {
   final VoidCallback onPressed;
-  final String label;
+  final String? label;
   final IconData icon;
 
   const SaveAssetFloatingButton({
     super.key,
     required this.onPressed,
-    this.label = "GUARDAR ACTIVO",
+    this.label,
     this.icon = Icons.check_circle_outline_rounded,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Positioned(
       bottom: 30,
@@ -57,7 +59,9 @@ class SaveAssetFloatingButton extends StatelessWidget {
                       Icon(icon, color: Colors.white, size: 24),
                       const SizedBox(width: 12),
                       Text(
-                        label,
+                        (label == null || label!.isEmpty)
+                            ? l10n.saveAsset.toUpperCase()
+                            : label!,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,

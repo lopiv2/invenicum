@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class AiMagicBannerWidget extends StatelessWidget {
   final bool isLoading;
@@ -12,6 +13,7 @@ class AiMagicBannerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Container(
@@ -38,12 +40,12 @@ class AiMagicBannerWidget extends StatelessWidget {
         children: [
           _buildIconOrLoader(),
           const SizedBox(width: 20),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "¿Tienes un link?",
+                  l10n.aiMagicQuestion,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -51,7 +53,7 @@ class AiMagicBannerWidget extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  "Autocompleta este activo con IA",
+                  l10n.aiAutocompleteAsset,
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 13,
@@ -72,8 +74,8 @@ class AiMagicBannerWidget extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               elevation: 0,
             ),
-            child: const Text(
-              "MAGIA",
+            child: Text(
+              l10n.magicLabel,
               style: TextStyle(fontWeight: FontWeight.bold),
             ),
           ),

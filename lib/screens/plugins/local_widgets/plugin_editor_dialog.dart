@@ -36,7 +36,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
         _jsonError = null; // JSON válido
       } catch (e) {
         // Extraemos solo el mensaje relevante del error de formato
-        _jsonError = "Error de formato: ${e.toString().split(':').last}";
+        _jsonError = "Format error: ${e.toString().split(':').last}";
       }
     });
   }
@@ -51,7 +51,9 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("No se puede formatear un JSON inválido")),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.cannotFormatInvalidJson),
+        ),
       );
     }
   }
@@ -87,40 +89,45 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
-          title: const Text("Vista Previa"),
+          title: Text(AppLocalizations.of(context)!.previewLabel),
           content: Container(
             constraints: const BoxConstraints(maxWidth: 400),
             width: MediaQuery.of(context).size.width * 0.8,
             child: SingleChildScrollView(
               child:
                   Stac.fromJson(jsonMap, ctx) ??
-                  const Center(child: Text("Estructura Stac no reconocida")),
+                  Center(
+                    child: Text(
+                      AppLocalizations.of(context)!.unrecognizedStacStructure,
+                    ),
+                  ),
             ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text("CERRAR"),
+              child: Text(AppLocalizations.of(context)!.closeLabelUpper),
             ),
           ],
         ),
       );
     } catch (e) {
-      ToastService.error("Error en el JSON");
+      ToastService.error(AppLocalizations.of(context)!.jsonErrorGeneric);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(widget.plugin == null ? "Crear Plugin" : "Editar Plugin"),
+          Text(widget.plugin == null ? l10n.createPluginTitle : l10n.editPluginTitle),
           const Spacer(),
           IconButton(
             icon: const Icon(Icons.help_outline, color: Colors.orange),
-            tooltip: "Documentación de Stac",
+            tooltip: l10n.stacDocumentation,
             onPressed: () => AppUtils.launchUrlWeb(Environment.stacDocsUrl),
           ),
           IconButton(
@@ -137,8 +144,8 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
             children: [
               TextFormField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: "Nombre"),
-                validator: (v) => v!.isEmpty ? "Requerido" : null,
+                decoration: InputDecoration(labelText: l10n.name),
+                validator: (v) => v!.isEmpty ? l10n.requiredField : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -146,31 +153,31 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                 enabled:
                     widget.plugin != null, // 💡 Solo editable en modo EDICIÓN
                 decoration: InputDecoration(
-                  labelText: "Versión",
+                  labelText: l10n.versionLabel,
                   helperText: widget.plugin == null
-                      ? "La primera versión será siempre 1.0.0"
-                      : "Incrementa la versión para tu propuesta (ej: 1.1.0)",
+                      ? l10n.firstVersionHint
+                      : l10n.incrementVersionHint,
                   prefixIcon: const Icon(Icons.numbers),
                   // Si está deshabilitado, le damos un aspecto visual distinto
                   filled: widget.plugin == null,
                   fillColor: widget.plugin == null ? Colors.grey[200] : null,
                 ),
                 validator: (v) {
-                  if (v == null || v.isEmpty) return "Requerido";
+                  if (v == null || v.isEmpty) return l10n.requiredField;
                   // Validación básica de formato SemVer (x.x.x)
                   final RegExp versionRegex = RegExp(r'^\d+\.\d+\.\d+$');
                   if (!versionRegex.hasMatch(v))
-                    return "Formato inválido (ej: 1.0.1)";
+                    return l10n.invalidVersionFormat;
                   return null;
                 },
               ),
               const SizedBox(height: 16),
               SwitchListTile(
-                title: const Text("Hacer público"),
+                title: Text(l10n.makePublicLabel),
                 subtitle: Text(
                   _isPublic
-                      ? "Otros usuarios podrán ver e instalar este plugin."
-                      : "Solo tú podrás ver este plugin en tu lista.",
+                      ? l10n.pluginPublicDescription
+                      : l10n.pluginPrivateDescription,
                 ),
                 value: _isPublic,
                 activeColor: Colors.blue,
@@ -189,18 +196,18 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                       bool? goToProfile = await showDialog<bool>(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: const Text("Requiere GitHub"),
-                          content: const Text(
-                            "Para publicar plugins en la comunidad, debes vincular tu cuenta de GitHub para darte crédito como autor.",
+                          title: Text(l10n.requiresGithubTitle),
+                          content: Text(
+                            l10n.requiresGithubDescription,
                           ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx, false),
-                              child: Text(AppLocalizations.of(context)!.cancel),
+                              child: Text(l10n.cancel),
                             ),
                             ElevatedButton(
                               onPressed: () => Navigator.pop(ctx, true),
-                              child: const Text("IR AL PERFIL"),
+                              child: Text(l10n.goToProfileUpper),
                             ),
                           ],
                         ),
@@ -228,9 +235,9 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _selectedSlot,
-                decoration: const InputDecoration(
-                  labelText: "Ubicación (Slot)",
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  labelText: l10n.slotLocationLabel,
+                  border: const OutlineInputBorder(),
                 ),
                 // Usamos la lista de la clase AppSlots
                 items: AppSlots.allSlots.map((String slot) {
@@ -260,10 +267,10 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                   suffixIcon: IconButton(
                     icon: const Icon(Icons.format_indent_increase),
                     onPressed: _formatJson,
-                    tooltip: "Formatear JSON",
+                    tooltip: l10n.formatJson,
                   ),
                   border: const OutlineInputBorder(),
-                  labelText: "JSON Stac (Interfaz)",
+                  labelText: l10n.stacJsonInterfaceLabel,
                   alignLabelWithHint: true,
                   filled: true,
                   fillColor: _jsonError == null
@@ -281,7 +288,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                     jsonDecode(v!);
                     return null;
                   } catch (e) {
-                    return "Corrige el JSON antes de guardar";
+                    return l10n.fixJsonBeforeSave;
                   }
                 },
               ),

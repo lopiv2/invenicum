@@ -7,6 +7,7 @@ import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/asset_type_model.dart';
 import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
 
 class AssetTechnicalSpecsWidget extends StatelessWidget {
@@ -23,6 +24,7 @@ class AssetTechnicalSpecsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final containerProvider = context.watch<ContainerProvider>();
 
@@ -54,9 +56,9 @@ class AssetTechnicalSpecsWidget extends StatelessWidget {
         ],
 
         if (fieldsWithValues.isEmpty)
-          const Text(
-            "No hay especificaciones disponibles",
-            style: TextStyle(color: Colors.grey),
+          Text(
+            l10n.noSpecificationsAvailable,
+            style: const TextStyle(color: Colors.grey),
           )
         else
           GridView.builder(

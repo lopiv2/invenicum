@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import '../../../data/models/list_data.dart'; // Modelo ListData
 
 class CustomFieldEditor extends StatefulWidget {
@@ -127,6 +128,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final List<ListData> availableLists = widget.availableDataLists;
 
     // Si no hay listas y es dropdown, forzamos a null y notificamos
@@ -196,7 +198,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               },
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'El nombre del campo es obligatorio';
+                  return AppLocalizations.of(context)!.fieldNameRequired;
                 }
                 return null;
               },
@@ -248,11 +250,11 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             const Divider(),
 
             // --- Opciones de Comportamiento del Campo ---
-            Text('Opciones:', style: Theme.of(context).textTheme.titleSmall),
+            Text(l10n.fieldsOptions, style: Theme.of(context).textTheme.titleSmall),
 
             // 3. Campo Requerido (Switch)
             SwitchListTile(
-              title: const Text('Es Requerido'),
+              title: Text(l10n.isRequiredField),
               value: _isRequired,
               onChanged: (bool newValue) {
                 setState(() {
@@ -267,8 +269,8 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             // 🔑 4. Es Sumable (Visible solo para tipos numéricos)
             if (_isNumericType)
               SwitchListTile(
-                title: const Text(
-                  'Es Sumatorio (Se suma en el total del tipo)',
+                title: Text(
+                  l10n.isSummativeFieldLabel,
                 ),
                 value: _isSummable,
                 onChanged: (bool newValue) {
@@ -284,9 +286,9 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             if (_selectedType == CustomFieldType.number ||
                 _selectedType == CustomFieldType.price)
               SwitchListTile(
-                title: const Text('Es Valor Monetario'),
-                subtitle: const Text(
-                  'Se usará para calcular la inversión total en el Dashboard',
+                title: Text(l10n.isMonetaryValueLabel),
+                subtitle: Text(
+                  l10n.monetaryValueDescription,
                 ),
                 value: _isMonetary,
                 activeColor: Colors.green, // Color sugerente para dinero
@@ -305,9 +307,9 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               const SizedBox(height: 16),
               const Divider(),
               if (availableLists.isEmpty)
-                const Text(
-                  '⚠️ No hay listas de datos disponibles en este contenedor.',
-                  style: TextStyle(
+                Text(
+                  l10n.noDataListsAvailable,
+                  style: const TextStyle(
                     color: Colors.orange,
                     fontStyle: FontStyle.italic,
                   ),
@@ -315,12 +317,12 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
               else
                 DropdownButtonFormField<int>(
                   value: _selectedListDataId,
-                  decoration: const InputDecoration(
-                    labelText: 'Seleccionar Lista de Datos',
-                    border: OutlineInputBorder(),
+                  decoration: InputDecoration(
+                    labelText: l10n.selectDataList,
+                    border: const OutlineInputBorder(),
                     isDense: true,
                   ),
-                  hint: const Text('Elija una lista'),
+                  hint: Text(l10n.chooseList),
                   items: availableLists.map((list) {
                     return DropdownMenuItem(
                       value: list.id,

@@ -6,6 +6,7 @@ import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/list_data.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class DataListGridScreen extends StatefulWidget {
   final String containerId;
@@ -42,24 +43,25 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
     BuildContext context,
     ListData dataList,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Confirmar Eliminación'),
+          title: Text(l10n.confirmDeletion),
           content: Text(
-            '¿Estás seguro de que quieres eliminar la lista "${dataList.name}"? Esta acción es irreversible.',
+            l10n.confirmDeleteDataList(dataList.name),
           ),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: const Text('Cancelar'),
+              child: Text(l10n.cancel),
             ),
             FilledButton(
               onPressed: () => Navigator.of(context).pop(true),
               style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: const Text(
-                'Eliminar',
+              child: Text(
+                l10n.delete,
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -73,11 +75,11 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
         final provider = context.read<ContainerProvider>();
         await provider.deleteDataList(dataList.id);
         if (context.mounted) {
-          ToastService.success('Lista "${dataList.name}" eliminada con éxito.');
+          ToastService.success(l10n.dataListDeletedSuccess(dataList.name));
         }
       } catch (e) {
         if (context.mounted) {
-          ToastService.error('Error al eliminar la lista: ${e.toString()}');
+          ToastService.error(l10n.errorDeletingDataList(e.toString()));
         }
       }
     }
@@ -85,6 +87,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final containerProvider = context.watch<ContainerProvider>();
     final container = containerProvider.containers
         .cast<ContainerNode?>()
@@ -94,7 +97,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
         );
 
     if (container == null) {
-      return const Center(child: Text('Contenedor no encontrado'));
+      return Center(child: Text(l10n.containerOrAssetTypeNotFound));
     }
 
     return Padding(
@@ -115,7 +118,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Text(
-                      'Listas Personalizadas - ${container.name}',
+                      l10n.customListsWithContainer(container.name),
                       style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         // Tamaño de fuente dinámico para que no rompa en pantallas muy pequeñas
@@ -132,7 +135,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                         );
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text('Nueva Lista'),
+                      label: Text(l10n.newDataListLabel),
                     ),
                   ],
                 ),
@@ -140,10 +143,10 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
 
                 // --- GRID DE LISTAS ---
                 if (container.dataLists.isEmpty)
-                  const Center(
+                  Center(
                     child: Text(
-                      'No hay listas personalizadas. ¡Crea una nueva!',
-                      style: TextStyle(fontSize: 16),
+                      l10n.noCustomListsCreateOne,
+                      style: const TextStyle(fontSize: 16),
                     ),
                   )
                 else
@@ -172,6 +175,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
 
   // Extraemos la tarjeta a un método para limpiar el build
   Widget _buildDataListCard(BuildContext context, ListData dataList) {
+    final l10n = AppLocalizations.of(context)!;
     return Card(
       elevation: 2,
       child: InkWell(
@@ -246,7 +250,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
               const SizedBox(height: 8),
               Expanded(
                 child: Text(
-                  dataList.description ?? 'Sin descripción',
+                  dataList.description ?? l10n.noDescriptionAvailable,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
@@ -265,7 +269,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${dataList.items.length} elementos',
+                      l10n.elementsCount(dataList.items.length),
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,

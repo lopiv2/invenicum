@@ -10,6 +10,7 @@ import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/template_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetTemplateDetailScreen extends StatefulWidget {
   final String templateId;
@@ -44,7 +45,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
       // Si el objeto existe pero los campos están vacíos,
       // significa que viene del resumen del Market y hay que pedir el detalle.
       if (_template!.fields.isEmpty) {
-        print("Estructura incompleta, hidratando desde el servidor...");
+        print("Incomplete structure, hydrating from server...");
         await _fetchTemplateData();
       }
     } else {
@@ -69,12 +70,13 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
       }
     } catch (e) {
       if (mounted) setState(() => _isFetching = false);
-      ToastService.error("No se pudo obtener el detalle de la plantilla");
+      ToastService.error(AppLocalizations.of(context)!.templateDetailFetchError);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     if (_isFetching) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -88,10 +90,10 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
             children: [
               const Icon(Icons.search_off, size: 64, color: Colors.grey),
               const SizedBox(height: 16),
-              const Text("La plantilla no existe o no está disponible"),
+              Text(l10n.templateNotAvailable),
               TextButton(
                 onPressed: () => context.pop(),
-                child: const Text("Volver"),
+                child: Text(l10n.backLabel),
               ),
             ],
           ),
@@ -101,11 +103,11 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Detalle de Plantilla'),
+        title: Text(l10n.templateDetailTitle),
         actions: [
           IconButton(
             icon: const Icon(Icons.bookmark_add_outlined),
-            tooltip: 'Guardar en biblioteca',
+            tooltip: l10n.saveToLibraryTooltip,
             onPressed: () => _handleSaveOnly(),
           ),
         ],
@@ -116,7 +118,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(),
+            _buildHeader(l10n),
             const SizedBox(height: 20),
             Text(
               _template!.description,
@@ -127,7 +129,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
             const SizedBox(height: 16),
             _buildTags(),
             const Divider(height: 40),
-            _buildFieldsSection(),
+            _buildFieldsSection(l10n),
             const SizedBox(height: 100), // Espacio para el botón inferior
           ],
         ),
@@ -137,7 +139,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
 
   // --- COMPONENTES DE UI ---
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppLocalizations l10n) {
     return Row(
       children: [
         CircleAvatar(
@@ -176,7 +178,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
                 ),
               ),
               Text(
-                'por @${_template!.author}',
+                l10n.templateByAuthor(_template!.author),
                 style: const TextStyle(
                   color: Colors.blue,
                   fontWeight: FontWeight.w600,
@@ -186,8 +188,8 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
           ),
         ),
         if (_template!.isOfficial)
-          const Tooltip(
-            message: 'Plantilla Oficial Verificada',
+          Tooltip(
+            message: l10n.officialVerifiedTemplate,
             child: Icon(Icons.verified, color: Colors.blue, size: 28),
           ),
       ],
@@ -209,7 +211,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
     );
   }
 
-  Widget _buildFieldsSection() {
+  Widget _buildFieldsSection(AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -218,7 +220,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
             const Icon(Icons.account_tree_outlined, color: Colors.blueGrey),
             const SizedBox(width: 8),
             Text(
-              'ESTRUCTURA DE DATOS (${_template!.fields.length} CAMPOS)',
+              l10n.dataStructureFieldsUpper(_template!.fields.length),
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.1,
@@ -318,8 +320,8 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
         child: ElevatedButton.icon(
           onPressed: () => _showInstallDialog(),
           icon: const Icon(Icons.download_for_offline_rounded),
-          label: const Text(
-            "INSTALAR EN MI INVENTARIO",
+          label: Text(
+            AppLocalizations.of(context)!.installInMyInventoryUpper,
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           style: ElevatedButton.styleFrom(
@@ -341,10 +343,13 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
     final success = await context
         .read<TemplateProvider>()
         .saveTemplateToLibrary(_template!);
-    if (success) ToastService.success("Añadida a tu biblioteca personal");
+    if (success) {
+      ToastService.success(AppLocalizations.of(context)!.addedToPersonalLibrary);
+    }
   }
 
   void _showInstallDialog() {
+    final l10n = AppLocalizations.of(context)!;
     final containers = context.read<ContainerProvider>().containers;
 
     showModalBottomSheet(
@@ -357,13 +362,13 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              "¿Dónde quieres instalarlo?",
+            Text(
+              l10n.whereDoYouWantToInstall,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
             if (containers.isEmpty)
-              const Text("No tienes contenedores. Crea uno primero.")
+              Text(l10n.noContainersCreateFirst)
             else
               Flexible(
                 child: ListView.builder(
@@ -430,7 +435,8 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
             final newList = await cProvider.createDataList(
               containerId: container.id,
               name: listName,
-              description: 'Lista generada automáticamente desde plantilla',
+              description: AppLocalizations.of(context)!
+                  .autoGeneratedListFromTemplate,
               items: field.options!,
             );
             targetListId = newList.id;
@@ -455,12 +461,14 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
 
       if (navigator.canPop()) navigator.pop();
       ToastService.success(
-        "¡Instalación exitosa! Listas configuradas automáticamente.",
+        AppLocalizations.of(context)!.installationSuccessAutoLists,
       );
       router.go('/container/${container.id}/asset-types');
     } catch (e) {
       if (navigator.canPop()) navigator.pop();
-      ToastService.error("Error al instalar: $e");
+      ToastService.error(
+        AppLocalizations.of(context)!.errorInstallingTemplate(e.toString()),
+      );
     }
   }
 }

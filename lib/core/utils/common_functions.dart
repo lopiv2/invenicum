@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
@@ -61,9 +62,10 @@ class AppUtils {
   static Future<void> copyToClipboard(BuildContext context, String text) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (context.mounted) {
+      final l10n = AppLocalizations.of(context)!;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text("Copiado al portapapeles")));
+      ).showSnackBar(SnackBar(content: Text(l10n.copiedToClipboard)));
     }
   }
 

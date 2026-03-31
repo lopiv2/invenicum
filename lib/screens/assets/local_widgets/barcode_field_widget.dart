@@ -20,9 +20,9 @@ class BarcodeFieldWidget extends StatelessWidget {
 
     return CommonFormField(
       controller: controller,
-      label: '${l10n.barCode} (Opcional)',
+      label: l10n.barCode,
       icon: Icons.qr_code_scanner_outlined,
-      helper: 'Escanee o introduzca el código del producto',
+      helper: l10n.scanOrEnterProductCode,
       keyboardType: TextInputType.text,
       highlighted: highlighted,
       // 🚩 Asumiendo que CommonFormField acepta un suffixIcon o similar

@@ -4,6 +4,7 @@ import 'package:invenicum/core/routing/route_names.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/template_provider.dart';
 import 'package:invenicum/data/models/asset_template_model.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetTemplatesMarketScreen extends StatefulWidget {
   const AssetTemplatesMarketScreen({super.key});
@@ -60,6 +61,7 @@ class _AssetTemplatesMarketScreenState
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // 🚩 Escuchamos los cambios en el provider
     final templateProvider = context.watch<TemplateProvider>();
     final templates = templateProvider.marketTemplates;
@@ -74,12 +76,13 @@ class _AssetTemplatesMarketScreenState
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.goNamed(RouteNames.templateCreate),
         icon: const Icon(Icons.add_to_photos),
-        label: const Text('Publicar Plantilla'),
+        label: Text(l10n.publishTemplateLabel),
       ),
     );
   }
 
   Widget _buildBody(TemplateProvider provider, List<AssetTemplate> templates) {
+    final l10n = AppLocalizations.of(context)!;
     // 1. Estado de carga
     if (provider.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -96,7 +99,7 @@ class _AssetTemplatesMarketScreenState
             Text(provider.errorMessage!),
             TextButton(
               onPressed: () => provider.fetchMarketTemplates(),
-              child: const Text("Reintentar"),
+              child: Text(l10n.retryLabel),
             ),
           ],
         ),
@@ -105,8 +108,8 @@ class _AssetTemplatesMarketScreenState
 
     // 3. Estado vacío
     if (templates.isEmpty) {
-      return const Center(
-        child: Text("No se encontraron plantillas en el mercado."),
+      return Center(
+        child: Text(l10n.noTemplatesFoundInMarket),
       );
     }
 
@@ -134,6 +137,7 @@ class _AssetTemplatesMarketScreenState
     TemplateProvider provider, // Añadimos el provider para el refresh
     List<AssetTemplate> templates,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final availableTags = _getAvailableTags(templates);
 
     return Container(
@@ -175,7 +179,7 @@ class _AssetTemplatesMarketScreenState
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Comunidad Invenicum',
+                      l10n.invenicumCommunity,
                       style: Theme.of(context).textTheme.headlineMedium
                           ?.copyWith(
                             fontWeight: FontWeight.w900,
@@ -195,7 +199,7 @@ class _AssetTemplatesMarketScreenState
                       Icons.refresh_rounded,
                       color: Colors.indigo,
                     ),
-                    tooltip: "Actualizar mercado",
+                    tooltip: l10n.refreshMarketTooltip,
                   ),
                 ),
               ],
@@ -203,8 +207,8 @@ class _AssetTemplatesMarketScreenState
           ),
 
           const SizedBox(height: 12),
-          const Text(
-            'Explora y descarga configuraciones de la comunidad',
+          Text(
+            l10n.exploreCommunityConfigurations,
             style: TextStyle(color: Colors.blueGrey, fontSize: 14),
           ),
 
@@ -223,6 +227,7 @@ class _AssetTemplatesMarketScreenState
   }
 
   Widget _buildModernSearchBar(List<String> availableTags) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       height: 54,
       decoration: BoxDecoration(
@@ -247,10 +252,10 @@ class _AssetTemplatesMarketScreenState
             child: TextField(
               onChanged: (value) => setState(() => searchQuery = value),
               style: const TextStyle(fontSize: 15),
-              decoration: const InputDecoration(
-                hintText: "Buscar por nombre de plantilla...",
+              decoration: InputDecoration(
+                hintText: l10n.searchByTemplateName,
                 border: InputBorder.none,
-                hintStyle: TextStyle(color: Colors.blueGrey, fontSize: 14),
+                hintStyle: const TextStyle(color: Colors.blueGrey, fontSize: 14),
                 isDense: true,
               ),
             ),
@@ -266,7 +271,7 @@ class _AssetTemplatesMarketScreenState
               color: Colors.indigo,
               size: 22,
             ),
-            tooltip: "Filtrar por etiqueta",
+            tooltip: l10n.filterByTagTooltip,
             offset: const Offset(0, 50), // Aparece justo debajo del botón
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
@@ -279,10 +284,10 @@ class _AssetTemplatesMarketScreenState
             itemBuilder: (context) {
               if (availableTags.isEmpty) {
                 return [
-                  const PopupMenuItem(
+                  PopupMenuItem(
                     enabled: false,
                     child: Text(
-                      "No hay más etiquetas",
+                      l10n.noMoreTags,
                       style: TextStyle(fontSize: 13),
                     ),
                   ),
@@ -520,7 +525,7 @@ class _TemplateCard extends StatelessWidget {
                                   errorBuilder: (context, error, stackTrace) {
                                     // Si falla, imprime el error exacto en consola para ver qué dice
                                     print(
-                                      "Error loading avatar ${template.id}: $error",
+                                      "Avatar load error ${template.id}: $error",
                                     );
                                     return _buildInitial();
                                   },

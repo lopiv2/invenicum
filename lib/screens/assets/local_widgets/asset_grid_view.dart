@@ -13,6 +13,7 @@ import '../../../../widgets/ui/price_display_widget.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../../providers/inventory_item_provider.dart';
 import '../../../data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetGridView extends StatefulWidget {
   final AssetType assetType;
@@ -88,7 +89,7 @@ class _AssetGridViewState extends State<AssetGridView> {
         forceReload: true,
       );
     } catch (_) {
-      ToastService.error('No se pudo recargar la lista');
+      ToastService.error(AppLocalizations.of(context)!.couldNotReloadList);
     }
   }
 
@@ -142,21 +143,22 @@ class _AssetGridViewState extends State<AssetGridView> {
         forceReload: true,
       );
     } catch (_) {
-      ToastService.error('No se pudo recargar la lista');
+      ToastService.error(AppLocalizations.of(context)!.couldNotReloadList);
     }
   }
 
   void _deleteAsset(BuildContext context, InventoryItem item) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Eliminar Activo'),
-        content: Text('¿Confirmas que deseas eliminar "${item.name}"?'),
+        title: Text(l10n.deleteAssetTitle),
+        content: Text(l10n.confirmDeleteAssetItem(item.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -171,9 +173,9 @@ class _AssetGridViewState extends State<AssetGridView> {
                 widget.containerId,
                 widget.assetTypeId,
               );
-              ToastService.success('Activo eliminado.');
+              ToastService.success(l10n.assetDeletedShort);
             },
-            child: const Text('Eliminar'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -189,6 +191,7 @@ class _AssetGridViewState extends State<AssetGridView> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final displayItems = _filteredItems;
     final hasSearch =
@@ -206,7 +209,7 @@ class _AssetGridViewState extends State<AssetGridView> {
             ),
             const SizedBox(height: 16),
             Text(
-              hasSearch ? 'Sin coincidencias.' : 'No hay activos creados aún.',
+              hasSearch ? l10n.noAssetsMatch : l10n.noAssetsCreated,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: theme.hintColor,
               ),
@@ -236,7 +239,7 @@ class _AssetGridViewState extends State<AssetGridView> {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Vista: $_columnsCount col.',
+                  l10n.viewColumnsLabel(_columnsCount),
                   style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: theme.primaryColor,
@@ -312,7 +315,7 @@ class _AssetGridViewState extends State<AssetGridView> {
     ThemeData theme,
   ) {
     final colorScheme = theme.colorScheme;
-
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -397,7 +400,7 @@ class _AssetGridViewState extends State<AssetGridView> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                item.description ?? 'Sin descripción',
+                                item.description ?? l10n.noDescriptionAvailable,
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   color: theme.hintColor,
                                   fontSize: 10,
@@ -434,7 +437,7 @@ class _AssetGridViewState extends State<AssetGridView> {
                                                   .onPrimaryContainer,
                                             )
                                           : Text(
-                                              'Sin valorar',
+                                              l10n.notValuedLabel,
                                               style: theme.textTheme.bodySmall
                                                   ?.copyWith(
                                                     fontWeight: FontWeight.w600,
@@ -521,7 +524,7 @@ class _AssetGridViewState extends State<AssetGridView> {
                 top: 4,
                 left: 8,
                 child: Tooltip(
-                  message: 'Ver Imagen',
+                  message: l10n.viewImageTooltip,
                   child: _miniActionButton(
                     icon: Icons.zoom_in_rounded,
                     onPressed: () => _showFullImage(context, url, item.name),

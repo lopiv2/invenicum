@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (mounted) {
         if (result.success && result.token != null) {
           // Mostrar mensaje de éxito
-          ToastService.success('Inicio de sesión exitoso');
+          ToastService.success(AppLocalizations.of(context)!.loginSuccess);
           // Pequeña pausa para mostrar el mensaje de éxito
           await Future.delayed(const Duration(seconds: 1));
 
@@ -61,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error('Error inesperado: ${e.toString()}');
+        ToastService.error(AppLocalizations.of(context)!.unknownError);
         // Mostrar mensaje de error
       }
     } finally {
@@ -166,16 +166,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      /*Text(
-                        AppLocalizations.of(context)!.appTitle,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                          letterSpacing: 0.5,
-                        ),
-                      ),*/
-                      const SizedBox(height: 8),
                       Text(
                         AppLocalizations.of(context)!.login,
                         style: TextStyle(

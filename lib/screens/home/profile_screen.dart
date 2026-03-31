@@ -6,11 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:invenicum/data/models/user_data_model.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:random_avatar/random_avatar.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../providers/auth_provider.dart';
-import '../../l10n/app_localizations.dart';
 
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
@@ -171,25 +171,26 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     // Opcional: Mostrar un diálogo de confirmación
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Desconectar GitHub"),
-        content: const Text(
-          "¿Estás seguro de que quieres desvincular tu cuenta de GitHub?",
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text("CANCELAR"),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text(
-              "DESCONECTAR",
-              style: TextStyle(color: Colors.red),
+      builder: (context) {
+        final l10n = AppLocalizations.of(context)!;
+        return AlertDialog(
+          title: Text(l10n.unlinkGithubTitle),
+          content: Text(l10n.unlinkGithubMessage),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(l10n.cancel.toUpperCase()),
             ),
-          ),
-        ],
-      ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text(
+                "DESCONECTAR",
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
     );
 
     if (confirm == true) {
@@ -652,7 +653,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 Icons.verified_user_outlined,
               ),
               const SizedBox(height: 16),
-              _buildUpdatePasswordButton(authProvider, colorScheme),
+              _buildUpdatePasswordButton(context, authProvider, colorScheme),
             ] else ...[
               const SizedBox(height: 8),
               Text(
@@ -684,9 +685,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Widget _buildUpdatePasswordButton(
+    BuildContext context,
     AuthProvider authProvider,
     ColorScheme colorScheme,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: OutlinedButton(
@@ -697,7 +700,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text("ACTUALIZAR CONTRASEÑA"),
+        child: Text(l10n.updatePasswordButton),
       ),
     );
   }

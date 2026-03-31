@@ -1,6 +1,7 @@
 // widgets/asset_list_header.dart
 
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:provider/provider.dart';
 import '../../../data/models/asset_type_model.dart';
@@ -25,6 +26,7 @@ class AssetListHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final bool isMobile = MediaQuery.of(context).size.width < 760;
     final theme = Theme.of(context);
     final titleBlock = Column(
@@ -41,7 +43,7 @@ class AssetListHeader extends StatelessWidget {
         ),
         const SizedBox(height: 2),
         Text(
-          'Gestiona, busca y sincroniza tus activos desde un solo panel.',
+          l10n.manageSearchSyncAssets,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: theme.colorScheme.onSurfaceVariant,
           ),
@@ -60,7 +62,9 @@ class AssetListHeader extends StatelessWidget {
           context,
           onPressed: onShowCountFilterDialog,
           icon: Icons.pin_drop,
-          label: selectedCountFieldId == null ? 'Filtro' : 'Filtro activo',
+            label: selectedCountFieldId == null
+              ? l10n.filterLabel
+              : l10n.activeFilterLabel,
           color: selectedCountFieldId != null
               ? theme.colorScheme.inversePrimary
               : theme.colorScheme.surfaceVariant,
@@ -70,7 +74,7 @@ class AssetListHeader extends StatelessWidget {
           context,
           onPressed: onImportCSV,
           icon: Icons.file_upload,
-          label: 'Importar',
+          label: l10n.importLabel,
           color: theme.colorScheme.surfaceVariant,
           isMobile: isMobile,
         ),
@@ -96,7 +100,7 @@ class AssetListHeader extends StatelessWidget {
                 context,
                 onPressed: isSyncing ? () {} : onSyncPrices,
                 icon: Icons.sync_alt_rounded,
-                label: isSyncing ? 'Sync...' : 'Sincronizar',
+                label: isSyncing ? l10n.syncingLabel : l10n.syncLabel,
                 color: theme.colorScheme.surfaceVariant,
                 isMobile: isMobile,
                 isLoading: isSyncing,
@@ -108,7 +112,7 @@ class AssetListHeader extends StatelessWidget {
           context,
           onPressed: onGoToCreateAsset,
           icon: Icons.add,
-          label: 'Nuevo activo',
+          label: l10n.newAssetLabel,
           color: theme.colorScheme.primary,
           textColor: theme.colorScheme.onPrimary,
           isMobile: isMobile,

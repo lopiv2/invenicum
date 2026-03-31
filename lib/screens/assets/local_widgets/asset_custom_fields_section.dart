@@ -76,6 +76,7 @@ class AssetCustomFieldsSection extends StatelessWidget {
     CustomFieldDefinition fieldDef,
     dynamic value,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final String displayValue = value?.toString() ?? '—';
     
     Widget valueWidget;
@@ -83,7 +84,7 @@ class AssetCustomFieldsSection extends StatelessWidget {
     if (fieldDef.type == CustomFieldType.boolean) {
       final isChecked = value == true;
       valueWidget = Tooltip(
-        message: isChecked ? 'Verdadero' : 'Falso',
+        message: isChecked ? l10n.trueLabel : l10n.falseLabel,
         child: Icon(
           isChecked ? Icons.check_circle : Icons.cancel,
           color: isChecked ? Colors.green.shade600 : Colors.red.shade600,
@@ -98,7 +99,7 @@ class AssetCustomFieldsSection extends StatelessWidget {
         child: GestureDetector(
           onTap: () => AppUtils.launchUrlWeb(displayValue),
           child: Tooltip(
-            message: 'Abrir enlace',
+            message: l10n.openLinkLabel,
             child: Text(
               displayValue,
               style: TextStyle(

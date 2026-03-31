@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/asset_type_model.dart';
 import 'barcode_field_widget.dart';
 import 'card_section_widget.dart';
@@ -34,7 +35,7 @@ class InventorySectionWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SectionHeaderWidget(
-            title: 'Inventario',
+            title: AppLocalizations.of(context)!.inventoryLabel,
             icon: Icons.warehouse_outlined,
           ),
           BarcodeFieldWidget(

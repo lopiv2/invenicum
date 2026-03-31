@@ -148,7 +148,8 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       );
     } catch (_) {
       if (!mounted) return;
-      ToastService.error('No se pudo recargar la lista');
+      final l10n = AppLocalizations.of(context)!;
+      ToastService.error(l10n.reloadListError);
     }
   }
 
@@ -180,29 +181,31 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   }
 
   void _copyAsset(InventoryItem item) async {
+    final l10n = AppLocalizations.of(context)!;
     final itemCopy = item.copyWith(
       id: 0,
-      name: "${item.name} (Copia)",
+      name: "${item.name} (${l10n.copyItemSuffix})",
       resetImageIds: true,
     );
     try {
       await context.read<InventoryItemProvider>().cloneInventoryItem(itemCopy);
-      ToastService.success('✅ Activo "${itemCopy.name}" copiado.');
+      ToastService.success(l10n.itemCopiedSuccess(itemCopy.name));
     } catch (e) {
-      ToastService.error('❌ Error al copiar: $e');
+      ToastService.error(l10n.copyError);
     }
   }
 
   void _deleteAsset(InventoryItem item) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Confirmar Eliminación'),
-        content: Text('¿Deseas eliminar "${item.name}"?'),
+        title: Text(l10n.confirmDeletion),
+        content: Text(l10n.deleteItemMessage(item.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () async {
@@ -212,9 +215,9 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                 widget.containerId,
                 widget.assetTypeId,
               );
-              ToastService.success('Elemento eliminado correctamente');
+              ToastService.success(l10n.elementDeletedSuccess);
             },
-            child: const Text('Eliminar', style: TextStyle(color: Colors.red)),
+            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -240,7 +243,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         enableFilterMenuItem: false,
       ),
       PlutoColumn(
-        title: 'Imagen',
+        title: l10n.imageColumnLabel,
         field: 'image',
         type: PlutoColumnType.text(),
         enableSorting: false,
@@ -255,7 +258,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
               borderRadius: BorderRadius.circular(4),
               child: imageUrl.isNotEmpty
                   ? Tooltip(
-                      message: 'Ver imagen',
+                      message: l10n.viewImageTooltip,
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: GestureDetector(
@@ -288,26 +291,26 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         width: 200,
       ),
       PlutoColumn(
-        title: 'Stock actual',
+        title: l10n.currentStockLabel,
         field: 'quantity',
         type: PlutoColumnType.number(),
         width: 100,
       ),
       PlutoColumn(
-        title: 'Stock mínimo',
+        title: l10n.minimumStockLabel,
         field: 'minStock',
         type: PlutoColumnType.number(),
         width: 100,
       ),
       PlutoColumn(
-        title: 'Ubicación',
+        title: l10n.locationColumnLabel,
         field: 'location',
         type: PlutoColumnType.text(),
         width: 150,
       ),
       if (widget.assetType.isSerialized)
         PlutoColumn(
-          title: 'Numero de serie',
+          title: l10n.serialNumberColumnLabel,
           field: 'serialNumber',
           type: PlutoColumnType.text(),
           width: 100,
@@ -319,7 +322,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         width: 150,
       ),
       PlutoColumn(
-        title: 'Precio de mercado',
+        title: l10n.marketPriceLabel,
         field: 'marketValue',
         type: PlutoColumnType.text(),
         width: 150,
@@ -344,7 +347,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         },
       ),
       PlutoColumn(
-        title: 'Condición',
+        title: l10n.conditionColumnLabel,
         field: 'condition',
         // select con los strings localizados — PlutoGrid muestra un dropdown
         // al filtrar con exactamente estas opciones.
@@ -410,7 +413,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       ...baseColumns,
       ...customColumns,
       PlutoColumn(
-        title: 'Acciones',
+        title: l10n.actionsColumnLabel,
         field: 'actions',
         type: PlutoColumnType.text(),
         enableSorting: false,
@@ -533,11 +536,11 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      'No se pudo cargar la imagen.',
+                      AppLocalizations.of(context)!.imageLoadError,
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
-                    const Text(
-                      'Asegúrate de que la URL es correcta y el servidor está activo.',
+                    Text(
+                      AppLocalizations.of(context)!.imageUrlHint,
                       textAlign: TextAlign.center,
                     ),
                   ],

@@ -2,6 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 class BarcodeScannerWidget extends StatefulWidget {
@@ -53,6 +54,7 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -76,15 +78,15 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
                   color: Colors.black87,
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Row(
+                child: Row(
                   // Quitamos const de arriba si hay variables, pero aquí es estático
                   children: [
-                    Icon(Icons.info_outline, color: Colors.amber, size: 20),
-                    SizedBox(width: 10),
+                    const Icon(Icons.info_outline, color: Colors.amber, size: 20),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        "Consejo: Si no enfoca, aleje el producto unos 30 cm de la cámara.",
-                        style: TextStyle(color: Colors.white, fontSize: 13),
+                        l10n.scannerFocusTip,
+                        style: const TextStyle(color: Colors.white, fontSize: 13),
                       ),
                     ),
                   ],
@@ -162,7 +164,7 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text("Escanear Código", style: Theme.of(context).textTheme.titleLarge),
+        Text(AppLocalizations.of(context)!.scanCodeTitle, style: Theme.of(context).textTheme.titleLarge),
         IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),

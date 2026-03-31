@@ -127,6 +127,7 @@ class _AssetListScreenState extends State<AssetListScreen>
   }
 
   Future<void> _refreshTable(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<InventoryItemProvider>();
     try {
       debugPrint(
@@ -144,7 +145,7 @@ class _AssetListScreenState extends State<AssetListScreen>
       _showRefreshDoneAnimation();
     } catch (_) {
       if (!context.mounted) return;
-      ToastService.error("No se pudo recargar la lista");
+      ToastService.error(l10n.couldNotReloadList);
     }
   }
 
@@ -158,6 +159,7 @@ class _AssetListScreenState extends State<AssetListScreen>
   }
 
   Future<void> _syncMarketPrices(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final provider = context.read<InventoryItemProvider>();
     final cIdInt = int.tryParse(widget.containerId) ?? 0;
     final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
@@ -165,18 +167,18 @@ class _AssetListScreenState extends State<AssetListScreen>
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sincronizar precios'),
-        content: const Text(
-          'Se consultará la API para actualizar el valor de mercado.',
+        title: Text(l10n.syncPricesTitle),
+        content: Text(
+          l10n.syncPricesDescription,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Sincronizar'),
+            child: Text(l10n.syncLabel),
           ),
         ],
       ),
@@ -191,8 +193,8 @@ class _AssetListScreenState extends State<AssetListScreen>
           assetTypeId: atIdInt,
           containerId: cIdInt,
         ),
-        loadingMessage: "Sincronizando precios de mercado...",
-        errorMessage: "No se pudieron sincronizar los precios",
+        loadingMessage: l10n.syncingMarketPrices,
+        errorMessage: l10n.couldNotSyncPrices,
       );
 
       if (!context.mounted) return;
@@ -200,33 +202,33 @@ class _AssetListScreenState extends State<AssetListScreen>
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Sincronización completada'),
+          title: Text(l10n.syncCompletedTitle),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               SyncResultRow(
                 icon: Icons.trending_up,
                 color: Colors.green,
-                label: 'Actualizados',
+                label: l10n.updatedLabel,
                 value: summary['updated'] ?? 0,
               ),
               SyncResultRow(
                 icon: Icons.remove_circle_outline,
                 color: Colors.orange,
-                label: 'Sin precio en API',
+                label: l10n.noApiPriceLabel,
                 value: summary['skipped'] ?? 0,
               ),
               SyncResultRow(
                 icon: Icons.error_outline,
                 color: Colors.red,
-                label: 'Errores',
+                label: l10n.errorsLabel,
                 value: summary['errors'] ?? 0,
               ),
               const Divider(),
               SyncResultRow(
                 icon: Icons.inventory_2_outlined,
                 color: Colors.grey,
-                label: 'Total procesados',
+                label: l10n.totalProcessedLabel,
                 value: summary['total'] ?? 0,
               ),
             ],
@@ -234,7 +236,7 @@ class _AssetListScreenState extends State<AssetListScreen>
           actions: [
             FilledButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cerrar'),
+              child: Text(l10n.closeLabel),
             ),
           ],
         ),

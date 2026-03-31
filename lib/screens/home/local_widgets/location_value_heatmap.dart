@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/location.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/widgets/ui/price_display_widget.dart';
@@ -258,7 +259,7 @@ class _LocationValueDonutCard extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 32),
               child: Center(
                 child: Text(
-                  'Aún no hay activos con ubicación y valor suficiente para dibujar esta gráfica.',
+                  AppLocalizations.of(context)!.noLocationValueData,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),

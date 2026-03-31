@@ -81,7 +81,7 @@ class AssetMarketStatusWidget extends StatelessWidget {
 
         if (item.marketValue > 0) ...[
           Text(
-            "VALOR DE MERCADO ACTUAL",
+            l10n.currentMarketValueLabel,
             style: theme.textTheme.labelSmall?.copyWith(
               letterSpacing: 1.2,
               fontWeight: FontWeight.bold,
@@ -151,8 +151,8 @@ class AssetMarketStatusWidget extends StatelessWidget {
                   : const Icon(Icons.cloud_sync_rounded),
               label: Text(
                 itemProvider.isSyncing
-                    ? "Sincronizando..."
-                    : "Actualizar Precio",
+                    ? l10n.syncingLabel
+                    : l10n.updatePriceLabel,
               ),
             ),
           ),
