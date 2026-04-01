@@ -4473,6 +4473,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Select Color'**
   String get selectColor;
+
+  /// Title for value distribution widget by location
+  ///
+  /// In en, this message translates to:
+  /// **'Value Distribution by Location'**
+  String get valueDistributionByLocation;
+
+  /// Description of heatmap widget
+  ///
+  /// In en, this message translates to:
+  /// **'The donut shows how the market value is distributed among the highest-weight locations.'**
+  String get heatmapDescription;
+
+  /// Label for number of locations
+  ///
+  /// In en, this message translates to:
+  /// **'{count} locations'**
+  String locationsCount(int count);
+
+  /// Label for units
+  ///
+  /// In en, this message translates to:
+  /// **'units'**
+  String get unitsLabel;
+
+  /// Label for records
+  ///
+  /// In en, this message translates to:
+  /// **'records'**
+  String get recordsLabel;
+
+  /// Fallback label for total value
+  ///
+  /// In en, this message translates to:
+  /// **'Total value'**
+  String get totalValueFallback;
+
+  /// Fallback label for container
+  ///
+  /// In en, this message translates to:
+  /// **'Container {id}'**
+  String containerFallback(String id);
+
+  /// Fallback label for location
+  ///
+  /// In en, this message translates to:
+  /// **'Location {id}'**
+  String locationFallback(String id);
+
+  /// Label for 'of the value'
+  ///
+  /// In en, this message translates to:
+  /// **'of the value'**
+  String get ofTheValueLabel;
 }
 
 class _AppLocalizationsDelegate

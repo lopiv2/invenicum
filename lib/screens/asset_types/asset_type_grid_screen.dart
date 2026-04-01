@@ -95,6 +95,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
     // ✅ watch() aquí es correcto para reaccionar a cambios de datos,
     // siempre que no disparemos lógica de carga aquí dentro.
     final containerProvider = context.watch<ContainerProvider>();
@@ -127,31 +128,62 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
     final assetTypes = container.assetTypes;
 
     return Padding(
-      padding: const EdgeInsets.all(24.0),
+      padding: EdgeInsets.all(screenWidth > 600 ? 24.0 : 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.assetTypesInContainer(container.name),
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: theme.colorScheme.onSurface,
+          // Header responsive
+          if (screenWidth > 600)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    l10n.assetTypesInContainer(container.name),
+                    style: theme.textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
                 ),
-              ),
-              ElevatedButton.icon(
-                onPressed: () => _goToCreateAssetType(context),
-                icon: const Icon(Icons.add_circle_outline),
-                label: Text(l10n.createNewTypeButton),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.surfaceContainer,
-                  foregroundColor: theme.colorScheme.onSurface,
+                const SizedBox(width: 16),
+                ElevatedButton.icon(
+                  onPressed: () => _goToCreateAssetType(context),
+                  icon: const Icon(Icons.add_circle_outline),
+                  label: Text(l10n.createNewTypeButton),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.surfaceContainer,
+                    foregroundColor: theme.colorScheme.onSurface,
+                  ),
                 ),
-              ),
-            ],
-          ),
+              ],
+            )
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.assetTypesInContainer(container.name),
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _goToCreateAssetType(context),
+                    icon: const Icon(Icons.add_circle_outline),
+                    label: Text(l10n.createNewTypeButton),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: theme.colorScheme.surfaceContainer,
+                      foregroundColor: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           const SizedBox(height: 20),
           if (assetTypes.isEmpty)
             Expanded(
@@ -167,11 +199,11 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
           else
             Expanded(
               child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: 400,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
-                  mainAxisExtent: 160,
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: screenWidth > 900 ? 420 : (screenWidth > 600 ? 320 : 220),
+                  crossAxisSpacing: screenWidth > 600 ? 20 : 12,
+                  mainAxisSpacing: screenWidth > 600 ? 20 : 12,
+                  mainAxisExtent: screenWidth > 600 ? 165 : 130,
                 ),
                 itemCount: assetTypes.length,
                 itemBuilder: (context, index) {

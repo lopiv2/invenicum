@@ -1335,5 +1335,56 @@
   "@selectColor": {
     "description": "Label for color selection button or dialog"
   },
-  "selectColor": "Select Color"
+  "selectColor": "Select Color",
+  "@valueDistributionByLocation": {
+    "description": "Title for value distribution widget by location"
+  },
+  "valueDistributionByLocation": "Value Distribution by Location",
+  "@heatmapDescription": {
+    "description": "Description of heatmap widget"
+  },
+  "heatmapDescription": "The donut shows how the market value is distributed among the highest-weight locations.",
+  "@locationsCount": {
+    "description": "Label for number of locations",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationsCount": "{count} locations",
+  "@unitsLabel": {
+    "description": "Label for units"
+  },
+  "unitsLabel": "units",
+  "@recordsLabel": {
+    "description": "Label for records"
+  },
+  "recordsLabel": "records",
+  "@totalValueFallback": {
+    "description": "Fallback label for total value"
+  },
+  "totalValueFallback": "Total value",
+  "@containerFallback": {
+    "description": "Fallback label for container",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "containerFallback": "Container {id}",
+  "@locationFallback": {
+    "description": "Fallback label for location",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "locationFallback": "Location {id}",
+  "@ofTheValueLabel": {
+    "description": "Label for 'of the value'"
+  },
+  "ofTheValueLabel": "of the value"
 }

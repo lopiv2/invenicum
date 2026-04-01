@@ -483,7 +483,16 @@
     "underConstruction",
     "comingSoon",
     "constructionSubtitle",
-    "selectColor"
+    "selectColor",
+    "valueDistributionByLocation",
+    "heatmapDescription",
+    "locationsCount",
+    "unitsLabel",
+    "recordsLabel",
+    "totalValueFallback",
+    "containerFallback",
+    "locationFallback",
+    "ofTheValueLabel"
   ],
 
   "fr": [
@@ -970,7 +979,16 @@
     "underConstruction",
     "comingSoon",
     "constructionSubtitle",
-    "selectColor"
+    "selectColor",
+    "valueDistributionByLocation",
+    "heatmapDescription",
+    "locationsCount",
+    "unitsLabel",
+    "recordsLabel",
+    "totalValueFallback",
+    "containerFallback",
+    "locationFallback",
+    "ofTheValueLabel"
   ],
 
   "it": [
@@ -1457,7 +1475,16 @@
     "underConstruction",
     "comingSoon",
     "constructionSubtitle",
-    "selectColor"
+    "selectColor",
+    "valueDistributionByLocation",
+    "heatmapDescription",
+    "locationsCount",
+    "unitsLabel",
+    "recordsLabel",
+    "totalValueFallback",
+    "containerFallback",
+    "locationFallback",
+    "ofTheValueLabel"
   ],
 
   "pt": [
@@ -1944,6 +1971,15 @@
     "underConstruction",
     "comingSoon",
     "constructionSubtitle",
-    "selectColor"
+    "selectColor",
+    "valueDistributionByLocation",
+    "heatmapDescription",
+    "locationsCount",
+    "unitsLabel",
+    "recordsLabel",
+    "totalValueFallback",
+    "containerFallback",
+    "locationFallback",
+    "ofTheValueLabel"
   ]
 }

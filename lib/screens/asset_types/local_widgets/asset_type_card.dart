@@ -226,12 +226,22 @@ class AssetTypeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
+    final isTablet = screenWidth >= 600 && screenWidth < 900;
+    
     final indicatorColor = isCollection
         ? Colors.lightGreen
-        : theme.primaryColor; // Azul/Primario para individuales
+        : theme.primaryColor;
     final fullImageUrl = assetType.images.isNotEmpty
         ? _buildImageUrl(assetType.images.first.url)
         : '';
+    
+    // Dimensiones responsivas
+    final imageWidth = isMobile ? 80.0 : (isTablet ? 100.0 : 110.0);
+    final cardHeight = isMobile ? 110.0 : 125.0;
+    final fontSize = isMobile ? 14.0 : 18.0;
+    final padding = isMobile ? 12.0 : 16.0;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -240,7 +250,7 @@ class AssetTypeCard extends StatelessWidget {
         border: Border(
           bottom: BorderSide(
             color: indicatorColor,
-            width: 4, // El grosor que quieras
+            width: 4,
           ),
         ),
         boxShadow: [
@@ -258,49 +268,52 @@ class AssetTypeCard extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             child: SizedBox(
-              height:
-                  125, // Un poco más de altura para acomodar el nombre arriba
+              height: cardHeight,
               child: Row(
                 children: [
-                  // Imagen lateral
-                  _buildHeroImage(fullImageUrl, theme),
+                  // Imagen lateral - responsive
+                  _buildHeroImage(fullImageUrl, theme, imageWidth),
 
                   // Contenido Principal
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: EdgeInsets.all(padding),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 1. NOMBRE ARRIBA (con más espacio)
-                          Text(
-                            assetType.name,
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              letterSpacing: -0.5,
+                          // 1. NOMBRE ARRIBA
+                          Flexible(
+                            child: Text(
+                              assetType.name,
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontSize: fontSize,
+                                letterSpacing: -0.5,
+                              ),
+                              maxLines: isMobile ? 1 : 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            maxLines: 2, // Permite 2 líneas si es muy largo
-                            overflow: TextOverflow.ellipsis,
                           ),
-                          const Spacer(), // Empuja el resto hacia abajo
+                          const Spacer(),
                           // 2. FILA INFERIOR: Badge + Botones
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Flexible(
                                 flex: 2,
-                                child: _buildAssetBadge(context, theme),
+                                child: _buildAssetBadge(context, theme, isMobile),
                               ),
                               const SizedBox(width: 4),
-                              // Botones envueltos en Flexible para que no desborden
+                              // Botones responsive
                               Flexible(
                                 flex: 3,
-                                child: FittedBox(
-                                  // Asegura que los botones se escalen si no caben
-                                  fit: BoxFit.scaleDown,
-                                  alignment: Alignment.centerRight,
-                                  child: _buildActionRow(context, theme),
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: _buildActionRow(
+                                    context,
+                                    theme,
+                                    isMobile,
+                                  ),
                                 ),
                               ),
                             ],
@@ -318,9 +331,13 @@ class AssetTypeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroImage(String url, ThemeData theme) {
+  Widget _buildHeroImage(
+    String url,
+    ThemeData theme,
+    double width,
+  ) {
     return Container(
-      width: 110,
+      width: width,
       height: double.infinity,
       decoration: BoxDecoration(
         color: theme.primaryColor.withValues(alpha: 0.05),
@@ -357,25 +374,41 @@ class AssetTypeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildAssetBadge(BuildContext context, ThemeData theme) {
+  Widget _buildAssetBadge(
+    BuildContext context,
+    ThemeData theme,
+    bool isMobile,
+  ) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 6.0 : 10.0,
+        vertical: isMobile ? 3.0 : 4.0,
+      ),
       decoration: BoxDecoration(
         color: theme.primaryColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        '$assetCount Activos',
+        '$assetCount ${AppLocalizations.of(context)!.active}',
         style: TextStyle(
-          fontSize: 12,
+          fontSize: isMobile ? 11.0 : 12.0,
           fontWeight: FontWeight.bold,
           color: theme.primaryColor,
         ),
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
 
-  Widget _buildActionRow(BuildContext context, ThemeData theme) {
+  Widget _buildActionRow(
+    BuildContext context,
+    ThemeData theme,
+    bool isMobile,
+  ) {
+    final buttonSize = isMobile ? 36.0 : 40.0;
+    final iconSize = isMobile ? 18.0 : 20.0;
+    
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -383,18 +416,26 @@ class AssetTypeCard extends StatelessWidget {
           _CircleIconButton(
             icon: Icons.tune_rounded,
             color: Colors.orange,
+            size: buttonSize,
+            iconSize: iconSize,
             onPressed: () => _showConfigureCollectionDialog(context),
             tooltip: 'Campos de colección',
           ),
+        const SizedBox(width: 4),
         _CircleIconButton(
           icon: Icons.edit_rounded,
           color: theme.primaryColor,
+          size: buttonSize,
+          iconSize: iconSize,
           onPressed: onEdit,
           tooltip: 'Editar',
         ),
+        const SizedBox(width: 4),
         _CircleIconButton(
           icon: Icons.delete_outline_rounded,
           color: Colors.redAccent,
+          size: buttonSize,
+          iconSize: iconSize,
           onPressed: () => _handleDelete(context),
           tooltip: 'Eliminar',
         ),
@@ -457,12 +498,16 @@ class _CircleIconButton extends StatelessWidget {
   final Color color;
   final VoidCallback? onPressed;
   final String tooltip;
+  final double size;
+  final double iconSize;
 
   const _CircleIconButton({
     required this.icon,
     required this.color,
     required this.onPressed,
     required this.tooltip,
+    this.size = 40.0,
+    this.iconSize = 20.0,
   });
 
   @override
@@ -475,14 +520,15 @@ class _CircleIconButton extends StatelessWidget {
           onTap: onPressed,
           borderRadius: BorderRadius.circular(12),
           child: Container(
-            padding: const EdgeInsets.all(
-              8,
-            ), // Un poco más pequeño para dar aire al nombre
+            width: size,
+            height: size,
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, size: 18, color: color),
+            child: Center(
+              child: Icon(icon, size: iconSize, color: color),
+            ),
           ),
         ),
       ),

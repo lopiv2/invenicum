@@ -183,14 +183,14 @@ class _LocationValueDonutCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Distribución de valor por ubicación',
+                    AppLocalizations.of(context)!.valueDistributionByLocation,
                     style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'El donut muestra cómo se reparte el valor de mercado entre las ubicaciones con más peso.',
+                    AppLocalizations.of(context)!.heatmapDescription,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: theme.colorScheme.onSurfaceVariant,
                     ),
@@ -202,21 +202,21 @@ class _LocationValueDonutCard extends StatelessWidget {
                 runSpacing: 8,
                 children: [
                   _LegendPill(
-                    label: '${cells.length} ubicaciones',
-                    color: const Color(0xFFCF7A32),
+                    label: AppLocalizations.of(context)!.locationsCount(cells.length),
+                    color: theme.colorScheme.primaryContainer,
                   ),
                   _LegendPill(
-                    color: const Color(0xFF245C4A),
+                    color: theme.colorScheme.primaryFixedDim,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Total '),
+                        Text('${AppLocalizations.of(context)!.totalValueFallback} '),
                         PriceDisplayWidget(
                           value: totalValue,
-                          color: Colors.white,
+                          color: theme.colorScheme.onSecondaryContainer,
                           fontSize: 12,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: theme.colorScheme.onSecondaryContainer,
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                           ),
@@ -226,17 +226,17 @@ class _LocationValueDonutCard extends StatelessWidget {
                   ),
                   if (unassignedCount > 0)
                     _LegendPill(
-                      color: const Color(0xFF245C4A),
+                      color: theme.colorScheme.tertiaryContainer,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('$unassignedCount sin ubicación · '),
+                          Text('$unassignedCount ${AppLocalizations.of(context)!.withoutLocationLabel} · '),
                           PriceDisplayWidget(
                             value: unassignedValue,
-                            color: Colors.white,
+                            color: theme.colorScheme.onTertiaryContainer,
                             fontSize: 12,
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: theme.colorScheme.onTertiaryContainer,
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
                             ),
@@ -401,7 +401,7 @@ class _DonutChartPanelState extends State<_DonutChartPanel> {
       child: Column(
         children: [
           SizedBox(
-            height: 280,
+            height: MediaQuery.of(context).size.height * 0.35,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -441,7 +441,7 @@ class _DonutChartPanelState extends State<_DonutChartPanel> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      highlighted?.cell.locationName ?? 'Valor total',
+                      highlighted?.cell.locationName ?? AppLocalizations.of(context)!.totalValueFallback,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
@@ -461,7 +461,7 @@ class _DonutChartPanelState extends State<_DonutChartPanel> {
                     if (highlighted != null) ...[
                       const SizedBox(height: 4),
                       Text(
-                        '${_percent(highlighted.cell.totalValue, widget.totalValue).toStringAsFixed(1)}% del valor',
+                        '${_percent(highlighted.cell.totalValue, widget.totalValue).toStringAsFixed(1)}% ${AppLocalizations.of(context)!.ofTheValueLabel}',
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: theme.colorScheme.onSurfaceVariant,
                         ),
@@ -612,8 +612,8 @@ class _RankingRow extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _MetricBadge(label: '${cell.totalQuantity} uds'),
-                  _MetricBadge(label: '${cell.totalEntries} registros'),
+                  _MetricBadge(label: '${cell.totalQuantity} ${AppLocalizations.of(context)!.unitsLabel}'),
+                  _MetricBadge(label: '${cell.totalEntries} ${AppLocalizations.of(context)!.recordsLabel}'),
                   _MetricBadge(label: '${percentage.toStringAsFixed(1)}%'),
                 ],
               ),

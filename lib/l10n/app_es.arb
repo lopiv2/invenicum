@@ -1335,5 +1335,56 @@
   "@selectColor": {
     "description": "Label for color selection button or dialog"
   },
-  "selectColor": "Seleccionar Color"
+  "selectColor": "Seleccionar Color",
+  "@valueDistributionByLocation": {
+    "description": "Título para el widget de distribución de valor por ubicación"
+  },
+  "valueDistributionByLocation": "Distribución de valor por ubicación",
+  "@heatmapDescription": {
+    "description": "Descripción del widget de mapa de calor"
+  },
+  "heatmapDescription": "El donut muestra cómo se reparte el valor de mercado entre las ubicaciones con más peso.",
+  "@locationsCount": {
+    "description": "Etiqueta para número de ubicaciones",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationsCount": "{count} ubicaciones",
+  "@unitsLabel": {
+    "description": "Etiqueta para unidades"
+  },
+  "unitsLabel": "uds",
+  "@recordsLabel": {
+    "description": "Etiqueta para registros"
+  },
+  "recordsLabel": "registros",
+  "@totalValueFallback": {
+    "description": "Etiqueta alternativa para valor total"
+  },
+  "totalValueFallback": "Valor total",
+  "@containerFallback": {
+    "description": "Etiqueta alternativa para contenedor",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "containerFallback": "Contenedor {id}",
+  "@locationFallback": {
+    "description": "Etiqueta alternativa para ubicación",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "locationFallback": "Ubicación {id}",
+  "@ofTheValueLabel": {
+    "description": "Etiqueta para 'del valor'"
+  },
+  "ofTheValueLabel": "del valor"
 }

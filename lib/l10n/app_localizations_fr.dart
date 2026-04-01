@@ -2418,4 +2418,38 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get selectColor => 'Select Color';
+
+  @override
+  String get valueDistributionByLocation => 'Value Distribution by Location';
+
+  @override
+  String get heatmapDescription =>
+      'The donut shows how the market value is distributed among the highest-weight locations.';
+
+  @override
+  String locationsCount(int count) {
+    return '$count locations';
+  }
+
+  @override
+  String get unitsLabel => 'units';
+
+  @override
+  String get recordsLabel => 'records';
+
+  @override
+  String get totalValueFallback => 'Total value';
+
+  @override
+  String containerFallback(String id) {
+    return 'Container $id';
+  }
+
+  @override
+  String locationFallback(String id) {
+    return 'Location $id';
+  }
+
+  @override
+  String get ofTheValueLabel => 'of the value';
 }

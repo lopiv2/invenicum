@@ -91,40 +91,59 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
               return Column(
                 children: [
-                  // 1. Widget de Inversión
-                  IntrinsicHeight(
-                    child: Row(
+                  // 1. Widget de Inversión - Responsive
+                  if (screenWidth > 600)
+                    IntrinsicHeight(
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TotalSpendingWidget(
+                              amount: stats.totalValue,
+                              isLoading: false,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Consumer<InventoryItemProvider>(
+                              builder: (context, itemProvider, child) {
+                                return TotalMarketValueWidget(
+                                  marketValue: itemProvider.totalMarketValue,
+                                  isLoading: itemProvider.isMarketValueLoading,
+                                );
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    Column(
                       children: [
-                        Expanded(
-                          child: TotalSpendingWidget(
-                            amount: stats.totalValue,
-                            isLoading: false,
-                          ),
+                        TotalSpendingWidget(
+                          amount: stats.totalValue,
+                          isLoading: false,
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Consumer<InventoryItemProvider>(
-                            builder: (context, itemProvider, child) {
-                              return TotalMarketValueWidget(
-                                marketValue: itemProvider.totalMarketValue,
-                                isLoading: itemProvider.isMarketValueLoading,
-                              );
-                            },
-                          ),
+                        const SizedBox(height: 12),
+                        Consumer<InventoryItemProvider>(
+                          builder: (context, itemProvider, child) {
+                            return TotalMarketValueWidget(
+                              marketValue: itemProvider.totalMarketValue,
+                              isLoading: itemProvider.isMarketValueLoading,
+                            );
+                          },
                         ),
                       ],
                     ),
-                  ),
                   const SizedBox(height: 24),
 
                   // 2. Grid de Estadísticas
                   Consumer<LoanProvider>(
                     builder: (context, loanProvider, child) {
                       return GridView.count(
-                        crossAxisCount: screenWidth > 600 ? 4 : 2,
-                        crossAxisSpacing: 20,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 1.8,
+                        crossAxisCount: screenWidth > 900 ? 4 : (screenWidth > 600 ? 3 : 2),
+                        crossAxisSpacing: screenWidth > 600 ? 20 : 12,
+                        mainAxisSpacing: screenWidth > 600 ? 12 : 8,
+                        childAspectRatio: screenWidth > 900 ? 1.8 : (screenWidth > 600 ? 1.6 : 1.5),
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         children: [
@@ -198,14 +217,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
           const SizedBox(height: 24),
           const LowStockCard(),
           const SizedBox(height: 24),
-          Row(
-            crossAxisAlignment:
-                CrossAxisAlignment.start, // Alinea las tarjetas arriba
-            children: [
-              const Expanded(child: TopLoanedItemsChart()),
-              const Expanded(child: MarketValueEvolutionChart()),
-            ],
-          ),
+          if (screenWidth > 600)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Expanded(child: TopLoanedItemsChart()),
+                const SizedBox(width: 16),
+                const Expanded(child: MarketValueEvolutionChart()),
+              ],
+            )
+          else
+            Column(
+              children: [
+                const TopLoanedItemsChart(),
+                const SizedBox(height: 16),
+                const MarketValueEvolutionChart(),
+              ],
+            ),
           const SizedBox(height: 32),
           const StacSlot(slotName: 'dashboard_bottom'),
         ],
