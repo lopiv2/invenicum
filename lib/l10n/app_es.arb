@@ -341,6 +341,7 @@
   "ignoreField": "🚫 Ignorar Campo",
   "importAssetsTo": "Importar Activos a",
   "importSuccessMessage": "¡Importación Exitosa! {count} activos creados.",
+  "importSerializedWarning": "Importación correcta. Este tipo de activo es serializado — todos los ítems se han creado con cantidad 1.",
   "integrations": "Integraciones",
   "integrationGeminiDesc": "Conecta Invenicum con Gemini de Google para aprovechar las capacidades avanzadas de IA en la gestión de tu inventario.",
   "integrationTelegramDesc": "Conecta Invenicum con Telegram para recibir notificaciones instantáneas sobre tu inventario directamente en tu dispositivo.",
@@ -373,6 +374,7 @@
   "march": "Marzo",
   "marketPriceObtained": "Precio de mercado obtenido correctamente",
   "marketValueEvolution": "Evolución del valor de mercado",
+  "marketValueField": "Valor de mercado",
   "maxStock": "Stock máximo",
   "may": "Mayo",
   "minStock": "Stock mínimo",
@@ -511,6 +513,44 @@
   "integrationsModularDesign": "Diseño modular por categorías",
   "integrationsCheckingStatuses": "Comprobando estados",
   "integrationsStatusSynced": "Estado sincronizado",
+  "integrationsHeroHeadline": "Conecta servicios, APIs y herramientas desde una única vista clara.",
+  "integrationsHeroSubheadline": "Agrupamos las integraciones por propósito para que la configuración sea más rápida, más visual y más fácil de mantener también en móvil.",
+  "integrationStatusConnected": "Conectada",
+  "integrationStatusNotConfigured": "Sin configurar",
+  "integrationTypeDataSource": "Fuente de datos",
+  "integrationTypeConnector": "Conector",
+  "integrationFieldsCount": "{count} campos",
+  "@integrationFieldsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "integrationNoLocalCredentials": "Sin credenciales locales",
+  "configureLabel": "Configurar",
+  "integrationModelDefaultGemini": "Predeterminado: gemini-3-flash-preview",
+  "integrationOpenaiDesc": "Usa GPT-4o y otros modelos de OpenAI como asistente inteligente.",
+  "integrationOpenaiApiKeyHint": "Obtenida en platform.openai.com/api-keys",
+  "integrationModelDefaultOpenai": "Predeterminado: gpt-4o",
+  "integrationClaudeDesc": "Usa Claude Sonnet, Opus y Haiku como asistente inteligente.",
+  "integrationClaudeApiKeyHint": "Obtenida en console.anthropic.com/settings/keys",
+  "integrationModelDefaultClaude": "Predeterminado: claude-sonnet-4-6",
+  "integrationTelegramBotTokenHint": "De @BotFather",
+  "integrationTelegramChatIdHint": "Usa @userinfobot para obtener tu ID",
+  "integrationEmailDesc": "Envío de correos ultra-confiable. Ideal para reportes y alertas críticas.",
+  "integrationEmailApiKeyHint": "Obtenida en resend.com/api-keys",
+  "integrationEmailFromLabel": "Remitente (From)",
+  "integrationEmailFromHint": "Ej: Invenicum <onboarding@resend.dev>",
+  "integrationBggDesc": "Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.",
+  "integrationPokemonDesc": "Conéctate a la API de Pokemon para sincronizar tu colección y enriquecer tus datos automáticamente.",
+  "integrationTcgdexDesc": "Consulta cartas y expansiones de juegos de cartas coleccionables para enriquecer tu inventario automáticamente.",
+  "integrationQrGeneratorName": "Generador QR",
+  "integrationQrLabelsDesc": "Configura el formato de tus etiquetas imprimibles.",
+  "integrationQrPageSizeLabel": "Tamaño de página (A4, Carta)",
+  "integrationQrMarginLabel": "Margen (mm)",
+  "integrationPriceChartingDesc": "Configura tu API Key para obtener precios actualizados.",
+  "integrationUpcitemdbDesc": "Búsqueda global de precios por código de barras.",
   "integrationConfiguredSuccess": "{name} configurado con éxito",
   "@integrationConfiguredSuccess": {
     "placeholders": {
@@ -904,7 +944,18 @@
   "filterLabel": "Filtro",
   "activeFilterLabel": "Filtro activo",
   "importLabel": "Importar",
-  "syncLabel": "Sincronizar",
+  "exportLabel": "Exportar",
+  "csvExportNoData": "No hay items para exportar.",
+  "csvExportSuccess": "CSV exportado correctamente ({count} items).",
+  "@csvExportSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "csvExportError": "No se pudo exportar el CSV",
+  "syncLabel": "Sincronizar precios",
   "syncingLabel": "Sincronizando...",
   "newAssetLabel": "Nuevo activo",
   "statusAndPreferences": "Estado y Preferencias",
@@ -1094,6 +1145,7 @@
   "actionsLabel": "Acciones",
   "editButtonLabel": "Editar",
   "deleteButtonLabel": "Eliminar",
+  "printLabel": "Imprimir etiqueta",
   "collectionFieldsTooltip": "Campos de colección",
   "totalLocations": "{count} ubicaciones",
   "@totalLocations": {
@@ -1298,6 +1350,18 @@
   "oceanTheme": "Océano Índico",
   "@cherryBlossomTheme": {},
   "cherryBlossomTheme": "Flor de Cerezo",
+  "themeBrand": "Invenicum (Marca)",
+  "themeEmerald": "Esmeralda",
+  "themeSunset": "Atardecer",
+  "themeLavender": "Lavanda Suave",
+  "themeForest": "Bosque Profundo",
+  "themeCherry": "Cereza",
+  "themeElectricNight": "Noche Eléctrica",
+  "themeAmberGold": "Oro Ámbar",
+  "themeModernSlate": "Pizarra Moderna",
+  "themeCyberpunk": "Cyberpunk",
+  "themeNordicArctic": "Ártico Nord",
+  "themeDeepNight": "Noche Profunda",
   "@loginSuccess": {},
   "loginSuccess": "Inicio de sesión exitoso",
   "reloadListError": "No se pudo recargar la lista",
@@ -1386,5 +1450,39 @@
   "@ofTheValueLabel": {
     "description": "Etiqueta para 'del valor'"
   },
-  "ofTheValueLabel": "del valor"
+  "ofTheValueLabel": "del valor",
+  "reportsDescription": "Genera informes en PDF o Excel para imprimir o guardar en tu PC",
+  "reportSectionType": "Tipo de informe",
+  "reportSectionFormat": "Formato de salida",
+  "reportSectionPreview": "Configuración actual",
+  "reportSelectContainerTitle": "Selecciona un contenedor",
+  "reportGenerate": "Generar informe",
+  "reportGenerating": "Generando...",
+  "reportTypeInventoryDescription": "Listado completo del inventario",
+  "reportTypeLoansDescription": "Préstamos activos y su estado",
+  "reportTypeAssetsDescription": "Listado de activos por categoría",
+  "reportLabelContainer": "Contenedor",
+  "reportLabelType": "Tipo de informe",
+  "reportLabelFormat": "Formato",
+  "reportFormatPdf": "PDF",
+  "reportFormatExcel": "Excel",
+  "reportNotSelected": "Sin seleccionar",
+  "reportUnknown": "Desconocido",
+  "reportSelectContainerFirst": "Por favor selecciona un contenedor",
+  "@reportDownloadedSuccess": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDownloadedSuccess": "Informe {format} descargado correctamente",
+  "@reportGenerateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportGenerateError": "Error al generar informe: {error}"
 }

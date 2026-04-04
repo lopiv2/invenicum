@@ -418,34 +418,73 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         type: PlutoColumnType.text(),
         enableSorting: false,
         enableFilterMenuItem: false,
-        width: 200,
+        width: 180,
         renderer: (rendererContext) {
           final item =
               rendererContext.row.cells['item_object']!.value as InventoryItem;
-          return Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit, size: 18, color: Colors.blue),
-                onPressed: () => _openAssetEdit(item),
-              ),
-              IconButton(
-                icon: const Icon(Icons.copy, size: 18, color: Colors.orange),
-                onPressed: () => _copyAsset(item),
-              ),
-              IconButton(
-                icon: const Icon(Icons.print, size: 18, color: Colors.green),
-                onPressed: () => PrintLabelButton.showPreview(context, item),
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete, size: 18, color: Colors.red),
-                onPressed: () => _deleteAsset(item),
-              ),
-            ],
+          final isMobile = MediaQuery.sizeOf(context).width < 700;
+
+          final actions = [
+            _buildActionIconButton(
+              icon: Icons.edit,
+              color: Colors.blue,
+              tooltip: l10n.edit,
+              compact: isMobile,
+              onPressed: () => _openAssetEdit(item),
+            ),
+            _buildActionIconButton(
+              icon: Icons.copy,
+              color: Colors.orange,
+              tooltip: l10n.copyItemSuffix,
+              compact: isMobile,
+              onPressed: () => _copyAsset(item),
+            ),
+            _buildActionIconButton(
+              icon: Icons.print,
+              color: Colors.green,
+              tooltip: l10n.printLabel,
+              compact: isMobile,
+              onPressed: () => PrintLabelButton.showPreview(context, item),
+            ),
+            _buildActionIconButton(
+              icon: Icons.delete,
+              color: Colors.red,
+              tooltip: l10n.delete,
+              compact: isMobile,
+              onPressed: () => _deleteAsset(item),
+            ),
+          ];
+
+          return Align(
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(mainAxisSize: MainAxisSize.min, children: actions),
+            ),
           );
         },
       ),
     ];
+  }
+
+  Widget _buildActionIconButton({
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+    required bool compact,
+    required VoidCallback onPressed,
+  }) {
+    return IconButton(
+      icon: Icon(icon, size: compact ? 16 : 18, color: color),
+      tooltip: tooltip,
+      visualDensity: compact ? VisualDensity.compact : VisualDensity.standard,
+      padding: EdgeInsets.all(compact ? 2 : 8),
+      constraints: BoxConstraints(
+        minWidth: compact ? 30 : 40,
+        minHeight: compact ? 30 : 40,
+      ),
+      onPressed: onPressed,
+    );
   }
 
   List<PlutoRow> _buildRows(List<InventoryItem> items) {
@@ -555,6 +594,13 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.sizeOf(context).width < 700;
+    final scrollbarThickness = isMobile ? 14.0 : 12.0;
+    final scrollbarThicknessWhileDragging = isMobile ? 16.0 : 14.0;
+    final scheme = Theme.of(context).colorScheme;
+    final scrollbarColor = scheme.primary.withValues(alpha: 0.95);
+    final scrollbarTrackColor = scheme.outline.withValues(alpha: 0.5);
+
     return PlutoGrid(
       columns: columns,
       rows: _initialRows,
@@ -572,6 +618,17 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         style: PlutoGridStyleConfig(
           gridBorderColor: Colors.transparent,
           columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        scrollbar: PlutoGridScrollbarConfig(
+          isAlwaysShown: true,
+          draggableScrollbar: true,
+          onlyDraggingThumb: false,
+          scrollbarThickness: scrollbarThickness,
+          scrollbarThicknessWhileDragging: scrollbarThicknessWhileDragging,
+          crossAxisMargin: isMobile ? 12 : 10,
+          mainAxisMargin: 6,
+          scrollBarColor: scrollbarColor,
+          scrollBarTrackColor: scrollbarTrackColor,
         ),
         columnSize: const PlutoGridColumnSizeConfig(
           autoSizeMode: PlutoAutoSizeMode.none,

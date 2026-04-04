@@ -1,4 +1,9 @@
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'dart:typed_data';
+import 'package:csv/csv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/async_task_helper.dart';
@@ -168,9 +173,7 @@ class _AssetListScreenState extends State<AssetListScreen>
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.syncPricesTitle),
-        content: Text(
-          l10n.syncPricesDescription,
-        ),
+        content: Text(l10n.syncPricesDescription),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -242,6 +245,93 @@ class _AssetListScreenState extends State<AssetListScreen>
         ),
       );
     } catch (_) {}
+  }
+
+  Future<void> _exportCsv(
+    BuildContext context,
+    AssetType assetType,
+    List<InventoryItem> items,
+  ) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (items.isEmpty) {
+      ToastService.error(l10n.csvExportNoData);
+      return;
+    }
+
+    try {
+      final headers = <dynamic>[
+        'name',
+        'description',
+        'quantity',
+        'minStock',
+        'location',
+        'serialNumber',
+        'barcode',
+        'marketValue',
+        'condition',
+        ...assetType.fieldDefinitions.map((f) => f.name),
+      ];
+
+      final rows = <List<dynamic>>[headers];
+
+      for (final item in items) {
+        final row = <dynamic>[
+          item.name,
+          item.description,
+          item.quantity,
+          item.minStock,
+          item.location?.name ?? '',
+          item.serialNumber ?? '',
+          item.barcode ?? '',
+          item.marketValue,
+          item.condition.name,
+        ];
+
+        for (final field in assetType.fieldDefinitions) {
+          final rawValue =
+              item.customFieldValues?[field.id] ??
+              item.customFieldValues?[field.id.toString()];
+
+          if (rawValue is Map || rawValue is List) {
+            row.add(jsonEncode(rawValue));
+          } else {
+            row.add(rawValue?.toString() ?? '');
+          }
+        }
+
+        rows.add(row);
+      }
+
+      final csvContent = const ListToCsvConverter(
+        fieldDelimiter: ';',
+        eol: '\n',
+      ).convert(rows);
+
+      final bytes = Uint8List.fromList(utf8.encode(csvContent));
+      final time = DateTime.now().toIso8601String().replaceAll(':', '-');
+      final safeTypeName = assetType.name
+          .trim()
+          .replaceAll(RegExp(r'\\s+'), '_')
+          .replaceAll(RegExp(r'[^A-Za-z0-9_\-]'), '');
+      final fileName = 'assets_${safeTypeName}_$time.csv';
+
+      final savedPath = await FilePicker.platform.saveFile(
+        dialogTitle: l10n.exportLabel,
+        fileName: fileName,
+        type: FileType.custom,
+        allowedExtensions: ['csv'],
+        bytes: bytes,
+      );
+
+      if (!kIsWeb && (savedPath == null || savedPath.isEmpty)) {
+        ToastService.error(l10n.importCancelled);
+        return;
+      }
+
+      ToastService.success(l10n.csvExportSuccess(items.length));
+    } catch (e) {
+      ToastService.error('${l10n.csvExportError}: $e');
+    }
   }
 
   void _goBack(BuildContext context) {
@@ -485,6 +575,8 @@ class _AssetListScreenState extends State<AssetListScreen>
                               if (!context.mounted) return;
                               await _refreshTable(context);
                             },
+                            onExportCSV: () =>
+                                _exportCsv(context, assetType, data.items),
                             onShowCountFilterDialog: () =>
                                 _showCountFilterDialog(context, assetType),
                             selectedCountFieldId: _selectedCountFieldId,

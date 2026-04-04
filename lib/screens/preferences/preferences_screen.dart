@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/theme_name_localizer.dart';
+import 'package:invenicum/data/models/custom_theme_model.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/theme_provider.dart';
 import 'package:invenicum/screens/preferences/local_widgets/ai_provider_card_widget.dart';
@@ -26,9 +28,10 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   @override
   Widget build(BuildContext context) {
     // Datos de tema necesarios para el widget general
-    final themeName = context.select<ThemeProvider, String>(
-      (p) => p.currentTheme.name,
+    final currentTheme = context.select<ThemeProvider, CustomTheme>(
+      (p) => p.currentTheme,
     );
+    final themeName = localizeThemeName(context, currentTheme);
     final themeColor = context.select<ThemeProvider, Color>(
       (p) => p.currentTheme.primaryColor,
     );
@@ -142,7 +145,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         // Panel Derecho: Contenido dinámico
         Expanded(
           child: Container(
-            color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.5),
+            color: Theme.of(
+              context,
+            ).scaffoldBackgroundColor.withValues(alpha: 0.5),
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(40.0),
               child: AnimatedSwitcher(
@@ -204,7 +209,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           ),
         ),
         selected: isSelected,
-        selectedTileColor: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+        selectedTileColor: Theme.of(
+          context,
+        ).primaryColor.withValues(alpha: 0.1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );

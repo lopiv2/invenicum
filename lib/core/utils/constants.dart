@@ -121,7 +121,7 @@ class AppIntegrations {
             id: 'model',
             label: l10n.geminiLabelModel,
             type: IntegrationFieldType.dropdown,
-            helperText: 'Default: gemini-3-flash-preview',
+            helperText: l10n.integrationModelDefaultGemini,
             options: AiModels.gemini.map((m) => m.id).toList(),
           ),
         ],
@@ -132,20 +132,19 @@ class AppIntegrations {
         isDataSource: false,
         icon: FaIcon(FontAwesomeIcons.openai),
         //icon: Icon(Icons.auto_awesome_mosaic_outlined),
-        description:
-            'Usa GPT-4o y otros modelos de OpenAI como asistente inteligente.',
+        description: l10n.integrationOpenaiDesc,
         fields: [
           IntegrationField(
             id: 'apiKey',
             label: 'API Key',
             type: IntegrationFieldType.password,
-            helperText: 'Obtenida en platform.openai.com/api-keys',
+            helperText: l10n.integrationOpenaiApiKeyHint,
           ),
           IntegrationField(
             id: 'model',
-            label: 'Modelo',
+            label: l10n.geminiLabelModel,
             type: IntegrationFieldType.dropdown,
-            helperText: 'Default: gpt-4o',
+            helperText: l10n.integrationModelDefaultOpenai,
             options: AiModels.openai.map((m) => m.id).toList(),
           ),
         ],
@@ -155,20 +154,19 @@ class AppIntegrations {
         name: 'Anthropic Claude',
         isDataSource: false,
         icon: FaIcon(FontAwesomeIcons.claude, color: Colors.orange[900]),
-        description:
-            'Usa Claude Sonnet, Opus y Haiku como asistente inteligente.',
+        description: l10n.integrationClaudeDesc,
         fields: [
           IntegrationField(
             id: 'apiKey',
             label: 'API Key',
             type: IntegrationFieldType.password,
-            helperText: 'Obtenida en console.anthropic.com/settings/keys',
+            helperText: l10n.integrationClaudeApiKeyHint,
           ),
           IntegrationField(
             id: 'model',
-            label: 'Modelo',
+            label: l10n.geminiLabelModel,
             type: IntegrationFieldType.dropdown,
-            helperText: 'Default: claude-sonnet-4-6',
+            helperText: l10n.integrationModelDefaultClaude,
             options: AiModels.claude.map((m) => m.id).toList(),
           ),
         ],
@@ -186,13 +184,13 @@ class AppIntegrations {
             id: 'botToken', // Antes 'bot_token'
             label: 'Bot Token',
             type: IntegrationFieldType.password,
-            helperText: 'De @BotFather',
+            helperText: l10n.integrationTelegramBotTokenHint,
           ),
           IntegrationField(
             id: 'chatId', // Antes 'chat_id'
             label: 'Chat ID',
             type: IntegrationFieldType.text,
-            helperText: 'Usa @userinfobot para obtener tu ID',
+            helperText: l10n.integrationTelegramChatIdHint,
           ),
         ],
       ),
@@ -201,20 +199,19 @@ class AppIntegrations {
         name: 'Resend Email',
         isDataSource: false,
         icon: Icon(Icons.email_outlined),
-        description:
-            'Envío de correos ultra-confiable. Ideal para reportes y alertas críticas.',
+        description: l10n.integrationEmailDesc,
         fields: [
           IntegrationField(
             id: 'apiKey', // sensitiveIds lo ocultará automáticamente
             label: 'Resend API Key',
             type: IntegrationFieldType.password,
-            helperText: 'Obtenida en resend.com/api-keys',
+            helperText: l10n.integrationEmailApiKeyHint,
           ),
           IntegrationField(
             id: 'fromEmail',
-            label: 'Remitente (From)',
+            label: l10n.integrationEmailFromLabel,
             type: IntegrationFieldType.text,
-            helperText: 'Ej: Invenicum <onboarding@resend.dev>',
+            helperText: l10n.integrationEmailFromHint,
           ),
         ],
       ),
@@ -228,8 +225,7 @@ class AppIntegrations {
           height: 35,
         ),
         icon: const FaIcon(FontAwesomeIcons.boardGameGeek, color: Colors.red),
-        description:
-            'Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.',
+        description: l10n.integrationBggDesc,
         fields: [],
       ),
       IntegrationModel(
@@ -237,8 +233,7 @@ class AppIntegrations {
         name: 'PokeApi',
         isDataSource: true,
         icon: const Icon(Icons.catching_pokemon, color: Colors.red),
-        description:
-            'Conectate a la Api de Pokemon para sincronizar tu colección y enriquecer tus datos automáticamente.',
+        description: l10n.integrationPokemonDesc,
         fields: [],
       ),
       IntegrationModel(
@@ -246,27 +241,26 @@ class AppIntegrations {
         name: 'TCGdex',
         isDataSource: true,
         icon: const Icon(Icons.style_outlined, color: Colors.deepOrange),
-        description:
-            'Consulta cartas y expansiones de juegos de cartas coleccionables para enriquecer tu inventario automáticamente.',
+        description: l10n.integrationTcgdexDesc,
         fields: [],
       ),
 
       // --- HERRAMIENTAS ---
       IntegrationModel(
         id: qrLabels,
-        name: 'Generador QR',
+        name: l10n.integrationQrGeneratorName,
         isDataSource: false,
         icon: FaIcon(FontAwesomeIcons.qrcode),
-        description: 'Configura el formato de tus etiquetas imprimibles.',
+        description: l10n.integrationQrLabelsDesc,
         fields: [
           IntegrationField(
             id: 'page_size',
-            label: 'Tamaño de Página (A4, Carta)',
+            label: l10n.integrationQrPageSizeLabel,
             type: IntegrationFieldType.text,
           ),
           IntegrationField(
             id: 'margin',
-            label: 'Margen (mm)',
+            label: l10n.integrationQrMarginLabel,
             type: IntegrationFieldType.text,
           ),
         ],
@@ -276,7 +270,7 @@ class AppIntegrations {
         name: 'PriceCharting',
         isDataSource: false,
         icon: FaIcon(FontAwesomeIcons.chartArea),
-        description: 'Configura tu API Key para obtener precios actualizados.',
+        description: l10n.integrationPriceChartingDesc,
         fields: [
           IntegrationField(
             id: 'api_key',
@@ -290,7 +284,7 @@ class AppIntegrations {
         name: 'UPCitemdb',
         isDataSource: false,
         icon: FaIcon(FontAwesomeIcons.barcode),
-        description: 'Búsqueda global de precios por código de barras.',
+        description: l10n.integrationUpcitemdbDesc,
         fields: [
           // Campo para que el usuario pegue su API Key de UPCitemdb
           IntegrationField(
@@ -334,12 +328,9 @@ class AiModels {
       id: 'gemini-3-flash-preview',
       label: 'Gemini 3.0 Flash Preview',
     ),
-    AiModelInfo(id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash'),
-    AiModelInfo(
-      id: 'gemini-2.0-flash-thinking',
-      label: 'Gemini 2.0 Flash Thinking',
-    ),
-    AiModelInfo(id: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro'),
+    AiModelInfo(id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash'),
+    AiModelInfo(id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite'),
+    AiModelInfo(id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro'),
   ];
 
   static const List<AiModelInfo> openai = [

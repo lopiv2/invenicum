@@ -970,6 +970,12 @@ abstract class AppLocalizations {
   /// **'Import Successful! {count} assets created.'**
   String importSuccessMessage(int count);
 
+  /// No description provided for @importSerializedWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Import successful. This asset type is serialized — all items were created with quantity 1.'**
+  String get importSerializedWarning;
+
   /// No description provided for @integrations.
   ///
   /// In en, this message translates to:
@@ -1161,6 +1167,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Market Value Evolution'**
   String get marketValueEvolution;
+
+  /// No description provided for @marketValueField.
+  ///
+  /// In en, this message translates to:
+  /// **'Market Value'**
+  String get marketValueField;
 
   /// No description provided for @maxStock.
   ///
@@ -1947,6 +1959,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Status synchronized'**
   String get integrationsStatusSynced;
+
+  /// No description provided for @integrationsHeroHeadline.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect services, APIs, and tools from one clear view.'**
+  String get integrationsHeroHeadline;
+
+  /// No description provided for @integrationsHeroSubheadline.
+  ///
+  /// In en, this message translates to:
+  /// **'We group integrations by purpose so setup is faster, more visual, and easier to maintain on mobile too.'**
+  String get integrationsHeroSubheadline;
+
+  /// No description provided for @integrationStatusConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get integrationStatusConnected;
+
+  /// No description provided for @integrationStatusNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Not configured'**
+  String get integrationStatusNotConfigured;
+
+  /// No description provided for @integrationTypeDataSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Data source'**
+  String get integrationTypeDataSource;
+
+  /// No description provided for @integrationTypeConnector.
+  ///
+  /// In en, this message translates to:
+  /// **'Connector'**
+  String get integrationTypeConnector;
+
+  /// No description provided for @integrationFieldsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} fields'**
+  String integrationFieldsCount(int count);
+
+  /// No description provided for @integrationNoLocalCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'No local credentials'**
+  String get integrationNoLocalCredentials;
+
+  /// No description provided for @configureLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure'**
+  String get configureLabel;
+
+  /// No description provided for @integrationModelDefaultGemini.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: gemini-3-flash-preview'**
+  String get integrationModelDefaultGemini;
+
+  /// No description provided for @integrationOpenaiDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use GPT-4o and other OpenAI models as an intelligent assistant.'**
+  String get integrationOpenaiDesc;
+
+  /// No description provided for @integrationOpenaiApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated at platform.openai.com/api-keys'**
+  String get integrationOpenaiApiKeyHint;
+
+  /// No description provided for @integrationModelDefaultOpenai.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: gpt-4o'**
+  String get integrationModelDefaultOpenai;
+
+  /// No description provided for @integrationClaudeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use Claude Sonnet, Opus, and Haiku as an intelligent assistant.'**
+  String get integrationClaudeDesc;
+
+  /// No description provided for @integrationClaudeApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated at console.anthropic.com/settings/keys'**
+  String get integrationClaudeApiKeyHint;
+
+  /// No description provided for @integrationModelDefaultClaude.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: claude-sonnet-4-6'**
+  String get integrationModelDefaultClaude;
+
+  /// No description provided for @integrationTelegramBotTokenHint.
+  ///
+  /// In en, this message translates to:
+  /// **'From @BotFather'**
+  String get integrationTelegramBotTokenHint;
+
+  /// No description provided for @integrationTelegramChatIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use @userinfobot to get your ID'**
+  String get integrationTelegramChatIdHint;
+
+  /// No description provided for @integrationEmailDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ultra-reliable email delivery. Ideal for reports and critical alerts.'**
+  String get integrationEmailDesc;
+
+  /// No description provided for @integrationEmailApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated at resend.com/api-keys'**
+  String get integrationEmailApiKeyHint;
+
+  /// No description provided for @integrationEmailFromLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sender (From)'**
+  String get integrationEmailFromLabel;
+
+  /// No description provided for @integrationEmailFromHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: Invenicum <onboarding@resend.dev>'**
+  String get integrationEmailFromHint;
+
+  /// No description provided for @integrationBggDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your BGG account to sync your collection and enrich your data automatically.'**
+  String get integrationBggDesc;
+
+  /// No description provided for @integrationPokemonDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect to the Pokemon API to sync your collection and enrich your data automatically.'**
+  String get integrationPokemonDesc;
+
+  /// No description provided for @integrationTcgdexDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Query cards and sets from collectible card games to enrich your inventory automatically.'**
+  String get integrationTcgdexDesc;
+
+  /// No description provided for @integrationQrGeneratorName.
+  ///
+  /// In en, this message translates to:
+  /// **'QR Generator'**
+  String get integrationQrGeneratorName;
+
+  /// No description provided for @integrationQrLabelsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure the format of your printable labels.'**
+  String get integrationQrLabelsDesc;
+
+  /// No description provided for @integrationQrPageSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Page size (A4, Letter)'**
+  String get integrationQrPageSizeLabel;
+
+  /// No description provided for @integrationQrMarginLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Margin (mm)'**
+  String get integrationQrMarginLabel;
+
+  /// No description provided for @integrationPriceChartingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure your API key to fetch updated prices.'**
+  String get integrationPriceChartingDesc;
+
+  /// No description provided for @integrationUpcitemdbDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Global price lookup by barcode.'**
+  String get integrationUpcitemdbDesc;
 
   /// No description provided for @integrationConfiguredSuccess.
   ///
@@ -3088,10 +3286,34 @@ abstract class AppLocalizations {
   /// **'Import'**
   String get importLabel;
 
+  /// No description provided for @exportLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get exportLabel;
+
+  /// No description provided for @csvExportNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no items to export.'**
+  String get csvExportNoData;
+
+  /// No description provided for @csvExportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV exported successfully ({count} items).'**
+  String csvExportSuccess(int count);
+
+  /// No description provided for @csvExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not export CSV'**
+  String get csvExportError;
+
   /// No description provided for @syncLabel.
   ///
   /// In en, this message translates to:
-  /// **'Sync'**
+  /// **'Sync prices'**
   String get syncLabel;
 
   /// No description provided for @syncingLabel.
@@ -3976,6 +4198,12 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get deleteButtonLabel;
 
+  /// No description provided for @printLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Print label'**
+  String get printLabel;
+
   /// No description provided for @collectionFieldsTooltip.
   ///
   /// In en, this message translates to:
@@ -4342,6 +4570,78 @@ abstract class AppLocalizations {
   /// **'Cherry Blossom'**
   String get cherryBlossomTheme;
 
+  /// No description provided for @themeBrand.
+  ///
+  /// In en, this message translates to:
+  /// **'Invenicum (Brand)'**
+  String get themeBrand;
+
+  /// No description provided for @themeEmerald.
+  ///
+  /// In en, this message translates to:
+  /// **'Emerald'**
+  String get themeEmerald;
+
+  /// No description provided for @themeSunset.
+  ///
+  /// In en, this message translates to:
+  /// **'Sunset'**
+  String get themeSunset;
+
+  /// No description provided for @themeLavender.
+  ///
+  /// In en, this message translates to:
+  /// **'Soft Lavender'**
+  String get themeLavender;
+
+  /// No description provided for @themeForest.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep Forest'**
+  String get themeForest;
+
+  /// No description provided for @themeCherry.
+  ///
+  /// In en, this message translates to:
+  /// **'Cherry'**
+  String get themeCherry;
+
+  /// No description provided for @themeElectricNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Electric Night'**
+  String get themeElectricNight;
+
+  /// No description provided for @themeAmberGold.
+  ///
+  /// In en, this message translates to:
+  /// **'Amber Gold'**
+  String get themeAmberGold;
+
+  /// No description provided for @themeModernSlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Modern Slate'**
+  String get themeModernSlate;
+
+  /// No description provided for @themeCyberpunk.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyberpunk'**
+  String get themeCyberpunk;
+
+  /// No description provided for @themeNordicArctic.
+  ///
+  /// In en, this message translates to:
+  /// **'Nordic Arctic'**
+  String get themeNordicArctic;
+
+  /// No description provided for @themeDeepNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Deep Night'**
+  String get themeDeepNight;
+
   /// No description provided for @loginSuccess.
   ///
   /// In en, this message translates to:
@@ -4527,6 +4827,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'of the value'**
   String get ofTheValueLabel;
+
+  /// No description provided for @reportsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate PDF or Excel reports to print or save on your PC'**
+  String get reportsDescription;
+
+  /// No description provided for @reportSectionType.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Type'**
+  String get reportSectionType;
+
+  /// No description provided for @reportSectionFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Output Format'**
+  String get reportSectionFormat;
+
+  /// No description provided for @reportSectionPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Configuration'**
+  String get reportSectionPreview;
+
+  /// No description provided for @reportSelectContainerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a Container'**
+  String get reportSelectContainerTitle;
+
+  /// No description provided for @reportGenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Report'**
+  String get reportGenerate;
+
+  /// No description provided for @reportGenerating.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get reportGenerating;
+
+  /// No description provided for @reportTypeInventoryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete inventory listing'**
+  String get reportTypeInventoryDescription;
+
+  /// No description provided for @reportTypeLoansDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Active loans and their status'**
+  String get reportTypeLoansDescription;
+
+  /// No description provided for @reportTypeAssetsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Assets listed by category'**
+  String get reportTypeAssetsDescription;
+
+  /// No description provided for @reportLabelContainer.
+  ///
+  /// In en, this message translates to:
+  /// **'Container'**
+  String get reportLabelContainer;
+
+  /// No description provided for @reportLabelType.
+  ///
+  /// In en, this message translates to:
+  /// **'Report Type'**
+  String get reportLabelType;
+
+  /// No description provided for @reportLabelFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Format'**
+  String get reportLabelFormat;
+
+  /// No description provided for @reportFormatPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get reportFormatPdf;
+
+  /// No description provided for @reportFormatExcel.
+  ///
+  /// In en, this message translates to:
+  /// **'Excel'**
+  String get reportFormatExcel;
+
+  /// No description provided for @reportNotSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Not selected'**
+  String get reportNotSelected;
+
+  /// No description provided for @reportUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get reportUnknown;
+
+  /// No description provided for @reportSelectContainerFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a container'**
+  String get reportSelectContainerFirst;
+
+  /// No description provided for @reportDownloadedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'{format} report downloaded successfully'**
+  String reportDownloadedSuccess(String format);
+
+  /// No description provided for @reportGenerateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error generating report: {error}'**
+  String reportGenerateError(String error);
 }
 
 class _AppLocalizationsDelegate

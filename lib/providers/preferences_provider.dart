@@ -307,6 +307,10 @@ class PreferencesProvider with ChangeNotifier {
 
     try {
       await _preferencesService.updateAiProvider(provider, model);
+      // Re-sincroniza con backend para reflejar exactamente lo persistido.
+      final json = await _preferencesService.getPreferences();
+      _prefs = UserPreferences.fromJson(json);
+      notifyListeners();
     } catch (e) {
       _prefs = previousPrefs;
       notifyListeners();

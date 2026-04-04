@@ -11,6 +11,7 @@ class AssetListHeader extends StatelessWidget {
   final VoidCallback onGoToCreateAsset;
   final VoidCallback onShowCountFilterDialog;
   final VoidCallback onImportCSV;
+  final VoidCallback onExportCSV;
   final VoidCallback onSyncPrices;
   final String? selectedCountFieldId;
 
@@ -20,6 +21,7 @@ class AssetListHeader extends StatelessWidget {
     required this.onGoToCreateAsset,
     required this.onShowCountFilterDialog,
     required this.onImportCSV,
+    required this.onExportCSV,
     required this.onSyncPrices,
     this.selectedCountFieldId,
   });
@@ -62,7 +64,7 @@ class AssetListHeader extends StatelessWidget {
           context,
           onPressed: onShowCountFilterDialog,
           icon: Icons.pin_drop,
-            label: selectedCountFieldId == null
+          label: selectedCountFieldId == null
               ? l10n.filterLabel
               : l10n.activeFilterLabel,
           color: selectedCountFieldId != null
@@ -75,6 +77,14 @@ class AssetListHeader extends StatelessWidget {
           onPressed: onImportCSV,
           icon: Icons.file_upload,
           label: l10n.importLabel,
+          color: theme.colorScheme.surfaceVariant,
+          isMobile: isMobile,
+        ),
+        _buildActionButton(
+          context,
+          onPressed: onExportCSV,
+          icon: Icons.file_download,
+          label: l10n.exportLabel,
           color: theme.colorScheme.surfaceVariant,
           isMobile: isMobile,
         ),

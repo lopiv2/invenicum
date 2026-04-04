@@ -366,7 +366,10 @@ class _ChatBubble extends StatelessWidget {
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 240),
-              child: Text(text, style: TextStyle(color: textColor)),
+              child: SelectableText(
+                text,
+                style: TextStyle(color: textColor),
+              ),
             ),
           ),
         ),

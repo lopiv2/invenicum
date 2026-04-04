@@ -467,7 +467,7 @@ class InventoryItemProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createBatchFromCSV({
+  Future<Map<String, dynamic>> createBatchFromCSV({
     required int containerId,
     required int assetTypeId,
     required List<Map<String, dynamic>> itemsToUpload,
@@ -475,7 +475,7 @@ class InventoryItemProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _itemService.createBatchInventoryItems(
+      final result = await _itemService.createBatchInventoryItems(
         containerId: containerId,
         assetTypeId: assetTypeId,
         itemsData: itemsToUpload,
@@ -485,6 +485,7 @@ class InventoryItemProvider with ChangeNotifier {
         assetTypeId: assetTypeId,
         forceReload: true,
       );
+      return result;
     } finally {
       _isLoading = false;
       notifyListeners();

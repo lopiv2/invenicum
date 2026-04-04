@@ -41,87 +41,259 @@ class _AlertsScreenState extends State<AlertsScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final alertProvider = context.watch<AlertProvider>();
+    final colorScheme = Theme.of(context).colorScheme;
 
     // Separación de listas
     final alerts = alertProvider.alerts.where((a) => !a.isEvent).toList();
     final notifications = alertProvider.alerts.where((a) => a.isEvent).toList();
+    final unreadAlerts = alertProvider.alerts
+        .where((a) => !a.isEvent && !a.isRead)
+        .length;
+    final unreadEvents = alertProvider.alerts
+        .where((a) => a.isEvent && !a.isRead)
+        .length;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.alerts),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () => alertProvider.loadAlerts(),
-          ),
-        ],
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: [
-            // Tab de Alertas
-            Tab(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Badge(
-                    label: Text(
-                      alertProvider.alerts
-                          .where((a) => !a.isEvent && !a.isRead)
-                          .length
-                          .toString(),
-                    ),
-                    isLabelVisible: alertProvider.alerts.any(
-                      (a) => !a.isEvent && !a.isRead,
-                    ),
-                    child: const Icon(Icons.warning_amber_rounded),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isMobile = constraints.maxWidth < 700;
+            final horizontalPadding = isMobile ? 12.0 : 20.0;
+
+            return Column(
+              children: [
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.fromLTRB(
+                    horizontalPadding,
+                    isMobile ? 10 : 16,
+                    horizontalPadding,
+                    14,
                   ),
-                  const SizedBox(width: 8),
-                  Text(l10n.alertsTabLabel),
-                ],
-              ),
-            ),
-            Tab(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Badge(
-                    label: Text(
-                      alertProvider.alerts
-                          .where((a) => a.isEvent && !a.isRead)
-                          .length
-                          .toString(),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        colorScheme.primaryContainer.withValues(alpha: 0.35),
+                        colorScheme.surface,
+                      ],
                     ),
-                    isLabelVisible: alertProvider.alerts.any(
-                      (a) => a.isEvent && !a.isRead,
+                    border: Border(
+                      bottom: BorderSide(color: colorScheme.outlineVariant),
                     ),
-                    backgroundColor: Colors
-                        .orange, // Color distinto para eventos si prefieres
-                    child: const Icon(Icons.event_note_rounded),
                   ),
-                  const SizedBox(width: 8),
-                  Text(l10n.calendarTabLabel),
-                ],
-              ),
-            ),
-          ],
+                  child: Column(
+                    children: [
+                      if (isMobile)
+                        Column(
+                          children: [
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: IconButton.filledTonal(
+                                onPressed: () => alertProvider.loadAlerts(),
+                                icon: const Icon(Icons.refresh_rounded),
+                                tooltip: l10n.refresh,
+                              ),
+                            ),
+                            Icon(
+                              Icons.notifications_active_rounded,
+                              size: 34,
+                              color: colorScheme.primary,
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              l10n.alerts,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headlineSmall
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    letterSpacing: -0.3,
+                                    color: colorScheme.primary,
+                                  ),
+                            ),
+                          ],
+                        )
+                      else
+                        SizedBox(
+                          width: double.infinity,
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    Icons.notifications_active_rounded,
+                                    size: 40,
+                                    color: colorScheme.primary,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    l10n.alerts,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -0.5,
+                                          color: colorScheme.primary,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: IconButton.filledTonal(
+                                  onPressed: () => alertProvider.loadAlerts(),
+                                  icon: const Icon(Icons.refresh_rounded),
+                                  tooltip: l10n.refresh,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          _buildHeaderStat(
+                            context,
+                            icon: Icons.warning_amber_rounded,
+                            label: l10n.alertsTabLabel,
+                            value: unreadAlerts,
+                          ),
+                          const SizedBox(width: 10),
+                          _buildHeaderStat(
+                            context,
+                            icon: Icons.event_note_rounded,
+                            label: l10n.calendarTabLabel,
+                            value: unreadEvents,
+                            accent: Colors.orange,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: colorScheme.outlineVariant),
+                        ),
+                        child: TabBar(
+                          controller: _tabController,
+                          dividerColor: Colors.transparent,
+                          labelPadding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                          ),
+                          indicator: BoxDecoration(
+                            color: colorScheme.primary.withValues(alpha: 0.14),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          tabs: [
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Badge(
+                                    label: Text(unreadAlerts.toString()),
+                                    isLabelVisible: unreadAlerts > 0,
+                                    child: const Icon(
+                                      Icons.warning_amber_rounded,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Flexible(child: Text(l10n.alertsTabLabel)),
+                                ],
+                              ),
+                            ),
+                            Tab(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Badge(
+                                    label: Text(unreadEvents.toString()),
+                                    isLabelVisible: unreadEvents > 0,
+                                    backgroundColor: Colors.orange,
+                                    child: const Icon(Icons.event_note_rounded),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Flexible(child: Text(l10n.calendarTabLabel)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: alertProvider.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _buildListView(alerts, alertProvider),
+                            _buildEventsCalendar(notifications, alertProvider),
+                          ],
+                        ),
+                ),
+              ],
+            );
+          },
         ),
       ),
-      body: alertProvider.isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : TabBarView(
-              controller: _tabController,
-              children: [
-                _buildListView(alerts, alertProvider),
-                _buildEventsCalendar(
-                  notifications,
-                  alertProvider,
-                ), // Corregido: Llamada a la vista de calendario
-              ],
-            ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showUnifiedCreateDialog(context),
         icon: const Icon(Icons.add),
         label: Text(l10n.newLabel),
+      ),
+    );
+  }
+
+  Widget _buildHeaderStat(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required int value,
+    Color? accent,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final tone = accent ?? colorScheme.primary;
+
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: tone.withValues(alpha: 0.10),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: tone.withValues(alpha: 0.25)),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 18, color: tone),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w600),
+              ),
+            ),
+            const SizedBox(width: 6),
+            Text(
+              '$value',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: tone,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -131,144 +303,255 @@ class _AlertsScreenState extends State<AlertsScreen>
   Widget _buildEventsCalendar(List<Alert> events, AlertProvider provider) {
     final PreferencesProvider preferencesProvider = context
         .watch<PreferencesProvider>();
+    final colorScheme = Theme.of(context).colorScheme;
 
-    return Column(
-      children: [
-        TableCalendar(
-          locale: preferencesProvider.locale.toLanguageTag(),
-          firstDay: DateTime.utc(1984, 1, 1),
-          lastDay: DateTime.utc(2030, 12, 31),
-          focusedDay: _focusedDay,
-          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          onDaySelected: (selectedDay, focusedDay) {
-            setState(() {
-              _selectedDay = selectedDay;
-              _focusedDay = focusedDay;
-            });
-          },
-          eventLoader: (day) {
-            return events
-                .where(
-                  (e) => e.scheduledAt != null && isSameDay(e.scheduledAt, day),
-                )
-                .toList();
-          },
-          calendarStyle: CalendarStyle(
-            todayDecoration: BoxDecoration(
-              color: Colors.indigo.withValues(alpha: 0.5),
-              shape: BoxShape.circle,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: colorScheme.outlineVariant),
             ),
-            selectedDecoration: const BoxDecoration(
-              color: Colors.indigo,
-              shape: BoxShape.circle,
-            ),
-            markerDecoration: const BoxDecoration(
-              color: Colors.orange,
-              shape: BoxShape.circle,
+            child: TableCalendar(
+              locale: preferencesProvider.locale.toLanguageTag(),
+              firstDay: DateTime.utc(1984, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: _focusedDay,
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+              },
+              eventLoader: (day) {
+                return events
+                    .where(
+                      (e) =>
+                          e.scheduledAt != null &&
+                          isSameDay(e.scheduledAt, day),
+                    )
+                    .toList();
+              },
+              calendarStyle: CalendarStyle(
+                todayDecoration: BoxDecoration(
+                  color: colorScheme.primary.withValues(alpha: 0.5),
+                  shape: BoxShape.circle,
+                ),
+                selectedDecoration: BoxDecoration(
+                  color: colorScheme.primary,
+                  shape: BoxShape.circle,
+                ),
+                markerDecoration: const BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              headerStyle: const HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+              ),
             ),
           ),
-          headerStyle: const HeaderStyle(
-            formatButtonVisible: false,
-            titleCentered: true,
+          const SizedBox(height: 8),
+          Expanded(
+            child: _buildListView(
+              events
+                  .where(
+                    (e) =>
+                        _selectedDay == null ||
+                        isSameDay(e.scheduledAt, _selectedDay),
+                  )
+                  .toList(),
+              provider,
+              isEvent: true,
+            ),
           ),
-        ),
-        const Divider(),
-        Expanded(
-          child: _buildListView(
-            events
-                .where(
-                  (e) =>
-                      _selectedDay == null ||
-                      isSameDay(e.scheduledAt, _selectedDay),
-                )
-                .toList(),
-            provider,
-            isEvent: true,
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
   Widget _buildListView(
-    List<dynamic> items,
+    List<Alert> items,
     AlertProvider provider, {
     bool isEvent = false,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+
     if (items.isEmpty) {
       return Center(
-        child: Text(
-          isEvent ? l10n.noEventsForDay : l10n.noActiveAlerts,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+          decoration: BoxDecoration(
+            color: colorScheme.surfaceContainerHigh,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: colorScheme.outlineVariant),
+          ),
+          child: Text(
+            isEvent ? l10n.noEventsForDay : l10n.noActiveAlerts,
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: TextAlign.center,
+          ),
         ),
       );
     }
+
     return ListView.builder(
-      padding: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.fromLTRB(12, 4, 12, 12),
       itemCount: items.length,
       itemBuilder: (context, index) {
         final alert = items[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          elevation: alert.isRead ? 0 : 3,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: alert.isRead
-                ? BorderSide.none
-                : BorderSide(color: Colors.indigo.withValues(alpha: 0.2), width: 1),
-          ),
-          child: ListTile(
-            onTap: () => _showDetailsDialog(context, alert),
-            leading: _buildLeadingIcon(alert.type, alert.isRead, alert.isEvent),
-            title: Text(
-              alert.title,
-              style: TextStyle(
-                fontWeight: alert.isRead ? FontWeight.normal : FontWeight.bold,
-                color: alert.isRead ? Colors.grey[700] : Colors.black87,
-              ),
+        return Container(
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          decoration: BoxDecoration(
+            color: alert.isRead
+                ? colorScheme.surface
+                : colorScheme.surfaceContainerLow,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: alert.isRead
+                  ? colorScheme.outlineVariant
+                  : colorScheme.primary.withValues(alpha: 0.28),
             ),
-            subtitle: Text(alert.message),
-            trailing: Row(
-              mainAxisSize: MainAxisSize
-                  .min, // Importante para que no ocupe todo el ancho
-              children: [
-                // --- BOTÓN EDITAR (Solo para eventos) ---
-                if (isEvent)
-                  IconButton(
-                    icon: const Icon(Icons.edit_outlined, color: Colors.blue),
-                    onPressed: () => _showEditEventDialog(context, alert),
-                  ),
-                // Botón de Marcar como Leído (Solo se muestra si no está leído)
-                if (!alert.isRead)
-                  IconButton(
-                    icon: const Icon(
-                      Icons.check_circle_outline,
-                      color: Colors.green,
-                    ),
-                    tooltip: l10n.markAsReadLabel,
-                    onPressed: () {
-                      provider.markAsRead(alert.id);
-                      ToastService.info(l10n.alertMarkedAsRead);
-                    },
-                  ),
-                // Botón de Eliminar
-                IconButton(
-                  icon: const Icon(
-                    Icons.delete_sweep_outlined,
-                    color: Colors.redAccent,
-                  ),
-                  tooltip: l10n.delete,
-                  onPressed: () async {
-                    // 1. Llamamos al borrado en el backend/estado
-                    await provider.deleteAlert(alert.id);
-
-                    // 2. Mostramos el mensaje de confirmación
-                    ToastService.success(
-                      l10n.notificationDeleted,
-                    );
-                  },
+            boxShadow: [
+              BoxShadow(
+                color: colorScheme.shadow.withValues(
+                  alpha: alert.isRead ? 0.03 : 0.06,
                 ),
-              ],
+                blurRadius: alert.isRead ? 8 : 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(14),
+              onTap: () => _showDetailsDialog(context, alert),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 12, 8, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: _buildLeadingIcon(
+                            alert.type,
+                            alert.isRead,
+                            alert.isEvent,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                alert.title,
+                                style: Theme.of(context).textTheme.titleSmall
+                                    ?.copyWith(
+                                      fontWeight: alert.isRead
+                                          ? FontWeight.w600
+                                          : FontWeight.w800,
+                                    ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                alert.message,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(
+                                      color: colorScheme.onSurfaceVariant,
+                                    ),
+                              ),
+                              if (isEvent && alert.scheduledAt != null) ...[
+                                const SizedBox(height: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: colorScheme.tertiaryContainer,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Text(
+                                    DateFormat(
+                                      'dd/MM/yyyy HH:mm',
+                                    ).format(alert.scheduledAt!),
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .labelSmall
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.w700,
+                                          color:
+                                              colorScheme.onTertiaryContainer,
+                                        ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: [
+                          if (isEvent)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.edit_outlined,
+                                color: Colors.blue,
+                              ),
+                              tooltip: l10n.editEventTitle,
+                              onPressed: () =>
+                                  _showEditEventDialog(context, alert),
+                            ),
+                          if (!alert.isRead)
+                            IconButton(
+                              icon: const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.green,
+                              ),
+                              tooltip: l10n.markAsReadLabel,
+                              onPressed: () {
+                                provider.markAsRead(alert.id);
+                                ToastService.info(l10n.alertMarkedAsRead);
+                              },
+                            ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.delete_sweep_outlined,
+                              color: Colors.redAccent,
+                            ),
+                            tooltip: l10n.delete,
+                            onPressed: () async {
+                              await provider.deleteAlert(alert.id);
+                              ToastService.success(l10n.notificationDeleted);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         );

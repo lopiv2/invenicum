@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class HeroTextBlock extends StatelessWidget {
   const HeroTextBlock({required this.summary});
@@ -7,11 +8,13 @@ class HeroTextBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Conecta servicios, APIs y herramientas desde una única vista clara.',
+          l10n.integrationsHeroHeadline,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
             color: Colors.white,
             fontWeight: FontWeight.w900,
@@ -21,7 +24,7 @@ class HeroTextBlock extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         Text(
-          'Agrupamos las integraciones por propósito para que la configuración sea más rápida, más visual y más fácil de mantener también en móvil.',
+          l10n.integrationsHeroSubheadline,
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: Colors.white.withValues(alpha: 0.78),
             height: 1.45,

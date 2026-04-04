@@ -27,11 +27,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
         final containerProvider = context.read<ContainerProvider>();
         if (containerProvider.containers.isEmpty) {
           containerProvider.loadContainers();
-        } else if (_selectedContainerId == null && 
-                   containerProvider.containers.isNotEmpty) {
+        } else if (_selectedContainerId == null &&
+            containerProvider.containers.isNotEmpty) {
           // Seleccionar el primer contenedor por defecto
-          setState(() =>
-              _selectedContainerId = containerProvider.containers.first.id);
+          setState(
+            () => _selectedContainerId = containerProvider.containers.first.id,
+          );
         }
       }
     });
@@ -41,122 +42,195 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final colorScheme = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final containerProvider = context.watch<ContainerProvider>();
 
     // Si no hay contenedor seleccionado y hay contenedores disponibles, seleccionar el primero
-    if (_selectedContainerId == null && 
+    if (_selectedContainerId == null &&
         containerProvider.containers.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          setState(() => _selectedContainerId =
-              containerProvider.containers.first.id);
+          setState(
+            () => _selectedContainerId = containerProvider.containers.first.id,
+          );
         }
       });
     }
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(40),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 700;
+        final isTablet =
+            constraints.maxWidth >= 700 && constraints.maxWidth < 1100;
+        final horizontalPadding = isMobile ? 16.0 : (isTablet ? 24.0 : 40.0);
+        final sectionGap = isMobile ? 28.0 : 40.0;
+        final maxContentWidth = isMobile ? double.infinity : 1080.0;
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(
+            horizontal: horizontalPadding,
+            vertical: isMobile ? 20 : 32,
+          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxContentWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeroHeader(context),
+                  SizedBox(height: sectionGap),
+
+                  if (containerProvider.containers.isEmpty)
+                    Center(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 20),
+                        child: Column(
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                colorScheme.primary,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              l10n.loadingContainers,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    _buildContainerSelector(
+                      context,
+                      containerProvider,
+                      isMobile: isMobile,
+                    ),
+                  SizedBox(height: sectionGap),
+
+                  Container(
+                    padding: EdgeInsets.all(isMobile ? 16 : 24),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: colorScheme.outlineVariant),
+                      boxShadow: [
+                        BoxShadow(
+                          color: colorScheme.shadow.withValues(alpha: 0.06),
+                          blurRadius: 18,
+                          offset: const Offset(0, 8),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildSectionTitle(context, l10n.reportSectionType),
+                        const SizedBox(height: 16),
+                        _buildReportTypeSelector(
+                          context,
+                          availableWidth:
+                              constraints.maxWidth - (horizontalPadding * 2),
+                        ),
+                        SizedBox(height: sectionGap),
+
+                        _buildSectionTitle(context, l10n.reportSectionFormat),
+                        const SizedBox(height: 16),
+                        _buildFormatSelector(context),
+                        SizedBox(height: sectionGap),
+
+                        _buildPreviewSection(
+                          context,
+                          availableWidth:
+                              constraints.maxWidth - (horizontalPadding * 2),
+                        ),
+                        SizedBox(height: sectionGap),
+
+                        SizedBox(
+                          width: double.infinity,
+                          height: isMobile ? 52 : 56,
+                          child: ElevatedButton.icon(
+                            onPressed: _isGenerating
+                                ? null
+                                : () => _generateReport(context),
+                            icon: _isGenerating
+                                ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        colorScheme.onPrimary,
+                                      ),
+                                    ),
+                                  )
+                                : const Icon(Icons.download),
+                            label: Text(
+                              _isGenerating
+                                  ? l10n.reportGenerating
+                                  : l10n.reportGenerate,
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
+                              textStyle: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(fontWeight: FontWeight.w700),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeroHeader(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            colorScheme.primary.withValues(alpha: 0.14),
+            colorScheme.tertiary.withValues(alpha: 0.12),
+            colorScheme.surfaceContainerHigh,
+          ],
+        ),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Encabezado
           Text(
-            AppLocalizations.of(context)!.reports,
-            style: textTheme.displaySmall?.copyWith(
-              color: colorScheme.primary,
-              fontWeight: FontWeight.bold,
+            l10n.reports,
+            style: textTheme.headlineMedium?.copyWith(
+              color: colorScheme.onSurface,
+              fontWeight: FontWeight.w800,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'Genera informes en PDF o Excel para imprimir o guardar en tu PC',
-            style: textTheme.bodyMedium?.copyWith(
+            l10n.reportsDescription,
+            style: textTheme.bodyLarge?.copyWith(
               color: colorScheme.onSurfaceVariant,
-            ),
-          ),
-          const SizedBox(height: 40),
-
-          // Selector de Contenedor
-          if (containerProvider.containers.isEmpty)
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.loadingContainers,
-                      style: textTheme.bodyMedium?.copyWith(
-                        color: colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else
-            _buildContainerSelector(context, containerProvider),
-          const SizedBox(height: 40),
-
-          // Contenedor principal con tarjetas
-          Container(
-            constraints: const BoxConstraints(maxWidth: 1000),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Sección 1: Tipo de informe
-                _buildSectionTitle(context, 'Tipo de Informe'),
-                const SizedBox(height: 16),
-                _buildReportTypeSelector(context),
-                const SizedBox(height: 40),
-
-                // Sección 2: Formato
-                _buildSectionTitle(context, 'Formato de Salida'),
-                const SizedBox(height: 16),
-                _buildFormatSelector(context),
-                const SizedBox(height: 40),
-
-                // Sección 3: Vista previa
-                _buildPreviewSection(context),
-                const SizedBox(height: 40),
-
-                // Botón de generación
-                SizedBox(
-                  width: double.infinity,
-                  height: 56,
-                  child: ElevatedButton.icon(
-                    onPressed: _isGenerating ? null : () => _generateReport(context),
-                    icon: _isGenerating
-                        ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                colorScheme.onPrimary,
-                              ),
-                            ),
-                          )
-                        : const Icon(Icons.download),
-                    label: Text(
-                      _isGenerating
-                          ? 'Generando...'
-                          : 'Generar Informe',
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: colorScheme.primary,
-                      foregroundColor: colorScheme.onPrimary,
-                      textStyle: textTheme.labelLarge,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         ],
@@ -164,44 +238,76 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _buildContainerSelector(BuildContext context, ContainerProvider containerProvider) {
+  Widget _buildContainerSelector(
+    BuildContext context,
+    ContainerProvider containerProvider, {
+    required bool isMobile,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final l10n = AppLocalizations.of(context)!;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Selecciona un Contenedor',
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: colorScheme.onSurface,
+    return Container(
+      padding: EdgeInsets.all(isMobile ? 16 : 20),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colorScheme.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            l10n.reportSelectContainerTitle,
+            style: textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: colorScheme.onSurface,
+            ),
           ),
-        ),
-        const SizedBox(height: 12),
-        DropdownButton<int>(
-          value: _selectedContainerId,
-          isExpanded: true,
-          items: containerProvider.containers
-              .map(
-                (container) => DropdownMenuItem<int>(
-                  value: container.id,
-                  child: Text(container.name),
-                ),
-              )
-              .toList(),
-          onChanged: (int? newValue) {
-            if (newValue != null) {
-              setState(() => _selectedContainerId = newValue);
-            }
-          },
-          hint: Text(AppLocalizations.of(context)!.selectContainerHint),
-          underline: Container(
-            height: 2,
-            color: colorScheme.primary,
+          const SizedBox(height: 12),
+          DropdownButtonFormField<int>(
+            value: _selectedContainerId,
+            isExpanded: true,
+            items: containerProvider.containers
+                .map(
+                  (container) => DropdownMenuItem<int>(
+                    value: container.id,
+                    child: Text(
+                      container.name,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+                .toList(),
+            onChanged: (int? newValue) {
+              if (newValue != null) {
+                setState(() => _selectedContainerId = newValue);
+              }
+            },
+            hint: Text(l10n.selectContainerHint),
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 14,
+              ),
+              filled: true,
+              fillColor: colorScheme.surfaceContainerHigh,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide(color: colorScheme.primary, width: 1.6),
+              ),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -218,49 +324,66 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _buildReportTypeSelector(BuildContext context) {
+  Widget _buildReportTypeSelector(
+    BuildContext context, {
+    required double availableWidth,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
 
     final reportTypes = [
       {
         'id': 'inventory',
-        'label': 'Inventario',
-        'description': 'Listado completo del inventario',
+        'label': l10n.inventoryLabel,
+        'description': l10n.reportTypeInventoryDescription,
         'icon': Icons.inventory_2,
       },
       {
         'id': 'loans',
-        'label': 'Préstamos',
-        'description': 'Préstamos activos y su estado',
+        'label': l10n.loans,
+        'description': l10n.reportTypeLoansDescription,
         'icon': Icons.assignment_turned_in,
       },
       {
         'id': 'assets',
-        'label': 'Activos',
-        'description': 'Listado de activos por categoría',
+        'label': l10n.assets,
+        'description': l10n.reportTypeAssetsDescription,
         'icon': Icons.category,
       },
     ];
 
-    return GridView.count(
-      crossAxisCount: 3,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
+    final crossAxisCount = availableWidth < 620
+        ? 1
+        : (availableWidth < 950 ? 2 : 3);
+    final childAspectRatio = crossAxisCount == 1
+        ? 2.75
+        : (crossAxisCount == 2 ? 1.25 : 0.9);
+
+    return GridView.builder(
+      itemCount: reportTypes.length,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      childAspectRatio: 0.85,
-      children: reportTypes.map((type) {
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: childAspectRatio,
+      ),
+      itemBuilder: (context, index) {
+        final type = reportTypes[index];
         final isSelected = _selectedReportType == type['id'];
+
         return _buildReportTypeCard(
           context,
           isSelected: isSelected,
           icon: type['icon'] as IconData,
           label: type['label'] as String,
           description: type['description'] as String,
+          isWideCard: crossAxisCount == 1,
           onTap: () {
             setState(() => _selectedReportType = type['id'] as String);
           },
         );
-      }).toList(),
+      },
     );
   }
 
@@ -270,16 +393,19 @@ class _ReportsScreenState extends State<ReportsScreen> {
     required IconData icon,
     required String label,
     required String description,
+    required bool isWideCard,
     required VoidCallback onTap,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             border: Border.all(
               color: isSelected
@@ -287,60 +413,99 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   : colorScheme.outlineVariant,
               width: isSelected ? 2 : 1,
             ),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
             color: isSelected
                 ? colorScheme.primary.withValues(alpha: 0.1)
                 : colorScheme.surface,
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                icon,
-                size: 32,
-                color:
-                    isSelected ? colorScheme.primary : colorScheme.onSurfaceVariant,
-              ),
-              const SizedBox(height: 12),
-              Text(
-                label,
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      color: colorScheme.onSurface,
-                      fontWeight: FontWeight.w600,
+          child: isWideCard
+              ? Row(
+                  children: [
+                    Icon(
+                      icon,
+                      size: 30,
+                      color: isSelected
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
                     ),
-              ),
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: Text(
-                  description,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label,
+                            style: textTheme.titleSmall?.copyWith(
+                              color: colorScheme.onSurface,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            description,
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      icon,
+                      size: 32,
+                      color: isSelected
+                          ? colorScheme.primary
+                          : colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      label,
+                      style: textTheme.titleSmall?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      description,
+                      textAlign: TextAlign.center,
+                      style: textTheme.bodySmall?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                       ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
         ),
       ),
     );
   }
 
   Widget _buildFormatSelector(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
 
-    return Row(
+    return Wrap(
+      spacing: 12,
+      runSpacing: 12,
       children: [
         _buildFormatChip(
           context,
-          label: 'PDF',
+          label: l10n.reportFormatPdf,
           value: 'pdf',
           icon: Icons.picture_as_pdf,
         ),
-        const SizedBox(width: 16),
         _buildFormatChip(
           context,
-          label: 'Excel',
+          label: l10n.reportFormatExcel,
           value: 'excel',
           icon: Icons.table_chart,
         ),
@@ -384,34 +549,38 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  Widget _buildPreviewSection(BuildContext context) {
+  Widget _buildPreviewSection(
+    BuildContext context, {
+    required double availableWidth,
+  }) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final containerProvider = context.watch<ContainerProvider>();
-    
+    final l10n = AppLocalizations.of(context)!;
+
     // Obtener el contenedor seleccionado
     final containerName = _selectedContainerId != null
         ? containerProvider.containers
-            .where((c) => c.id == _selectedContainerId)
-            .firstOrNull
-            ?.name ??
-            'Sin seleccionar'
-        : 'Sin seleccionar';
+                  .where((c) => c.id == _selectedContainerId)
+                  .firstOrNull
+                  ?.name ??
+              l10n.reportNotSelected
+        : l10n.reportNotSelected;
 
     final infoCards = [
       {
         'icon': Icons.folder_outlined,
-        'label': 'Contenedor',
+        'label': l10n.reportLabelContainer,
         'value': containerName,
       },
       {
         'icon': Icons.description_outlined,
-        'label': 'Tipo de Informe',
-        'value': _getReportTypeLabel(),
+        'label': l10n.reportLabelType,
+        'value': _getReportTypeLabel(context),
       },
       {
         'icon': Icons.save_outlined,
-        'label': 'Formato',
+        'label': l10n.reportLabelFormat,
         'value': _selectedFormat.toUpperCase(),
       },
     ];
@@ -420,33 +589,35 @@ class _ReportsScreenState extends State<ReportsScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         border: Border.all(color: colorScheme.outlineVariant),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
         color: colorScheme.surface,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Configuración actual',
-            style: textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            l10n.reportSectionPreview,
+            style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: 3,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
+          GridView.builder(
+            itemCount: infoCards.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            childAspectRatio: 2.5,
-            children: infoCards.map((card) {
+            gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: availableWidth < 760 ? 320 : 280,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: availableWidth < 760 ? 2.8 : 2.35,
+            ),
+            itemBuilder: (_, index) {
+              final card = infoCards[index];
               return _buildInfoCard(
                 icon: card['icon'] as IconData,
                 label: card['label'] as String,
                 value: card['value'] as String,
               );
-            }).toList(),
+            },
           ),
         ],
       ),
@@ -500,22 +671,24 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  String _getReportTypeLabel() {
+  String _getReportTypeLabel(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     switch (_selectedReportType) {
       case 'inventory':
-        return 'Inventario';
+        return l10n.inventoryLabel;
       case 'loans':
-        return 'Préstamos';
+        return l10n.loans;
       case 'assets':
-        return 'Activos';
+        return l10n.assets;
       default:
-        return 'Desconocido';
+        return l10n.reportUnknown;
     }
   }
 
- Future<void> _generateReport(BuildContext context) async {
+  Future<void> _generateReport(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     if (_selectedContainerId == null) {
-      ToastService.error('Por favor selecciona un contenedor');
+      ToastService.error(l10n.reportSelectContainerFirst);
       return;
     }
 
@@ -523,18 +696,18 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     try {
       final reportService = context.read<ReportService>();
-      
+
       await reportService.generateReport(
         containerId: _selectedContainerId!,
         reportType: _selectedReportType,
         format: _selectedFormat,
       );
-      
+
       ToastService.success(
-        'Informe ${_selectedFormat.toUpperCase()} descargado correctamente',
+        l10n.reportDownloadedSuccess(_selectedFormat.toUpperCase()),
       );
     } catch (e) {
-      ToastService.error('Error al generar informe: $e');
+      ToastService.error(l10n.reportGenerateError(e.toString()));
     } finally {
       if (mounted) {
         setState(() => _isGenerating = false);

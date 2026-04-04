@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/theme_name_localizer.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/custom_theme_model.dart';
 import 'package:invenicum/providers/theme_provider.dart';
@@ -29,10 +30,16 @@ void showThemePickerModal(BuildContext context, ThemeProvider provider) {
               Wrap(
                 spacing: 15,
                 children: [
-                  ThemeColorDot(theme: ThemeProvider.brandTheme),
+                  Tooltip(
+                    message: localizeThemeName(
+                      sheetContext,
+                      ThemeProvider.brandTheme,
+                    ),
+                    child: ThemeColorDot(theme: ThemeProvider.brandTheme),
+                  ),
                   ...ThemeProvider.predefinedThemes.map(
                     (t) => Tooltip(
-                      message: t.name,
+                      message: localizeThemeName(sheetContext, t),
                       child: ThemeColorDot(theme: t),
                     ),
                   ),

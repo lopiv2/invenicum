@@ -82,7 +82,7 @@ class IntegrationSection extends StatelessWidget {
                   ? 1.38
                   : width >= 760
                   ? 1.28
-                  : 1.55;
+                  : 1.18;
 
               return GridView.builder(
                 itemCount: section.integrations.length,

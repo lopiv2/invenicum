@@ -341,6 +341,7 @@
   "ignoreField": "🚫 Ignore Field",
   "importAssetsTo": "Import Assets To",
   "importSuccessMessage": "Import Successful! {count} assets created.",
+  "importSerializedWarning": "Import successful. This asset type is serialized \u2014 all items were created with quantity 1.",
   "integrations": "Integrations",
   "integrationGeminiDesc": "Connect Invenicum with Google's Gemini to leverage advanced AI capabilities in managing your inventory.",
   "integrationTelegramDesc": "Connect Invenicum with Telegram to receive instant notifications about your inventory directly on your device.",
@@ -373,6 +374,7 @@
   "march": "March",
   "marketPriceObtained": "Market price obtained successfully",
   "marketValueEvolution": "Market Value Evolution",
+  "marketValueField": "Market Value",
   "maxStock": "Max stock",
   "may": "May",
   "minStock": "Min stock",
@@ -511,6 +513,44 @@
   "integrationsModularDesign": "Modular design by categories",
   "integrationsCheckingStatuses": "Checking statuses",
   "integrationsStatusSynced": "Status synchronized",
+  "integrationsHeroHeadline": "Connect services, APIs, and tools from one clear view.",
+  "integrationsHeroSubheadline": "We group integrations by purpose so setup is faster, more visual, and easier to maintain on mobile too.",
+  "integrationStatusConnected": "Connected",
+  "integrationStatusNotConfigured": "Not configured",
+  "integrationTypeDataSource": "Data source",
+  "integrationTypeConnector": "Connector",
+  "integrationFieldsCount": "{count} fields",
+  "@integrationFieldsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "integrationNoLocalCredentials": "No local credentials",
+  "configureLabel": "Configure",
+  "integrationModelDefaultGemini": "Default: gemini-3-flash-preview",
+  "integrationOpenaiDesc": "Use GPT-4o and other OpenAI models as an intelligent assistant.",
+  "integrationOpenaiApiKeyHint": "Generated at platform.openai.com/api-keys",
+  "integrationModelDefaultOpenai": "Default: gpt-4o",
+  "integrationClaudeDesc": "Use Claude Sonnet, Opus, and Haiku as an intelligent assistant.",
+  "integrationClaudeApiKeyHint": "Generated at console.anthropic.com/settings/keys",
+  "integrationModelDefaultClaude": "Default: claude-sonnet-4-6",
+  "integrationTelegramBotTokenHint": "From @BotFather",
+  "integrationTelegramChatIdHint": "Use @userinfobot to get your ID",
+  "integrationEmailDesc": "Ultra-reliable email delivery. Ideal for reports and critical alerts.",
+  "integrationEmailApiKeyHint": "Generated at resend.com/api-keys",
+  "integrationEmailFromLabel": "Sender (From)",
+  "integrationEmailFromHint": "Example: Invenicum <onboarding@resend.dev>",
+  "integrationBggDesc": "Connect your BGG account to sync your collection and enrich your data automatically.",
+  "integrationPokemonDesc": "Connect to the Pokemon API to sync your collection and enrich your data automatically.",
+  "integrationTcgdexDesc": "Query cards and sets from collectible card games to enrich your inventory automatically.",
+  "integrationQrGeneratorName": "QR Generator",
+  "integrationQrLabelsDesc": "Configure the format of your printable labels.",
+  "integrationQrPageSizeLabel": "Page size (A4, Letter)",
+  "integrationQrMarginLabel": "Margin (mm)",
+  "integrationPriceChartingDesc": "Configure your API key to fetch updated prices.",
+  "integrationUpcitemdbDesc": "Global price lookup by barcode.",
   "integrationConfiguredSuccess": "{name} configured successfully",
   "@integrationConfiguredSuccess": {
     "placeholders": {
@@ -904,7 +944,18 @@
   "filterLabel": "Filter",
   "activeFilterLabel": "Active filter",
   "importLabel": "Import",
-  "syncLabel": "Sync",
+  "exportLabel": "Export",
+  "csvExportNoData": "There are no items to export.",
+  "csvExportSuccess": "CSV exported successfully ({count} items).",
+  "@csvExportSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "csvExportError": "Could not export CSV",
+  "syncLabel": "Sync prices",
   "syncingLabel": "Syncing...",
   "newAssetLabel": "New asset",
   "statusAndPreferences": "Status and Preferences",
@@ -1094,6 +1145,7 @@
   "actionsLabel": "Actions",
   "editButtonLabel": "Edit",
   "deleteButtonLabel": "Delete",
+  "printLabel": "Print label",
   "collectionFieldsTooltip": "Collection Fields",
   "totalLocations": "{count} locations",
   "@totalLocations": {
@@ -1298,6 +1350,18 @@
   "oceanTheme": "Indian Ocean",
   "@cherryBlossomTheme": {},
   "cherryBlossomTheme": "Cherry Blossom",
+  "themeBrand": "Invenicum (Brand)",
+  "themeEmerald": "Emerald",
+  "themeSunset": "Sunset",
+  "themeLavender": "Soft Lavender",
+  "themeForest": "Deep Forest",
+  "themeCherry": "Cherry",
+  "themeElectricNight": "Electric Night",
+  "themeAmberGold": "Amber Gold",
+  "themeModernSlate": "Modern Slate",
+  "themeCyberpunk": "Cyberpunk",
+  "themeNordicArctic": "Nordic Arctic",
+  "themeDeepNight": "Deep Night",
   "@loginSuccess": {},
   "loginSuccess": "Login successful",
   "reloadListError": "Failed to reload the list",
@@ -1386,5 +1450,39 @@
   "@ofTheValueLabel": {
     "description": "Label for 'of the value'"
   },
-  "ofTheValueLabel": "of the value"
+  "ofTheValueLabel": "of the value",
+  "reportsDescription": "Generate PDF or Excel reports to print or save on your PC",
+  "reportSectionType": "Report Type",
+  "reportSectionFormat": "Output Format",
+  "reportSectionPreview": "Current Configuration",
+  "reportSelectContainerTitle": "Select a Container",
+  "reportGenerate": "Generate Report",
+  "reportGenerating": "Generating...",
+  "reportTypeInventoryDescription": "Complete inventory listing",
+  "reportTypeLoansDescription": "Active loans and their status",
+  "reportTypeAssetsDescription": "Assets listed by category",
+  "reportLabelContainer": "Container",
+  "reportLabelType": "Report Type",
+  "reportLabelFormat": "Format",
+  "reportFormatPdf": "PDF",
+  "reportFormatExcel": "Excel",
+  "reportNotSelected": "Not selected",
+  "reportUnknown": "Unknown",
+  "reportSelectContainerFirst": "Please select a container",
+  "@reportDownloadedSuccess": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDownloadedSuccess": "{format} report downloaded successfully",
+  "@reportGenerateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportGenerateError": "Error generating report: {error}"
 }

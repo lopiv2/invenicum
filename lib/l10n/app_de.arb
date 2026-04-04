@@ -440,6 +440,40 @@
   "veniCmdScanQR": "QR/Barcode scannen",
   "veniCmdUnknown": "Ich erkenne diesen Befehl nicht. Schreiben Sie Hilfe, um zu sehen, was ich tun kann.",
   "version": "Version {name}",
+  "reportsDescription": "Erstellen Sie PDF- oder Excel-Berichte zum Drucken oder Speichern auf Ihrem PC",
+  "reportSectionType": "Berichtsart",
+  "reportSectionFormat": "Ausgabeformat",
+  "reportSectionPreview": "Aktuelle Konfiguration",
+  "reportSelectContainerTitle": "Wählen Sie einen Behälter",
+  "reportGenerate": "Bericht erstellen",
+  "reportGenerating": "Wird erstellt...",
+  "reportTypeInventoryDescription": "Vollständige Inventarliste",
+  "reportTypeLoansDescription": "Aktive Darlehen und ihr Status",
+  "reportTypeAssetsDescription": "Liste der Anlagen nach Kategorie",
+  "reportLabelContainer": "Behälter",
+  "reportLabelType": "Berichtsart",
+  "reportLabelFormat": "Format",
+  "reportFormatPdf": "PDF",
+  "reportFormatExcel": "Excel",
+  "reportNotSelected": "Nicht ausgewählt",
+  "reportUnknown": "Unbekannt",
+  "reportSelectContainerFirst": "Bitte wählen Sie einen Behälter aus",
+  "@reportDownloadedSuccess": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDownloadedSuccess": "{format}-Bericht erfolgreich heruntergeladen",
+  "@reportGenerateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportGenerateError": "Fehler beim Erstellen des Berichts: {error}",
   "yes": "Ja",
   "zoomToFit": "Zoom anpassen"
 }

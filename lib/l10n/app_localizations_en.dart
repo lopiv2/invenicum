@@ -499,6 +499,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get importSerializedWarning =>
+      'Import successful. This asset type is serialized — all items were created with quantity 1.';
+
+  @override
   String get integrations => 'Integrations';
 
   @override
@@ -598,6 +602,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get marketValueEvolution => 'Market Value Evolution';
+
+  @override
+  String get marketValueField => 'Market Value';
 
   @override
   String get maxStock => 'Max stock';
@@ -1005,6 +1012,114 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get integrationsStatusSynced => 'Status synchronized';
+
+  @override
+  String get integrationsHeroHeadline =>
+      'Connect services, APIs, and tools from one clear view.';
+
+  @override
+  String get integrationsHeroSubheadline =>
+      'We group integrations by purpose so setup is faster, more visual, and easier to maintain on mobile too.';
+
+  @override
+  String get integrationStatusConnected => 'Connected';
+
+  @override
+  String get integrationStatusNotConfigured => 'Not configured';
+
+  @override
+  String get integrationTypeDataSource => 'Data source';
+
+  @override
+  String get integrationTypeConnector => 'Connector';
+
+  @override
+  String integrationFieldsCount(int count) {
+    return '$count fields';
+  }
+
+  @override
+  String get integrationNoLocalCredentials => 'No local credentials';
+
+  @override
+  String get configureLabel => 'Configure';
+
+  @override
+  String get integrationModelDefaultGemini => 'Default: gemini-3-flash-preview';
+
+  @override
+  String get integrationOpenaiDesc =>
+      'Use GPT-4o and other OpenAI models as an intelligent assistant.';
+
+  @override
+  String get integrationOpenaiApiKeyHint =>
+      'Generated at platform.openai.com/api-keys';
+
+  @override
+  String get integrationModelDefaultOpenai => 'Default: gpt-4o';
+
+  @override
+  String get integrationClaudeDesc =>
+      'Use Claude Sonnet, Opus, and Haiku as an intelligent assistant.';
+
+  @override
+  String get integrationClaudeApiKeyHint =>
+      'Generated at console.anthropic.com/settings/keys';
+
+  @override
+  String get integrationModelDefaultClaude => 'Default: claude-sonnet-4-6';
+
+  @override
+  String get integrationTelegramBotTokenHint => 'From @BotFather';
+
+  @override
+  String get integrationTelegramChatIdHint => 'Use @userinfobot to get your ID';
+
+  @override
+  String get integrationEmailDesc =>
+      'Ultra-reliable email delivery. Ideal for reports and critical alerts.';
+
+  @override
+  String get integrationEmailApiKeyHint => 'Generated at resend.com/api-keys';
+
+  @override
+  String get integrationEmailFromLabel => 'Sender (From)';
+
+  @override
+  String get integrationEmailFromHint =>
+      'Example: Invenicum <onboarding@resend.dev>';
+
+  @override
+  String get integrationBggDesc =>
+      'Connect your BGG account to sync your collection and enrich your data automatically.';
+
+  @override
+  String get integrationPokemonDesc =>
+      'Connect to the Pokemon API to sync your collection and enrich your data automatically.';
+
+  @override
+  String get integrationTcgdexDesc =>
+      'Query cards and sets from collectible card games to enrich your inventory automatically.';
+
+  @override
+  String get integrationQrGeneratorName => 'QR Generator';
+
+  @override
+  String get integrationQrLabelsDesc =>
+      'Configure the format of your printable labels.';
+
+  @override
+  String get integrationQrPageSizeLabel => 'Page size (A4, Letter)';
+
+  @override
+  String get integrationQrMarginLabel => 'Margin (mm)';
+
+  @override
+  String get integrationPriceChartingDesc =>
+      'Configure your API key to fetch updated prices.';
+
+  @override
+  String get integrationUpcitemdbDesc => 'Global price lookup by barcode.';
 
   @override
   String integrationConfiguredSuccess(String name) {
@@ -1656,7 +1771,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get importLabel => 'Import';
 
   @override
-  String get syncLabel => 'Sync';
+  String get exportLabel => 'Export';
+
+  @override
+  String get csvExportNoData => 'There are no items to export.';
+
+  @override
+  String csvExportSuccess(int count) {
+    return 'CSV exported successfully ($count items).';
+  }
+
+  @override
+  String get csvExportError => 'Could not export CSV';
+
+  @override
+  String get syncLabel => 'Sync prices';
 
   @override
   String get syncingLabel => 'Syncing...';
@@ -2130,6 +2259,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteButtonLabel => 'Delete';
 
   @override
+  String get printLabel => 'Print label';
+
+  @override
   String get collectionFieldsTooltip => 'Collection Fields';
 
   @override
@@ -2346,6 +2478,42 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cherryBlossomTheme => 'Cherry Blossom';
 
   @override
+  String get themeBrand => 'Invenicum (Brand)';
+
+  @override
+  String get themeEmerald => 'Emerald';
+
+  @override
+  String get themeSunset => 'Sunset';
+
+  @override
+  String get themeLavender => 'Soft Lavender';
+
+  @override
+  String get themeForest => 'Deep Forest';
+
+  @override
+  String get themeCherry => 'Cherry';
+
+  @override
+  String get themeElectricNight => 'Electric Night';
+
+  @override
+  String get themeAmberGold => 'Amber Gold';
+
+  @override
+  String get themeModernSlate => 'Modern Slate';
+
+  @override
+  String get themeCyberpunk => 'Cyberpunk';
+
+  @override
+  String get themeNordicArctic => 'Nordic Arctic';
+
+  @override
+  String get themeDeepNight => 'Deep Night';
+
+  @override
   String get loginSuccess => 'Login successful';
 
   @override
@@ -2447,4 +2615,69 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ofTheValueLabel => 'of the value';
+
+  @override
+  String get reportsDescription =>
+      'Generate PDF or Excel reports to print or save on your PC';
+
+  @override
+  String get reportSectionType => 'Report Type';
+
+  @override
+  String get reportSectionFormat => 'Output Format';
+
+  @override
+  String get reportSectionPreview => 'Current Configuration';
+
+  @override
+  String get reportSelectContainerTitle => 'Select a Container';
+
+  @override
+  String get reportGenerate => 'Generate Report';
+
+  @override
+  String get reportGenerating => 'Generating...';
+
+  @override
+  String get reportTypeInventoryDescription => 'Complete inventory listing';
+
+  @override
+  String get reportTypeLoansDescription => 'Active loans and their status';
+
+  @override
+  String get reportTypeAssetsDescription => 'Assets listed by category';
+
+  @override
+  String get reportLabelContainer => 'Container';
+
+  @override
+  String get reportLabelType => 'Report Type';
+
+  @override
+  String get reportLabelFormat => 'Format';
+
+  @override
+  String get reportFormatPdf => 'PDF';
+
+  @override
+  String get reportFormatExcel => 'Excel';
+
+  @override
+  String get reportNotSelected => 'Not selected';
+
+  @override
+  String get reportUnknown => 'Unknown';
+
+  @override
+  String get reportSelectContainerFirst => 'Please select a container';
+
+  @override
+  String reportDownloadedSuccess(String format) {
+    return '$format report downloaded successfully';
+  }
+
+  @override
+  String reportGenerateError(String error) {
+    return 'Error generating report: $error';
+  }
 }

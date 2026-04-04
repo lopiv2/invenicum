@@ -440,6 +440,40 @@
   "veniCmdScanQR": "Scanner QR/Code-barres",
   "veniCmdUnknown": "Je ne reconnais pas cette commande. Écrivez help pour voir ce que je peux faire.",
   "version": "Version {name}",
+  "reportsDescription": "Générez des rapports PDF ou Excel à imprimer ou à enregistrer sur votre PC",
+  "reportSectionType": "Type de rapport",
+  "reportSectionFormat": "Format de sortie",
+  "reportSectionPreview": "Configuration actuelle",
+  "reportSelectContainerTitle": "Sélectionnez un conteneur",
+  "reportGenerate": "Générer le rapport",
+  "reportGenerating": "Génération...",
+  "reportTypeInventoryDescription": "Liste complète de l'inventaire",
+  "reportTypeLoansDescription": "Prêts actifs et leur statut",
+  "reportTypeAssetsDescription": "Liste des ressources par catégorie",
+  "reportLabelContainer": "Conteneur",
+  "reportLabelType": "Type de rapport",
+  "reportLabelFormat": "Format",
+  "reportFormatPdf": "PDF",
+  "reportFormatExcel": "Excel",
+  "reportNotSelected": "Non sélectionné",
+  "reportUnknown": "Inconnu",
+  "reportSelectContainerFirst": "Veuillez sélectionner un conteneur",
+  "@reportDownloadedSuccess": {
+    "placeholders": {
+      "format": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDownloadedSuccess": "Rapport {format} téléchargé avec succès",
+  "@reportGenerateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "reportGenerateError": "Erreur lors de la génération du rapport : {error}",
   "yes": "Oui",
   "zoomToFit": "Zoom pour ajuster"
 }

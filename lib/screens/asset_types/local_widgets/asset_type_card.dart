@@ -281,7 +281,7 @@ class AssetTypeCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 1. NOMBRE ARRIBA
+                          // 1. NOMBRE
                           Flexible(
                             child: Text(
                               assetType.name,
@@ -294,29 +294,18 @@ class AssetTypeCard extends StatelessWidget {
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const Spacer(),
-                          // 2. FILA INFERIOR: Badge + Botones
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                flex: 2,
-                                child: _buildAssetBadge(context, theme, isMobile),
-                              ),
-                              const SizedBox(width: 4),
-                              // Botones responsive
-                              Flexible(
-                                flex: 3,
-                                child: SingleChildScrollView(
-                                  scrollDirection: Axis.horizontal,
-                                  child: _buildActionRow(
-                                    context,
-                                    theme,
-                                    isMobile,
-                                  ),
-                                ),
-                              ),
-                            ],
+                          const SizedBox(height: 4),
+                          // 2. NÚMERO DE ACTIVOS
+                          _buildAssetBadge(context, theme, isMobile),
+                          const SizedBox(height: 4),
+                          // 3. BOTONES
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: _buildActionRow(
+                              context,
+                              theme,
+                              isMobile,
+                            ),
                           ),
                         ],
                       ),

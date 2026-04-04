@@ -501,6 +501,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get importSerializedWarning =>
+      'Importación correcta. Este tipo de activo es serializado — todos los ítems se han creado con cantidad 1.';
+
+  @override
   String get integrations => 'Integraciones';
 
   @override
@@ -601,6 +605,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get marketValueEvolution => 'Evolución del valor de mercado';
+
+  @override
+  String get marketValueField => 'Valor de mercado';
 
   @override
   String get maxStock => 'Stock máximo';
@@ -1012,6 +1019,118 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get integrationsStatusSynced => 'Estado sincronizado';
+
+  @override
+  String get integrationsHeroHeadline =>
+      'Conecta servicios, APIs y herramientas desde una única vista clara.';
+
+  @override
+  String get integrationsHeroSubheadline =>
+      'Agrupamos las integraciones por propósito para que la configuración sea más rápida, más visual y más fácil de mantener también en móvil.';
+
+  @override
+  String get integrationStatusConnected => 'Conectada';
+
+  @override
+  String get integrationStatusNotConfigured => 'Sin configurar';
+
+  @override
+  String get integrationTypeDataSource => 'Fuente de datos';
+
+  @override
+  String get integrationTypeConnector => 'Conector';
+
+  @override
+  String integrationFieldsCount(int count) {
+    return '$count campos';
+  }
+
+  @override
+  String get integrationNoLocalCredentials => 'Sin credenciales locales';
+
+  @override
+  String get configureLabel => 'Configurar';
+
+  @override
+  String get integrationModelDefaultGemini =>
+      'Predeterminado: gemini-3-flash-preview';
+
+  @override
+  String get integrationOpenaiDesc =>
+      'Usa GPT-4o y otros modelos de OpenAI como asistente inteligente.';
+
+  @override
+  String get integrationOpenaiApiKeyHint =>
+      'Obtenida en platform.openai.com/api-keys';
+
+  @override
+  String get integrationModelDefaultOpenai => 'Predeterminado: gpt-4o';
+
+  @override
+  String get integrationClaudeDesc =>
+      'Usa Claude Sonnet, Opus y Haiku como asistente inteligente.';
+
+  @override
+  String get integrationClaudeApiKeyHint =>
+      'Obtenida en console.anthropic.com/settings/keys';
+
+  @override
+  String get integrationModelDefaultClaude =>
+      'Predeterminado: claude-sonnet-4-6';
+
+  @override
+  String get integrationTelegramBotTokenHint => 'De @BotFather';
+
+  @override
+  String get integrationTelegramChatIdHint =>
+      'Usa @userinfobot para obtener tu ID';
+
+  @override
+  String get integrationEmailDesc =>
+      'Envío de correos ultra-confiable. Ideal para reportes y alertas críticas.';
+
+  @override
+  String get integrationEmailApiKeyHint => 'Obtenida en resend.com/api-keys';
+
+  @override
+  String get integrationEmailFromLabel => 'Remitente (From)';
+
+  @override
+  String get integrationEmailFromHint =>
+      'Ej: Invenicum <onboarding@resend.dev>';
+
+  @override
+  String get integrationBggDesc =>
+      'Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.';
+
+  @override
+  String get integrationPokemonDesc =>
+      'Conéctate a la API de Pokemon para sincronizar tu colección y enriquecer tus datos automáticamente.';
+
+  @override
+  String get integrationTcgdexDesc =>
+      'Consulta cartas y expansiones de juegos de cartas coleccionables para enriquecer tu inventario automáticamente.';
+
+  @override
+  String get integrationQrGeneratorName => 'Generador QR';
+
+  @override
+  String get integrationQrLabelsDesc =>
+      'Configura el formato de tus etiquetas imprimibles.';
+
+  @override
+  String get integrationQrPageSizeLabel => 'Tamaño de página (A4, Carta)';
+
+  @override
+  String get integrationQrMarginLabel => 'Margen (mm)';
+
+  @override
+  String get integrationPriceChartingDesc =>
+      'Configura tu API Key para obtener precios actualizados.';
+
+  @override
+  String get integrationUpcitemdbDesc =>
+      'Búsqueda global de precios por código de barras.';
 
   @override
   String integrationConfiguredSuccess(String name) {
@@ -1667,7 +1786,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get importLabel => 'Importar';
 
   @override
-  String get syncLabel => 'Sincronizar';
+  String get exportLabel => 'Exportar';
+
+  @override
+  String get csvExportNoData => 'No hay items para exportar.';
+
+  @override
+  String csvExportSuccess(int count) {
+    return 'CSV exportado correctamente ($count items).';
+  }
+
+  @override
+  String get csvExportError => 'No se pudo exportar el CSV';
+
+  @override
+  String get syncLabel => 'Sincronizar precios';
 
   @override
   String get syncingLabel => 'Sincronizando...';
@@ -2148,6 +2281,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get deleteButtonLabel => 'Eliminar';
 
   @override
+  String get printLabel => 'Imprimir etiqueta';
+
+  @override
   String get collectionFieldsTooltip => 'Campos de colección';
 
   @override
@@ -2364,6 +2500,42 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cherryBlossomTheme => 'Flor de Cerezo';
 
   @override
+  String get themeBrand => 'Invenicum (Marca)';
+
+  @override
+  String get themeEmerald => 'Esmeralda';
+
+  @override
+  String get themeSunset => 'Atardecer';
+
+  @override
+  String get themeLavender => 'Lavanda Suave';
+
+  @override
+  String get themeForest => 'Bosque Profundo';
+
+  @override
+  String get themeCherry => 'Cereza';
+
+  @override
+  String get themeElectricNight => 'Noche Eléctrica';
+
+  @override
+  String get themeAmberGold => 'Oro Ámbar';
+
+  @override
+  String get themeModernSlate => 'Pizarra Moderna';
+
+  @override
+  String get themeCyberpunk => 'Cyberpunk';
+
+  @override
+  String get themeNordicArctic => 'Ártico Nord';
+
+  @override
+  String get themeDeepNight => 'Noche Profunda';
+
+  @override
   String get loginSuccess => 'Inicio de sesión exitoso';
 
   @override
@@ -2466,4 +2638,70 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get ofTheValueLabel => 'del valor';
+
+  @override
+  String get reportsDescription =>
+      'Genera informes en PDF o Excel para imprimir o guardar en tu PC';
+
+  @override
+  String get reportSectionType => 'Tipo de informe';
+
+  @override
+  String get reportSectionFormat => 'Formato de salida';
+
+  @override
+  String get reportSectionPreview => 'Configuración actual';
+
+  @override
+  String get reportSelectContainerTitle => 'Selecciona un contenedor';
+
+  @override
+  String get reportGenerate => 'Generar informe';
+
+  @override
+  String get reportGenerating => 'Generando...';
+
+  @override
+  String get reportTypeInventoryDescription =>
+      'Listado completo del inventario';
+
+  @override
+  String get reportTypeLoansDescription => 'Préstamos activos y su estado';
+
+  @override
+  String get reportTypeAssetsDescription => 'Listado de activos por categoría';
+
+  @override
+  String get reportLabelContainer => 'Contenedor';
+
+  @override
+  String get reportLabelType => 'Tipo de informe';
+
+  @override
+  String get reportLabelFormat => 'Formato';
+
+  @override
+  String get reportFormatPdf => 'PDF';
+
+  @override
+  String get reportFormatExcel => 'Excel';
+
+  @override
+  String get reportNotSelected => 'Sin seleccionar';
+
+  @override
+  String get reportUnknown => 'Desconocido';
+
+  @override
+  String get reportSelectContainerFirst => 'Por favor selecciona un contenedor';
+
+  @override
+  String reportDownloadedSuccess(String format) {
+    return 'Informe $format descargado correctamente';
+  }
+
+  @override
+  String reportGenerateError(String error) {
+    return 'Error al generar informe: $error';
+  }
 }

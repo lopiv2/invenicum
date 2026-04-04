@@ -44,8 +44,8 @@ class UserPreferences {
       language: json['language'] as String? ?? 'es',
       currency: json['currency'] as String? ?? 'USD',
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
-      aiProvider: json['aiProvider'] as String?,
-      aiModel: json['aiModel'] as String?,
+      aiProvider: (json['aiProvider'] ?? json['ai_provider']) as String?,
+      aiModel: (json['aiModel'] ?? json['ai_model']) as String?,
       userId: json['userId'] as int?,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'] as String)
