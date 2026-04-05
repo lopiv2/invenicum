@@ -61,11 +61,6 @@ Share the love (but keep control). Create accounts for family members or employe
 
 For more screenshots and additional information, visit https://invenicum.com/en/.
 
-<p align="center">
-  <img src="assets/screenshots/dashboard.png" width="48%" alt="Dashboard" style="border-radius:10px"> 
-  <img src="assets/screenshots/loans.png" width="48%" alt="Loan Management" style="border-radius:10px">
-</p>
-
 ---
 
 ## 🛠️ Installation
