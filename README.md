@@ -81,7 +81,7 @@ The easiest way to get started is with Docker Compose.
 
 Use the English website Quick Deploy section as the single source of truth for Docker Compose:
 
-`https://invenicum.com/en/#quick-deploy`
+https://invenicum.com/en/#quick-deploy
 
 1. **Copy the latest compose from the website and save it as `docker-compose.yml`.**
 
