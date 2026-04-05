@@ -5,7 +5,10 @@ class Environment {
     //defaultValue: 'http://192.168.1.173:3000', // URL por defecto para desarrollo
   );
 
-  static const String appVersion = '1.0.0'; // Versión por defecto
+  static const String appVersion = String.fromEnvironment(
+    'APP_VERSION',
+    defaultValue: '0.0.0', // Fallback solo en desarrollo local
+  );
 
   static const String apiVersion = '/api/v1';
 
