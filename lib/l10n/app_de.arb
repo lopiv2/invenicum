@@ -182,7 +182,7 @@
     }
   },
   "@veniChatProcessing": {
-    "description": "Nachricht beim Laden der KI",
+    "description": "Lademeldung der KI",
     "placeholders": {
       "query": {
         "type": "String"
@@ -197,19 +197,31 @@
     }
   },
   "@@locale": "de",
-  "about": "Über Invenicum",
   "aboutInvenicum": "Über Invenicum",
+  "aboutDialogTitle": "Über Invenicum",
+  "aboutDialogCoolText": "Dein Inventar auf Steroiden. Wir prüfen gerade, ob eine neuere Version verfügbar ist.",
+  "aboutCurrentVersionLabel": "Aktuelle Version",
+  "aboutLatestVersionLabel": "Neueste Version",
+  "aboutCheckingVersion": "Online-Version wird geprüft...",
+  "aboutVersionUnknown": "Unbekannt",
+  "aboutVersionUpToDate": "Deine App ist aktuell.",
+  "aboutUpdateAvailable": "Eine neue Version ist verfügbar.",
+  "aboutVersionCheckFailed": "Online-Version konnte nicht geprüft werden.",
+  "aboutOpenReleases": "Releases ansehen",
   "active": "Aktiv",
-  "activeLoans": "Aktive Darlehen",
-  "activeLoansCount": "Aktive Darlehen",
+  "actives": "Aktiva",
+  "activeInsight": "INFORMATIONEN ZU LAUFENDEN AKTIVA",
+  "activeLoans": "Laufende Ausleihen",
+  "activeLoansCount": "Laufende Ausleihen",
   "addAlert": "Benachrichtigung hinzufügen",
-  "addAsset": "Anlage hinzufügen",
-  "addContainer": "Behälter hinzufügen",
+  "addAsset": "Aktiv hinzufügen",
+  "addContainer": "Container hinzufügen",
   "addNewLocation": "Neuen Standort hinzufügen",
-  "additionalThumbnails": "Zusätzliche Miniaturansichten",
-  "aiExtractionError": "Die KI konnte keine Daten extrahieren: {error}",
-  "aiPasteUrlDescription": "Fügen Sie den Produktlink ein und die KI extrahiert automatisch die Informationen zum Ausfüllen der Felder.",
-  "all": "Alle",
+  "additionalInformation": "Zusätzliche Informationen",
+  "additionalThumbnails": "Weitere Vorschaubilder",
+  "adquisition": "ERWERB",
+  "aiExtractionError": "KI konnte Daten nicht extrahieren: {error}",
+  "aiPasteUrlDescription": "Füge den Produkt-Link ein und die KI extrahiert automatisch die Informationen zum Ausfüllen der Felder.",
   "alertCritical": "Kritisch",
   "alertCreated": "Benachrichtigung erstellt",
   "alertDeleted": "Benachrichtigung gelöscht",
@@ -218,246 +230,1263 @@
   "alertTitle": "Titel",
   "alertType": "Typ",
   "alertWarning": "Warnung",
-  "alerts": "Benachrichtigungen",
+  "alerts": "Benachrichtigungen & Warnungen",
+  "all": "Alle",
+  "allUpToDateStatus": "Alles aktuell",
   "appTitle": "Invenicum Inventar",
-  "applicationTheme": "Anwendungsthema",
+  "applicationTheme": "App-Design",
   "apply": "Anwenden",
   "april": "April",
-  "assetImages": "Anlagenbilder",
-  "assetImport": "Anlagenimport",
-  "assetName": "Anlagenname",
-  "assetTypeDeleted": "Anlagentyp \"{name}\" erfolgreich gelöscht.",
-  "assetTypes": "Anlagentypen",
-  "assetUpdated": "Anlage \"{name}\" erfolgreich aktualisiert.",
-  "assets": "Anlagen",
-  "assetsIn": "Anlagen in",
+  "assetDetail": "Aktiv-Details",
+  "assetImages": "Aktiv-Bilder",
+  "assetImport": "Aktiv-Import",
+  "assetName": "Name",
+  "assetNotFound": "Aktiv nicht gefunden",
+  "assetTypeDeleted": "Aktivtyp \"{name}\" erfolgreich gelöscht.",
+  "assetTypes": "Aktivtypen",
+  "assetUpdated": "Aktiv \"{name}\" erfolgreich aktualisiert.",
+  "assets": "Aktiva",
+  "assetsIn": "Aktiva in",
   "august": "August",
-  "backToAssetTypes": "Zurück zu Anlagentypen",
-  "borrowerEmail": "E-Mail des Kreditnehmers",
-  "borrowerName": "Name des Kreditnehmers",
-  "borrowerPhone": "Telefon des Kreditnehmers",
+  "averageMarketValue": "Durchschnittlicher Marktwert",
+  "backToAssetTypes": "Zurück zu Aktivtypen",
+  "barCode": "Barcode (EAN)",
+  "baseCostAccumulatedWithoutInflation": "Kumulierte Basiskosten ohne Inflation",
+  "borrowerEmail": "E-Mail des Entleihers",
+  "borrowerName": "Name des Entleihers",
+  "borrowerPhone": "Telefon des Entleihers",
   "cancel": "Abbrechen",
-  "centerView": "Mittelansicht",
-  "chooseFile": "Datei wählen",
-  "clearCounter": "Zähler löschen",
-  "collectionContainerInfo": "Sammlungsbehälter haben Sammlungs-Tracking-Balken, investierten Wert, Marktwert und Expositionsansicht",
+  "centerView": "Ansicht zentrieren",
+  "chooseFile": "Datei auswählen",
+  "clearCounter": "Zähler zurücksetzen",
+  "collectionContainerInfo": "Sammlungs-Container haben Sammlungs-Fortschrittsbalken, Investitionswert, Marktwert und Ausstellungsansicht",
   "collectionFieldsConfigured": "Sammlungsfelder konfiguriert.",
+  "condition": "Zustand",
+  "condition_mint": "Originalverpackung",
+  "condition_loose": "Lose (Ohne Verpackung)",
+  "condition_incomplete": "Unvollständig",
+  "condition_damaged": "Beschädigt / Gebrauchsspuren",
+  "condition_new": "Neu",
+  "condition_digital": "Digital / Immateriell",
   "configureCollectionFields": "Sammlungsfelder konfigurieren",
   "configureDeliveryVoucher": "Lieferschein konfigurieren",
-  "configureVoucherBody": "Lieferscheinkörper konfigurieren...",
+  "configureVoucherBody": "Inhalt des Scheins konfigurieren...",
   "confirmDeleteAlert": "Benachrichtigung löschen",
-  "confirmDeleteAlertMessage": "Sind Sie sicher, dass Sie diesen Datensatz löschen möchten?",
-  "confirmDeleteAssetType": "Sind Sie sicher, dass Sie den Anlagentyp \"{name}\" und alle zugehörigen Elemente löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
-  "confirmDeleteContainer": "Sind Sie sicher, dass Sie den Behälter \"{name}\" löschen möchten? Diese Aktion ist unwiderruflich und entfernt alle Anlagen und Daten.",
-  "confirmDeleteLocationMessage": "Sind Sie sicher, dass Sie den Standort \"{name}\" löschen möchten?",
-  "confirmDeletion": "Löschung bestätigen",
+  "confirmDeleteAlertMessage": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
+  "confirmDeleteAssetType": "Bist du sicher, dass du den Aktivtyp \"{name}\" und alle zugehörigen Elemente löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",
+  "confirmDeleteContainer": "Bist du sicher, dass du den Container \"{name}\" löschen möchtest? Diese Aktion ist unwiderruflich und löscht alle enthaltenen Aktiva und Daten.",
+  "confirmDeleteLocationMessage": "Bist du sicher, dass du den Standort \"{name}\" löschen möchtest?",
+  "confirmDeletion": "Löschen bestätigen",
   "configurationSaved": "Konfiguration erfolgreich gespeichert.",
-  "containerCreated": "Behälter \"{name}\" erfolgreich erstellt.",
-  "containerDeleted": "Behälter \"{name}\" erfolgreich gelöscht.",
-  "containerName": "Behältername",
-  "containerOrAssetTypeNotFound": "Behälter oder Anlagentyp nicht gefunden.",
-  "containerRenamed": "Behälter in \"{name}\" umbenannt.",
-  "containers": "Behälter",
+  "containerCreated": "Container \"{name}\" erfolgreich erstellt.",
+  "containerDeleted": "Container \"{name}\" erfolgreich gelöscht.",
+  "containerName": "Container-Name",
+  "containerOrAssetTypeNotFound": "Container oder Aktivtyp nicht gefunden.",
+  "containerRenamed": "Container umbenannt in \"{name}\".",
+  "containers": "Container",
   "countItemsByValue": "Elemente nach bestimmtem Wert zählen",
   "create": "Erstellen",
-  "createFirstContainer": "Erstellen Sie Ihren ersten Behälter.",
+  "createFirstContainer": "Erstelle deinen ersten Container.",
+  "createdAt": "Erstellt am",
+  "currency": "Währung",
   "current": "Aktuell",
-  "customColor": "Benutzerdefinierte Farbe",
+  "customColor": "Farbe anpassen",
   "customFields": "Benutzerdefinierte Felder",
   "customFieldsOf": "Benutzerdefinierte Felder von {name}",
-  "customizeDeliveryVoucher": "Passen Sie die PDF-Vorlage für Darlehen an",
-  "darkMode": "Dunkelmodus",
+  "customizeDeliveryVoucher": "PDF-Vorlage für Ausleihen anpassen",
+  "darkMode": "Dunkler Modus",
   "dashboard": "Dashboard",
   "datalists": "Benutzerdefinierte Listen",
   "december": "Dezember",
-  "definitionCustomFields": "Benutzerdefinierte Felderdefinition",
+  "definitionCustomFields": "Definition benutzerdefinierter Felder",
   "delete": "Löschen",
   "deleteError": "Fehler beim Löschen: {error}",
   "deleteSuccess": "Standort erfolgreich gelöscht.",
   "deliveryVoucher": "LIEFERSCHEIN",
   "deliveryVoucherEditor": "Lieferschein-Editor",
   "description": "Beschreibung (optional)",
-  "desiredField": "Gewünschtes Feld",
+  "desiredField": "Wunschfeld",
   "dueDate": "Fälligkeitsdatum",
   "edit": "Bearbeiten",
-  "enterContainerName": "Geben Sie den Behälternamen ein",
-  "enterDescription": "Geben Sie eine Beschreibung ein",
+  "enterContainerName": "Container-Namen eingeben",
+  "enterDescription": "Beschreibung eingeben",
   "enterURL": "URL eingeben",
-  "enterValidUrl": "Geben Sie eine gültige URL ein",
-  "errorCsvMinRows": "Wählen Sie eine CSV-Datei mit Überschriften und mindestens einer Datenzeile.",
-  "errorDeletingAssetType": "Fehler beim Löschen des Anlagentyps: {error}",
-  "errorDeletingContainer": "Fehler beim Löschen des Behälters: {error}",
+  "enterValidUrl": "Gültige URL eingeben",
+  "errorChangingLanguage": "Fehler beim Ändern der Sprache: {error}",
+  "errorCsvMinRows": "Bitte wähle eine CSV-Datei mit Kopfzeilen und mindestens einer Datenzeile aus.",
+  "errorDeletingAssetType": "Fehler beim Löschen des Aktivtyps: {error}",
+  "errorDeletingContainer": "Fehler beim Löschen des Containers: {error}",
   "errorDuringImport": "Fehler beim Import",
   "errorEmptyCsv": "Die CSV-Datei ist leer.",
-  "errorGeneratingPDF": "Fehler beim Generieren von PDF: {error}",
+  "errorGeneratingPDF": "Fehler beim Erstellen des PDFs: {error}",
   "errorInvalidPath": "Ungültiger Dateipfad.",
-  "errorLoadingData": "Fehler beim Laden von Daten",
-  "errorLoadingListValues": "Fehler beim Laden von Listenwerten: {error}",
-  "errorLoadingLocations": "Fehler beim Laden von Standorten: {error}",
-  "errorNameMappingRequired": "Das Feld \"Name\" ist erforderlich und muss zugeordnet sein.",
-  "errorNoVoucherTemplate": "Keine Lieferscheinvorlage konfiguriert.",
-  "errorReadingBytes": "Dateibytes konnten nicht gelesen werden.",
+  "errorLoadingData": "Fehler beim Laden der Daten",
+  "errorLoadingListValues": "Fehler beim Laden der Listenwerte: {error}",
+  "errorLoadingLocations": "Fehler beim Laden der Standorte: {error}",
+  "errorNameMappingRequired": "Das Feld 'Name' ist erforderlich und muss zugeordnet werden.",
+  "errorNoVoucherTemplate": "Es ist keine Schein-Vorlage konfiguriert.",
+  "errorNotBarCode": "Der Artikel hat keinen oder keinen gültigen Barcode.",
+  "errorReadingBytes": "Datei-Bytes konnten nicht gelesen werden.",
   "errorReadingFile": "Fehler beim Lesen der Datei: {error}",
-  "errorRegisteringLoan": "Fehler beim Registrieren des Darlehens: {error}",
+  "errorRegisteringLoan": "Fehler beim Registrieren der Ausleihe: {error}",
   "errorRenaming": "Fehler beim Umbenennen: {error}",
   "errorSaving": "Fehler beim Speichern: {error}",
-  "errorUpdatingAsset": "Fehler beim Aktualisieren der Anlage: {error}",
-  "exampleFilterHint": "z.B. Beschädigt, Rot, 50",
-  "errorChangingLanguage": "Fehler beim Sprachwechsel: {error}",
+  "errorUpdatingAsset": "Fehler beim Aktualisieren des Aktivs: {error}",
+  "exampleFilterHint": "Bsp.: Beschädigt, Rot, 50",
   "february": "Februar",
   "fieldChip": "Feld",
   "fieldRequiredWithName": "Das Feld \"{field}\" ist erforderlich.",
-  "fieldToCount": "Feld zum Zählen",
-  "fieldsFilledSuccess": "Felder erfolgreich gefüllt!",
+  "fieldToCount": "Zu zählendes Feld",
+  "fieldsFilledSuccess": "Felder erfolgreich ausgefüllt!",
   "formatsPNG": "Formate: PNG, JPG",
+  "forToday": "Für heute",
+  "geminiLabelModel": "Empfohlenes Gemini-Modell: gemini-3-flash-preview",
   "generalSettings": "Allgemeine Einstellungen",
-  "generateVoucher": "Lieferschein generieren",
+  "generateVoucher": "Lieferschein erstellen",
   "globalSearch": "Globale Suche",
   "greeting": "Hallo, willkommen!",
   "guest": "Gast",
+  "helpDocs": "Hilfe & Dokumentation",
+  "helperGeminiKey": "Gib deinen Gemini API-Schlüssel ein, um die Integration zu aktivieren. Erhältlich unter https://aistudio.google.com/",
   "ignoreField": "🚫 Feld ignorieren",
-  "importAssetsTo": "Anlagen importieren nach",
-  "importSuccessMessage": "Import erfolgreich! {count} Anlagen erstellt.",
+  "importAssetsTo": "Aktiva importieren nach",
+  "importSuccessMessage": "Import erfolgreich! {count} Aktiva erstellt.",
+  "importSerializedWarning": "Import erfolgreich. Dieser Aktivtyp ist serialisiert — alle Elemente wurden mit Menge 1 erstellt.",
+  "integrations": "Integrationen",
+  "integrationGeminiDesc": "Verbinde Invenicum mit Google Gemini, um erweiterte KI-Funktionen in deiner Inventarverwaltung zu nutzen.",
+  "integrationTelegramDesc": "Verbinde Invenicum mit Telegram, um sofortige Benachrichtigungen über dein Inventar direkt auf deinem Gerät zu erhalten.",
+  "invalidAssetId": "Ungültige Aktiv-ID",
   "invalidNavigationIds": "Fehler: Ungültige Navigations-IDs.",
+  "inventoryLabel": "Inventar",
   "january": "Januar",
   "july": "Juli",
   "june": "Juni",
   "language": "Sprache",
-  "languageNotImplemented": "Sprachfunktionalität muss noch implementiert werden",
-  "languageChanged": "Sprache zu Deutsch gewechselt!",
-  "lightMode": "Hellmodus",
-  "loadingAssetType": "Anlagentyp wird geladen...",
-  "loadingListField": "Lädt {field}...",
-  "loanDate": "Leihdate",
-  "loanManagement": "Darlehenverwaltung",
-  "loanObject": "Darlehensobjekt",
-  "loans": "Darlehen",
+  "languageChanged": "Sprache auf Deutsch geändert!",
+  "languageNotImplemented": "Sprachfunktion noch nicht implementiert",
+  "lightMode": "Heller Modus",
+  "loadingAssetType": "Aktivtyp wird geladen...",
+  "loadingListField": "{field} wird geladen...",
+  "loanDate": "Ausleihdatum",
+  "loanLanguageNotImplemented": "Sprachfunktion noch nicht implementiert",
+  "loanManagement": "Ausleihverwaltung",
+  "loanObject": "Auszuleihendes Objekt",
+  "loans": "Ausleihen",
+  "location": "Standort",
   "locations": "Standorte",
   "locationsScheme": "Standortschema",
-  "login": "Anmeldung",
-  "logoVoucher": "Lieferscheinlogo",
-  "logout": "Abmeldung",
-  "magicAssistant": "Magischer KI-Assistent",
+  "login": "Anmelden",
+  "logoVoucher": "Schein-Logo",
+  "logout": "Abmelden",
+  "lookForContainersOrAssets": "Container oder Aktiva suchen...",
+  "lowStockTitle": "Niedriger Bestand",
+  "magicAssistant": "KI-Magie-Assistent",
   "march": "März",
+  "marketPriceObtained": "Marktpreis erfolgreich abgerufen",
+  "marketValueEvolution": "Entwicklung des Marktwerts",
+  "marketValueField": "Marktwert",
+  "maxStock": "Maximaler Bestand",
   "may": "Mai",
-  "myCustomTheme": "Mein Thema",
+  "minStock": "Mindestbestand",
+  "myAchievements": "Meine Erfolge",
+  "myCustomTheme": "Mein Design",
   "myProfile": "Mein Profil",
-  "myThemesStored": "Meine gespeicherten Themen",
-  "nameCannotBeEmpty": "Der Name darf nicht leer sein",
-  "nameSameAsCurrent": "Der Name ist gleich dem aktuellen",
+  "myThemesStored": "Meine gespeicherten Designs",
+  "name": "Name",
+  "nameCannotBeEmpty": "Name darf nicht leer sein",
+  "nameSameAsCurrent": "Name ist identisch mit dem aktuellen",
   "newAlert": "Neue manuelle Benachrichtigung",
-  "newContainer": "Neuer Behälter",
+  "newContainer": "Neuer Container",
   "newName": "Neuer Name",
-  "noAssetsCreated": "Noch keine Anlagen erstellt.",
-  "noAssetsMatch": "Keine Anlagen entsprechen den Such-/Filterkriterien.",
+  "next": "Weiter",
+  "noAssetsCreated": "Noch keine Aktiva erstellt.",
+  "noAssetsMatch": "Kein Aktiv entspricht den Such-/Filterkriterien.",
   "noBooleanFields": "Keine booleschen Felder definiert.",
-  "noContainerMessage": "Erstellen Sie Ihren ersten Behälter.",
-  "noCustomFields": "Dieser Anlagentyp hat keine benutzerdefinierten Felder.",
+  "noContainerMessage": "Erstelle deinen ersten Container.",
+  "noCustomFields": "Dieser Aktivtyp hat keine benutzerdefinierten Felder.",
   "noFileSelected": "Keine Datei ausgewählt",
+  "noImageAvailable": "Kein Bild verfügbar",
   "noImagesAdded": "Noch keine Bilder hinzugefügt. Das erste Bild wird das Hauptbild.",
-  "noLoansFound": "Keine Darlehen in diesem Behälter gefunden.",
-  "noLocationsMessage": "Noch keine Standorte in diesem Behälter erstellt. Fügen Sie den ersten hinzu!",
+  "noLoansFound": "Keine Ausleihen in diesem Container gefunden.",
+  "noLocationsMessage": "Keine Standorte in diesem Container erstellt. Füge den ersten hinzu!",
   "noNotifications": "Keine Benachrichtigungen",
-  "noThemesSaved": "Noch keine Themen gespeichert",
+  "noThemesSaved": "Noch keine Designs gespeichert",
   "none": "Keine",
   "november": "November",
-  "obligatory": "Erforderlich",
+  "obligatory": "Pflichtfeld",
   "october": "Oktober",
+  "optimalStockStatus": "Bestand auf optimalem Niveau",
   "optional": "Optional",
   "overdue": "Überfällig",
   "password": "Passwort",
-  "pleaseEnterPassword": "Bitte geben Sie Ihr Passwort ein",
-  "pleaseEnterUsername": "Bitte geben Sie Ihren Benutzernamen ein",
-  "pleasePasteUrl": "Bitte fügen Sie eine URL ein",
-  "pleaseSelectCsvWithHeaders": "Bitte wählen Sie eine CSV-Datei mit Überschriften.",
-  "pleaseSelectLocation": "Bitte wählen Sie einen Standort.",
+  "pleaseEnterPassword": "Bitte Passwort eingeben",
+  "pleaseEnterUsername": "Bitte Benutzernamen eingeben",
+  "pleasePasteUrl": "Bitte URL einfügen",
+  "pleaseSelectCsvWithHeaders": "Bitte wähle eine CSV-Datei mit Kopfzeilen aus.",
+  "pleaseSelectLocation": "Bitte einen Standort auswählen.",
+  "plugins": "Plugins",
   "possessionFieldDef": "Besitzfeld",
   "possessionFieldName": "Im Besitz",
   "preferences": "Einstellungen",
-  "previewPDF": "PDF-Vorschau",
-  "primaryImage": "Primärbild",
+  "previewPDF": "Vorschau",
+  "previous": "Zurück",
+  "primaryImage": "Hauptbild",
   "productUrlLabel": "Produkt-URL",
   "quantity": "Menge",
-  "registerNewLoan": "Neues Darlehen registrieren",
-  "reloadContainers": "Behälter neu laden",
+  "refresh": "Daten neu laden",
+  "registerNewLoan": "Neue Ausleihe registrieren",
+  "reloadContainers": "Container neu laden",
   "reloadLocations": "Standorte neu laden",
+  "reloadLoans": "Ausleihen neu laden",
   "removeImage": "Bild entfernen",
   "rename": "Umbenennen",
-  "renameContainer": "Behälter umbenennen",
+  "renameContainer": "Container umbenennen",
+  "responsibleLabel": "Verantwortlich",
   "reports": "Berichte",
   "returned": "Zurückgegeben",
-  "rowsPerPageTitle": "Anlagen pro Seite:",
+  "returnsLabel": "Rückgaben",
+  "rowsPerPageTitle": "Aktiva pro Seite:",
   "save": "Speichern",
   "saveAndApply": "Speichern und anwenden",
-  "saveAsset": "Anlage speichern",
+  "saveAsset": "Aktiv speichern",
   "saveChanges": "Änderungen speichern",
   "saveConfiguration": "Konfiguration speichern",
-  "saveCustomTheme": "Benutzerdefiniertes Thema speichern",
+  "saveCustomTheme": "Benutzerdefiniertes Design speichern",
   "searchInAllColumns": "In allen Spalten suchen...",
   "selectAndUploadImage": "Bild auswählen und hochladen",
-  "selectApplicationLanguage": "Wählen Sie die Anwendungssprache",
-  "selectBooleanFields": "Wählen Sie boolesche Felder zur Steuerung der Sammlung:",
+  "selectApplicationCurrency": "App-Währung auswählen",
+  "selectApplicationLanguage": "App-Sprache auswählen",
+  "selectBooleanFields": "Boolesche Felder zur Sammlungskontrolle auswählen:",
   "selectCsvColumn": "CSV-Spalte auswählen",
   "selectField": "Feld auswählen...",
   "selectFieldType": "Feldtyp auswählen",
   "selectImage": "Bild auswählen",
-  "selectLocationRequired": "Sie müssen einen Standort für die Anlage auswählen.",
+  "selectLocationRequired": "Es muss ein Standort für das Aktiv ausgewählt werden.",
   "selectedLocationLabel": "Ausgewählt: {name}",
-  "selectTheme": "Thema auswählen",
+  "selectTheme": "Design auswählen",
   "september": "September",
   "settings": "Einstellungen",
   "showAsGrid": "Als Raster anzeigen",
   "showAsList": "Als Liste anzeigen",
-  "specificValueToCount": "Bestimmter Wert zum Zählen",
+  "slotDashboardBottom": "Dashboard unten",
+  "slotDashboardTop": "Dashboard oben",
+  "slotFloatingActionButton": "Schwebende Aktionsschaltfläche",
+  "slotInventoryHeader": "Inventar-Kopfzeile",
+  "slotLeftSidebar": "Linke Seitenleiste",
+  "slotUnknown": "Unbekannter Slot",
+  "specificValueToCount": "Spezifischer zu zählender Wert",
   "startImport": "Import starten",
   "startMagic": "Magie starten",
   "status": "Status",
   "step1SelectFile": "Schritt 1: CSV-Datei auswählen",
-  "step2ColumnMapping": "Schritt 2: Spaltenzuordnung (CSV -> System)",
+  "step2ColumnMapping": "Schritt 2: Spalten-Zuordnung (CSV -> System)",
   "syncingSession": "Sitzung wird synchronisiert...",
-  "systemThemes": "Systemthemen",
-  "systemThemesModal": "Systemthemen",
-  "themeNameLabel": "Themaname",
+  "systemThemes": "System-Designs",
+  "systemThemesModal": "System-Designs",
+  "templates": "Vorlagen",
+  "themeNameLabel": "Design-Name",
   "thisFieldIsRequired": "Dieses Feld ist erforderlich.",
-  "topLoanedItems": "Meistgeliehene Artikel",
-  "totalAssets": "Anlagentypen",
-  "totalItems": "Anlagen",
-  "totals": "Gesamtsummen",
+  "topDemanded": "Am meisten nachgefragt",
+  "topLoanedItems": "Meistgeliehene Artikel nach Monaten",
+  "totalAssets": "Aktivtypen",
+  "totalItems": "Aktiva",
+  "totals": "Gesamt",
+  "totalSpending": "Gesamtinvestition",
+  "totalMarketValue": "Gesamtmarktwert",
+  "updatedAt": "Zuletzt aktualisiert",
   "upload": "Hochladen",
   "uploadImage": "Bild hochladen",
   "username": "Benutzername",
-  "veniChatTitle": "Veni KI",
-  "veniChatStatus": "Online",
-  "veniChatWelcome": "Hallo! Ich bin Veni, Ihr Invenicum-Assistent. Wie kann ich Ihnen heute bei Ihrem Inventar helfen?",
-  "veniChatPlaceholder": "Fragen Sie mich alles...",
+  "copiedToClipboard": "In Zwischenablage kopiert",
+  "connectionTestFailed": "Verbindungstest fehlgeschlagen",
+  "connectionVerified": "Verbindung erfolgreich verifiziert",
+  "errorSavingConfiguration": "Fehler beim Speichern der Konfiguration",
+  "integrationsAndConnectionsTitle": "Integrationen und Verbindungen",
+  "integrationsSectionAiTitle": "Künstliche Intelligenz",
+  "integrationsSectionAiSubtitle": "Konversationsengines und Assistenten zur Bereicherung von Abläufen und Automatisierungen.",
+  "integrationsSectionMessagingTitle": "Messaging und Benachrichtigungen",
+  "integrationsSectionMessagingSubtitle": "Ausgabekanäle für Hinweise, Bots, Berichte und automatische Lieferungen.",
+  "integrationsSectionDataApisTitle": "Daten-APIs",
+  "integrationsSectionDataApisSubtitle": "Externe Quellen zur Anreicherung von Karten, Spielen und Katalogreferenzen.",
+  "integrationsSectionValuationTitle": "Bewertung und Markt",
+  "integrationsSectionValuationSubtitle": "Konnektoren für Preise, Barcodes und aktuelle Wertschätzung.",
+  "integrationsSectionHardwareTitle": "Hardware und Etiketten",
+  "integrationsSectionHardwareSubtitle": "Physische Werkzeuge und Hilfsprogramme für Druck, Kodierung und Betrieb.",
+  "integrationsActiveConnections": "{count} aktive Verbindungen",
+  "@integrationsActiveConnections": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "integrationsModularDesign": "Modulares Design nach Kategorien",
+  "integrationsCheckingStatuses": "Status wird geprüft",
+  "integrationsStatusSynced": "Status synchronisiert",
+  "integrationsHeroHeadline": "Verbinde Dienste, APIs und Tools in einer klaren Ansicht.",
+  "integrationsHeroSubheadline": "Wir gruppieren Integrationen nach Zweck, damit die Konfiguration schneller, visueller und auch auf dem Handy einfacher zu pflegen ist.",
+  "integrationStatusConnected": "Verbunden",
+  "integrationStatusNotConfigured": "Nicht konfiguriert",
+  "integrationTypeDataSource": "Datenquelle",
+  "integrationTypeConnector": "Konnektor",
+  "integrationFieldsCount": "{count} Felder",
+  "@integrationFieldsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "integrationNoLocalCredentials": "Keine lokalen Anmeldedaten",
+  "configureLabel": "Konfigurieren",
+  "integrationModelDefaultGemini": "Standard: gemini-3-flash-preview",
+  "integrationOpenaiDesc": "Nutze GPT-4o und andere OpenAI-Modelle als intelligenten Assistenten.",
+  "integrationOpenaiApiKeyHint": "Erhältlich unter platform.openai.com/api-keys",
+  "integrationModelDefaultOpenai": "Standard: gpt-4o",
+  "integrationClaudeDesc": "Nutze Claude Sonnet, Opus und Haiku als intelligenten Assistenten.",
+  "integrationClaudeApiKeyHint": "Erhältlich unter console.anthropic.com/settings/keys",
+  "integrationModelDefaultClaude": "Standard: claude-sonnet-4-6",
+  "integrationTelegramBotTokenHint": "Von @BotFather",
+  "integrationTelegramChatIdHint": "Verwende @userinfobot, um deine ID zu erhalten",
+  "integrationEmailDesc": "Höchst zuverlässiger E-Mail-Versand. Ideal für Berichte und kritische Warnungen.",
+  "integrationEmailApiKeyHint": "Erhältlich unter resend.com/api-keys",
+  "integrationEmailFromLabel": "Absender (Von)",
+  "integrationEmailFromHint": "Bsp.: Invenicum <onboarding@resend.dev>",
+  "integrationBggDesc": "Verbinde dein BGG-Konto, um deine Sammlung zu synchronisieren und Daten automatisch anzureichern.",
+  "integrationPokemonDesc": "Verbinde dich mit der Pokemon-API, um deine Sammlung zu synchronisieren und Daten automatisch anzureichern.",
+  "integrationTcgdexDesc": "Karten und Erweiterungen von Sammelkartenspielen abfragen, um dein Inventar automatisch anzureichern.",
+  "integrationQrGeneratorName": "QR-Generator",
+  "integrationQrLabelsDesc": "Format deiner druckbaren Etiketten konfigurieren.",
+  "integrationQrPageSizeLabel": "Seitengröße (A4, Letter)",
+  "integrationQrMarginLabel": "Rand (mm)",
+  "integrationPriceChartingDesc": "API-Schlüssel konfigurieren, um aktuelle Preise zu erhalten.",
+  "integrationUpcitemdbDesc": "Globale Preissuche per Barcode.",
+  "integrationConfiguredSuccess": "{name} erfolgreich konfiguriert",
+  "@integrationConfiguredSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "integrationUnlinkedWithName": "{name} wurde getrennt",
+  "@integrationUnlinkedWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidUiFormat": "Ungültiges UI-Format",
+  "loadingConfiguration": "Konfiguration wird geladen...",
+  "pageNotFoundUri": "Seite nicht gefunden: {uri}",
+  "@pageNotFoundUri": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginLoadError": "Fehler beim Laden der Plugin-Oberfläche",
+  "pluginRenderError": "Rendering-Fehler",
+  "testConnection": "Verbindung testen",
+  "testingConnection": "Wird getestet...",
+  "unableToUnlinkAccount": "Konto konnte nicht getrennt werden",
+  "unlinkIntegrationUpper": "INTEGRATION TRENNEN",
+  "upcFreeModeHint": "Dieses Feld leer lassen, um den kostenlosen Modus (eingeschränkt) zu nutzen.",
+  "alertsTabLabel": "Benachrichtigungen",
+  "alertMarkedAsRead": "Als gelesen markiert",
+  "calendarTabLabel": "Kalender",
+  "closeLabel": "Schließen",
+  "closeLabelUpper": "SCHLIESSEN",
+  "configureReminderLabel": "Erinnerung konfigurieren:",
+  "cannotFormatInvalidJson": "Ungültiges JSON kann nicht formatiert werden",
+  "createAlertOrEventTitle": "Benachrichtigung/Ereignis erstellen",
+  "createdSuccessfully": "Erfolgreich erstellt",
+  "createPluginTitle": "Plugin erstellen",
+  "editPluginTitle": "Plugin bearbeiten",
+  "deleteFromGithubLabel": "Von GitHub löschen",
+  "deleteFromGithubSubtitle": "Datei aus dem öffentlichen Markt entfernen",
+  "deletePluginQuestion": "Plugin löschen?",
+  "deletePluginLocalWarning": "Es wird aus deiner lokalen Datenbank gelöscht.",
+  "deleteUpper": "LÖSCHEN",
+  "editEventTitle": "Ereignis bearbeiten",
+  "editLabel": "Bearbeiten",
+  "eventDataSection": "Ereignisdaten",
+  "eventReminderAtTime": "Zum Zeitpunkt des Ereignisses",
+  "eventUpdated": "Ereignis aktualisiert",
+  "firstVersionHint": "Die erste Version ist immer 1.0.0",
+  "fixJsonBeforeSave": "JSON vor dem Speichern korrigieren",
+  "formatJson": "JSON formatieren",
+  "goToProfileUpper": "ZUM PROFIL",
+  "installPluginLabel": "Plugin installieren",
+  "invalidVersionFormat": "Ungültiges Format (Bsp.: 1.0.1)",
+  "isEventQuestion": "Ist es ein Ereignis?",
+  "jsonErrorGeneric": "Fehler im JSON",
+  "makePublicLabel": "Öffentlich machen",
+  "markAsReadLabel": "Als gelesen markieren",
+  "messageWithColon": "Nachricht:",
+  "minutesBeforeLabel": "{minutes} Minuten vorher",
+  "@minutesBeforeLabel": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "newLabel": "Neu",
+  "newPluginLabel": "Neues Plugin",
+  "noActiveAlerts": "Keine aktiven Benachrichtigungen",
+  "noDescriptionAvailable": "Keine Beschreibung verfügbar.",
+  "noEventsForDay": "Keine Ereignisse für diesen Tag",
+  "noPluginsAvailable": "Keine Plugins vorhanden",
+  "notificationDeleted": "Benachrichtigung erfolgreich gelöscht",
+  "oneHourBeforeLabel": "1 Stunde vorher",
+  "pluginPrivateDescription": "Nur du kannst dieses Plugin in deiner Liste sehen.",
+  "pluginPublicDescription": "Andere Benutzer können dieses Plugin sehen und installieren.",
+  "pluginTabLibrary": "Bibliothek",
+  "pluginTabMarket": "Marktplatz",
+  "pluginTabMine": "Meine",
+  "previewLabel": "Vorschau",
+  "remindMeLabel": "Erinnere mich:",
+  "requiredField": "Erforderlich",
+  "requiresGithubDescription": "Um Plugins in der Community zu veröffentlichen, musst du dein GitHub-Konto verknüpfen, damit du als Autor anerkannt wirst.",
+  "requiresGithubTitle": "GitHub erforderlich",
+  "slotLocationLabel": "Standort (Slot)",
+  "stacDocumentation": "Stac-Dokumentation",
+  "stacJsonInterfaceLabel": "Stac JSON (Oberfläche)",
+  "uninstallLabel": "Deinstallieren",
+  "unrecognizedStacStructure": "Unbekannte Stac-Struktur",
+  "updateLabelUpper": "AKTUALISIEREN",
+  "updateToVersion": "Auf v{version} aktualisieren",
+  "@updateToVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "versionLabel": "Version",
+  "incrementVersionHint": "Version für deinen Vorschlag erhöhen (Bsp.: 1.1.0)",
+  "cancelUpper": "ABBRECHEN",
+  "mustLinkGithubToPublishTemplate": "Du musst GitHub in deinem Profil verknüpfen, um zu veröffentlichen.",
+  "templateNeedsAtLeastOneField": "Die Vorlage muss mindestens ein definiertes Feld haben.",
+  "templatePullRequestCreated": "Vorschlag eingereicht. Ein Pull Request wurde auf GitHub erstellt.",
+  "errorPublishingTemplate": "Fehler beim Veröffentlichen: {error}",
+  "@errorPublishingTemplate": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "createGlobalTemplateTitle": "Globale Vorlage erstellen",
+  "githubVerifiedLabel": "GitHub verifiziert",
+  "githubNotLinkedLabel": "GitHub nicht verknüpft",
+  "veniDesignedTemplateBanner": "Veni hat diese Struktur basierend auf deiner Anfrage entworfen. Überprüfe und passe sie vor der Veröffentlichung an.",
+  "templateNameLabel": "Vorlagenname",
+  "templateNameHint": "Bsp.: Meine Comic-Sammlung",
+  "githubUserLabel": "GitHub-Benutzer",
+  "categoryLabel": "Kategorie",
+  "categoryHint": "Bsp.: Bücher, Elektronik...",
+  "templatePurposeDescription": "Zweckbeschreibung",
+  "definedFieldsTitle": "Definierte Felder",
+  "addFieldButton": "Feld hinzufügen",
+  "clickAddFieldToStart": "Klicke auf 'Feld hinzufügen', um mit dem Entwurf zu beginnen.",
+  "configureOptionsUpper": "OPTIONEN KONFIGURIEREN",
+  "writeOptionAndPressEnter": "Option eingeben und Enter drücken",
+  "publishOnGithubUpper": "AUF GITHUB VERÖFFENTLICHEN",
+  "templateDetailFetchError": "Vorlagendetail konnte nicht abgerufen werden",
+  "templateNotAvailable": "Die Vorlage existiert nicht oder ist nicht verfügbar",
+  "backLabel": "Zurück",
+  "templateDetailTitle": "Vorlagen-Detail",
+  "saveToLibraryTooltip": "In Bibliothek speichern",
+  "templateByAuthor": "von @{name}",
+  "@templateByAuthor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "officialVerifiedTemplate": "Offizielle verifizierte Vorlage",
+  "dataStructureFieldsUpper": "DATENSTRUKTUR ({count} FELDER)",
+  "@dataStructureFieldsUpper": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "installInMyInventoryUpper": "IN MEIN INVENTAR INSTALLIEREN",
+  "addedToPersonalLibrary": "Zu deiner persönlichen Bibliothek hinzugefügt",
+  "whereDoYouWantToInstall": "Wo möchtest du es installieren?",
+  "noContainersCreateFirst": "Du hast keine Container. Erstelle zuerst einen.",
+  "autoGeneratedListFromTemplate": "Automatisch aus Vorlage generierte Liste",
+  "installationSuccessAutoLists": "Installation erfolgreich. Listen automatisch konfiguriert.",
+  "errorInstallingTemplate": "Fehler bei der Installation: {error}",
+  "@errorInstallingTemplate": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "publishTemplateLabel": "Vorlage veröffentlichen",
+  "retryLabel": "Erneut versuchen",
+  "noTemplatesFoundInMarket": "Keine Vorlagen im Marktplatz gefunden.",
+  "invenicumCommunity": "Invenicum Community",
+  "refreshMarketTooltip": "Marktplatz aktualisieren",
+  "exploreCommunityConfigurations": "Community-Konfigurationen erkunden und herunterladen",
+  "searchByTemplateName": "Nach Vorlagenname suchen...",
+  "filterByTagTooltip": "Nach Tag filtern",
+  "noMoreTags": "Keine weiteren Tags",
+  "confirmDeleteDataList": "Bist du sicher, dass du die Liste \"{name}\" löschen möchtest? Diese Aktion ist unwiderruflich.",
+  "@confirmDeleteDataList": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dataListDeletedSuccess": "Liste \"{name}\" erfolgreich gelöscht.",
+  "@dataListDeletedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeletingDataList": "Fehler beim Löschen der Liste: {error}",
+  "@errorDeletingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "customListsWithContainer": "Benutzerdefinierte Listen - {name}",
+  "@customListsWithContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newDataListLabel": "Neue Liste",
+  "noCustomListsCreateOne": "Keine benutzerdefinierten Listen. Erstelle eine neue.",
+  "elementsCount": "{count} Elemente",
+  "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataListNeedsAtLeastOneElement": "Die Liste muss mindestens ein Element haben",
+  "customDataListCreated": "Benutzerdefinierte Liste erfolgreich erstellt",
+  "errorCreatingDataList": "Fehler beim Erstellen der Liste: {error}",
+  "@errorCreatingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "newCustomDataListTitle": "Neue benutzerdefinierte Liste",
+  "dataListNameLabel": "Listenname",
+  "pleaseEnterAName": "Bitte einen Namen eingeben",
+  "dataListElementsTitle": "Listenelemente",
+  "newElementLabel": "Neues Element",
+  "addLabel": "Hinzufügen",
+  "addElementsToListHint": "Elemente zur Liste hinzufügen",
+  "saveListLabel": "Liste speichern",
+  "dataListUpdatedSuccessfully": "Liste erfolgreich aktualisiert",
+  "errorUpdatingDataList": "Fehler beim Aktualisieren der Liste: {error}",
+  "@errorUpdatingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editListWithName": "Liste bearbeiten: {name}",
+  "@editListWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewLocationTitle": "Neuen Standort erstellen",
+  "locationNameLabel": "Standortname",
+  "locationNameHint": "Bsp.: Regal B3, Serverraum",
+  "locationDescriptionHint": "Zugangsinformationen, Inhaltstyp usw.",
+  "parentLocationLabel": "Übergeordneter Standort (Enthält diesen)",
+  "noParentRootLocation": "Kein übergeordneter Standort (Wurzel-Standort)",
+  "noneRootScheme": "Kein übergeordneter (Schemawurzel)",
+  "savingLabel": "Wird gespeichert...",
+  "saveLocationLabel": "Standort speichern",
+  "locationCreatedSuccessfully": "Standort \"{name}\" erfolgreich erstellt.",
+  "@locationCreatedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreatingLocation": "Fehler beim Erstellen des Standorts: {error}",
+  "@errorCreatingLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "locationCannotBeItsOwnParent": "Ein Standort kann nicht sein eigener übergeordneter Standort sein.",
+  "locationUpdatedSuccessfully": "Standort \"{name}\" aktualisiert.",
+  "@locationUpdatedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdatingLocation": "Fehler beim Aktualisieren des Standorts: {error}",
+  "@errorUpdatingLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editLocationTitle": "Bearbeiten: {name}",
+  "@editLocationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "updateLocationLabel": "Standort aktualisieren",
+  "selectObjectTitle": "Objekt auswählen",
+  "noObjectsAvailable": "Keine Objekte verfügbar",
+  "availableQuantity": "Verfügbar: {quantity}",
+  "@availableQuantity": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "errorSelectingObject": "Fehler beim Auswählen des Objekts: {error}",
+  "@errorSelectingObject": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mustSelectAnObject": "Du musst ein Objekt auswählen",
+  "loanRegisteredSuccessfully": "Ausleihe erfolgreich registriert",
+  "selectAnObject": "Objekt auswählen",
+  "selectLabel": "Auswählen",
+  "borrowerNameHint": "Bsp.: Max Mustermann",
+  "borrowerNameRequired": "Name ist erforderlich",
+  "loanQuantityAvailable": "Auszuleihende Menge (Verfügbar: {quantity})",
+  "@loanQuantityAvailable": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "enterQuantity": "Menge eingeben",
+  "invalidQuantity": "Ungültige Menge",
+  "notEnoughStock": "Nicht genug Bestand",
+  "invalidEmail": "Ungültige E-Mail",
+  "expectedReturnDateLabel": "Erwartete Rückgabe: {date}",
+  "@expectedReturnDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "selectReturnDate": "Rückgabedatum auswählen",
+  "additionalNotes": "Zusätzliche Anmerkungen",
+  "registerLoanLabel": "Ausleihe registrieren",
+  "totalLabel": "Gesamt",
+  "newLocationLabel": "Neuer Standort",
+  "newLocationHint": "Bsp.: Regal A1, Schrank 3...",
+  "parentLocationOptionalLabel": "Übergeordneter Standort (optional)",
+  "noneRootLabel": "Keiner (Wurzel)",
+  "locationCreatedShort": "Standort \"{name}\" erstellt",
+  "@locationCreatedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newLocationEllipsis": "Neuer Standort...",
+  "couldNotReloadList": "Liste konnte nicht neu geladen werden",
+  "deleteAssetTitle": "Aktiv löschen",
+  "confirmDeleteAssetItem": "Möchtest du \"{name}\" wirklich löschen?",
+  "@confirmDeleteAssetItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDeletedShort": "Aktiv gelöscht.",
+  "viewColumnsLabel": "Ansicht: {count} Sp.",
+  "@viewColumnsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notValuedLabel": "Nicht bewertet",
+  "manageSearchSyncAssets": "Verwalte, suche und synchronisiere deine Aktiva in einem einzigen Dashboard.",
+  "filterLabel": "Filter",
+  "activeFilterLabel": "Aktiver Filter",
+  "importLabel": "Importieren",
+  "exportLabel": "Exportieren",
+  "csvExportNoData": "Keine Elemente zum Exportieren.",
+  "csvExportSuccess": "CSV erfolgreich exportiert ({count} Elemente).",
+  "@csvExportSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "csvExportError": "CSV konnte nicht exportiert werden",
+  "syncLabel": "Preise synchronisieren",
+  "syncingLabel": "Wird synchronisiert...",
+  "newAssetLabel": "Neues Aktiv",
+  "statusAndPreferences": "Status und Einstellungen",
+  "itemStatusLabel": "Element-Status",
+  "availableLabel": "Verfügbar",
+  "mustBeGreaterThanZero": "Muss größer als 0 sein.",
+  "alertThresholdLabel": "Warnschwelle",
+  "enterMinimumStock": "Mindestbestand eingeben.",
+  "serializedItemFixedQuantity": "Dies ist ein serialisierter Artikel. Die Menge ist fest auf 1 gesetzt.",
+  "serialNumberLabel": "Seriennummer",
+  "serialNumberHint": "Bsp.: SN-2024-00123",
+  "mainDataTitle": "Hauptdaten",
+  "currentMarketValueLabel": "AKTUELLER MARKTWERT",
+  "updatePriceLabel": "Preis aktualisieren",
+  "viewLabel": "Ansicht",
+  "visualGalleryTitle": "Visuelle Galerie",
+  "statusAndMarketTitle": "Status und Markt",
+  "valuationHistoryTitle": "Bewertungsverlauf",
+  "specificationsTitle": "Spezifikationen",
+  "traceabilityTitle": "Rückverfolgbarkeit",
+  "stockLabel": "Bestand",
+  "internalReferenceLabel": "Interne Referenz",
+  "noSpecificationsAvailable": "Keine Spezifikationen verfügbar",
+  "trueLabel": "Wahr",
+  "falseLabel": "Falsch",
+  "openLinkLabel": "Link öffnen",
+  "scannerFocusTip": "Tipp: Wenn der Fokus nicht funktioniert, halte das Produkt ca. 30 cm von der Kamera entfernt.",
+  "scanCodeTitle": "Code scannen",
+  "scanOrEnterProductCode": "Produktcode scannen oder eingeben",
+  "possessionProgressLabel": "Fortschritt von {name}",
+  "@possessionProgressLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "externalImportTitle": "Aus externer Quelle importieren",
+  "galleryTitle": "Galerie",
+  "stockAndCodingTitle": "Bestand und Codierung",
+  "cameraPermissionRequired": "Kameraerlaubnis zum Scannen erforderlich",
+  "cloudDataFound": "Daten in der Cloud gefunden!",
+  "typeSomethingToSearch": "Etwas eingeben, um zu suchen",
+  "importCancelled": "Import abgebrochen.",
+  "couldNotCompleteImport": "Import konnte nicht abgeschlossen werden",
+  "yearLabel": "Jahr",
+  "authorLabel": "Autor",
+  "selectResultTitle": "Ergebnis auswählen",
+  "unnamedLabel": "Ohne Namen",
+  "completeRequiredFields": "Bitte die Pflichtfelder ausfüllen.",
+  "assetCreatedSuccess": "Aktiv erstellt!",
+  "errorCreatingAsset": "Fehler beim Erstellen des Aktivs: {error}",
+  "@errorCreatingAsset": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "technicalDetailsTitle": "Technische Details",
+  "itemImportedSuccessfully": "{name} erfolgreich importiert!",
+  "@itemImportedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newImagesSelected": "{count} neue Bilder ausgewählt.",
+  "@newImagesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newFileRemoved": "Neue Datei entfernt.",
+  "imageMarkedForDeletion": "Bild beim Speichern zum Löschen markiert.",
+  "couldNotIdentifyImage": "Bild konnte nicht identifiziert werden.",
+  "editAssetTitle": "Bearbeiten: {name}",
+  "@editAssetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncPricesTitle": "Preise synchronisieren",
+  "syncPricesDescription": "Die API wird abgefragt, um den Marktwert zu aktualisieren.",
+  "syncingMarketPrices": "Marktpreise werden synchronisiert...",
+  "couldNotSyncPrices": "Preise konnten nicht synchronisiert werden",
+  "syncCompletedTitle": "Synchronisierung abgeschlossen",
+  "updatedLabel": "Aktualisiert",
+  "noApiPriceLabel": "Kein Preis in API",
+  "errorsLabel": "Fehler",
+  "totalProcessedLabel": "Gesamt verarbeitet",
+  "noAssetsToShow": "Keine Aktiva zum Anzeigen",
+  "noImageLabel": "Kein Bild",
+  "aiMagicQuestion": "Hast du einen Link?",
+  "aiAutocompleteAsset": "Dieses Aktiv mit KI automatisch ausfüllen",
+  "magicLabel": "MAGIE",
+  "skuBarcodeLabel": "SKU / EAN / UPC",
+  "veniChatPlaceholder": "Frag mich etwas...",
   "veniChatPoweredBy": "Powered by ",
-  "veniChatProcessing": "Ich verarbeite Ihre Frage zu \"{query}\"...",
-  "veniCmdHelpTitle": "Veni-Fähigkeiten",
+  "veniChatProcessing": "Ich verarbeite deine Anfrage zu \"{query}\"...",
+  "veniChatStatus": "Online",
+  "veniChatTitle": "Venibot KI",
+  "veniChatWelcome": "Hallo! Ich bin Venibot, dein Invenicum-Assistent. Wie kann ich dir heute bei deinem Inventar helfen?",
   "veniCmdDashboard": "Zum Dashboard gehen",
-  "veniCmdInventory": "Überprüfen Sie den Bestand eines Artikels",
-  "veniCmdLoans": "Aktive Darlehen anzeigen",
-  "veniCmdReport": "Inventarbericht generieren",
-  "veniCmdScanQR": "QR/Barcode scannen",
-  "veniCmdUnknown": "Ich erkenne diesen Befehl nicht. Schreiben Sie Hilfe, um zu sehen, was ich tun kann.",
+  "veniCmdHelpTitle": "Venis Fähigkeiten",
+  "veniCmdInventory": "Bestand eines Artikels abfragen",
+  "veniCmdLoans": "Aktive Ausleihen anzeigen",
+  "veniCmdReport": "Inventarbericht erstellen",
+  "veniCmdScanQR": "QR-/Barcode scannen",
+  "veniCmdUnknown": "Diesen Befehl kenne ich nicht. Tippe Hilfe, um zu sehen, was ich kann.",
   "version": "Version {name}",
-  "reportsDescription": "Erstellen Sie PDF- oder Excel-Berichte zum Drucken oder Speichern auf Ihrem PC",
-  "reportSectionType": "Berichtsart",
+  "yes": "Ja",
+  "zoomToFit": "Ansicht anpassen",
+  "generalSettingsMenuLabel": "Allgemeine Einstellungen",
+  "aiAssistantMenuLabel": "KI-Assistent",
+  "notificationsMenuLabel": "Benachrichtigungen",
+  "loanManagementMenuLabel": "Ausleihverwaltung",
+  "aboutMenuLabel": "Info",
+  "automaticDarkModeLabel": "Automatischer Dunkelmodus",
+  "syncWithSystemLabel": "Mit System synchronisieren",
+  "manualDarkModeLabel": "Manueller Dunkelmodus",
+  "disableAutomaticToChange": "Automatischen Modus deaktivieren, um ihn zu ändern",
+  "changeLightDark": "Zwischen Hell und Dunkel wechseln",
+  "enableAiAndChatbot": "Künstliche Intelligenz und Chatbot aktivieren",
+  "requiresGeminiLinking": "Erfordert Verknüpfung mit Gemini unter Integrationen",
+  "aiOrganizeInventory": "KI nutzen, um dein Inventar intelligent zu organisieren",
+  "aiAssistantTitle": "KI-Assistent",
+  "selectAiProvider": "Wähle, welchen KI-Anbieter Veni verwenden soll. Stelle sicher, dass der API-Schlüssel unter Integrationen konfiguriert ist.",
+  "aiProviderLabel": "Anbieter",
+  "aiModelLabel": "Modell",
+  "aiProviderUpdated": "KI-Anbieter aktualisiert",
+  "purgeChatHistoryTitle": "Chatverlauf",
+  "purgeChatHistoryDescription": "Löscht dauerhaft den gesamten gespeicherten Gesprächsverlauf von Veni.",
+  "purgeChatHistoryButton": "Verlauf löschen",
+  "purgeChatHistoryConfirmTitle": "Chatverlauf löschen?",
+  "purgeChatHistoryConfirmMessage": "Diese Aktion löscht alle gespeicherten Nachrichten und kann nicht rückgängig gemacht werden.",
+  "purgeChatHistoryConfirmAction": "Ja, löschen",
+  "purgeChatHistorySuccess": "Chatverlauf erfolgreich gelöscht.",
+  "purgeChatHistoryError": "Chatverlauf konnte nicht gelöscht werden.",
+  "notificationSettingsTitle": "Benachrichtigungsverwaltung",
+  "channelPriorityLabel": "Kanalpriorität (Zum Sortieren ziehen)",
+  "telegramBotLabel": "Telegram Bot",
+  "resendEmailLabel": "Resend E-Mail",
+  "lowStockLabel": "Niedriger Bestand",
+  "lowStockHint": "Benachrichtigen, wenn ein Produkt unter das Minimum fällt.",
+  "newPresalesLabel": "Neue Vorbestellungen",
+  "newPresalesHint": "Über von der KI erkannte Markteinführungen benachrichtigen.",
+  "loanReminderLabel": "Ausleih-Erinnerung",
+  "loanReminderHint": "Vor dem Rückgabedatum benachrichtigen.",
+  "overdueLoansLabel": "Überfällige Ausleihen",
+  "overdueLoansHint": "Kritische Warnung, wenn ein Objekt nicht rechtzeitig zurückgegeben wird.",
+  "maintenanceLabel": "Wartung",
+  "maintenanceHint": "Benachrichtigen, wenn ein Aktiv überprüft werden muss.",
+  "priceChangeLabel": "Preisänderungen",
+  "priceChangeHint": "Über Wertschwankungen auf dem Markt benachrichtigen.",
+  "unlinkGithubTitle": "GitHub trennen",
+  "unlinkGithubMessage": "Bist du sicher, dass du dein GitHub-Konto trennen möchtest?",
+  "updatePasswordButton": "PASSWORT AKTUALISIEREN",
+  "newContainerDialog": "Neuer Container",
+  "descriptionField": "Beschreibung",
+  "isCollectionQuestion": "Ist es eine Sammlung?",
+  "createContainerButton": "Container erstellen",
+  "selectContainerHint": "Container auswählen",
+  "newAssetTypeTitle": "Neuer Aktivtyp",
+  "generalConfiguration": "Allgemeine Konfiguration",
+  "collectionContainerWarning": "Dieser Container ist eine Sammlung. Du kannst serialisierte oder nicht serialisierte Typen erstellen, aber Besitz- und Wunschfelder können nur bei nicht serialisierten Typen konfiguriert werden.",
+  "createAssetTypeButton": "Aktivtyp erstellen",
+  "assetTypesInContainer": "Aktivtypen in \"{name}\"",
+  "@assetTypesInContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewTypeButton": "Neuen Typ erstellen",
+  "isSerializedQuestion": "Ist es ein serialisierter Artikel?",
+  "addNewFieldButton": "Neues Feld hinzufügen",
+  "deleteFieldTooltip": "Feld löschen",
+  "fieldsOptions": "Optionen:",
+  "isRequiredField": "Ist Pflichtfeld",
+  "isSummativeFieldLabel": "Ist summativ (Wird zum Typ-Gesamtwert addiert)",
+  "isMonetaryValueLabel": "Ist Geldwert",
+  "monetaryValueDescription": "Wird zur Berechnung der Gesamtinvestition im Dashboard verwendet",
+  "noDataListsAvailable": "⚠️ Keine Datenlisten in diesem Container verfügbar.",
+  "selectDataList": "Datenliste auswählen",
+  "chooseList": "Liste auswählen",
+  "goToPageLabel": "Zur Seite:",
+  "conditionLabel": "Zustand",
+  "actionsLabel": "Aktionen",
+  "editButtonLabel": "Bearbeiten",
+  "deleteButtonLabel": "Löschen",
+  "printLabel": "Etikett drucken",
+  "collectionFieldsTooltip": "Sammlungsfelder",
+  "totalLocations": "{count} Standorte",
+  "@totalLocations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "withoutLocationLabel": "{count} ohne Standort · ",
+  "@withoutLocationLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "objectIdColumn": "Obj.-ID",
+  "containerNotFoundError": "Container mit ID {id} nicht gefunden.",
+  "@containerNotFoundError": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidContainerIdError": "Fehler: Ungültige Container-ID.",
+  "startConfigurationButton": "Konfiguration starten",
+  "fullNameField": "Vollständiger Name",
+  "emailField": "E-Mail-Adresse",
+  "passwordField": "Passwort",
+  "confirmPasswordField": "Passwort bestätigen",
+  "goBackButton": "Zurück",
+  "createAccountButton": "Konto erstellen",
+  "goToLoginButton": "Zur Anmeldung",
+  "deleteConfirmationTitle": "Löschen bestätigen",
+  "deleteItemMessage": "Möchtest du \"{name}\" löschen?",
+  "@deleteItemMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "elementDeletedSuccess": "Element erfolgreich gelöscht",
+  "enterYourNameValidation": "Gib deinen Namen ein.",
+  "minTwoCharactersValidation": "Mindestens 2 Zeichen.",
+  "enterEmailValidation": "Gib eine E-Mail ein.",
+  "invalidEmailValidation": "Ungültige E-Mail.",
+  "enterPasswordValidation": "Gib ein Passwort ein.",
+  "minEightCharactersValidation": "Mindestens 8 Zeichen.",
+  "threeDbuttonLabel": "3D",
+  "barcodeCount": "{count}",
+  "@barcodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "rotationSpeedLabel": "{count}s",
+  "@rotationSpeedLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tagLabel": "#{tag}",
+  "@tagLabel": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "@invalidIdError": {},
+  "invalidIdError": "Ungültige ID",
+  "@assetTypeLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeLoadError": "Fehler beim Laden der Daten: {error}",
+  "@assetTypeUpdateSuccess": {},
+  "assetTypeUpdateSuccess": "Aktivtyp erfolgreich aktualisiert",
+  "@assetTypeUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeUpdateError": "Fehler beim Aktualisieren: {error}",
+  "@editAssetTypeTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editAssetTypeTitle": "Bearbeiten: {name}",
+  "@achievementCollectionTitle": {
+    "description": "Titel für den Abschnitt Sammlungserfolge"
+  },
+  "achievementCollectionTitle": "Sammlungserfolge",
+  "@achievementSubtitle": {
+    "description": "Untertitel des Erfolge-Bildschirms"
+  },
+  "achievementSubtitle": "Schalte Meilensteine durch die Nutzung von Invenicum frei",
+  "@legendaryAchievementLabel": {
+    "description": "Bezeichnung für legendäre Erfolge"
+  },
+  "legendaryAchievementLabel": "LEGENDÄRER ERFOLG",
+  "@achievementCompleted": {
+    "description": "Statusbezeichnung für abgeschlossene Erfolge"
+  },
+  "achievementCompleted": "Abgeschlossen",
+  "@achievementLocked": {
+    "description": "Statusbezeichnung für gesperrte Erfolge"
+  },
+  "achievementLocked": "Gesperrt",
+  "@achievementUnlockedDate": {
+    "description": "Zeigt das Datum an, an dem der Erfolg freigeschaltet wurde",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementUnlockedDate": "Erreicht am {date}",
+  "@achievementLockedMessage": {
+    "description": "Nachricht, die erklärt, wie ein Erfolg freigeschaltet wird"
+  },
+  "achievementLockedMessage": "Ziel erfüllen, um freizuschalten",
+  "@closeButtonLabel": {
+    "description": "Bezeichnung der Schließen-Schaltfläche in Dialogen"
+  },
+  "closeButtonLabel": "Verstanden",
+  "@configurationGeneralSection": {},
+  "configurationGeneralSection": "Allgemeine Konfiguration",
+  "@assetTypeCollectionWarning": {},
+  "assetTypeCollectionWarning": "Dieser Container ist eine Sammlung. Du kannst serialisierte oder nicht serialisierte Typen erstellen, aber Besitz- und Wunschfelder können nur bei nicht serialisierten Typen konfiguriert werden.",
+  "@updateAssetTypeButton": {},
+  "updateAssetTypeButton": "Aktivtyp aktualisieren",
+  "@createAssetTypeButtonDefault": {},
+  "createAssetTypeButtonDefault": "Aktivtyp erstellen",
+  "@noAssetTypesMessage": {},
+  "noAssetTypesMessage": "In diesem Container sind noch keine Aktivtypen definiert.",
+  "@totalCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "totalCountLabel": "Gesamt: {count}",
+  "@possessionCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "possessionCountLabel": "Besitz: {count}",
+  "@desiredCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "desiredCountLabel": "Gewünscht: {count}",
+  "marketValueLabel": "Markt: ",
+  "defaultSumFieldName": "Summe",
+  "calculatingLabel": "Wird berechnet...",
+  "@unknownError": {},
+  "unknownError": "Unbekannter Fehler",
+  "@noNameItem": {},
+  "noNameItem": "Ohne Namen",
+  "@loadingContainers": {},
+  "loadingContainers": "Container werden geladen...",
+  "@fieldNameRequired": {},
+  "fieldNameRequired": "Feldname ist erforderlich",
+  "@selectImageButton": {},
+  "selectImageButton": "Bild auswählen",
+  "@assetTypeDeletedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeDeletedSuccess": "{name} gelöscht",
+  "@noLocationValueData": {},
+  "noLocationValueData": "Noch keine Aktiva mit Standort und ausreichendem Wert, um dieses Diagramm zu erstellen.",
+  "@requiredFieldValidation": {},
+  "requiredFieldValidation": "Dieses Feld ist erforderlich",
+  "@oceanTheme": {},
+  "oceanTheme": "Indischer Ozean",
+  "@cherryBlossomTheme": {},
+  "cherryBlossomTheme": "Kirschblüte",
+  "themeBrand": "Invenicum (Marke)",
+  "themeEmerald": "Smaragd",
+  "themeSunset": "Sonnenuntergang",
+  "themeLavender": "Sanfter Lavendel",
+  "themeForest": "Tiefer Wald",
+  "themeCherry": "Kirsche",
+  "themeElectricNight": "Elektrische Nacht",
+  "themeAmberGold": "Bernsteingold",
+  "themeModernSlate": "Modernes Schiefer",
+  "themeCyberpunk": "Cyberpunk",
+  "themeNordicArctic": "Nordisches Arktis",
+  "themeDeepNight": "Tiefe Nacht",
+  "@loginSuccess": {},
+  "loginSuccess": "Anmeldung erfolgreich",
+  "reloadListError": "Liste konnte nicht neu geladen werden",
+  "copyItemSuffix": "Kopie",
+  "@itemCopiedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemCopiedSuccess": "Element kopiert: {name}",
+  "copyError": "Fehler beim Kopieren",
+  "imageColumnLabel": "Bild",
+  "viewImageTooltip": "Bild anzeigen",
+  "currentStockLabel": "Aktueller Bestand",
+  "minimumStockLabel": "Mindestbestand",
+  "locationColumnLabel": "Standort",
+  "serialNumberColumnLabel": "Seriennummer",
+  "marketPriceLabel": "Marktpreis",
+  "conditionColumnLabel": "Zustand",
+  "actionsColumnLabel": "Aktionen",
+  "imageLoadError": "Bild konnte nicht geladen werden",
+  "imageUrlHint": "Stelle sicher, dass die URL korrekt ist und der Server aktiv ist",
+  "@assetTypeNameHint": {},
+  "assetTypeNameHint": "Bsp.: Laptop, Chemikalie",
+  "@assetTypeNameLabel": {},
+  "assetTypeNameLabel": "Name des Aktivtyps",
+  "@underConstruction": {},
+  "underConstruction": "Im Aufbau",
+  "@comingSoon": {},
+  "comingSoon": "Demnächst",
+  "@constructionSubtitle": {},
+  "constructionSubtitle": "Diese Funktion wird gerade entwickelt",
+  "@selectColor": {
+    "description": "Bezeichnung für Farbauswahl-Schaltfläche oder Dialog"
+  },
+  "selectColor": "Farbe auswählen",
+  "@valueDistributionByLocation": {
+    "description": "Titel für das Widget zur Wertverteilung nach Standort"
+  },
+  "valueDistributionByLocation": "Wertverteilung nach Standort",
+  "@heatmapDescription": {
+    "description": "Beschreibung des Heatmap-Widgets"
+  },
+  "heatmapDescription": "Der Donut zeigt, wie sich der Marktwert auf die wichtigsten Standorte verteilt.",
+  "@locationsCount": {
+    "description": "Bezeichnung für Anzahl der Standorte",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationsCount": "{count} Standorte",
+  "@unitsLabel": {
+    "description": "Bezeichnung für Einheiten"
+  },
+  "unitsLabel": "Stk.",
+  "@recordsLabel": {
+    "description": "Bezeichnung für Einträge"
+  },
+  "recordsLabel": "Einträge",
+  "@totalValueFallback": {
+    "description": "Alternativbezeichnung für Gesamtwert"
+  },
+  "totalValueFallback": "Gesamtwert",
+  "@containerFallback": {
+    "description": "Alternativbezeichnung für Container",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "containerFallback": "Container {id}",
+  "@locationFallback": {
+    "description": "Alternativbezeichnung für Standort",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "locationFallback": "Standort {id}",
+  "@ofTheValueLabel": {
+    "description": "Bezeichnung für 'des Werts'"
+  },
+  "ofTheValueLabel": "des Werts",
+  "reportsDescription": "Berichte als PDF oder Excel erstellen, um sie zu drucken oder auf dem PC zu speichern",
+  "reportSectionType": "Berichtstyp",
   "reportSectionFormat": "Ausgabeformat",
   "reportSectionPreview": "Aktuelle Konfiguration",
-  "reportSelectContainerTitle": "Wählen Sie einen Behälter",
+  "reportSelectContainerTitle": "Container auswählen",
   "reportGenerate": "Bericht erstellen",
   "reportGenerating": "Wird erstellt...",
   "reportTypeInventoryDescription": "Vollständige Inventarliste",
-  "reportTypeLoansDescription": "Aktive Darlehen und ihr Status",
-  "reportTypeAssetsDescription": "Liste der Anlagen nach Kategorie",
-  "reportLabelContainer": "Behälter",
-  "reportLabelType": "Berichtsart",
+  "reportTypeLoansDescription": "Aktive Ausleihen und ihr Status",
+  "reportTypeAssetsDescription": "Aktivliste nach Kategorie",
+  "reportLabelContainer": "Container",
+  "reportLabelType": "Berichtstyp",
   "reportLabelFormat": "Format",
   "reportFormatPdf": "PDF",
   "reportFormatExcel": "Excel",
   "reportNotSelected": "Nicht ausgewählt",
   "reportUnknown": "Unbekannt",
-  "reportSelectContainerFirst": "Bitte wählen Sie einen Behälter aus",
+  "reportSelectContainerFirst": "Bitte zuerst einen Container auswählen",
   "@reportDownloadedSuccess": {
     "placeholders": {
       "format": {
@@ -465,7 +1494,7 @@
       }
     }
   },
-  "reportDownloadedSuccess": "{format}-Bericht erfolgreich heruntergeladen",
+  "reportDownloadedSuccess": "Bericht {format} erfolgreich heruntergeladen",
   "@reportGenerateError": {
     "placeholders": {
       "error": {
@@ -473,7 +1502,5 @@
       }
     }
   },
-  "reportGenerateError": "Fehler beim Erstellen des Berichts: {error}",
-  "yes": "Ja",
-  "zoomToFit": "Zoom anpassen"
+  "reportGenerateError": "Fehler beim Erstellen des Berichts: {error}"
 }

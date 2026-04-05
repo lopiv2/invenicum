@@ -1,6 +1,5 @@
 {
-  "@@locale": "fr",
- "@aiExtractionError": {
+  "@aiExtractionError": {
     "placeholders": {
       "error": {
         "type": "String"
@@ -197,19 +196,32 @@
       }
     }
   },
-  "about": "À propos d'Invenicum",
+  "@@locale": "fr",
   "aboutInvenicum": "À propos d'Invenicum",
+  "aboutDialogTitle": "À propos d'Invenicum",
+  "aboutDialogCoolText": "Votre inventaire, mais sous stéroïdes. On vérifie si une version plus fraîche vous attend.",
+  "aboutCurrentVersionLabel": "Version actuelle",
+  "aboutLatestVersionLabel": "Dernière version",
+  "aboutCheckingVersion": "Vérification de la version en ligne...",
+  "aboutVersionUnknown": "Inconnue",
+  "aboutVersionUpToDate": "Votre application est à jour.",
+  "aboutUpdateAvailable": "Une nouvelle version est disponible.",
+  "aboutVersionCheckFailed": "Impossible de vérifier la version en ligne.",
+  "aboutOpenReleases": "Voir les releases",
   "active": "Actif",
+  "actives": "Actifs",
+  "activeInsight": "APERÇU DES RESSOURCES ACTIVES",
   "activeLoans": "Prêts actifs",
   "activeLoansCount": "Prêts actifs",
   "addAlert": "Ajouter une alerte",
   "addAsset": "Ajouter une ressource",
   "addContainer": "Ajouter un conteneur",
   "addNewLocation": "Ajouter une nouvelle localisation",
+  "additionalInformation": "Informations supplémentaires",
   "additionalThumbnails": "Miniatures supplémentaires",
+  "adquisition": "ACQUISITION",
   "aiExtractionError": "L'IA n'a pas pu extraire les données: {error}",
   "aiPasteUrlDescription": "Collez le lien du produit et l'IA extraira automatiquement les informations pour remplir les champs.",
-  "all": "Tous",
   "alertCritical": "Critique",
   "alertCreated": "Alerte créée",
   "alertDeleted": "Alerte supprimée",
@@ -219,20 +231,27 @@
   "alertType": "Type",
   "alertWarning": "Avertissement",
   "alerts": "Alertes et notifications",
+  "all": "Tous",
+  "allUpToDateStatus": "Tout est à jour",
   "appTitle": "Invenicum Inventaire",
   "applicationTheme": "Thème de l'application",
   "apply": "Appliquer",
   "april": "Avril",
+  "assetDetail": "Détails de la ressource",
   "assetImages": "Images des ressources",
   "assetImport": "Importation des ressources",
   "assetName": "Nom de la ressource",
+  "assetNotFound": "Ressource introuvable",
   "assetTypeDeleted": "Type de ressource \"{name}\" supprimé avec succès.",
   "assetTypes": "Types de ressources",
   "assetUpdated": "Ressource \"{name}\" mise à jour avec succès.",
   "assets": "Ressources",
   "assetsIn": "Ressources dans",
   "august": "Août",
+  "averageMarketValue": "Prix moyen du marché",
   "backToAssetTypes": "Retour aux types de ressources",
+  "barCode": "Code-barres (EAN)",
+  "baseCostAccumulatedWithoutInflation": "Coût de base cumulé hors inflation",
   "borrowerEmail": "Email de l'emprunteur",
   "borrowerName": "Nom de l'emprunteur",
   "borrowerPhone": "Téléphone de l'emprunteur",
@@ -242,6 +261,13 @@
   "clearCounter": "Effacer le compteur",
   "collectionContainerInfo": "Les conteneurs de collection ont des barres de suivi de collection, une valeur investie, une valeur marchande et une vue d'exposition",
   "collectionFieldsConfigured": "Champs de collection configurés.",
+  "condition": "État",
+  "condition_mint": "Boîte d'origine",
+  "condition_loose": "En vrac (sans boîte)",
+  "condition_incomplete": "Incomplet",
+  "condition_damaged": "Abîmé / Marques",
+  "condition_new": "Neuf",
+  "condition_digital": "Numérique / Intangible",
   "configureCollectionFields": "Configurer les champs de collection",
   "configureDeliveryVoucher": "Configurer le bon de livraison",
   "configureVoucherBody": "Configurer le corps du bon...",
@@ -261,6 +287,8 @@
   "countItemsByValue": "Compter les éléments par valeur spécifique",
   "create": "Créer",
   "createFirstContainer": "Créez votre premier conteneur.",
+  "createdAt": "Date de création",
+  "currency": "Devise",
   "current": "Actuel",
   "customColor": "Couleur personnalisée",
   "customFields": "Champs personnalisés",
@@ -284,6 +312,7 @@
   "enterDescription": "Entrez une description",
   "enterURL": "Entrez une URL",
   "enterValidUrl": "Entrez une URL valide",
+  "errorChangingLanguage": "Erreur lors du changement de langue: {error}",
   "errorCsvMinRows": "Veuillez sélectionner un fichier CSV avec en-têtes et au moins une ligne de données.",
   "errorDeletingAssetType": "Erreur lors de la suppression du type de ressource: {error}",
   "errorDeletingContainer": "Erreur lors de la suppression du conteneur: {error}",
@@ -296,6 +325,7 @@
   "errorLoadingLocations": "Erreur lors du chargement des localisations: {error}",
   "errorNameMappingRequired": "Le champ \"Nom\" est obligatoire et doit être mappé.",
   "errorNoVoucherTemplate": "Aucun modèle de bon configuré.",
+  "errorNotBarCode": "L'article n'a pas de code-barres ou il n'est pas valide.",
   "errorReadingBytes": "Impossible de lire les octets du fichier.",
   "errorReadingFile": "Erreur lors de la lecture du fichier: {error}",
   "errorRegisteringLoan": "Erreur lors de l'enregistrement du prêt: {error}",
@@ -303,57 +333,79 @@
   "errorSaving": "Erreur lors de l'enregistrement: {error}",
   "errorUpdatingAsset": "Erreur lors de la mise à jour de la ressource: {error}",
   "exampleFilterHint": "Ex: Endommagé, Rouge, 50",
-  "errorChangingLanguage": "Erreur lors du changement de langue: {error}",
   "february": "Février",
   "fieldChip": "Champ",
   "fieldRequiredWithName": "Le champ \"{field}\" est obligatoire.",
   "fieldToCount": "Champ à compter",
   "fieldsFilledSuccess": "Champs remplis avec succès!",
   "formatsPNG": "Formats: PNG, JPG",
+  "forToday": "Pour aujourd'hui",
+  "geminiLabelModel": "Modèle Gemini recommandé : gemini-3-flash-preview",
   "generalSettings": "Paramètres généraux",
   "generateVoucher": "Générer un bon de livraison",
   "globalSearch": "Recherche globale",
   "greeting": "Bonjour, bienvenue!",
   "guest": "Invité",
-  "ignoreField": "🚫 Ignorer le champ",
+  "helpDocs": "Aide et documentation",
+  "helperGeminiKey": "Entrez votre clé API Gemini pour activer l'intégration. Obtenez-la sur https://aistudio.google.com/",
+  "ignoreField": "Ignorer le champ",
   "importAssetsTo": "Importer les ressources vers",
   "importSuccessMessage": "Importation réussie! {count} ressources créées.",
+  "importSerializedWarning": "Importation réussie. Ce type de ressource est sérialisé : tous les éléments ont été créés avec une quantité de 1.",
+  "integrations": "Intégrations",
+  "integrationGeminiDesc": "Connectez Invenicum à Gemini de Google pour exploiter des capacités d'IA avancées dans la gestion de votre inventaire.",
+  "integrationTelegramDesc": "Connectez Invenicum à Telegram pour recevoir des notifications instantanées sur votre inventaire directement sur votre appareil.",
+  "invalidAssetId": "ID de ressource non valide",
   "invalidNavigationIds": "Erreur: ID de navigation non valides.",
+  "inventoryLabel": "Inventaire",
   "january": "Janvier",
   "july": "Juillet",
   "june": "Juin",
   "language": "Langue",
-  "languageNotImplemented": "Fonctionnalité de langue à implémenter",
   "languageChanged": "Langue changée en français!",
+  "languageNotImplemented": "Fonctionnalité de langue à implémenter",
   "lightMode": "Mode clair",
   "loadingAssetType": "Chargement du type de ressource...",
   "loadingListField": "Chargement de {field}...",
   "loanDate": "Date du prêt",
+  "loanLanguageNotImplemented": "Fonctionnalité de langue à implémenter",
   "loanManagement": "Gestion des prêts",
   "loanObject": "Objet du prêt",
   "loans": "Prêts",
+  "location": "Emplacement",
   "locations": "Localisations",
   "locationsScheme": "Schéma des localisations",
   "login": "Connexion",
   "logoVoucher": "Logo du bon",
   "logout": "Déconnexion",
+  "lookForContainersOrAssets": "Rechercher des conteneurs ou des ressources...",
+  "lowStockTitle": "Stock faible",
   "magicAssistant": "Assistant IA magique",
   "march": "Mars",
+  "marketPriceObtained": "Prix du marché obtenu avec succès",
+  "marketValueEvolution": "Évolution de la valeur de marché",
+  "marketValueField": "Valeur de marché",
+  "maxStock": "Stock maximum",
   "may": "Mai",
+  "minStock": "Stock minimum",
+  "myAchievements": "Mes réalisations",
   "myCustomTheme": "Mon thème",
   "myProfile": "Mon profil",
   "myThemesStored": "Mes thèmes enregistrés",
+  "name": "Nom",
   "nameCannotBeEmpty": "Le nom ne peut pas être vide",
   "nameSameAsCurrent": "Le nom est identique à celui actuel",
   "newAlert": "Nouvelle alerte manuelle",
   "newContainer": "Nouveau conteneur",
   "newName": "Nouveau nom",
+  "next": "Suivant",
   "noAssetsCreated": "Aucune ressource créée pour le moment.",
   "noAssetsMatch": "Aucune ressource ne correspond aux critères de recherche/filtrage.",
   "noBooleanFields": "Aucun champ booléen défini.",
   "noContainerMessage": "Créez votre premier conteneur.",
   "noCustomFields": "Ce type de ressource n'a pas de champs personnalisés.",
   "noFileSelected": "Aucun fichier sélectionné",
+  "noImageAvailable": "Aucune image disponible",
   "noImagesAdded": "Aucune image ajoutée pour le moment. La première image sera la principale.",
   "noLoansFound": "Aucun prêt trouvé dans ce conteneur.",
   "noLocationsMessage": "Aucune localisation créée dans ce conteneur. Ajoutez la première!",
@@ -363,6 +415,7 @@
   "november": "Novembre",
   "obligatory": "Obligatoire",
   "october": "Octobre",
+  "optimalStockStatus": "Stock à des niveaux optimaux",
   "optional": "Optionnel",
   "overdue": "En retard",
   "password": "Mot de passe",
@@ -371,21 +424,27 @@
   "pleasePasteUrl": "Veuillez coller une URL",
   "pleaseSelectCsvWithHeaders": "Veuillez sélectionner un fichier CSV avec en-têtes.",
   "pleaseSelectLocation": "Veuillez sélectionner une localisation.",
+  "plugins": "Plugins",
   "possessionFieldDef": "Champ de possession",
   "possessionFieldName": "En possession",
   "preferences": "Préférences",
   "previewPDF": "Aperçu PDF",
+  "previous": "Précédent",
   "primaryImage": "Image principale",
   "productUrlLabel": "URL du produit",
   "quantity": "Quantité",
+  "refresh": "Recharger les données",
   "registerNewLoan": "Enregistrer un nouveau prêt",
   "reloadContainers": "Recharger les conteneurs",
   "reloadLocations": "Recharger les localisations",
+  "reloadLoans": "Recharger les prêts",
   "removeImage": "Supprimer l'image",
   "rename": "Renommer",
   "renameContainer": "Renommer le conteneur",
+  "responsibleLabel": "Responsable",
   "reports": "Rapports",
   "returned": "Retourné",
+  "returnsLabel": "Retours",
   "rowsPerPageTitle": "Ressources par page:",
   "save": "Enregistrer",
   "saveAndApply": "Enregistrer et appliquer",
@@ -395,6 +454,7 @@
   "saveCustomTheme": "Enregistrer le thème personnalisé",
   "searchInAllColumns": "Rechercher dans toutes les colonnes...",
   "selectAndUploadImage": "Sélectionner et télécharger une image",
+  "selectApplicationCurrency": "Sélectionnez la devise de l'application",
   "selectApplicationLanguage": "Sélectionnez la langue de l'application",
   "selectBooleanFields": "Sélectionnez les champs booléens pour contrôler la collection:",
   "selectCsvColumn": "Sélectionner la colonne CSV",
@@ -408,6 +468,12 @@
   "settings": "Paramètres",
   "showAsGrid": "Afficher en tant que grille",
   "showAsList": "Afficher sous forme de liste",
+  "slotDashboardBottom": "Panneau inférieur du tableau de bord",
+  "slotDashboardTop": "Panneau supérieur du tableau de bord",
+  "slotFloatingActionButton": "Bouton flottant",
+  "slotInventoryHeader": "En-tête de l'inventaire",
+  "slotLeftSidebar": "Barre latérale",
+  "slotUnknown": "Emplacement inconnu",
   "specificValueToCount": "Valeur spécifique à compter",
   "startImport": "Démarrer l'importation",
   "startMagic": "Démarrer la magie",
@@ -417,29 +483,992 @@
   "syncingSession": "Synchronisation de la session...",
   "systemThemes": "Thèmes du système",
   "systemThemesModal": "Thèmes du système",
+  "templates": "Modèles",
   "themeNameLabel": "Nom du thème",
   "thisFieldIsRequired": "Ce champ est obligatoire.",
+  "topDemanded": "Les plus demandés",
   "topLoanedItems": "Articles les plus empruntés",
   "totalAssets": "Types de ressources",
   "totalItems": "Ressources",
   "totals": "Totaux",
+  "totalSpending": "Investissement économique total",
+  "totalMarketValue": "Valeur totale du marché",
+  "updatedAt": "Dernière mise à jour",
   "upload": "Télécharger",
   "uploadImage": "Télécharger l'image",
   "username": "Nom d'utilisateur",
-  "veniChatTitle": "Veni IA",
-  "veniChatStatus": "En ligne",
-  "veniChatWelcome": "Bonjour! Je suis Veni, votre assistant Invenicum. Comment puis-je vous aider avec votre inventaire aujourd'hui?",
+  "copiedToClipboard": "Copié dans le presse-papiers",
+  "connectionTestFailed": "Le test de connexion a échoué",
+  "connectionVerified": "Connexion vérifiée avec succès",
+  "errorSavingConfiguration": "Erreur lors de l'enregistrement de la configuration",
+  "integrationsAndConnectionsTitle": "Intégrations et connexions",
+  "integrationsSectionAiTitle": "Intelligence artificielle",
+  "integrationsSectionAiSubtitle": "Moteurs conversationnels et assistants pour enrichir les flux et automatisations.",
+  "integrationsSectionMessagingTitle": "Messagerie et notifications",
+  "integrationsSectionMessagingSubtitle": "Canaux de sortie pour alertes, bots, rapports et envois automatiques.",
+  "integrationsSectionDataApisTitle": "API de données",
+  "integrationsSectionDataApisSubtitle": "Sources externes pour enrichir fiches, cartes, jeux et références de catalogue.",
+  "integrationsSectionValuationTitle": "Valorisation et marché",
+  "integrationsSectionValuationSubtitle": "Connecteurs pour les prix, codes-barres et estimation de valeur actualisée.",
+  "integrationsSectionHardwareTitle": "Matériel et étiquettes",
+  "integrationsSectionHardwareSubtitle": "Outils physiques et utilitaires pour l'impression, le codage et l'exploitation.",
+  "integrationsActiveConnections": "{count} connexions actives",
+  "@integrationsActiveConnections": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "integrationsModularDesign": "Conception modulaire par catégories",
+  "integrationsCheckingStatuses": "Vérification des statuts",
+  "integrationsStatusSynced": "Statut synchronisé",
+  "integrationsHeroHeadline": "Connectez services, API et outils depuis une vue unique et claire.",
+  "integrationsHeroSubheadline": "Nous regroupons les intégrations par objectif pour rendre la configuration plus rapide, plus visuelle et plus simple à maintenir, y compris sur mobile.",
+  "integrationStatusConnected": "Connectée",
+  "integrationStatusNotConfigured": "Non configurée",
+  "integrationTypeDataSource": "Source de données",
+  "integrationTypeConnector": "Connecteur",
+  "integrationFieldsCount": "{count} champs",
+  "@integrationFieldsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "integrationNoLocalCredentials": "Aucun identifiant local",
+  "configureLabel": "Configurer",
+  "integrationModelDefaultGemini": "Par défaut : gemini-3-flash-preview",
+  "integrationOpenaiDesc": "Utilisez GPT-4o et d'autres modèles OpenAI comme assistant intelligent.",
+  "integrationOpenaiApiKeyHint": "Obtenue sur platform.openai.com/api-keys",
+  "integrationModelDefaultOpenai": "Par défaut : gpt-4o",
+  "integrationClaudeDesc": "Utilisez Claude Sonnet, Opus et Haiku comme assistant intelligent.",
+  "integrationClaudeApiKeyHint": "Obtenue sur console.anthropic.com/settings/keys",
+  "integrationModelDefaultClaude": "Par défaut : claude-sonnet-4-6",
+  "integrationTelegramBotTokenHint": "Depuis @BotFather",
+  "integrationTelegramChatIdHint": "Utilisez @userinfobot pour obtenir votre identifiant",
+  "integrationEmailDesc": "Envoi d'e-mails ultra fiable. Idéal pour les rapports et alertes critiques.",
+  "integrationEmailApiKeyHint": "Obtenue sur resend.com/api-keys",
+  "integrationEmailFromLabel": "Expéditeur (From)",
+  "integrationEmailFromHint": "Ex. : Invenicum <onboarding@resend.dev>",
+  "integrationBggDesc": "Connectez votre compte BGG pour synchroniser votre collection et enrichir automatiquement vos données.",
+  "integrationPokemonDesc": "Connectez-vous à l'API Pokemon pour synchroniser votre collection et enrichir automatiquement vos données.",
+  "integrationTcgdexDesc": "Consultez cartes et extensions de jeux de cartes à collectionner pour enrichir automatiquement votre inventaire.",
+  "integrationQrGeneratorName": "Générateur QR",
+  "integrationQrLabelsDesc": "Configurez le format de vos étiquettes imprimables.",
+  "integrationQrPageSizeLabel": "Taille de page (A4, Lettre)",
+  "integrationQrMarginLabel": "Marge (mm)",
+  "integrationPriceChartingDesc": "Configurez votre clé API pour obtenir des prix actualisés.",
+  "integrationUpcitemdbDesc": "Recherche mondiale de prix par code-barres.",
+  "integrationConfiguredSuccess": "{name} configuré avec succès",
+  "@integrationConfiguredSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "integrationUnlinkedWithName": "{name} a été dissocié",
+  "@integrationUnlinkedWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidUiFormat": "Format d'interface invalide",
+  "loadingConfiguration": "Chargement de la configuration...",
+  "pageNotFoundUri": "Page introuvable : {uri}",
+  "@pageNotFoundUri": {
+    "placeholders": {
+      "uri": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginLoadError": "Erreur lors du chargement de l'interface du plugin",
+  "pluginRenderError": "Erreur de rendu",
+  "testConnection": "Tester la connexion",
+  "testingConnection": "Test en cours...",
+  "unableToUnlinkAccount": "Impossible de dissocier le compte",
+  "unlinkIntegrationUpper": "DISSOCIER L'INTÉGRATION",
+  "upcFreeModeHint": "Laissez ce champ vide pour utiliser le mode Gratuit (limité).",
+  "alertsTabLabel": "Alertes",
+  "alertMarkedAsRead": "Marquée comme lue",
+  "calendarTabLabel": "Calendrier",
+  "closeLabel": "Fermer",
+  "closeLabelUpper": "FERMER",
+  "configureReminderLabel": "Configurer le rappel :",
+  "cannotFormatInvalidJson": "Impossible de formater un JSON invalide",
+  "createAlertOrEventTitle": "Créer une alerte/un événement",
+  "createdSuccessfully": "Créé avec succès",
+  "createPluginTitle": "Créer un plugin",
+  "editPluginTitle": "Modifier le plugin",
+  "deleteFromGithubLabel": "Supprimer de GitHub",
+  "deleteFromGithubSubtitle": "Supprime le fichier du marché public",
+  "deletePluginQuestion": "Supprimer le plugin ?",
+  "deletePluginLocalWarning": "Il sera supprimé de votre base de données locale.",
+  "deleteUpper": "SUPPRIMER",
+  "editEventTitle": "Modifier l'événement",
+  "editLabel": "Modifier",
+  "eventDataSection": "Données de l'événement",
+  "eventReminderAtTime": "À l'heure de l'événement",
+  "eventUpdated": "Événement mis à jour",
+  "firstVersionHint": "La première version sera toujours 1.0.0",
+  "fixJsonBeforeSave": "Corrigez le JSON avant d'enregistrer",
+  "formatJson": "Formater le JSON",
+  "goToProfileUpper": "ALLER AU PROFIL",
+  "installPluginLabel": "Installer le plugin",
+  "invalidVersionFormat": "Format invalide (ex : 1.0.1)",
+  "isEventQuestion": "S'agit-il d'un événement ?",
+  "jsonErrorGeneric": "Erreur JSON",
+  "makePublicLabel": "Rendre public",
+  "markAsReadLabel": "Marquer comme lu",
+  "messageWithColon": "Message :",
+  "minutesBeforeLabel": "{minutes} minutes avant",
+  "@minutesBeforeLabel": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "newLabel": "Nouveau",
+  "newPluginLabel": "Nouveau plugin",
+  "noActiveAlerts": "Aucune alerte active",
+  "noDescriptionAvailable": "Aucune description disponible.",
+  "noEventsForDay": "Aucun événement pour cette journée",
+  "noPluginsAvailable": "Aucun plugin",
+  "notificationDeleted": "Notification supprimée avec succès",
+  "oneHourBeforeLabel": "1 hora antes",
+  "pluginPrivateDescription": "Vous seul pourrez voir ce plugin dans votre liste.",
+  "pluginPublicDescription": "Les autres utilisateurs pourront voir et installer ce plugin.",
+  "pluginTabLibrary": "Bibliothèque",
+  "pluginTabMarket": "Market",
+  "pluginTabMine": "Les miens",
+  "previewLabel": "Aperçu",
+  "remindMeLabel": "Me rappeler :",
+  "requiredField": "Requis",
+  "requiresGithubDescription": "Pour publier des plugins dans la communauté, vous devez lier votre compte GitHub pour être crédité comme auteur.",
+  "requiresGithubTitle": "GitHub requis",
+  "slotLocationLabel": "Emplacement (slot)",
+  "stacDocumentation": "Documentation Stac",
+  "stacJsonInterfaceLabel": "JSON Stac (interface)",
+  "uninstallLabel": "Désinstaller",
+  "unrecognizedStacStructure": "Structure Stac non reconnue",
+  "updateLabelUpper": "UPDATE",
+  "updateToVersion": "Mettre à jour vers v{version}",
+  "@updateToVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "versionLabel": "Version",
+  "incrementVersionHint": "Augmentez la version de votre proposition (ex : 1.1.0)",
+  "cancelUpper": "ANNULER",
+  "mustLinkGithubToPublishTemplate": "Vous devez lier GitHub dans votre profil pour publier.",
+  "templateNeedsAtLeastOneField": "Le modèle doit contenir au moins un champ défini.",
+  "templatePullRequestCreated": "Propuesta enviada. Se ha creado un Pull Request en GitHub.",
+  "errorPublishingTemplate": "Erreur lors de la publication : {error}",
+  "@errorPublishingTemplate": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "createGlobalTemplateTitle": "Créer un modèle global",
+  "githubVerifiedLabel": "GitHub verificado",
+  "githubNotLinkedLabel": "GitHub no vinculado",
+  "veniDesignedTemplateBanner": "Veni a conçu cette structure à partir de votre demande. Vérifiez-la et ajustez-la avant de publier.",
+  "templateNameLabel": "Nom du modèle",
+  "templateNameHint": "Ex. : Ma collection de bandes dessinées",
+  "githubUserLabel": "Utilisateur GitHub",
+  "categoryLabel": "Catégorie",
+  "categoryHint": "Ex. : Livres, électronique...",
+  "templatePurposeDescription": "Description de l'objectif",
+  "definedFieldsTitle": "Champs définis",
+  "addFieldButton": "Ajouter un champ",
+  "clickAddFieldToStart": "Cliquez sur 'Ajouter un champ' pour commencer à concevoir.",
+  "configureOptionsUpper": "CONFIGURER LES OPTIONS",
+  "writeOptionAndPressEnter": "Saisissez une option et appuyez sur Entrée",
+  "publishOnGithubUpper": "PUBLIER SUR GITHUB",
+  "templateDetailFetchError": "Impossible de récupérer le détail du modèle",
+  "templateNotAvailable": "Le modèle n'existe pas ou n'est pas disponible",
+  "backLabel": "Retour",
+  "templateDetailTitle": "Détail du modèle",
+  "saveToLibraryTooltip": "Enregistrer dans la bibliothèque",
+  "templateByAuthor": "par @{name}",
+  "@templateByAuthor": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "officialVerifiedTemplate": "Modèle officiel vérifié",
+  "dataStructureFieldsUpper": "STRUCTURE DE DONNÉES ({count} CHAMPS)",
+  "@dataStructureFieldsUpper": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "installInMyInventoryUpper": "INSTALLER DANS MON INVENTAIRE",
+  "addedToPersonalLibrary": "Ajouté à votre bibliothèque personnelle",
+  "whereDoYouWantToInstall": "Où voulez-vous l'installer ?",
+  "noContainersCreateFirst": "Vous n'avez aucun conteneur. Créez-en un d'abord.",
+  "autoGeneratedListFromTemplate": "Liste générée automatiquement depuis le modèle",
+  "installationSuccessAutoLists": "Installation réussie. Listes configurées automatiquement.",
+  "errorInstallingTemplate": "Erreur lors de l'installation : {error}",
+  "@errorInstallingTemplate": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "publishTemplateLabel": "Publier le modèle",
+  "retryLabel": "Réessayer",
+  "noTemplatesFoundInMarket": "Aucun modèle trouvé dans le marché.",
+  "invenicumCommunity": "Communauté Invenicum",
+  "refreshMarketTooltip": "Actualiser le marché",
+  "exploreCommunityConfigurations": "Explorez et téléchargez les configurations de la communauté",
+  "searchByTemplateName": "Rechercher par nom de modèle...",
+  "filterByTagTooltip": "Filtrer par étiquette",
+  "noMoreTags": "Il n'y a plus d'étiquettes",
+  "confirmDeleteDataList": "Êtes-vous sûr de vouloir supprimer la liste \"{name}\" ? Cette action est irréversible.",
+  "@confirmDeleteDataList": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "dataListDeletedSuccess": "Liste \"{name}\" supprimée avec succès.",
+  "@dataListDeletedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeletingDataList": "Erreur lors de la suppression de la liste : {error}",
+  "@errorDeletingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "customListsWithContainer": "Listes personnalisées - {name}",
+  "@customListsWithContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newDataListLabel": "Nouvelle liste",
+  "noCustomListsCreateOne": "Il n'y a pas de listes personnalisées. Créez-en une nouvelle.",
+  "elementsCount": "{count} éléments",
+  "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dataListNeedsAtLeastOneElement": "La liste doit contenir au moins un élément",
+  "customDataListCreated": "Liste personnalisée créée avec succès",
+  "errorCreatingDataList": "Erreur lors de la création de la liste : {error}",
+  "@errorCreatingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "newCustomDataListTitle": "Nouvelle liste personnalisée",
+  "dataListNameLabel": "Nom de la liste",
+  "pleaseEnterAName": "Veuillez saisir un nom",
+  "dataListElementsTitle": "Éléments de la liste",
+  "newElementLabel": "Nouvel élément",
+  "addLabel": "Ajouter",
+  "addElementsToListHint": "Ajoutez des éléments à la liste",
+  "saveListLabel": "Enregistrer la liste",
+  "dataListUpdatedSuccessfully": "Liste mise à jour avec succès",
+  "errorUpdatingDataList": "Erreur lors de la mise à jour de la liste : {error}",
+  "@errorUpdatingDataList": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editListWithName": "Modifier la liste : {name}",
+  "@editListWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewLocationTitle": "Créer un nouvel emplacement",
+  "locationNameLabel": "Nom de l'emplacement",
+  "locationNameHint": "Ex. : Étagère B3, salle serveurs",
+  "locationDescriptionHint": "Détails d'accès, type de contenu, etc.",
+  "parentLocationLabel": "Emplacement parent (contient celui-ci)",
+  "noParentRootLocation": "Aucun parent (emplacement racine)",
+  "noneRootScheme": "Aucun (racine du schéma)",
+  "savingLabel": "Enregistrement...",
+  "saveLocationLabel": "Enregistrer l'emplacement",
+  "locationCreatedSuccessfully": "Emplacement \"{name}\" créé avec succès.",
+  "@locationCreatedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreatingLocation": "Erreur lors de la création de l'emplacement : {error}",
+  "@errorCreatingLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "locationCannotBeItsOwnParent": "Un emplacement ne peut pas être son propre parent.",
+  "locationUpdatedSuccessfully": "Emplacement \"{name}\" mis à jour.",
+  "@locationUpdatedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdatingLocation": "Erreur lors de la mise à jour de l'emplacement : {error}",
+  "@errorUpdatingLocation": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "editLocationTitle": "Modifier : {name}",
+  "@editLocationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "updateLocationLabel": "Mettre à jour l'emplacement",
+  "selectObjectTitle": "Sélectionner un objet",
+  "noObjectsAvailable": "Aucun objet disponible",
+  "availableQuantity": "Disponible : {quantity}",
+  "@availableQuantity": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "errorSelectingObject": "Erreur lors de la sélection de l'objet : {error}",
+  "@errorSelectingObject": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mustSelectAnObject": "Vous devez sélectionner un objet",
+  "loanRegisteredSuccessfully": "Prêt enregistré avec succès",
+  "selectAnObject": "Sélectionnez un objet",
+  "selectLabel": "Sélectionner",
+  "borrowerNameHint": "Ex. : Jean Dupont",
+  "borrowerNameRequired": "Le nom est obligatoire",
+  "loanQuantityAvailable": "Quantité à prêter (Disponible : {quantity})",
+  "@loanQuantityAvailable": {
+    "placeholders": {
+      "quantity": {
+        "type": "int"
+      }
+    }
+  },
+  "enterQuantity": "Saisissez une quantité",
+  "invalidQuantity": "Quantité invalide",
+  "notEnoughStock": "Stock insuffisant",
+  "invalidEmail": "Adresse e-mail invalide",
+  "expectedReturnDateLabel": "Retour prévu : {date}",
+  "@expectedReturnDateLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "selectReturnDate": "Sélectionnez une date de retour",
+  "additionalNotes": "Notes supplémentaires",
+  "registerLoanLabel": "Enregistrer le prêt",
+  "totalLabel": "Total",
+  "newLocationLabel": "Nueva ubicación",
+  "newLocationHint": "Ej: Estantería A1, Armario 3...",
+  "parentLocationOptionalLabel": "Ubicación padre (opcional)",
+  "noneRootLabel": "Ninguna (raíz)",
+  "locationCreatedShort": "Ubicación \"{name}\" creada",
+  "@locationCreatedShort": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newLocationEllipsis": "Nueva ubicación...",
+  "couldNotReloadList": "No se pudo recargar la lista",
+  "deleteAssetTitle": "Eliminar Activo",
+  "confirmDeleteAssetItem": "¿Confirmas que deseas eliminar \"{name}\"?",
+  "@confirmDeleteAssetItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assetDeletedShort": "Activo eliminado.",
+  "viewColumnsLabel": "Vista: {count} col.",
+  "@viewColumnsLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notValuedLabel": "Sin valorar",
+  "manageSearchSyncAssets": "Gestiona, busca y sincroniza tus activos desde un solo panel.",
+  "filterLabel": "Filtro",
+  "activeFilterLabel": "Filtro activo",
+  "importLabel": "Importar",
+  "exportLabel": "Exportar",
+  "csvExportNoData": "No hay items para exportar.",
+  "csvExportSuccess": "CSV exportado correctamente ({count} items).",
+  "@csvExportSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "csvExportError": "No se pudo exportar el CSV",
+  "syncLabel": "Sincronizar precios",
+  "syncingLabel": "Sincronizando...",
+  "newAssetLabel": "Nuevo activo",
+  "statusAndPreferences": "Estado y Preferencias",
+  "itemStatusLabel": "Estado del ítem",
+  "availableLabel": "Disponible",
+  "mustBeGreaterThanZero": "Debe ser mayor a 0.",
+  "alertThresholdLabel": "Umbral de alerta",
+  "enterMinimumStock": "Introduce un stock mínimo.",
+  "serializedItemFixedQuantity": "Este es un artículo seriado. La cantidad es fija a 1.",
+  "serialNumberLabel": "Número de serie",
+  "serialNumberHint": "Ej: SN-2024-00123",
+  "mainDataTitle": "Datos Principales",
+  "currentMarketValueLabel": "VALOR DE MERCADO ACTUAL",
+  "updatePriceLabel": "Actualizar Precio",
+  "viewLabel": "Vista",
+  "visualGalleryTitle": "Galería Visual",
+  "statusAndMarketTitle": "Estado y Mercado",
+  "valuationHistoryTitle": "Historial de Valoración",
+  "specificationsTitle": "Especificaciones",
+  "traceabilityTitle": "Trazabilidad",
+  "stockLabel": "Stock",
+  "internalReferenceLabel": "Referencia Interna",
+  "noSpecificationsAvailable": "No hay especificaciones disponibles",
+  "trueLabel": "Verdadero",
+  "falseLabel": "Falso",
+  "openLinkLabel": "Abrir enlace",
+  "scannerFocusTip": "Consejo: Si no enfoca, aleje el producto unos 30 cm de la cámara.",
+  "scanCodeTitle": "Escanear Código",
+  "scanOrEnterProductCode": "Escanee o introduzca el código del producto",
+  "possessionProgressLabel": "Progreso de {name}",
+  "@possessionProgressLabel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "externalImportTitle": "Importar desde Fuente Externa",
+  "galleryTitle": "Galería",
+  "stockAndCodingTitle": "Stock y Codificación",
+  "cameraPermissionRequired": "Se requiere permiso de cámara para escanear",
+  "cloudDataFound": "¡Datos encontrados en la nube!",
+  "typeSomethingToSearch": "Escribe algo para buscar",
+  "importCancelled": "Importación cancelada.",
+  "couldNotCompleteImport": "No se pudo completar la importación",
+  "yearLabel": "Año",
+  "authorLabel": "Autor",
+  "selectResultTitle": "Selecciona un resultado",
+  "unnamedLabel": "Sin nombre",
+  "completeRequiredFields": "Por favor, complete los campos obligatorios.",
+  "assetCreatedSuccess": "Activo creado!",
+  "errorCreatingAsset": "Error al crear activo: {error}",
+  "@errorCreatingAsset": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "technicalDetailsTitle": "Detalles Técnicos",
+  "itemImportedSuccessfully": "¡{name} importado con éxito!",
+  "@itemImportedSuccessfully": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newImagesSelected": "Se seleccionaron {count} nuevas imágenes.",
+  "@newImagesSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "newFileRemoved": "Archivo nuevo removido.",
+  "imageMarkedForDeletion": "Imagen marcada para eliminación al guardar.",
+  "couldNotIdentifyImage": "No se pudo identificar la imagen.",
+  "editAssetTitle": "Editar: {name}",
+  "@editAssetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "syncPricesTitle": "Sincronizar precios",
+  "syncPricesDescription": "Se consultará la API para actualizar el valor de mercado.",
+  "syncingMarketPrices": "Sincronizando precios de mercado...",
+  "couldNotSyncPrices": "No se pudieron sincronizar los precios",
+  "syncCompletedTitle": "Sincronización completada",
+  "updatedLabel": "Actualizados",
+  "noApiPriceLabel": "Sin precio en API",
+  "errorsLabel": "Errores",
+  "totalProcessedLabel": "Total procesados",
+  "noAssetsToShow": "No hay activos para mostrar",
+  "noImageLabel": "Sin imagen",
+  "aiMagicQuestion": "¿Tienes un link?",
+  "aiAutocompleteAsset": "Autocompleta este activo con IA",
+  "magicLabel": "MAGIA",
+  "skuBarcodeLabel": "SKU / EAN / UPC",
   "veniChatPlaceholder": "Posez-moi n'importe quelle question...",
   "veniChatPoweredBy": "Powered by ",
   "veniChatProcessing": "Je traite votre question sur \"{query}\"...",
-  "veniCmdHelpTitle": "Capacités de Veni",
+  "veniChatStatus": "En ligne",
+  "veniChatTitle": "Veni IA",
+  "veniChatWelcome": "Bonjour! Je suis Veni, votre assistant Invenicum. Comment puis-je vous aider avec votre inventaire aujourd'hui?",
   "veniCmdDashboard": "Aller au tableau de bord",
+  "veniCmdHelpTitle": "Capacités de Veni",
   "veniCmdInventory": "Vérifier le stock d'un article",
   "veniCmdLoans": "Afficher les prêts actifs",
   "veniCmdReport": "Générer un rapport d'inventaire",
   "veniCmdScanQR": "Scanner QR/Code-barres",
   "veniCmdUnknown": "Je ne reconnais pas cette commande. Écrivez help pour voir ce que je peux faire.",
   "version": "Version {name}",
+  "yes": "Oui",
+  "zoomToFit": "Zoom pour ajuster",
+  "generalSettingsMenuLabel": "Paramètres généraux",
+  "aiAssistantMenuLabel": "Assistant IA",
+  "notificationsMenuLabel": "Notifications",
+  "loanManagementMenuLabel": "Gestion des prêts",
+  "aboutMenuLabel": "À propos",
+  "automaticDarkModeLabel": "Mode sombre automatique",
+  "syncWithSystemLabel": "Synchroniser avec le système",
+  "manualDarkModeLabel": "Mode sombre manuel",
+  "disableAutomaticToChange": "Désactivez le mode automatique pour le modifier",
+  "changeLightDark": "Basculer entre clair et sombre",
+  "enableAiAndChatbot": "Activer l'intelligence artificielle et le chatbot",
+  "requiresGeminiLinking": "Nécessite une liaison avec Gemini dans Intégrations",
+  "aiOrganizeInventory": "Usa IA para organizar tu inventario de manera inteligente",
+  "aiAssistantTitle": "Asistente de Inteligencia Artificial",
+  "selectAiProvider": "Choisissez le fournisseur d'IA utilisé par Veni. Assurez-vous d'avoir configuré la clé API dans Intégrations.",
+  "aiProviderLabel": "Proveedor",
+  "aiModelLabel": "Modelo",
+  "aiProviderUpdated": "Proveedor de IA actualizado",
+  "purgeChatHistoryTitle": "Historique du chat",
+  "purgeChatHistoryDescription": "Supprime définitivement tout l'historique des conversations Veni enregistrées.",
+  "purgeChatHistoryButton": "Purger l'historique",
+  "purgeChatHistoryConfirmTitle": "Purger l'historique du chat ?",
+  "purgeChatHistoryConfirmMessage": "Cette action supprimera tous les messages enregistrés et ne peut pas être annulée.",
+  "purgeChatHistoryConfirmAction": "Oui, purger",
+  "purgeChatHistorySuccess": "Historique du chat supprimé avec succès.",
+  "purgeChatHistoryError": "Impossible de supprimer l'historique du chat.",
+  "notificationSettingsTitle": "Gestion des notifications",
+  "channelPriorityLabel": "Priorité des canaux (glissez pour réordonner)",
+  "telegramBotLabel": "Telegram Bot",
+  "resendEmailLabel": "Resend Email",
+  "lowStockLabel": "Stock Bajo",
+  "lowStockHint": "Avisar cuando un producto baje del mínimo.",
+  "newPresalesLabel": "Nuevas Preventas",
+  "newPresalesHint": "Notificar lanzamientos detectados por la IA.",
+  "loanReminderLabel": "Recordatorio de Préstamos",
+  "loanReminderHint": "Avisar antes de la fecha de devolución.",
+  "overdueLoansLabel": "Préstamos Vencidos",
+  "overdueLoansHint": "Alerta crítica si un objeto no se devuelve a tiempo.",
+  "maintenanceLabel": "Mantenimiento",
+  "maintenanceHint": "Avisar cuando toque revisar un activo.",
+  "priceChangeLabel": "Cambios de Precio",
+  "priceChangeHint": "Notificar variaciones de valor en el mercado.",
+  "unlinkGithubTitle": "Desconectar GitHub",
+  "unlinkGithubMessage": "¿Estás seguro de que quieres desvincular tu cuenta de GitHub?",
+  "updatePasswordButton": "ACTUALIZAR CONTRASEÑA",
+  "newContainerDialog": "Nuevo Contenedor",
+  "descriptionField": "Descripción",
+  "isCollectionQuestion": "¿Es una colección?",
+  "createContainerButton": "Crear Contenedor",
+  "selectContainerHint": "Selecciona un contenedor",
+  "newAssetTypeTitle": "Nuevo Tipo de Activo",
+  "generalConfiguration": "Configuración General",
+  "collectionContainerWarning": "Este contenedor es una colección. Puedes crear tipos seriados o no seriados, pero los campos de posesión y deseados solo se podrán configurar en tipos no seriados.",
+  "createAssetTypeButton": "Crear Tipo de Activo",
+  "assetTypesInContainer": "Tipos de Activo en \"{name}\"",
+  "@assetTypesInContainer": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "createNewTypeButton": "Crear Nuevo Tipo",
+  "isSerializedQuestion": "¿Es un artículo seriado?",
+  "addNewFieldButton": "Añadir Nuevo Campo",
+  "deleteFieldTooltip": "Eliminar campo",
+  "fieldsOptions": "Opciones:",
+  "isRequiredField": "Es Requerido",
+  "isSummativeFieldLabel": "Es Sumatorio (Se suma en el total del tipo)",
+  "isMonetaryValueLabel": "Es Valor Monetario",
+  "monetaryValueDescription": "Se usará para calcular la inversión total en el Dashboard",
+  "noDataListsAvailable": "⚠️ No hay listas de datos disponibles en este contenedor.",
+  "selectDataList": "Seleccionar Lista de Datos",
+  "chooseList": "Elija una lista",
+  "goToPageLabel": "Ir a página:",
+  "conditionLabel": "Condición",
+  "actionsLabel": "Acciones",
+  "editButtonLabel": "Editar",
+  "deleteButtonLabel": "Eliminar",
+  "printLabel": "Imprimir etiqueta",
+  "collectionFieldsTooltip": "Campos de colección",
+  "totalLocations": "{count} ubicaciones",
+  "@totalLocations": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "withoutLocationLabel": "{count} sin ubicación · ",
+  "@withoutLocationLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "objectIdColumn": "ID Obj",
+  "containerNotFoundError": "Contenedor con ID {id} no encontrado.",
+  "@containerNotFoundError": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "invalidContainerIdError": "Error: ID de contenedor inválido.",
+  "startConfigurationButton": "Comenzar configuración",
+  "fullNameField": "Nombre completo",
+  "emailField": "Correo electrónico",
+  "passwordField": "Contraseña",
+  "confirmPasswordField": "Confirmar contraseña",
+  "goBackButton": "Volver",
+  "createAccountButton": "Crear cuenta",
+  "goToLoginButton": "Ir al inicio de sesión",
+  "deleteConfirmationTitle": "Confirmar Eliminación",
+  "deleteItemMessage": "¿Deseas eliminar \"{name}\"?",
+  "@deleteItemMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "elementDeletedSuccess": "Elemento eliminado correctamente",
+  "enterYourNameValidation": "Introduce tu nombre.",
+  "minTwoCharactersValidation": "Mínimo 2 caracteres.",
+  "enterEmailValidation": "Introduce un email.",
+  "invalidEmailValidation": "Email no válido.",
+  "enterPasswordValidation": "Introduce una contraseña.",
+  "minEightCharactersValidation": "Mínimo 8 caracteres.",
+  "threeDbuttonLabel": "3D",
+  "barcodeCount": "{count}",
+  "@barcodeCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "rotationSpeedLabel": "{count}s",
+  "@rotationSpeedLabel": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "tagLabel": "#{tag}",
+  "@tagLabel": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "@invalidIdError": {},
+  "invalidIdError": "ID inválido",
+  "@assetTypeLoadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeLoadError": "Error al cargar datos: {error}",
+  "@assetTypeUpdateSuccess": {},
+  "assetTypeUpdateSuccess": "Tipo de activo actualizado con éxito",
+  "@assetTypeUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeUpdateError": "Error al actualizar: {error}",
+  "@editAssetTypeTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "editAssetTypeTitle": "Editar: {name}",
+  "@achievementCollectionTitle": {
+    "description": "Título para la sección de logros de colección"
+  },
+  "achievementCollectionTitle": "Logros de Colección",
+  "@achievementSubtitle": {
+    "description": "Subtítulo de la pantalla de logros"
+  },
+  "achievementSubtitle": "Desbloquea hitos usando Invenicum",
+  "@legendaryAchievementLabel": {
+    "description": "Etiqueta para logros legendarios"
+  },
+  "legendaryAchievementLabel": "LOGRO LEGENDARIO",
+  "@achievementCompleted": {
+    "description": "Etiqueta de estado para logros completados"
+  },
+  "achievementCompleted": "Completado",
+  "@achievementLocked": {
+    "description": "Etiqueta de estado para logros bloqueados"
+  },
+  "achievementLocked": "Bloqueado",
+  "@achievementUnlockedDate": {
+    "description": "Muestra la fecha en que se desbloqueó el logro",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "achievementUnlockedDate": "Conseguido el {date}",
+  "@achievementLockedMessage": {
+    "description": "Mensaje explicando cómo desbloquear un logro"
+  },
+  "achievementLockedMessage": "Cumple el objetivo para desbloquear",
+  "@closeButtonLabel": {
+    "description": "Etiqueta del botón cerrar en diálogos"
+  },
+  "closeButtonLabel": "Entendido",
+  "@configurationGeneralSection": {},
+  "configurationGeneralSection": "Configuración General",
+  "@assetTypeCollectionWarning": {},
+  "assetTypeCollectionWarning": "Este contenedor es una colección. Puedes crear tipos seriados o no seriados, pero los campos de posesión y deseados solo se podrán configurar en tipos no seriados.",
+  "@updateAssetTypeButton": {},
+  "updateAssetTypeButton": "Actualizar Tipo de Activo",
+  "@createAssetTypeButtonDefault": {},
+  "createAssetTypeButtonDefault": "Crear Tipo de Activo",
+  "@noAssetTypesMessage": {},
+  "noAssetTypesMessage": "Aún no hay Tipos de Activo definidos en este contenedor.",
+  "@totalCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "totalCountLabel": "Total: {count}",
+  "@possessionCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "possessionCountLabel": "Posesión: {count}",
+  "@desiredCountLabel": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "desiredCountLabel": "Deseados: {count}",
+  "marketValueLabel": "Mercado: ",
+  "defaultSumFieldName": "Suma",
+  "calculatingLabel": "Calculando...",
+  "@unknownError": {},
+  "unknownError": "Error desconocido",
+  "@noNameItem": {},
+  "noNameItem": "Sin nombre",
+  "@loadingContainers": {},
+  "loadingContainers": "Cargando contenedores...",
+  "@fieldNameRequired": {},
+  "fieldNameRequired": "El nombre del campo es obligatorio",
+  "@selectImageButton": {},
+  "selectImageButton": "Seleccionar Imagen",
+  "@assetTypeDeletedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "assetTypeDeletedSuccess": "{name} eliminado",
+  "@noLocationValueData": {},
+  "noLocationValueData": "Aún no hay activos con ubicación y valor suficiente para dibujar esta gráfica.",
+  "@requiredFieldValidation": {},
+  "requiredFieldValidation": "Este campo es obligatorio",
+  "@oceanTheme": {},
+  "oceanTheme": "Océano Índico",
+  "@cherryBlossomTheme": {},
+  "cherryBlossomTheme": "Flor de Cerezo",
+  "themeBrand": "Invenicum (Marca)",
+  "themeEmerald": "Esmeralda",
+  "themeSunset": "Atardecer",
+  "themeLavender": "Lavanda Suave",
+  "themeForest": "Bosque Profundo",
+  "themeCherry": "Cereza",
+  "themeElectricNight": "Noche Eléctrica",
+  "themeAmberGold": "Oro Ámbar",
+  "themeModernSlate": "Pizarra Moderna",
+  "themeCyberpunk": "Cyberpunk",
+  "themeNordicArctic": "Ártico Nord",
+  "themeDeepNight": "Noche Profunda",
+  "@loginSuccess": {},
+  "loginSuccess": "Inicio de sesión exitoso",
+  "reloadListError": "No se pudo recargar la lista",
+  "copyItemSuffix": "Copia",
+  "@itemCopiedSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "itemCopiedSuccess": "Elemento copiado: {name}",
+  "copyError": "Error al copiar",
+  "imageColumnLabel": "Imagen",
+  "viewImageTooltip": "Ver imagen",
+  "currentStockLabel": "Stock actual",
+  "minimumStockLabel": "Stock mínimo",
+  "locationColumnLabel": "Ubicación",
+  "serialNumberColumnLabel": "Numero de serie",
+  "marketPriceLabel": "Precio de mercado",
+  "conditionColumnLabel": "Condición",
+  "actionsColumnLabel": "Acciones",
+  "imageLoadError": "No se pudo cargar la imagen",
+  "imageUrlHint": "Asegúrate de que la URL es correcta y el servidor está activo",
+  "@assetTypeNameHint": {},
+  "assetTypeNameHint": "Ej: Ordenador Portátil, Sustancia Química",
+  "@assetTypeNameLabel": {},
+  "assetTypeNameLabel": "Nombre del Tipo de Activo",
+  "@underConstruction": {},
+  "underConstruction": "En Construcción",
+  "@comingSoon": {},
+  "comingSoon": "Próximamente",
+  "@constructionSubtitle": {},
+  "constructionSubtitle": "Esta funcionalidad se está desarrollando",
+  "@selectColor": {
+    "description": "Label for color selection button or dialog"
+  },
+  "selectColor": "Seleccionar Color",
+  "@valueDistributionByLocation": {
+    "description": "Título para el widget de distribución de valor por ubicación"
+  },
+  "valueDistributionByLocation": "Distribución de valor por ubicación",
+  "@heatmapDescription": {
+    "description": "Descripción del widget de mapa de calor"
+  },
+  "heatmapDescription": "El donut muestra cómo se reparte el valor de mercado entre las ubicaciones con más peso.",
+  "@locationsCount": {
+    "description": "Etiqueta para número de ubicaciones",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "locationsCount": "{count} ubicaciones",
+  "@unitsLabel": {
+    "description": "Etiqueta para unidades"
+  },
+  "unitsLabel": "uds",
+  "@recordsLabel": {
+    "description": "Etiqueta para registros"
+  },
+  "recordsLabel": "registros",
+  "@totalValueFallback": {
+    "description": "Etiqueta alternativa para valor total"
+  },
+  "totalValueFallback": "Valor total",
+  "@containerFallback": {
+    "description": "Etiqueta alternativa para contenedor",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "containerFallback": "Contenedor {id}",
+  "@locationFallback": {
+    "description": "Etiqueta alternativa para ubicación",
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "locationFallback": "Ubicación {id}",
+  "@ofTheValueLabel": {
+    "description": "Etiqueta para 'del valor'"
+  },
+  "ofTheValueLabel": "del valor",
   "reportsDescription": "Générez des rapports PDF ou Excel à imprimer ou à enregistrer sur votre PC",
   "reportSectionType": "Type de rapport",
   "reportSectionFormat": "Format de sortie",
@@ -473,7 +1502,5 @@
       }
     }
   },
-  "reportGenerateError": "Erreur lors de la génération du rapport : {error}",
-  "yes": "Oui",
-  "zoomToFit": "Zoom pour ajuster"
+  "reportGenerateError": "Erreur lors de la génération du rapport : {error}"
 }

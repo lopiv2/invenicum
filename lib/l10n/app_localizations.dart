@@ -112,6 +112,66 @@ abstract class AppLocalizations {
   /// **'About Invenicum'**
   String get aboutInvenicum;
 
+  /// No description provided for @aboutDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'About Invenicum'**
+  String get aboutDialogTitle;
+
+  /// No description provided for @aboutDialogCoolText.
+  ///
+  /// In en, this message translates to:
+  /// **'Your inventory, now with extra horsepower. Checking if a fresher version is waiting for you.'**
+  String get aboutDialogCoolText;
+
+  /// No description provided for @aboutCurrentVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current version'**
+  String get aboutCurrentVersionLabel;
+
+  /// No description provided for @aboutLatestVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version'**
+  String get aboutLatestVersionLabel;
+
+  /// No description provided for @aboutCheckingVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking online version...'**
+  String get aboutCheckingVersion;
+
+  /// No description provided for @aboutVersionUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get aboutVersionUnknown;
+
+  /// No description provided for @aboutVersionUpToDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Your app is up to date.'**
+  String get aboutVersionUpToDate;
+
+  /// No description provided for @aboutUpdateAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'A newer version is available.'**
+  String get aboutUpdateAvailable;
+
+  /// No description provided for @aboutVersionCheckFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not check online version.'**
+  String get aboutVersionCheckFailed;
+
+  /// No description provided for @aboutOpenReleases.
+  ///
+  /// In en, this message translates to:
+  /// **'View releases'**
+  String get aboutOpenReleases;
+
   /// No description provided for @active.
   ///
   /// In en, this message translates to:
@@ -3921,6 +3981,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'AI Provider updated'**
   String get aiProviderUpdated;
+
+  /// No description provided for @purgeChatHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat history'**
+  String get purgeChatHistoryTitle;
+
+  /// No description provided for @purgeChatHistoryDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete all saved Veni conversation history.'**
+  String get purgeChatHistoryDescription;
+
+  /// No description provided for @purgeChatHistoryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Purge history'**
+  String get purgeChatHistoryButton;
+
+  /// No description provided for @purgeChatHistoryConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Purge chat history?'**
+  String get purgeChatHistoryConfirmTitle;
+
+  /// No description provided for @purgeChatHistoryConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This action will delete all saved messages and cannot be undone.'**
+  String get purgeChatHistoryConfirmMessage;
+
+  /// No description provided for @purgeChatHistoryConfirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, purge'**
+  String get purgeChatHistoryConfirmAction;
+
+  /// No description provided for @purgeChatHistorySuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat history deleted successfully.'**
+  String get purgeChatHistorySuccess;
+
+  /// No description provided for @purgeChatHistoryError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete chat history.'**
+  String get purgeChatHistoryError;
 
   /// No description provided for @notificationSettingsTitle.
   ///

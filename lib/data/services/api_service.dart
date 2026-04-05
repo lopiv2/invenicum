@@ -217,6 +217,43 @@ class ApiService {
     }
   }
 
+  /// Consulta al backend por el estado de versión de la app.
+  ///
+  /// Endpoint esperado en backend:
+  /// GET /app/version/check?currentVersion=x.y.z
+  /// Respuesta esperada (ejemplo):
+  /// {
+  ///   "latestVersion": "1.2.0",
+  ///   "hasUpdate": true,
+  ///   "releasesUrl": "https://github.com/lopiv2/invenicum/releases"
+  /// }
+  Future<Map<String, dynamic>> checkAppVersion({
+    required String currentVersion,
+  }) async {
+    try {
+      final response = await dio.get(
+        '/app/version/check',
+        queryParameters: {'currentVersion': currentVersion},
+      );
+
+      final dynamic raw = response.data;
+      if (raw is Map<String, dynamic>) {
+        if (raw['data'] is Map<String, dynamic>) {
+          return Map<String, dynamic>.from(raw['data']);
+        }
+        return Map<String, dynamic>.from(raw);
+      }
+
+      throw Exception('Invalid version check response');
+    } on DioException catch (e) {
+      final message =
+          e.response?.data?['message']?.toString() ??
+          e.response?.data?['error']?.toString() ??
+          'Error checking app version';
+      throw Exception(message);
+    }
+  }
+
   // ----------------------------------------------------
   // MÉTODOS DE AUTENTICACIÓN
   // ----------------------------------------------------

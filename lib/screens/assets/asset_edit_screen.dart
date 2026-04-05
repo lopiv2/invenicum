@@ -64,6 +64,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   late TextEditingController _minStockController;
   late TextEditingController _barcodeController;
   late TextEditingController _serialController;
+  late FocusNode _nameAutocompleteFocusNode;
+  final Map<int, FocusNode> _dynamicAutocompleteFocusNodes = {};
 
   bool _isMagicLoading = false;
   bool _isEnrichLoading = false;
@@ -86,6 +88,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   InventoryItem? currentItem;
   bool _isInitialized = false;
+  bool _autocompleteDataRequested = false;
 
   ItemCondition _selectedCondition = ItemCondition.mint;
   AssetType? _assetType;
@@ -119,6 +122,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _minStockController = TextEditingController();
     _barcodeController = TextEditingController();
     _serialController = TextEditingController();
+    _nameAutocompleteFocusNode = FocusNode();
     _dynamicControllers = {};
     _selectedLocationId = currentItem?.locationId;
     _currentImages = List.from(currentItem?.images ?? []);
@@ -145,6 +149,18 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     final containerProvider = context.watch<ContainerProvider>();
     final itemProvider = context.watch<InventoryItemProvider>();
     final itemId = int.tryParse(widget.assetItemId);
+    final cId = int.tryParse(widget.containerId);
+    final atId = int.tryParse(widget.assetTypeId);
+
+    if (!_autocompleteDataRequested && cId != null && atId != null) {
+      _autocompleteDataRequested = true;
+      Future.microtask(
+        () => itemProvider.loadInventoryItems(
+          containerId: cId,
+          assetTypeId: atId,
+        ),
+      );
+    }
 
     currentItem =
         widget.initialItem ??
@@ -227,6 +243,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             _dynamicControllers[fieldId] = TextEditingController(
               text: textToShow,
             );
+            _dynamicAutocompleteFocusNodes[fieldId] = FocusNode();
           }
         }
       });
@@ -257,6 +274,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _minStockController.dispose();
     _barcodeController.dispose();
     _serialController.dispose();
+    _nameAutocompleteFocusNode.dispose();
+    _dynamicAutocompleteFocusNodes.values.forEach((n) => n.dispose());
     _dynamicControllers.values.forEach((c) => c.dispose());
     _aiSearchController.dispose();
     _scrollController.dispose();
@@ -621,6 +640,66 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     return null;
   }
 
+  List<InventoryItem> _getSameTypeItems(InventoryItemProvider itemProvider) {
+    final assetTypeId = int.tryParse(widget.assetTypeId);
+    if (assetTypeId == null) return const <InventoryItem>[];
+
+    final currentId = currentItem?.id;
+    return itemProvider.allDownloadedItems
+        .where((item) => item.assetTypeId == assetTypeId && item.id != currentId)
+        .toList();
+  }
+
+  List<String> _buildNameSuggestions(InventoryItemProvider itemProvider) {
+    final suggestions = _getSameTypeItems(itemProvider)
+        .map((item) => item.name.trim())
+        .where((value) => value.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return suggestions;
+  }
+
+  Map<int, List<String>> _buildCustomFieldSuggestions(
+    InventoryItemProvider itemProvider,
+  ) {
+    final assetType = _assetType;
+    if (assetType == null) return const <int, List<String>>{};
+
+    final fieldIds = assetType.fieldDefinitions
+        .where(
+          (field) =>
+              field.id != null &&
+              field.type != CustomFieldType.boolean &&
+              field.type != CustomFieldType.dropdown,
+        )
+        .map((field) => field.id!)
+        .toList();
+
+    final Map<int, Set<String>> accumulator = {
+      for (final id in fieldIds) id: <String>{},
+    };
+
+    for (final item in _getSameTypeItems(itemProvider)) {
+      final values = item.customFieldValues;
+      if (values == null) continue;
+
+      for (final fieldId in fieldIds) {
+        final rawValue = values[fieldId.toString()];
+        final normalized = rawValue?.toString().trim() ?? '';
+        if (normalized.isNotEmpty) {
+          accumulator[fieldId]!.add(normalized);
+        }
+      }
+    }
+
+    return {
+      for (final entry in accumulator.entries)
+        entry.key: (entry.value.toList()
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()))),
+    };
+  }
+
   void _showMagicDialog() async {
     final String? url = await showDialog<String>(
       context: context,
@@ -832,7 +911,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     final l10n = AppLocalizations.of(context)!;
     context.watch<ContainerProvider>();
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
+    final itemProvider = context.watch<InventoryItemProvider>();
     final theme = Theme.of(context);
+
+    final nameSuggestions = _buildNameSuggestions(itemProvider);
+    final customFieldSuggestions = _buildCustomFieldSuggestions(itemProvider);
 
     if (_assetType == null || currentItem == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -882,6 +965,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                       child: MainDataSectionWidget(
                         nameController: _nameController,
                         descriptionController: _descriptionController,
+                        nameSuggestions: nameSuggestions,
+                        nameAutocompleteFocusNode:
+                          _nameAutocompleteFocusNode,
                         availableLocations: _availableLocations,
                         selectedLocationId: _selectedLocationId,
                         onLocationChanged: (v) =>
@@ -944,6 +1030,10 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                               onBooleanChanged: (id, v) =>
                                   setState(() => _booleanValues[id] = v),
                               onControllerText: (id, ctrl) {},
+                              autocompleteSuggestionsByField:
+                                  customFieldSuggestions,
+                              autocompleteFocusNodesByField:
+                                  _dynamicAutocompleteFocusNodes,
                             ),
                           )
                         : null,

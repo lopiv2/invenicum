@@ -246,7 +246,7 @@ class AppIntegrations {
       ),
 
       // --- HERRAMIENTAS ---
-      IntegrationModel(
+      /*IntegrationModel(
         id: qrLabels,
         name: l10n.integrationQrGeneratorName,
         isDataSource: false,
@@ -264,8 +264,8 @@ class AppIntegrations {
             type: IntegrationFieldType.text,
           ),
         ],
-      ),
-      IntegrationModel(
+      ),*/
+      /*IntegrationModel(
         id: priceCharting,
         name: 'PriceCharting',
         isDataSource: false,
@@ -278,7 +278,7 @@ class AppIntegrations {
             type: IntegrationFieldType.password,
           ),
         ],
-      ),
+      ),*/
       IntegrationModel(
         id: upcitemdb,
         name: 'UPCitemdb',

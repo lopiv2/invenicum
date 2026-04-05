@@ -12,6 +12,38 @@ class AppLocalizationsEs extends AppLocalizations {
   String get aboutInvenicum => 'Sobre Invenicum';
 
   @override
+  String get aboutDialogTitle => 'Sobre Invenicum';
+
+  @override
+  String get aboutDialogCoolText =>
+      'Tu inventario, pero con esteroides. Estamos comprobando si hay una versión más fresca para que sigas a tope.';
+
+  @override
+  String get aboutCurrentVersionLabel => 'Versión actual';
+
+  @override
+  String get aboutLatestVersionLabel => 'Última versión';
+
+  @override
+  String get aboutCheckingVersion => 'Comprobando versión online...';
+
+  @override
+  String get aboutVersionUnknown => 'Desconocida';
+
+  @override
+  String get aboutVersionUpToDate => 'Tu app está al día.';
+
+  @override
+  String get aboutUpdateAvailable => 'Hay una nueva versión disponible.';
+
+  @override
+  String get aboutVersionCheckFailed =>
+      'No se pudo comprobar la versión online.';
+
+  @override
+  String get aboutOpenReleases => 'Ver releases';
+
+  @override
   String get active => 'Activo';
 
   @override
@@ -2132,6 +2164,34 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get aiProviderUpdated => 'Proveedor de IA actualizado';
+
+  @override
+  String get purgeChatHistoryTitle => 'Historial de chat';
+
+  @override
+  String get purgeChatHistoryDescription =>
+      'Elimina permanentemente todo el historial de conversaciones guardado de Veni.';
+
+  @override
+  String get purgeChatHistoryButton => 'Purgar historial';
+
+  @override
+  String get purgeChatHistoryConfirmTitle => '¿Purgar historial de chat?';
+
+  @override
+  String get purgeChatHistoryConfirmMessage =>
+      'Esta acción eliminará todos los mensajes guardados y no se puede deshacer.';
+
+  @override
+  String get purgeChatHistoryConfirmAction => 'Sí, purgar';
+
+  @override
+  String get purgeChatHistorySuccess =>
+      'Historial de chat eliminado correctamente.';
+
+  @override
+  String get purgeChatHistoryError =>
+      'No se pudo eliminar el historial de chat.';
 
   @override
   String get notificationSettingsTitle => 'Gestión de Notificaciones';

@@ -42,6 +42,24 @@ class ChatService extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Purga el historial remoto de chat y limpia el estado local.
+  Future<void> purgeRemoteHistory() async {
+    try {
+      final response = await _dio.delete('/ai/chat/history');
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        clearHistory();
+        return;
+      }
+      throw Exception('Unexpected status: ${response.statusCode}');
+    } on DioException catch (e) {
+      final message =
+          e.response?.data?['message']?.toString() ??
+          e.response?.data?['error']?.toString() ??
+          'Error purging chat history';
+      throw Exception(message);
+    }
+  }
+
   Future<VeniResponse?> sendMessageToVeni({
     required String message,
     required String locale, // 👈 Nuevo parámetro obligatorio

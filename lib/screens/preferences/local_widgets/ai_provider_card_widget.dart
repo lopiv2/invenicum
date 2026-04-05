@@ -1,6 +1,7 @@
 // screens/preferences/local_widgets/ai_provider_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/data/services/veni_chatbot_service.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -15,6 +16,7 @@ class AiProviderCardWidget extends StatefulWidget {
 
 class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
   bool _isSaving = false;
+  bool _isPurgingHistory = false;
 
   Future<void> _save(
     PreferencesProvider prov,
@@ -30,6 +32,42 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
       if (mounted) ToastService.error('Error al guardar: $e');
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _confirmAndPurgeHistory(AppLocalizations l10n) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.purgeChatHistoryConfirmTitle),
+        content: Text(l10n.purgeChatHistoryConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          FilledButton.tonal(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(l10n.purgeChatHistoryConfirmAction),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isPurgingHistory = true);
+    try {
+      await context.read<ChatService>().purgeRemoteHistory();
+      if (mounted) {
+        ToastService.success(l10n.purgeChatHistorySuccess);
+      }
+    } catch (_) {
+      if (mounted) {
+        ToastService.error(l10n.purgeChatHistoryError);
+      }
+    } finally {
+      if (mounted) setState(() => _isPurgingHistory = false);
     }
   }
 
@@ -173,6 +211,50 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                   ],
                 ),
               ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer.withValues(alpha: 0.35),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: theme.colorScheme.error.withValues(alpha: 0.2),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.purgeChatHistoryTitle,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    l10n.purgeChatHistoryDescription,
+                    style: theme.textTheme.bodySmall,
+                  ),
+                  const SizedBox(height: 10),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: OutlinedButton.icon(
+                      onPressed: _isPurgingHistory
+                          ? null
+                          : () => _confirmAndPurgeHistory(l10n),
+                      icon: _isPurgingHistory
+                          ? const SizedBox(
+                              width: 14,
+                              height: 14,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.delete_sweep_outlined),
+                      label: Text(l10n.purgeChatHistoryButton),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -21,6 +21,8 @@ class CustomFieldsSectionWidget extends StatelessWidget {
   final Function(int, TextEditingController) onControllerText;
   final Function(int, String?) onDropdownChanged;
   final Function(int, bool?) onBooleanChanged;
+  final Map<int, List<String>> autocompleteSuggestionsByField;
+  final Map<int, FocusNode> autocompleteFocusNodesByField;
 
   const CustomFieldsSectionWidget({
     super.key,
@@ -33,6 +35,8 @@ class CustomFieldsSectionWidget extends StatelessWidget {
     required this.onControllerText,
     required this.onDropdownChanged,
     required this.onBooleanChanged,
+    this.autocompleteSuggestionsByField = const {},
+    this.autocompleteFocusNodesByField = const {},
   });
 
   @override
@@ -212,10 +216,26 @@ class CustomFieldsSectionWidget extends StatelessWidget {
 
     final inputFormatters = AssetFormUtils.getInputFormatters(fieldDef.type) ?? [];
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: CommonFormField(
-        controller: controller,
+    final suggestions = (autocompleteSuggestionsByField[fieldDef.id] ?? const <String>[]);
+    final autocompleteFocusNode = autocompleteFocusNodesByField[fieldDef.id];
+
+    String? validator(String? value) {
+      if (fieldDef.isRequired && (value == null || value.isEmpty)) {
+        return AppLocalizations.of(context)!.requiredFieldValidation;
+      }
+      return fieldDef.type.validateValue(value);
+    }
+
+    CommonFormField buildBaseField({
+      required TextEditingController effectiveController,
+      FocusNode? focusNode,
+      void Function(String)? onFieldSubmitted,
+      Widget? suffixIcon,
+    }) {
+      return CommonFormField(
+        controller: effectiveController,
+        focusNode: focusNode,
+        onFieldSubmitted: onFieldSubmitted,
         label: fieldDef.name,
         icon: _iconForFieldType(fieldDef.type),
         prefix: fieldDef.type == CustomFieldType.price
@@ -226,13 +246,79 @@ class CustomFieldsSectionWidget extends StatelessWidget {
         keyboardType: fieldDef.type.keyboardType,
         inputFormatters: inputFormatters,
         highlighted: highlightedFields.contains(fieldDef.name),
-        validator: (value) {
-          if (fieldDef.isRequired && (value == null || value.isEmpty)) {
-            return AppLocalizations.of(context)!.requiredFieldValidation;
-          }
-          return fieldDef.type.validateValue(value);
-        },
-      ),
+        validator: validator,
+        onChanged: (_) => onControllerText(fieldDef.id!, effectiveController),
+        suffixIcon: suffixIcon,
+      );
+    }
+
+    Iterable<String> optionsBuilder(TextEditingValue value) {
+      final query = value.text.trim().toLowerCase();
+      if (query.isEmpty) return suggestions.take(8);
+      return suggestions
+          .where((option) => option.toLowerCase().contains(query))
+          .take(8);
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: suggestions.isEmpty
+          ? buildBaseField(effectiveController: controller)
+          : RawAutocomplete<String>(
+              textEditingController: controller,
+              focusNode: autocompleteFocusNode,
+              optionsBuilder: optionsBuilder,
+              optionsViewBuilder: (context, onSelected, options) {
+                return Align(
+                  alignment: Alignment.topLeft,
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(12),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxHeight: 220,
+                        minWidth: 260,
+                        maxWidth: 520,
+                      ),
+                      child: ListView.builder(
+                        padding: EdgeInsets.zero,
+                        shrinkWrap: true,
+                        itemCount: options.length,
+                        itemBuilder: (context, index) {
+                          final option = options.elementAt(index);
+                          return ListTile(
+                            dense: true,
+                            title: Text(option),
+                            onTap: () => onSelected(option),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                );
+              },
+              onSelected: (selection) {
+                controller
+                  ..text = selection
+                  ..selection = TextSelection.collapsed(
+                    offset: selection.length,
+                  );
+                onControllerText(fieldDef.id!, controller);
+              },
+              fieldViewBuilder: (
+                context,
+                textController,
+                focusNode,
+                onFieldSubmitted,
+              ) {
+                return buildBaseField(
+                  effectiveController: textController,
+                  focusNode: focusNode,
+                  onFieldSubmitted: (_) => onFieldSubmitted(),
+                  suffixIcon: const Icon(Icons.history_outlined, size: 18),
+                );
+              },
+            ),
     );
   }
 

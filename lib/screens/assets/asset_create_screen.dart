@@ -60,6 +60,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   final _quantityController = TextEditingController(text: '1');
   final _minStockController = TextEditingController(text: '1');
   final _aiSearchController = TextEditingController();
+  final FocusNode _nameAutocompleteFocusNode = FocusNode();
+  final Map<int, FocusNode> _customAutocompleteFocusNodes = {};
   bool _isEnrichLoading = false;
   final ScrollController _scrollController = ScrollController();
   ItemCondition _selectedCondition = ItemCondition.loose;
@@ -154,9 +156,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           _booleanFieldValues[field.id!] = false;
         } else {
           _customControllers[field.id!] = TextEditingController();
+          _customAutocompleteFocusNodes[field.id!] = FocusNode();
         }
       }
     });
+
+    Future.microtask(
+      () => context.read<InventoryItemProvider>().loadInventoryItems(
+        containerId: _containerId!,
+        assetTypeId: _assetTypeId!,
+      ),
+    );
 
     _fadeController.forward();
   }
@@ -521,6 +531,64 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     return null;
   }
 
+  List<InventoryItem> _getSameTypeItems(InventoryItemProvider itemProvider) {
+    final assetTypeId = _assetTypeId;
+    if (assetTypeId == null) return const <InventoryItem>[];
+
+    return itemProvider.allDownloadedItems
+        .where((item) => item.assetTypeId == assetTypeId)
+        .toList();
+  }
+
+  List<String> _buildNameSuggestions(InventoryItemProvider itemProvider) {
+    return _getSameTypeItems(itemProvider)
+        .map((item) => item.name.trim())
+        .where((value) => value.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+  }
+
+  Map<int, List<String>> _buildCustomFieldSuggestions(
+    InventoryItemProvider itemProvider,
+  ) {
+    final assetType = _assetType;
+    if (assetType == null) return const <int, List<String>>{};
+
+    final fieldIds = assetType.fieldDefinitions
+        .where(
+          (field) =>
+              field.id != null &&
+              field.type != CustomFieldType.boolean &&
+              field.type != CustomFieldType.dropdown,
+        )
+        .map((field) => field.id!)
+        .toList();
+
+    final Map<int, Set<String>> accumulator = {
+      for (final id in fieldIds) id: <String>{},
+    };
+
+    for (final item in _getSameTypeItems(itemProvider)) {
+      final values = item.customFieldValues;
+      if (values == null) continue;
+
+      for (final fieldId in fieldIds) {
+        final rawValue = values[fieldId.toString()];
+        final normalized = rawValue?.toString().trim() ?? '';
+        if (normalized.isNotEmpty) {
+          accumulator[fieldId]!.add(normalized);
+        }
+      }
+    }
+
+    return {
+      for (final entry in accumulator.entries)
+        entry.key: (entry.value.toList()
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()))),
+    };
+  }
+
   Future<void> _saveAsset() async {
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
@@ -640,6 +708,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _minStockController.dispose();
     _aiSearchController.dispose();
     _scrollController.dispose();
+    _nameAutocompleteFocusNode.dispose();
+    _customAutocompleteFocusNodes.values.forEach((n) => n.dispose());
     _customControllers.forEach((_, c) => c.dispose());
     super.dispose();
   }
@@ -653,6 +723,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
+    final itemProvider = context.watch<InventoryItemProvider>();
+
+    final nameSuggestions = _buildNameSuggestions(itemProvider);
+    final customFieldSuggestions = _buildCustomFieldSuggestions(itemProvider);
 
     final containerProvider = context.watch<ContainerProvider>();
     final liveContainer = containerProvider.containers.firstWhere(
@@ -719,6 +793,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         child: MainDataSectionWidget(
                           nameController: _nameController,
                           descriptionController: _descriptionController,
+                          nameSuggestions: nameSuggestions,
+                            nameAutocompleteFocusNode:
+                              _nameAutocompleteFocusNode,
                           availableLocations: liveLocations,
                           selectedLocationId: _selectedLocationId,
                           onLocationChanged: (v) =>
@@ -780,6 +857,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                                   () => _booleanFieldValues[id] = v ?? false,
                                 ),
                                 onControllerText: (id, ctrl) {},
+                                autocompleteSuggestionsByField:
+                                    customFieldSuggestions,
+                                autocompleteFocusNodesByField:
+                                    _customAutocompleteFocusNodes,
                               ),
                             )
                           : null,

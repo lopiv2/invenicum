@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -50,18 +51,42 @@ class ContainerTreeView extends StatelessWidget {
                     size: 20,
                     color: theme.colorScheme.primary,
                   ),
-                  title: GestureDetector(
-                    onSecondaryTapDown: (details) => _showContextMenu(
-                      context,
-                      details.globalPosition,
-                      container,
-                    ),
-                    child: Text(
-                      container.name,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
+                  title: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onSecondaryTapDown: kIsWeb
+                              ? null
+                              : (details) => _showContextMenu(
+                                  context,
+                                  details.globalPosition,
+                                  container,
+                                ),
+                          child: Text(
+                            container.name,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
+                      PopupMenuButton<ContainerAction>(
+                        tooltip: '',
+                        onSelected: (result) =>
+                            _handleContextAction(context, container, result),
+                        itemBuilder: (context) =>
+                            _buildContextMenuItems(context),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4),
+                          child: Icon(
+                            Icons.more_horiz,
+                            size: 18,
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   childrenPadding: const EdgeInsets.only(left: 10),
                   children: [
@@ -153,22 +178,36 @@ class ContainerTreeView extends StatelessWidget {
         position & const Size(40, 40),
         Offset.zero & overlay.size,
       ),
-      items: [
-        PopupMenuItem(
-          value: ContainerAction.rename,
-          child: Text(AppLocalizations.of(context)!.rename),
-        ),
-        PopupMenuItem(
-          value: ContainerAction.delete,
-          child: Text(AppLocalizations.of(context)!.delete),
-        ),
-      ],
-    ).then((result) {
-      if (result == ContainerAction.rename)
-        _showRenameDialog(context, container);
-      if (result == ContainerAction.delete)
-        _showDeleteConfirmationDialog(context, container);
-    });
+      items: _buildContextMenuItems(context),
+    ).then((result) => _handleContextAction(context, container, result));
+  }
+
+  List<PopupMenuEntry<ContainerAction>> _buildContextMenuItems(
+    BuildContext context,
+  ) {
+    return [
+      PopupMenuItem(
+        value: ContainerAction.rename,
+        child: Text(AppLocalizations.of(context)!.rename),
+      ),
+      PopupMenuItem(
+        value: ContainerAction.delete,
+        child: Text(AppLocalizations.of(context)!.delete),
+      ),
+    ];
+  }
+
+  void _handleContextAction(
+    BuildContext context,
+    ContainerNode container,
+    ContainerAction? result,
+  ) {
+    if (result == ContainerAction.rename) {
+      _showRenameDialog(context, container);
+    }
+    if (result == ContainerAction.delete) {
+      _showDeleteConfirmationDialog(context, container);
+    }
   }
 
   // --- DIÁLOGOS (REUTILIZANDO TU LÓGICA) ---

@@ -12,6 +12,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutInvenicum => 'About Invenicum';
 
   @override
+  String get aboutDialogTitle => 'About Invenicum';
+
+  @override
+  String get aboutDialogCoolText =>
+      'Your inventory, now with extra horsepower. Checking if a fresher version is waiting for you.';
+
+  @override
+  String get aboutCurrentVersionLabel => 'Current version';
+
+  @override
+  String get aboutLatestVersionLabel => 'Latest version';
+
+  @override
+  String get aboutCheckingVersion => 'Checking online version...';
+
+  @override
+  String get aboutVersionUnknown => 'Unknown';
+
+  @override
+  String get aboutVersionUpToDate => 'Your app is up to date.';
+
+  @override
+  String get aboutUpdateAvailable => 'A newer version is available.';
+
+  @override
+  String get aboutVersionCheckFailed => 'Could not check online version.';
+
+  @override
+  String get aboutOpenReleases => 'View releases';
+
+  @override
   String get active => 'Active';
 
   @override
@@ -2112,6 +2143,32 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aiProviderUpdated => 'AI Provider updated';
+
+  @override
+  String get purgeChatHistoryTitle => 'Chat history';
+
+  @override
+  String get purgeChatHistoryDescription =>
+      'Permanently delete all saved Veni conversation history.';
+
+  @override
+  String get purgeChatHistoryButton => 'Purge history';
+
+  @override
+  String get purgeChatHistoryConfirmTitle => 'Purge chat history?';
+
+  @override
+  String get purgeChatHistoryConfirmMessage =>
+      'This action will delete all saved messages and cannot be undone.';
+
+  @override
+  String get purgeChatHistoryConfirmAction => 'Yes, purge';
+
+  @override
+  String get purgeChatHistorySuccess => 'Chat history deleted successfully.';
+
+  @override
+  String get purgeChatHistoryError => 'Could not delete chat history.';
 
   @override
   String get notificationSettingsTitle => 'Notification Management';

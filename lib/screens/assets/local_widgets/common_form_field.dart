@@ -15,8 +15,9 @@ class CommonFormField extends StatelessWidget {
   final List<TextInputFormatter> inputFormatters;
   final String? Function(String?)? validator;
   final void Function(String)? onChanged;
-  // 🚩 Añadimos el parámetro suffixIcon
   final Widget? suffixIcon;
+  final FocusNode? focusNode;
+  final void Function(String)? onFieldSubmitted;
 
   const CommonFormField({
     super.key,
@@ -32,7 +33,9 @@ class CommonFormField extends StatelessWidget {
     this.inputFormatters = const [],
     this.validator,
     this.onChanged,
-    this.suffixIcon, // 🚩 Lo añadimos al constructor
+    this.suffixIcon,
+    this.focusNode,
+    this.onFieldSubmitted,
   });
 
   @override
@@ -45,8 +48,7 @@ class CommonFormField extends StatelessWidget {
       hintText: hint,
       prefixText: prefix,
       prefixIcon: Icon(icon, size: 20),
-      // 🚩 Conectamos el parámetro con la decoración de Flutter
-      suffixIcon: suffixIcon, 
+      suffixIcon: suffixIcon,
       helperText: helper,
       helperMaxLines: 2,
       filled: true,
@@ -87,11 +89,13 @@ class CommonFormField extends StatelessWidget {
 
     return TextFormField(
       controller: controller,
+      focusNode: focusNode,
       keyboardType: keyboardType,
       maxLines: maxLines,
       inputFormatters: inputFormatters,
       validator: validator,
       onChanged: onChanged,
+      onFieldSubmitted: onFieldSubmitted,
       decoration: decoration,
     );
   }

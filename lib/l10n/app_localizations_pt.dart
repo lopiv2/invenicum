@@ -9,16 +9,48 @@ class AppLocalizationsPt extends AppLocalizations {
   AppLocalizationsPt([String locale = 'pt']) : super(locale);
 
   @override
-  String get aboutInvenicum => 'Sobre Invenicum';
+  String get aboutInvenicum => 'Sobre o Invenicum';
+
+  @override
+  String get aboutDialogTitle => 'Sobre o Invenicum';
+
+  @override
+  String get aboutDialogCoolText =>
+      'Seu inventário, agora turbinado. Estamos verificando se existe uma versão mais nova esperando por você.';
+
+  @override
+  String get aboutCurrentVersionLabel => 'Versão atual';
+
+  @override
+  String get aboutLatestVersionLabel => 'Última versão';
+
+  @override
+  String get aboutCheckingVersion => 'Verificando versão online...';
+
+  @override
+  String get aboutVersionUnknown => 'Desconhecida';
+
+  @override
+  String get aboutVersionUpToDate => 'Seu app está atualizado.';
+
+  @override
+  String get aboutUpdateAvailable => 'Há uma nova versão disponível.';
+
+  @override
+  String get aboutVersionCheckFailed =>
+      'Não foi possível verificar a versão online.';
+
+  @override
+  String get aboutOpenReleases => 'Ver lançamentos';
 
   @override
   String get active => 'Ativo';
 
   @override
-  String get actives => 'Actives';
+  String get actives => 'Ativos';
 
   @override
-  String get activeInsight => 'ACTIVE ASSETS INSIGHTS';
+  String get activeInsight => 'INFORMAÇÕES DE ATIVOS VIGENTES';
 
   @override
   String get activeLoans => 'Empréstimos ativos';
@@ -39,13 +71,13 @@ class AppLocalizationsPt extends AppLocalizations {
   String get addNewLocation => 'Adicionar nova localização';
 
   @override
-  String get additionalInformation => 'Additional Information';
+  String get additionalInformation => 'Informações adicionais';
 
   @override
   String get additionalThumbnails => 'Miniaturas adicionais';
 
   @override
-  String get adquisition => 'ADQUISITION';
+  String get adquisition => 'AQUISIÇÃO';
 
   @override
   String aiExtractionError(String error) {
@@ -63,10 +95,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get alertCreated => 'Alerta criado';
 
   @override
-  String get alertDeleted => 'Alerta deletado';
+  String get alertDeleted => 'Alerta excluído';
 
   @override
-  String get alertInfo => 'Informações';
+  String get alertInfo => 'Informação';
 
   @override
   String get alertMessage => 'Mensagem';
@@ -84,10 +116,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get alerts => 'Alertas e notificações';
 
   @override
-  String get all => 'Tudo';
+  String get all => 'Todos';
 
   @override
-  String get allUpToDateStatus => 'All up to date';
+  String get allUpToDateStatus => 'Tudo em dia';
 
   @override
   String get appTitle => 'Invenicum Inventário';
@@ -102,19 +134,19 @@ class AppLocalizationsPt extends AppLocalizations {
   String get april => 'Abril';
 
   @override
-  String get assetDetail => 'Asset Details';
+  String get assetDetail => 'Detalhes do ativo';
 
   @override
-  String get assetImages => 'Imagens de ativos';
+  String get assetImages => 'Imagens do ativo';
 
   @override
   String get assetImport => 'Importação de ativos';
 
   @override
-  String get assetName => 'Nome do ativo';
+  String get assetName => 'Nome';
 
   @override
-  String get assetNotFound => 'Asset not found';
+  String get assetNotFound => 'Ativo não encontrado';
 
   @override
   String assetTypeDeleted(String name) {
@@ -142,17 +174,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get backToAssetTypes => 'Voltar aos tipos de ativos';
 
   @override
-  String get averageMarketValue => 'Average market price';
+  String get averageMarketValue => 'Preço médio de mercado';
 
   @override
-  String get barCode => 'Barcode (UPC)';
+  String get barCode => 'Código de barras (EAN)';
 
   @override
   String get baseCostAccumulatedWithoutInflation =>
-      'Base cost accumulated without inflation';
+      'Custo base acumulado sem inflação';
 
   @override
-  String get borrowerEmail => 'Email do mutuário';
+  String get borrowerEmail => 'E-mail do mutuário';
 
   @override
   String get borrowerName => 'Nome do mutuário';
@@ -164,7 +196,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get cancel => 'Cancelar';
 
   @override
-  String get centerView => 'Visualização central';
+  String get centerView => 'Centralizar visualização';
 
   @override
   String get chooseFile => 'Escolher arquivo';
@@ -174,31 +206,31 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get collectionContainerInfo =>
-      'Recipientes de coleção têm barras de rastreamento de coleção, valor investido, valor de mercado e visualização de exposição';
+      'Recipientes de coleção têm barras de rastreamento, valor investido, valor de mercado e visualização de exposição';
 
   @override
   String get collectionFieldsConfigured => 'Campos de coleção configurados.';
 
   @override
-  String get condition => 'Condition';
+  String get condition => 'Condição';
 
   @override
-  String get condition_mint => 'Mint (Original box)';
+  String get condition_mint => 'Caixa original';
 
   @override
-  String get condition_loose => 'Loose (No box)';
+  String get condition_loose => 'Solto (sem caixa)';
 
   @override
-  String get condition_incomplete => 'Incomplete';
+  String get condition_incomplete => 'Incompleto';
 
   @override
-  String get condition_damaged => 'Damaged';
+  String get condition_damaged => 'Danificado / Marcas';
 
   @override
-  String get condition_new => 'New';
+  String get condition_new => 'Novo';
 
   @override
-  String get condition_digital => 'Digital';
+  String get condition_digital => 'Digital / Intangível';
 
   @override
   String get configureCollectionFields => 'Configurar campos de coleção';
@@ -272,10 +304,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get createFirstContainer => 'Crie seu primeiro recipiente.';
 
   @override
-  String get createdAt => 'Creation Date';
+  String get createdAt => 'Data de criação';
 
   @override
-  String get currency => 'Currency';
+  String get currency => 'Moeda';
 
   @override
   String get current => 'Atual';
@@ -346,7 +378,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get enterDescription => 'Digite uma descrição';
 
   @override
-  String get enterURL => 'Digite URL';
+  String get enterURL => 'Digite a URL';
 
   @override
   String get enterValidUrl => 'Digite uma URL válida';
@@ -399,7 +431,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errorNameMappingRequired =>
-      'O campo \"Nome\" é obrigatório e deve ser mapeado.';
+      'O campo \'Nome\' é obrigatório e deve ser mapeado.';
 
   @override
   String get errorNoVoucherTemplate =>
@@ -407,10 +439,10 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get errorNotBarCode =>
-      'The article does not have a barcode or is invalid.';
+      'O item não possui código de barras ou o código não é válido.';
 
   @override
-  String get errorReadingBytes => 'Não foi possível ler bytes do arquivo.';
+  String get errorReadingBytes => 'Não foi possível ler os bytes do arquivo.';
 
   @override
   String errorReadingFile(String error) {
@@ -461,11 +493,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get formatsPNG => 'Formatos: PNG, JPG';
 
   @override
-  String get forToday => 'For today';
+  String get forToday => 'Para hoje';
 
   @override
   String get geminiLabelModel =>
-      'Recommended Gemini model: gemini-3-flash-preview';
+      'Modelo Gemini recomendado: gemini-3-flash-preview';
 
   @override
   String get generalSettings => 'Configurações gerais';
@@ -483,11 +515,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get guest => 'Convidado';
 
   @override
-  String get helpDocs => 'Help & Documentation';
+  String get helpDocs => 'Ajuda e documentação';
 
   @override
   String get helperGeminiKey =>
-      'Enter your Gemini API key to enable integration. Get it at https://aistudio.google.com/';
+      'Insira sua chave de API do Gemini para ativar a integração. Obtenha em https://aistudio.google.com/';
 
   @override
   String get ignoreField => '🚫 Ignorar campo';
@@ -502,27 +534,27 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get importSerializedWarning =>
-      'Import successful. This asset type is serialized — all items were created with quantity 1.';
+      'Importação correta. Este tipo de ativo é serializado — todos os itens foram criados com quantidade 1.';
 
   @override
-  String get integrations => 'Integrations';
+  String get integrations => 'Integrações';
 
   @override
   String get integrationGeminiDesc =>
-      'Connect Invenicum with Google\'s Gemini to leverage advanced AI capabilities in managing your inventory.';
+      'Conecte o Invenicum ao Gemini do Google para aproveitar recursos avançados de IA na gestão do seu inventário.';
 
   @override
   String get integrationTelegramDesc =>
-      'Connect Invenicum with Telegram to receive instant notifications about your inventory directly on your device.';
+      'Conecte o Invenicum ao Telegram para receber notificações instantâneas sobre o seu inventário diretamente no seu dispositivo.';
 
   @override
-  String get invalidAssetId => 'Invalid asset ID';
+  String get invalidAssetId => 'ID de ativo inválido';
 
   @override
   String get invalidNavigationIds => 'Erro: IDs de navegação inválidos.';
 
   @override
-  String get inventoryLabel => 'Inventory';
+  String get inventoryLabel => 'Inventário';
 
   @override
   String get january => 'Janeiro';
@@ -559,19 +591,19 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get loanLanguageNotImplemented =>
-      'Language feature not yet implemented';
+      'Funcionalidade de idioma a ser implementada';
 
   @override
   String get loanManagement => 'Gestão de empréstimos';
 
   @override
-  String get loanObject => 'Objeto de empréstimo';
+  String get loanObject => 'Objeto a emprestar';
 
   @override
   String get loans => 'Empréstimos';
 
   @override
-  String get location => 'Location';
+  String get location => 'Localização';
 
   @override
   String get locations => 'Localizações';
@@ -580,46 +612,46 @@ class AppLocalizationsPt extends AppLocalizations {
   String get locationsScheme => 'Esquema de localizações';
 
   @override
-  String get login => 'Login';
+  String get login => 'Entrar';
 
   @override
   String get logoVoucher => 'Logo do comprovante';
 
   @override
-  String get logout => 'Logout';
+  String get logout => 'Sair';
 
   @override
-  String get lookForContainersOrAssets => 'Look for containers or assets...';
+  String get lookForContainersOrAssets => 'Buscar recipientes ou ativos...';
 
   @override
-  String get lowStockTitle => 'Low Stock';
+  String get lowStockTitle => 'Estoque baixo';
 
   @override
-  String get magicAssistant => 'Assistente IA mágico';
+  String get magicAssistant => 'Assistente mágico de IA';
 
   @override
   String get march => 'Março';
 
   @override
-  String get marketPriceObtained => 'Market price obtained successfully';
+  String get marketPriceObtained => 'Preço de mercado obtido com sucesso';
 
   @override
-  String get marketValueEvolution => 'Market Value Evolution';
+  String get marketValueEvolution => 'Evolução do valor de mercado';
 
   @override
-  String get marketValueField => 'Market Value';
+  String get marketValueField => 'Valor de mercado';
 
   @override
-  String get maxStock => 'Max stock';
+  String get maxStock => 'Estoque máximo';
 
   @override
   String get may => 'Maio';
 
   @override
-  String get minStock => 'Min stock';
+  String get minStock => 'Estoque mínimo';
 
   @override
-  String get myAchievements => 'My Achievements';
+  String get myAchievements => 'Minhas conquistas';
 
   @override
   String get myCustomTheme => 'Meu tema';
@@ -631,7 +663,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get myThemesStored => 'Meus temas salvos';
 
   @override
-  String get name => 'Name';
+  String get name => 'Nome';
 
   @override
   String get nameCannotBeEmpty => 'O nome não pode estar vazio';
@@ -649,7 +681,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get newName => 'Novo nome';
 
   @override
-  String get next => 'Next';
+  String get next => 'Próximo';
 
   @override
   String get noAssetsCreated => 'Nenhum ativo criado ainda.';
@@ -672,7 +704,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noFileSelected => 'Nenhum arquivo selecionado';
 
   @override
-  String get noImageAvailable => 'No image available';
+  String get noImageAvailable => 'Nenhuma imagem disponível';
 
   @override
   String get noImagesAdded =>
@@ -683,7 +715,7 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get noLocationsMessage =>
-      'Nenhuma localização criada neste recipiente. Adicione uma!';
+      'Nenhuma localização criada neste recipiente. Adicione a primeira!';
 
   @override
   String get noNotifications => 'Sem notificações';
@@ -704,7 +736,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get october => 'Outubro';
 
   @override
-  String get optimalStockStatus => 'Stock at optimal levels';
+  String get optimalStockStatus => 'Estoque em níveis ideais';
 
   @override
   String get optional => 'Opcional';
@@ -716,20 +748,20 @@ class AppLocalizationsPt extends AppLocalizations {
   String get password => 'Senha';
 
   @override
-  String get pleaseEnterPassword => 'Digite sua senha';
+  String get pleaseEnterPassword => 'Por favor, insira sua senha';
 
   @override
-  String get pleaseEnterUsername => 'Digite seu nome de usuário';
+  String get pleaseEnterUsername => 'Por favor, insira seu nome de usuário';
 
   @override
-  String get pleasePasteUrl => 'Cole uma URL';
+  String get pleasePasteUrl => 'Por favor, cole uma URL';
 
   @override
   String get pleaseSelectCsvWithHeaders =>
-      'Selecione um arquivo CSV com cabeçalhos.';
+      'Por favor, selecione um arquivo CSV com cabeçalhos.';
 
   @override
-  String get pleaseSelectLocation => 'Selecione uma localização.';
+  String get pleaseSelectLocation => 'Por favor, selecione uma localização.';
 
   @override
   String get plugins => 'Plugins';
@@ -744,10 +776,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get preferences => 'Preferências';
 
   @override
-  String get previewPDF => 'Visualização em PDF';
+  String get previewPDF => 'Visualização';
 
   @override
-  String get previous => 'Previous';
+  String get previous => 'Anterior';
 
   @override
   String get primaryImage => 'Imagem principal';
@@ -759,7 +791,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get quantity => 'Quantidade';
 
   @override
-  String get refresh => 'Refresh data';
+  String get refresh => 'Recarregar dados';
 
   @override
   String get registerNewLoan => 'Registrar novo empréstimo';
@@ -771,7 +803,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get reloadLocations => 'Recarregar localizações';
 
   @override
-  String get reloadLoans => 'Reload loans';
+  String get reloadLoans => 'Recarregar empréstimos';
 
   @override
   String get removeImage => 'Remover imagem';
@@ -783,16 +815,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get renameContainer => 'Renomear recipiente';
 
   @override
-  String get responsibleLabel => 'Responsible';
+  String get responsibleLabel => 'Responsável';
 
   @override
   String get reports => 'Relatórios';
 
   @override
-  String get returned => 'Retornado';
+  String get returned => 'Devolvido';
 
   @override
-  String get returnsLabel => 'Returns';
+  String get returnsLabel => 'Devoluções';
 
   @override
   String get rowsPerPageTitle => 'Ativos por página:';
@@ -819,10 +851,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get searchInAllColumns => 'Pesquisar em todas as colunas...';
 
   @override
-  String get selectAndUploadImage => 'Selecionar e fazer upload de imagem';
+  String get selectAndUploadImage => 'Selecionar e enviar imagem';
 
   @override
-  String get selectApplicationCurrency => 'Select application currency';
+  String get selectApplicationCurrency => 'Selecionar moeda da aplicação';
 
   @override
   String get selectApplicationLanguage => 'Selecionar idioma da aplicação';
@@ -868,22 +900,22 @@ class AppLocalizationsPt extends AppLocalizations {
   String get showAsList => 'Mostrar como lista';
 
   @override
-  String get slotDashboardBottom => 'Bottom Dashboard Panel';
+  String get slotDashboardBottom => 'Painel inferior';
 
   @override
-  String get slotDashboardTop => 'Top Dashboard Panel';
+  String get slotDashboardTop => 'Painel superior';
 
   @override
-  String get slotFloatingActionButton => 'Floating Button';
+  String get slotFloatingActionButton => 'Botão flutuante';
 
   @override
-  String get slotInventoryHeader => 'Inventory Header';
+  String get slotInventoryHeader => 'Cabeçalho do inventário';
 
   @override
-  String get slotLeftSidebar => 'Sidebar';
+  String get slotLeftSidebar => 'Barra lateral esquerda';
 
   @override
-  String get slotUnknown => 'Unknown Slot';
+  String get slotUnknown => 'Slot desconhecido';
 
   @override
   String get specificValueToCount => 'Valor específico para contar';
@@ -914,7 +946,7 @@ class AppLocalizationsPt extends AppLocalizations {
   String get systemThemesModal => 'Temas do sistema';
 
   @override
-  String get templates => 'Templates';
+  String get templates => 'Modelos';
 
   @override
   String get themeNameLabel => 'Nome do tema';
@@ -923,10 +955,10 @@ class AppLocalizationsPt extends AppLocalizations {
   String get thisFieldIsRequired => 'Este campo é obrigatório.';
 
   @override
-  String get topDemanded => 'Top Demanded';
+  String get topDemanded => 'Mais solicitados';
 
   @override
-  String get topLoanedItems => 'Itens mais emprestados';
+  String get topLoanedItems => 'Itens mais emprestados por mês';
 
   @override
   String get totalAssets => 'Tipos de ativos';
@@ -938,1072 +970,1079 @@ class AppLocalizationsPt extends AppLocalizations {
   String get totals => 'Totais';
 
   @override
-  String get totalSpending => 'Total Economic Investment';
+  String get totalSpending => 'Investimento total';
 
   @override
-  String get totalMarketValue => 'Total Market Value';
+  String get totalMarketValue => 'Valor total de mercado';
 
   @override
-  String get updatedAt => 'Last Update';
+  String get updatedAt => 'Última atualização';
 
   @override
-  String get upload => 'Upload';
+  String get upload => 'Enviar';
 
   @override
-  String get uploadImage => 'Fazer upload de imagem';
+  String get uploadImage => 'Enviar imagem';
 
   @override
   String get username => 'Nome de usuário';
 
   @override
-  String get copiedToClipboard => 'Copied to clipboard';
+  String get copiedToClipboard => 'Copiado para a área de transferência';
 
   @override
-  String get connectionTestFailed => 'Connection test failed';
+  String get connectionTestFailed => 'O teste de conexão falhou';
 
   @override
-  String get connectionVerified => 'Connection verified successfully';
+  String get connectionVerified => 'Conexão verificada com sucesso';
 
   @override
-  String get errorSavingConfiguration => 'Error saving configuration';
+  String get errorSavingConfiguration => 'Erro ao salvar a configuração';
 
   @override
-  String get integrationsAndConnectionsTitle => 'Integrations and connections';
+  String get integrationsAndConnectionsTitle => 'Integrações e conexões';
 
   @override
-  String get integrationsSectionAiTitle => 'Artificial intelligence';
+  String get integrationsSectionAiTitle => 'Inteligência artificial';
 
   @override
   String get integrationsSectionAiSubtitle =>
-      'Conversational engines and assistants to enhance workflows and automations.';
+      'Motores conversacionais e assistentes para enriquecer fluxos e automações.';
 
   @override
-  String get integrationsSectionMessagingTitle => 'Messaging and notifications';
+  String get integrationsSectionMessagingTitle => 'Mensageria e notificações';
 
   @override
   String get integrationsSectionMessagingSubtitle =>
-      'Output channels for alerts, bots, reports, and automated deliveries.';
+      'Canais de saída para avisos, bots, relatórios e entregas automáticas.';
 
   @override
-  String get integrationsSectionDataApisTitle => 'Data APIs';
+  String get integrationsSectionDataApisTitle => 'APIs de dados';
 
   @override
   String get integrationsSectionDataApisSubtitle =>
-      'External sources to enrich cards, games, and catalog references.';
+      'Fontes externas para enriquecer fichas, cartas, jogos e referências de catálogo.';
 
   @override
-  String get integrationsSectionValuationTitle => 'Valuation and market';
+  String get integrationsSectionValuationTitle => 'Avaliação e mercado';
 
   @override
   String get integrationsSectionValuationSubtitle =>
-      'Connectors for pricing, barcodes, and up-to-date value estimation.';
+      'Conectores para preços, códigos de barras e estimativa de valor atualizado.';
 
   @override
-  String get integrationsSectionHardwareTitle => 'Hardware and labels';
+  String get integrationsSectionHardwareTitle => 'Hardware e etiquetas';
 
   @override
   String get integrationsSectionHardwareSubtitle =>
-      'Physical tools and utilities for printing, coding, and operations.';
+      'Ferramentas físicas e utilitários para impressão, codificação e operação.';
 
   @override
   String integrationsActiveConnections(int count) {
-    return '$count active connections';
+    return '$count conexões ativas';
   }
 
   @override
-  String get integrationsModularDesign => 'Modular design by categories';
+  String get integrationsModularDesign => 'Design modular por categorias';
 
   @override
-  String get integrationsCheckingStatuses => 'Checking statuses';
+  String get integrationsCheckingStatuses => 'Verificando status';
 
   @override
-  String get integrationsStatusSynced => 'Status synchronized';
+  String get integrationsStatusSynced => 'Status sincronizado';
 
   @override
   String get integrationsHeroHeadline =>
-      'Connect services, APIs, and tools from one clear view.';
+      'Conecte serviços, APIs e ferramentas em uma única visão clara.';
 
   @override
   String get integrationsHeroSubheadline =>
-      'We group integrations by purpose so setup is faster, more visual, and easier to maintain on mobile too.';
+      'Agrupamos as integrações por propósito para que a configuração seja mais rápida, mais visual e mais fácil de manter também no celular.';
 
   @override
-  String get integrationStatusConnected => 'Connected';
+  String get integrationStatusConnected => 'Conectada';
 
   @override
-  String get integrationStatusNotConfigured => 'Not configured';
+  String get integrationStatusNotConfigured => 'Não configurada';
 
   @override
-  String get integrationTypeDataSource => 'Data source';
+  String get integrationTypeDataSource => 'Fonte de dados';
 
   @override
-  String get integrationTypeConnector => 'Connector';
+  String get integrationTypeConnector => 'Conector';
 
   @override
   String integrationFieldsCount(int count) {
-    return '$count fields';
+    return '$count campos';
   }
 
   @override
-  String get integrationNoLocalCredentials => 'No local credentials';
+  String get integrationNoLocalCredentials => 'Sem credenciais locais';
 
   @override
-  String get configureLabel => 'Configure';
+  String get configureLabel => 'Configurar';
 
   @override
-  String get integrationModelDefaultGemini => 'Default: gemini-3-flash-preview';
+  String get integrationModelDefaultGemini => 'Padrão: gemini-3-flash-preview';
 
   @override
   String get integrationOpenaiDesc =>
-      'Use GPT-4o and other OpenAI models as an intelligent assistant.';
+      'Use GPT-4o e outros modelos da OpenAI como assistente inteligente.';
 
   @override
   String get integrationOpenaiApiKeyHint =>
-      'Generated at platform.openai.com/api-keys';
+      'Obtida em platform.openai.com/api-keys';
 
   @override
-  String get integrationModelDefaultOpenai => 'Default: gpt-4o';
+  String get integrationModelDefaultOpenai => 'Padrão: gpt-4o';
 
   @override
   String get integrationClaudeDesc =>
-      'Use Claude Sonnet, Opus, and Haiku as an intelligent assistant.';
+      'Use Claude Sonnet, Opus e Haiku como assistente inteligente.';
 
   @override
   String get integrationClaudeApiKeyHint =>
-      'Generated at console.anthropic.com/settings/keys';
+      'Obtida em console.anthropic.com/settings/keys';
 
   @override
-  String get integrationModelDefaultClaude => 'Default: claude-sonnet-4-6';
+  String get integrationModelDefaultClaude => 'Padrão: claude-sonnet-4-6';
 
   @override
-  String get integrationTelegramBotTokenHint => 'From @BotFather';
+  String get integrationTelegramBotTokenHint => 'De @BotFather';
 
   @override
-  String get integrationTelegramChatIdHint => 'Use @userinfobot to get your ID';
+  String get integrationTelegramChatIdHint =>
+      'Use @userinfobot para obter seu ID';
 
   @override
   String get integrationEmailDesc =>
-      'Ultra-reliable email delivery. Ideal for reports and critical alerts.';
+      'Envio de e-mails altamente confiável. Ideal para relatórios e alertas críticos.';
 
   @override
-  String get integrationEmailApiKeyHint => 'Generated at resend.com/api-keys';
+  String get integrationEmailApiKeyHint => 'Obtida em resend.com/api-keys';
 
   @override
-  String get integrationEmailFromLabel => 'Sender (From)';
+  String get integrationEmailFromLabel => 'Remetente (De)';
 
   @override
   String get integrationEmailFromHint =>
-      'Example: Invenicum <onboarding@resend.dev>';
+      'Ex: Invenicum <onboarding@resend.dev>';
 
   @override
   String get integrationBggDesc =>
-      'Connect your BGG account to sync your collection and enrich your data automatically.';
+      'Conecte sua conta do BGG para sincronizar sua coleção e enriquecer seus dados automaticamente.';
 
   @override
   String get integrationPokemonDesc =>
-      'Connect to the Pokemon API to sync your collection and enrich your data automatically.';
+      'Conecte-se à API do Pokémon para sincronizar sua coleção e enriquecer seus dados automaticamente.';
 
   @override
   String get integrationTcgdexDesc =>
-      'Query cards and sets from collectible card games to enrich your inventory automatically.';
+      'Consulte cartas e expansões de jogos de cartas colecionáveis para enriquecer seu inventário automaticamente.';
 
   @override
-  String get integrationQrGeneratorName => 'QR Generator';
+  String get integrationQrGeneratorName => 'Gerador de QR';
 
   @override
   String get integrationQrLabelsDesc =>
-      'Configure the format of your printable labels.';
+      'Configure o formato das suas etiquetas imprimíveis.';
 
   @override
-  String get integrationQrPageSizeLabel => 'Page size (A4, Letter)';
+  String get integrationQrPageSizeLabel => 'Tamanho de página (A4, Carta)';
 
   @override
-  String get integrationQrMarginLabel => 'Margin (mm)';
+  String get integrationQrMarginLabel => 'Margem (mm)';
 
   @override
   String get integrationPriceChartingDesc =>
-      'Configure your API key to fetch updated prices.';
+      'Configure sua chave de API para obter preços atualizados.';
 
   @override
-  String get integrationUpcitemdbDesc => 'Global price lookup by barcode.';
+  String get integrationUpcitemdbDesc =>
+      'Pesquisa global de preços por código de barras.';
 
   @override
   String integrationConfiguredSuccess(String name) {
-    return '$name configured successfully';
+    return '$name configurado com sucesso';
   }
 
   @override
   String integrationUnlinkedWithName(String name) {
-    return '$name has been unlinked';
+    return '$name foi desvinculado';
   }
 
   @override
-  String get invalidUiFormat => 'Invalid UI format';
+  String get invalidUiFormat => 'Formato de UI inválido';
 
   @override
-  String get loadingConfiguration => 'Loading configuration...';
+  String get loadingConfiguration => 'Carregando configuração...';
 
   @override
   String pageNotFoundUri(String uri) {
-    return 'Page not found: $uri';
+    return 'Página não encontrada: $uri';
   }
 
   @override
-  String get pluginLoadError => 'Error loading plugin UI';
+  String get pluginLoadError => 'Erro ao carregar a interface do plugin';
 
   @override
-  String get pluginRenderError => 'Render error';
+  String get pluginRenderError => 'Erro de renderização';
 
   @override
-  String get testConnection => 'Test connection';
+  String get testConnection => 'Testar conexão';
 
   @override
-  String get testingConnection => 'Testing...';
+  String get testingConnection => 'Testando...';
 
   @override
-  String get unableToUnlinkAccount => 'Could not unlink account';
+  String get unableToUnlinkAccount => 'Não foi possível desvincular a conta';
 
   @override
-  String get unlinkIntegrationUpper => 'UNLINK INTEGRATION';
+  String get unlinkIntegrationUpper => 'DESVINCULAR INTEGRAÇÃO';
 
   @override
   String get upcFreeModeHint =>
-      'Leave this field empty to use Free mode (Limited).';
+      'Deixe este campo vazio para usar o modo gratuito (limitado).';
 
   @override
-  String get alertsTabLabel => 'Alerts';
+  String get alertsTabLabel => 'Alertas';
 
   @override
-  String get alertMarkedAsRead => 'Marked as read';
+  String get alertMarkedAsRead => 'Marcado como lido';
 
   @override
-  String get calendarTabLabel => 'Calendar';
+  String get calendarTabLabel => 'Calendário';
 
   @override
-  String get closeLabel => 'Close';
+  String get closeLabel => 'Fechar';
 
   @override
-  String get closeLabelUpper => 'CLOSE';
+  String get closeLabelUpper => 'FECHAR';
 
   @override
-  String get configureReminderLabel => 'Configure reminder:';
+  String get configureReminderLabel => 'Configurar aviso:';
 
   @override
-  String get cannotFormatInvalidJson => 'Cannot format an invalid JSON';
+  String get cannotFormatInvalidJson =>
+      'Não é possível formatar um JSON inválido';
 
   @override
-  String get createAlertOrEventTitle => 'Create alert/event';
+  String get createAlertOrEventTitle => 'Criar alerta/evento';
 
   @override
-  String get createdSuccessfully => 'Created successfully';
+  String get createdSuccessfully => 'Criado com sucesso';
 
   @override
-  String get createPluginTitle => 'Create plugin';
+  String get createPluginTitle => 'Criar plugin';
 
   @override
-  String get editPluginTitle => 'Edit plugin';
+  String get editPluginTitle => 'Editar plugin';
 
   @override
-  String get deleteFromGithubLabel => 'Delete from GitHub';
+  String get deleteFromGithubLabel => 'Excluir do GitHub';
 
   @override
-  String get deleteFromGithubSubtitle =>
-      'Removes the file from the public market';
+  String get deleteFromGithubSubtitle => 'Remove o arquivo do mercado público';
 
   @override
-  String get deletePluginQuestion => 'Delete plugin?';
+  String get deletePluginQuestion => 'Excluir plugin?';
 
   @override
   String get deletePluginLocalWarning =>
-      'It will be removed from your local database.';
+      'Será removido do seu banco de dados local.';
 
   @override
-  String get deleteUpper => 'DELETE';
+  String get deleteUpper => 'EXCLUIR';
 
   @override
-  String get editEventTitle => 'Edit event';
+  String get editEventTitle => 'Editar evento';
 
   @override
-  String get editLabel => 'Edit';
+  String get editLabel => 'Editar';
 
   @override
-  String get eventDataSection => 'Event data';
+  String get eventDataSection => 'Dados do evento';
 
   @override
-  String get eventReminderAtTime => 'At event time';
+  String get eventReminderAtTime => 'No horário do evento';
 
   @override
-  String get eventUpdated => 'Event updated';
+  String get eventUpdated => 'Evento atualizado';
 
   @override
-  String get firstVersionHint => 'The first version will always be 1.0.0';
+  String get firstVersionHint => 'A primeira versão será sempre 1.0.0';
 
   @override
-  String get fixJsonBeforeSave => 'Fix the JSON before saving';
+  String get fixJsonBeforeSave => 'Corrija o JSON antes de salvar';
 
   @override
-  String get formatJson => 'Format JSON';
+  String get formatJson => 'Formatar JSON';
 
   @override
-  String get goToProfileUpper => 'GO TO PROFILE';
+  String get goToProfileUpper => 'IR AO PERFIL';
 
   @override
-  String get installPluginLabel => 'Install plugin';
+  String get installPluginLabel => 'Instalar plugin';
 
   @override
-  String get invalidVersionFormat => 'Invalid format (e.g., 1.0.1)';
+  String get invalidVersionFormat => 'Formato inválido (ex: 1.0.1)';
 
   @override
-  String get isEventQuestion => 'Is this an event?';
+  String get isEventQuestion => 'É um evento?';
 
   @override
-  String get jsonErrorGeneric => 'JSON error';
+  String get jsonErrorGeneric => 'Erro no JSON';
 
   @override
-  String get makePublicLabel => 'Make public';
+  String get makePublicLabel => 'Tornar público';
 
   @override
-  String get markAsReadLabel => 'Mark as read';
+  String get markAsReadLabel => 'Marcar como lido';
 
   @override
-  String get messageWithColon => 'Message:';
+  String get messageWithColon => 'Mensagem:';
 
   @override
   String minutesBeforeLabel(int minutes) {
-    return '$minutes minutes before';
+    return '$minutes minutos antes';
   }
 
   @override
-  String get newLabel => 'New';
+  String get newLabel => 'Novo';
 
   @override
-  String get newPluginLabel => 'New plugin';
+  String get newPluginLabel => 'Novo plugin';
 
   @override
-  String get noActiveAlerts => 'No active alerts';
+  String get noActiveAlerts => 'Nenhum alerta ativo';
 
   @override
-  String get noDescriptionAvailable => 'No description available.';
+  String get noDescriptionAvailable => 'Sem descrição disponível.';
 
   @override
-  String get noEventsForDay => 'No events for this day';
+  String get noEventsForDay => 'Sem eventos para este dia';
 
   @override
-  String get noPluginsAvailable => 'No plugins';
+  String get noPluginsAvailable => 'Nenhum plugin disponível';
 
   @override
-  String get notificationDeleted => 'Notification deleted successfully';
+  String get notificationDeleted => 'Notificação excluída com sucesso';
 
   @override
-  String get oneHourBeforeLabel => '1 hour before';
+  String get oneHourBeforeLabel => '1 hora antes';
 
   @override
   String get pluginPrivateDescription =>
-      'Only you can see this plugin in your list.';
+      'Somente você poderá ver este plugin na sua lista.';
 
   @override
   String get pluginPublicDescription =>
-      'Other users will be able to see and install this plugin.';
+      'Outros usuários poderão ver e instalar este plugin.';
 
   @override
-  String get pluginTabLibrary => 'Library';
+  String get pluginTabLibrary => 'Biblioteca';
 
   @override
-  String get pluginTabMarket => 'Market';
+  String get pluginTabMarket => 'Mercado';
 
   @override
-  String get pluginTabMine => 'Mine';
+  String get pluginTabMine => 'Meus';
 
   @override
-  String get previewLabel => 'Preview';
+  String get previewLabel => 'Visualização';
 
   @override
-  String get remindMeLabel => 'Remind me:';
+  String get remindMeLabel => 'Me avisar:';
 
   @override
-  String get requiredField => 'Required';
+  String get requiredField => 'Obrigatório';
 
   @override
   String get requiresGithubDescription =>
-      'To publish plugins in the community, you need to link your GitHub account to get author credit.';
+      'Para publicar plugins na comunidade, você deve vincular sua conta do GitHub para ser creditado como autor.';
 
   @override
-  String get requiresGithubTitle => 'GitHub required';
+  String get requiresGithubTitle => 'Requer GitHub';
 
   @override
-  String get slotLocationLabel => 'Location (slot)';
+  String get slotLocationLabel => 'Localização (slot)';
 
   @override
-  String get stacDocumentation => 'Stac documentation';
+  String get stacDocumentation => 'Documentação do Stac';
 
   @override
-  String get stacJsonInterfaceLabel => 'Stac JSON (interface)';
+  String get stacJsonInterfaceLabel => 'JSON Stac (interface)';
 
   @override
-  String get uninstallLabel => 'Uninstall';
+  String get uninstallLabel => 'Desinstalar';
 
   @override
-  String get unrecognizedStacStructure => 'Unrecognized Stac structure';
+  String get unrecognizedStacStructure => 'Estrutura Stac não reconhecida';
 
   @override
-  String get updateLabelUpper => 'UPDATE';
+  String get updateLabelUpper => 'ATUALIZAR';
 
   @override
   String updateToVersion(String version) {
-    return 'Update to v$version';
+    return 'Atualizar para v$version';
   }
 
   @override
-  String get versionLabel => 'Version';
+  String get versionLabel => 'Versão';
 
   @override
   String get incrementVersionHint =>
-      'Increase the version for your proposal (e.g., 1.1.0)';
+      'Incremente a versão para sua proposta (ex: 1.1.0)';
 
   @override
-  String get cancelUpper => 'CANCEL';
+  String get cancelUpper => 'CANCELAR';
 
   @override
   String get mustLinkGithubToPublishTemplate =>
-      'You must link GitHub in your profile to publish.';
+      'Você deve vincular o GitHub no seu perfil para publicar.';
 
   @override
   String get templateNeedsAtLeastOneField =>
-      'The template must have at least one defined field.';
+      'O modelo deve ter pelo menos um campo definido.';
 
   @override
   String get templatePullRequestCreated =>
-      'Proposal sent. A Pull Request has been created on GitHub.';
+      'Proposta enviada. Um Pull Request foi criado no GitHub.';
 
   @override
   String errorPublishingTemplate(String error) {
-    return 'Error publishing: $error';
+    return 'Erro ao publicar: $error';
   }
 
   @override
-  String get createGlobalTemplateTitle => 'Create global template';
+  String get createGlobalTemplateTitle => 'Criar modelo global';
 
   @override
-  String get githubVerifiedLabel => 'GitHub verified';
+  String get githubVerifiedLabel => 'GitHub verificado';
 
   @override
-  String get githubNotLinkedLabel => 'GitHub not linked';
+  String get githubNotLinkedLabel => 'GitHub não vinculado';
 
   @override
   String get veniDesignedTemplateBanner =>
-      'Veni designed this structure based on your request. Review and adjust it before publishing.';
+      'Veni projetou esta estrutura com base na sua solicitação. Revise e ajuste antes de publicar.';
 
   @override
-  String get templateNameLabel => 'Template name';
+  String get templateNameLabel => 'Nome do modelo';
 
   @override
-  String get templateNameHint => 'E.g.: My comics collection';
+  String get templateNameHint => 'Ex: Minha coleção de quadrinhos';
 
   @override
-  String get githubUserLabel => 'GitHub user';
+  String get githubUserLabel => 'Usuário do GitHub';
 
   @override
-  String get categoryLabel => 'Category';
+  String get categoryLabel => 'Categoria';
 
   @override
-  String get categoryHint => 'E.g.: Books, Electronics...';
+  String get categoryHint => 'Ex: Livros, Eletrônicos...';
 
   @override
-  String get templatePurposeDescription => 'Purpose description';
+  String get templatePurposeDescription => 'Descrição do propósito';
 
   @override
-  String get definedFieldsTitle => 'Defined fields';
+  String get definedFieldsTitle => 'Campos definidos';
 
   @override
-  String get addFieldButton => 'Add field';
+  String get addFieldButton => 'Adicionar campo';
 
   @override
-  String get clickAddFieldToStart => 'Click \'Add field\' to start designing.';
+  String get clickAddFieldToStart =>
+      'Clique em \'Adicionar campo\' para começar a projetar.';
 
   @override
-  String get configureOptionsUpper => 'CONFIGURE OPTIONS';
+  String get configureOptionsUpper => 'CONFIGURAR OPÇÕES';
 
   @override
-  String get writeOptionAndPressEnter => 'Type an option and press Enter';
+  String get writeOptionAndPressEnter => 'Escreva uma opção e pressione Enter';
 
   @override
-  String get publishOnGithubUpper => 'PUBLISH ON GITHUB';
+  String get publishOnGithubUpper => 'PUBLICAR NO GITHUB';
 
   @override
-  String get templateDetailFetchError => 'Could not fetch template details';
+  String get templateDetailFetchError =>
+      'Não foi possível obter os detalhes do modelo';
 
   @override
   String get templateNotAvailable =>
-      'The template does not exist or is not available';
+      'O modelo não existe ou não está disponível';
 
   @override
-  String get backLabel => 'Back';
+  String get backLabel => 'Voltar';
 
   @override
-  String get templateDetailTitle => 'Template detail';
+  String get templateDetailTitle => 'Detalhe do modelo';
 
   @override
-  String get saveToLibraryTooltip => 'Save to library';
+  String get saveToLibraryTooltip => 'Salvar na biblioteca';
 
   @override
   String templateByAuthor(String name) {
-    return 'by @$name';
+    return 'por @$name';
   }
 
   @override
-  String get officialVerifiedTemplate => 'Official verified template';
+  String get officialVerifiedTemplate => 'Modelo oficial verificado';
 
   @override
   String dataStructureFieldsUpper(int count) {
-    return 'DATA STRUCTURE ($count FIELDS)';
+    return 'ESTRUTURA DE DADOS ($count CAMPOS)';
   }
 
   @override
-  String get installInMyInventoryUpper => 'INSTALL IN MY INVENTORY';
+  String get installInMyInventoryUpper => 'INSTALAR NO MEU INVENTÁRIO';
 
   @override
-  String get addedToPersonalLibrary => 'Added to your personal library';
+  String get addedToPersonalLibrary => 'Adicionado à sua biblioteca pessoal';
 
   @override
-  String get whereDoYouWantToInstall => 'Where do you want to install it?';
+  String get whereDoYouWantToInstall => 'Onde você quer instalar?';
 
   @override
   String get noContainersCreateFirst =>
-      'You have no containers. Create one first.';
+      'Você não tem recipientes. Crie um primeiro.';
 
   @override
   String get autoGeneratedListFromTemplate =>
-      'Auto-generated list from template';
+      'Lista gerada automaticamente a partir do modelo';
 
   @override
   String get installationSuccessAutoLists =>
-      'Installation successful. Lists configured automatically.';
+      'Instalação bem-sucedida. Listas configuradas automaticamente.';
 
   @override
   String errorInstallingTemplate(String error) {
-    return 'Error installing: $error';
+    return 'Erro ao instalar: $error';
   }
 
   @override
-  String get publishTemplateLabel => 'Publish template';
+  String get publishTemplateLabel => 'Publicar modelo';
 
   @override
-  String get retryLabel => 'Retry';
+  String get retryLabel => 'Tentar novamente';
 
   @override
-  String get noTemplatesFoundInMarket =>
-      'No templates were found in the market.';
+  String get noTemplatesFoundInMarket => 'Nenhum modelo encontrado no mercado.';
 
   @override
-  String get invenicumCommunity => 'Invenicum Community';
+  String get invenicumCommunity => 'Comunidade Invenicum';
 
   @override
-  String get refreshMarketTooltip => 'Refresh market';
+  String get refreshMarketTooltip => 'Atualizar mercado';
 
   @override
   String get exploreCommunityConfigurations =>
-      'Explore and download community configurations';
+      'Explore e baixe configurações da comunidade';
 
   @override
-  String get searchByTemplateName => 'Search by template name...';
+  String get searchByTemplateName => 'Buscar por nome do modelo...';
 
   @override
-  String get filterByTagTooltip => 'Filter by tag';
+  String get filterByTagTooltip => 'Filtrar por etiqueta';
 
   @override
-  String get noMoreTags => 'No more tags';
+  String get noMoreTags => 'Não há mais etiquetas';
 
   @override
   String confirmDeleteDataList(String name) {
-    return 'Are you sure you want to delete list \"$name\"? This action is irreversible.';
+    return 'Tem certeza de que deseja excluir a lista \"$name\"? Esta ação é irreversível.';
   }
 
   @override
   String dataListDeletedSuccess(String name) {
-    return 'List \"$name\" deleted successfully.';
+    return 'Lista \"$name\" excluída com sucesso.';
   }
 
   @override
   String errorDeletingDataList(String error) {
-    return 'Error deleting list: $error';
+    return 'Erro ao excluir a lista: $error';
   }
 
   @override
   String customListsWithContainer(String name) {
-    return 'Custom lists - $name';
+    return 'Listas personalizadas - $name';
   }
 
   @override
-  String get newDataListLabel => 'New list';
+  String get newDataListLabel => 'Nova lista';
 
   @override
   String get noCustomListsCreateOne =>
-      'There are no custom lists. Create a new one.';
+      'Nenhuma lista personalizada. Crie uma nova.';
 
   @override
   String elementsCount(int count) {
-    return '$count elements';
+    return '$count elementos';
   }
 
   @override
   String get dataListNeedsAtLeastOneElement =>
-      'The list must have at least one element';
+      'A lista deve ter pelo menos um elemento';
 
   @override
-  String get customDataListCreated => 'Custom list created successfully';
+  String get customDataListCreated => 'Lista personalizada criada com sucesso';
 
   @override
   String errorCreatingDataList(String error) {
-    return 'Error creating list: $error';
+    return 'Erro ao criar a lista: $error';
   }
 
   @override
-  String get newCustomDataListTitle => 'New custom list';
+  String get newCustomDataListTitle => 'Nova lista personalizada';
 
   @override
-  String get dataListNameLabel => 'List name';
+  String get dataListNameLabel => 'Nome da lista';
 
   @override
-  String get pleaseEnterAName => 'Please enter a name';
+  String get pleaseEnterAName => 'Por favor, insira um nome';
 
   @override
-  String get dataListElementsTitle => 'List elements';
+  String get dataListElementsTitle => 'Elementos da lista';
 
   @override
-  String get newElementLabel => 'New element';
+  String get newElementLabel => 'Novo elemento';
 
   @override
-  String get addLabel => 'Add';
+  String get addLabel => 'Adicionar';
 
   @override
-  String get addElementsToListHint => 'Add elements to the list';
+  String get addElementsToListHint => 'Adicione elementos à lista';
 
   @override
-  String get saveListLabel => 'Save list';
+  String get saveListLabel => 'Salvar lista';
 
   @override
-  String get dataListUpdatedSuccessfully => 'List updated successfully';
+  String get dataListUpdatedSuccessfully => 'Lista atualizada com sucesso';
 
   @override
   String errorUpdatingDataList(String error) {
-    return 'Error updating list: $error';
+    return 'Erro ao atualizar a lista: $error';
   }
 
   @override
   String editListWithName(String name) {
-    return 'Edit list: $name';
+    return 'Editar lista: $name';
   }
 
   @override
-  String get createNewLocationTitle => 'Create New Location';
+  String get createNewLocationTitle => 'Criar nova localização';
 
   @override
-  String get locationNameLabel => 'Location Name';
+  String get locationNameLabel => 'Nome da localização';
 
   @override
-  String get locationNameHint => 'E.g.: Shelf B3, Server Room';
+  String get locationNameHint => 'Ex: Prateleira B3, Sala de Servidores';
 
   @override
-  String get locationDescriptionHint => 'Access details, content type, etc.';
+  String get locationDescriptionHint =>
+      'Detalhes de acesso, tipo de conteúdo, etc.';
 
   @override
-  String get parentLocationLabel => 'Parent Location (Contains this one)';
+  String get parentLocationLabel => 'Localização pai (contém esta)';
 
   @override
-  String get noParentRootLocation => 'No parent (Root Location)';
+  String get noParentRootLocation => 'Nenhum pai (localização raiz)';
 
   @override
-  String get noneRootScheme => 'None (Scheme Root)';
+  String get noneRootScheme => 'Nenhum (raiz do esquema)';
 
   @override
-  String get savingLabel => 'Saving...';
+  String get savingLabel => 'Salvando...';
 
   @override
-  String get saveLocationLabel => 'Save Location';
+  String get saveLocationLabel => 'Salvar localização';
 
   @override
   String locationCreatedSuccessfully(String name) {
-    return 'Location \"$name\" created successfully.';
+    return 'Localização \"$name\" criada com sucesso.';
   }
 
   @override
   String errorCreatingLocation(String error) {
-    return 'Error creating location: $error';
+    return 'Erro ao criar localização: $error';
   }
 
   @override
   String get locationCannotBeItsOwnParent =>
-      'A location cannot be its own parent.';
+      'Uma localização não pode ser sua própria pai.';
 
   @override
   String locationUpdatedSuccessfully(String name) {
-    return 'Location \"$name\" updated.';
+    return 'Localização \"$name\" atualizada.';
   }
 
   @override
   String errorUpdatingLocation(String error) {
-    return 'Error updating location: $error';
+    return 'Erro ao atualizar localização: $error';
   }
 
   @override
   String editLocationTitle(String name) {
-    return 'Edit: $name';
+    return 'Editar: $name';
   }
 
   @override
-  String get updateLocationLabel => 'Update Location';
+  String get updateLocationLabel => 'Atualizar localização';
 
   @override
-  String get selectObjectTitle => 'Select Object';
+  String get selectObjectTitle => 'Selecionar objeto';
 
   @override
-  String get noObjectsAvailable => 'No objects available';
+  String get noObjectsAvailable => 'Nenhum objeto disponível';
 
   @override
   String availableQuantity(int quantity) {
-    return 'Available: $quantity';
+    return 'Disponível: $quantity';
   }
 
   @override
   String errorSelectingObject(String error) {
-    return 'Error selecting object: $error';
+    return 'Erro ao selecionar objeto: $error';
   }
 
   @override
-  String get mustSelectAnObject => 'You must select an object';
+  String get mustSelectAnObject => 'Você deve selecionar um objeto';
 
   @override
-  String get loanRegisteredSuccessfully => 'Loan registered successfully';
+  String get loanRegisteredSuccessfully => 'Empréstimo registrado com sucesso';
 
   @override
-  String get selectAnObject => 'Select an object';
+  String get selectAnObject => 'Selecione um objeto';
 
   @override
-  String get selectLabel => 'Select';
+  String get selectLabel => 'Selecionar';
 
   @override
-  String get borrowerNameHint => 'E.g.: John Doe';
+  String get borrowerNameHint => 'Ex: João Silva';
 
   @override
-  String get borrowerNameRequired => 'Name is required';
+  String get borrowerNameRequired => 'O nome é obrigatório';
 
   @override
   String loanQuantityAvailable(int quantity) {
-    return 'Quantity to loan (Available: $quantity)';
+    return 'Quantidade a emprestar (Disponível: $quantity)';
   }
 
   @override
-  String get enterQuantity => 'Enter a quantity';
+  String get enterQuantity => 'Insira uma quantidade';
 
   @override
-  String get invalidQuantity => 'Invalid quantity';
+  String get invalidQuantity => 'Quantidade inválida';
 
   @override
-  String get notEnoughStock => 'Not enough stock';
+  String get notEnoughStock => 'Estoque insuficiente';
 
   @override
-  String get invalidEmail => 'Invalid email';
+  String get invalidEmail => 'E-mail inválido';
 
   @override
   String expectedReturnDateLabel(String date) {
-    return 'Expected return: $date';
+    return 'Devolução esperada: $date';
   }
 
   @override
-  String get selectReturnDate => 'Select return date';
+  String get selectReturnDate => 'Selecione a data de devolução';
 
   @override
-  String get additionalNotes => 'Additional Notes';
+  String get additionalNotes => 'Notas adicionais';
 
   @override
-  String get registerLoanLabel => 'Register Loan';
+  String get registerLoanLabel => 'Registrar empréstimo';
 
   @override
   String get totalLabel => 'Total';
 
   @override
-  String get newLocationLabel => 'New location';
+  String get newLocationLabel => 'Nova localização';
 
   @override
-  String get newLocationHint => 'E.g.: Shelf A1, Cabinet 3...';
+  String get newLocationHint => 'Ex: Prateleira A1, Armário 3...';
 
   @override
-  String get parentLocationOptionalLabel => 'Parent location (optional)';
+  String get parentLocationOptionalLabel => 'Localização pai (opcional)';
 
   @override
-  String get noneRootLabel => 'None (root)';
+  String get noneRootLabel => 'Nenhuma (raiz)';
 
   @override
   String locationCreatedShort(String name) {
-    return 'Location \"$name\" created';
+    return 'Localização \"$name\" criada';
   }
 
   @override
-  String get newLocationEllipsis => 'New location...';
+  String get newLocationEllipsis => 'Nova localização...';
 
   @override
-  String get couldNotReloadList => 'Could not reload the list';
+  String get couldNotReloadList => 'Não foi possível recarregar a lista';
 
   @override
-  String get deleteAssetTitle => 'Delete Asset';
+  String get deleteAssetTitle => 'Excluir ativo';
 
   @override
   String confirmDeleteAssetItem(String name) {
-    return 'Do you confirm deleting \"$name\"?';
+    return 'Confirma que deseja excluir \"$name\"?';
   }
 
   @override
-  String get assetDeletedShort => 'Asset deleted.';
+  String get assetDeletedShort => 'Ativo excluído.';
 
   @override
   String viewColumnsLabel(int count) {
-    return 'View: $count col.';
+    return 'Vista: $count col.';
   }
 
   @override
-  String get notValuedLabel => 'Not valued';
+  String get notValuedLabel => 'Sem valor';
 
   @override
   String get manageSearchSyncAssets =>
-      'Manage, search and sync your assets from a single panel.';
+      'Gerencie, pesquise e sincronize seus ativos em um único painel.';
 
   @override
-  String get filterLabel => 'Filter';
+  String get filterLabel => 'Filtro';
 
   @override
-  String get activeFilterLabel => 'Active filter';
+  String get activeFilterLabel => 'Filtro ativo';
 
   @override
-  String get importLabel => 'Import';
+  String get importLabel => 'Importar';
 
   @override
-  String get exportLabel => 'Export';
+  String get exportLabel => 'Exportar';
 
   @override
-  String get csvExportNoData => 'There are no items to export.';
+  String get csvExportNoData => 'Nenhum item para exportar.';
 
   @override
   String csvExportSuccess(int count) {
-    return 'CSV exported successfully ($count items).';
+    return 'CSV exportado com sucesso ($count itens).';
   }
 
   @override
-  String get csvExportError => 'Could not export CSV';
+  String get csvExportError => 'Não foi possível exportar o CSV';
 
   @override
-  String get syncLabel => 'Sync prices';
+  String get syncLabel => 'Sincronizar preços';
 
   @override
-  String get syncingLabel => 'Syncing...';
+  String get syncingLabel => 'Sincronizando...';
 
   @override
-  String get newAssetLabel => 'New asset';
+  String get newAssetLabel => 'Novo ativo';
 
   @override
-  String get statusAndPreferences => 'Status and Preferences';
+  String get statusAndPreferences => 'Status e preferências';
 
   @override
-  String get itemStatusLabel => 'Item status';
+  String get itemStatusLabel => 'Status do item';
 
   @override
-  String get availableLabel => 'Available';
+  String get availableLabel => 'Disponível';
 
   @override
-  String get mustBeGreaterThanZero => 'Must be greater than 0.';
+  String get mustBeGreaterThanZero => 'Deve ser maior que 0.';
 
   @override
-  String get alertThresholdLabel => 'Alert threshold';
+  String get alertThresholdLabel => 'Limite de alerta';
 
   @override
-  String get enterMinimumStock => 'Enter a minimum stock';
+  String get enterMinimumStock => 'Insira um estoque mínimo.';
 
   @override
   String get serializedItemFixedQuantity =>
-      'This is a serialized item. Quantity is fixed at 1.';
+      'Este é um item serializado. A quantidade é fixa em 1.';
 
   @override
-  String get serialNumberLabel => 'Serial number';
+  String get serialNumberLabel => 'Número de série';
 
   @override
-  String get serialNumberHint => 'E.g.: SN-2024-00123';
+  String get serialNumberHint => 'Ex: SN-2024-00123';
 
   @override
-  String get mainDataTitle => 'Main Data';
+  String get mainDataTitle => 'Dados principais';
 
   @override
-  String get currentMarketValueLabel => 'CURRENT MARKET VALUE';
+  String get currentMarketValueLabel => 'VALOR DE MERCADO ATUAL';
 
   @override
-  String get updatePriceLabel => 'Update Price';
+  String get updatePriceLabel => 'Atualizar preço';
 
   @override
-  String get viewLabel => 'View';
+  String get viewLabel => 'Visualização';
 
   @override
-  String get visualGalleryTitle => 'Visual Gallery';
+  String get visualGalleryTitle => 'Galeria visual';
 
   @override
-  String get statusAndMarketTitle => 'Status and Market';
+  String get statusAndMarketTitle => 'Status e mercado';
 
   @override
-  String get valuationHistoryTitle => 'Valuation History';
+  String get valuationHistoryTitle => 'Histórico de avaliação';
 
   @override
-  String get specificationsTitle => 'Specifications';
+  String get specificationsTitle => 'Especificações';
 
   @override
-  String get traceabilityTitle => 'Traceability';
+  String get traceabilityTitle => 'Rastreabilidade';
 
   @override
-  String get stockLabel => 'Stock';
+  String get stockLabel => 'Estoque';
 
   @override
-  String get internalReferenceLabel => 'Internal Reference';
+  String get internalReferenceLabel => 'Referência interna';
 
   @override
-  String get noSpecificationsAvailable => 'No specifications available';
+  String get noSpecificationsAvailable => 'Nenhuma especificação disponível';
 
   @override
-  String get trueLabel => 'True';
+  String get trueLabel => 'Verdadeiro';
 
   @override
-  String get falseLabel => 'False';
+  String get falseLabel => 'Falso';
 
   @override
-  String get openLinkLabel => 'Open link';
+  String get openLinkLabel => 'Abrir link';
 
   @override
   String get scannerFocusTip =>
-      'Tip: If it does not focus, move the product about 30 cm away from the camera.';
+      'Dica: Se não focar, afaste o produto cerca de 30 cm da câmera.';
 
   @override
-  String get scanCodeTitle => 'Scan Code';
+  String get scanCodeTitle => 'Escanear código';
 
   @override
-  String get scanOrEnterProductCode => 'Scan or enter the product code';
+  String get scanOrEnterProductCode => 'Escaneie ou insira o código do produto';
 
   @override
   String possessionProgressLabel(String name) {
-    return 'Progress of $name';
+    return 'Progresso de $name';
   }
 
   @override
-  String get externalImportTitle => 'Import from External Source';
+  String get externalImportTitle => 'Importar de fonte externa';
 
   @override
-  String get galleryTitle => 'Gallery';
+  String get galleryTitle => 'Galeria';
 
   @override
-  String get stockAndCodingTitle => 'Stock and Coding';
+  String get stockAndCodingTitle => 'Estoque e codificação';
 
   @override
   String get cameraPermissionRequired =>
-      'Camera permission is required to scan';
+      'Permissão de câmera necessária para escanear';
 
   @override
-  String get cloudDataFound => 'Data found in the cloud!';
+  String get cloudDataFound => 'Dados encontrados na nuvem!';
 
   @override
-  String get typeSomethingToSearch => 'Type something to search';
+  String get typeSomethingToSearch => 'Digite algo para pesquisar';
 
   @override
-  String get importCancelled => 'Import cancelled.';
+  String get importCancelled => 'Importação cancelada.';
 
   @override
-  String get couldNotCompleteImport => 'Could not complete the import';
+  String get couldNotCompleteImport => 'Não foi possível concluir a importação';
 
   @override
-  String get yearLabel => 'Year';
+  String get yearLabel => 'Ano';
 
   @override
-  String get authorLabel => 'Author';
+  String get authorLabel => 'Autor';
 
   @override
-  String get selectResultTitle => 'Select a result';
+  String get selectResultTitle => 'Selecione um resultado';
 
   @override
-  String get unnamedLabel => 'Unnamed';
+  String get unnamedLabel => 'Sem nome';
 
   @override
-  String get completeRequiredFields => 'Please complete the required fields.';
+  String get completeRequiredFields =>
+      'Por favor, preencha os campos obrigatórios.';
 
   @override
-  String get assetCreatedSuccess => 'Asset created!';
+  String get assetCreatedSuccess => 'Ativo criado!';
 
   @override
   String errorCreatingAsset(String error) {
-    return 'Error creating asset: $error';
+    return 'Erro ao criar ativo: $error';
   }
 
   @override
-  String get technicalDetailsTitle => 'Technical Details';
+  String get technicalDetailsTitle => 'Detalhes técnicos';
 
   @override
   String itemImportedSuccessfully(String name) {
-    return '$name imported successfully!';
+    return '$name importado com sucesso!';
   }
 
   @override
   String newImagesSelected(int count) {
-    return '$count new images were selected.';
+    return '$count novas imagens selecionadas.';
   }
 
   @override
-  String get newFileRemoved => 'New file removed.';
+  String get newFileRemoved => 'Novo arquivo removido.';
 
   @override
-  String get imageMarkedForDeletion => 'Image marked for deletion when saving.';
+  String get imageMarkedForDeletion =>
+      'Imagem marcada para exclusão ao salvar.';
 
   @override
-  String get couldNotIdentifyImage => 'Could not identify the image.';
+  String get couldNotIdentifyImage => 'Não foi possível identificar a imagem.';
 
   @override
   String editAssetTitle(String name) {
-    return 'Edit: $name';
+    return 'Editar: $name';
   }
 
   @override
-  String get syncPricesTitle => 'Sync prices';
+  String get syncPricesTitle => 'Sincronizar preços';
 
   @override
   String get syncPricesDescription =>
-      'The API will be queried to update the market value.';
+      'A API será consultada para atualizar o valor de mercado.';
 
   @override
-  String get syncingMarketPrices => 'Syncing market prices...';
+  String get syncingMarketPrices => 'Sincronizando preços de mercado...';
 
   @override
-  String get couldNotSyncPrices => 'Could not sync prices';
+  String get couldNotSyncPrices => 'Não foi possível sincronizar os preços';
 
   @override
-  String get syncCompletedTitle => 'Synchronization completed';
+  String get syncCompletedTitle => 'Sincronização concluída';
 
   @override
-  String get updatedLabel => 'Updated';
+  String get updatedLabel => 'Atualizados';
 
   @override
-  String get noApiPriceLabel => 'No price in API';
+  String get noApiPriceLabel => 'Sem preço na API';
 
   @override
-  String get errorsLabel => 'Errors';
+  String get errorsLabel => 'Erros';
 
   @override
-  String get totalProcessedLabel => 'Total processed';
+  String get totalProcessedLabel => 'Total processados';
 
   @override
-  String get noAssetsToShow => 'No assets to display';
+  String get noAssetsToShow => 'Nenhum ativo para exibir';
 
   @override
-  String get noImageLabel => 'No image';
+  String get noImageLabel => 'Sem imagem';
 
   @override
-  String get aiMagicQuestion => 'Do you have a link?';
+  String get aiMagicQuestion => 'Você tem um link?';
 
   @override
-  String get aiAutocompleteAsset => 'Autocomplete this asset with AI';
+  String get aiAutocompleteAsset =>
+      'Preencher este ativo automaticamente com IA';
 
   @override
-  String get magicLabel => 'MAGIC';
+  String get magicLabel => 'MAGIA';
 
   @override
   String get skuBarcodeLabel => 'SKU / EAN / UPC';
@@ -2023,11 +2062,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get veniChatStatus => 'Online';
 
   @override
-  String get veniChatTitle => 'Veni IA';
+  String get veniChatTitle => 'Venibot IA';
 
   @override
   String get veniChatWelcome =>
-      'Oi! Sou Veni, seu assistente Invenicum. Como posso ajudá-lo com seu inventário hoje?';
+      'Olá! Sou o Venibot, seu assistente Invenicum. Como posso ajudá-lo com seu inventário hoje?';
 
   @override
   String get veniCmdDashboard => 'Ir para o painel';
@@ -2045,11 +2084,11 @@ class AppLocalizationsPt extends AppLocalizations {
   String get veniCmdReport => 'Gerar relatório de inventário';
 
   @override
-  String get veniCmdScanQR => 'Digitalizar QR/Código de barras';
+  String get veniCmdScanQR => 'Escanear QR/código de barras';
 
   @override
   String get veniCmdUnknown =>
-      'Não reconheço esse comando. Escreva ajuda para ver o que posso fazer.';
+      'Não reconheço esse comando. Digite ajuda para ver o que posso fazer.';
 
   @override
   String version(String name) {
@@ -2060,70 +2099,100 @@ class AppLocalizationsPt extends AppLocalizations {
   String get yes => 'Sim';
 
   @override
-  String get zoomToFit => 'Zoom para ajustar';
+  String get zoomToFit => 'Ajustar visualização';
 
   @override
-  String get generalSettingsMenuLabel => 'General Settings';
+  String get generalSettingsMenuLabel => 'Configurações gerais';
 
   @override
-  String get aiAssistantMenuLabel => 'AI Assistant';
+  String get aiAssistantMenuLabel => 'Assistente de IA';
 
   @override
-  String get notificationsMenuLabel => 'Notifications';
+  String get notificationsMenuLabel => 'Notificações';
 
   @override
-  String get loanManagementMenuLabel => 'Loan Management';
+  String get loanManagementMenuLabel => 'Gestão de empréstimos';
 
   @override
-  String get aboutMenuLabel => 'About';
+  String get aboutMenuLabel => 'Sobre';
 
   @override
-  String get automaticDarkModeLabel => 'Automatic dark mode';
+  String get automaticDarkModeLabel => 'Modo escuro automático';
 
   @override
-  String get syncWithSystemLabel => 'Sync with system';
+  String get syncWithSystemLabel => 'Sincronizar com o sistema';
 
   @override
-  String get manualDarkModeLabel => 'Manual dark mode';
+  String get manualDarkModeLabel => 'Modo escuro manual';
 
   @override
-  String get disableAutomaticToChange => 'Disable automatic mode to change it';
+  String get disableAutomaticToChange =>
+      'Desative o modo automático para alterá-lo';
 
   @override
-  String get changeLightDark => 'Switch between light and dark';
+  String get changeLightDark => 'Alternar entre claro e escuro';
 
   @override
-  String get enableAiAndChatbot => 'Enable Artificial Intelligence and Chatbot';
+  String get enableAiAndChatbot => 'Ativar inteligência artificial e chatbot';
 
   @override
   String get requiresGeminiLinking =>
-      'Requires linking with Gemini in Integrations';
+      'Requer vínculo com o Gemini em Integrações';
 
   @override
   String get aiOrganizeInventory =>
-      'Use AI to organize your inventory intelligently';
+      'Use IA para organizar seu inventário de forma inteligente';
 
   @override
-  String get aiAssistantTitle => 'Artificial Intelligence Assistant';
+  String get aiAssistantTitle => 'Assistente de Inteligência Artificial';
 
   @override
   String get selectAiProvider =>
-      'Choose which AI provider Veni will use. Make sure you have the API Key configured in Integrations.';
+      'Escolha qual provedor de IA o Veni vai usar. Certifique-se de que a chave de API está configurada em Integrações.';
 
   @override
-  String get aiProviderLabel => 'Provider';
+  String get aiProviderLabel => 'Provedor';
 
   @override
-  String get aiModelLabel => 'Model';
+  String get aiModelLabel => 'Modelo';
 
   @override
-  String get aiProviderUpdated => 'AI Provider updated';
+  String get aiProviderUpdated => 'Provedor de IA atualizado';
 
   @override
-  String get notificationSettingsTitle => 'Notification Management';
+  String get purgeChatHistoryTitle => 'Histórico do chat';
 
   @override
-  String get channelPriorityLabel => 'Channel Priority (Drag to reorder)';
+  String get purgeChatHistoryDescription =>
+      'Exclui permanentemente todo o histórico salvo de conversas do Veni.';
+
+  @override
+  String get purgeChatHistoryButton => 'Limpar histórico';
+
+  @override
+  String get purgeChatHistoryConfirmTitle => 'Limpar histórico do chat?';
+
+  @override
+  String get purgeChatHistoryConfirmMessage =>
+      'Esta ação excluirá todas as mensagens salvas e não pode ser desfeita.';
+
+  @override
+  String get purgeChatHistoryConfirmAction => 'Sim, limpar';
+
+  @override
+  String get purgeChatHistorySuccess =>
+      'Histórico do chat removido com sucesso.';
+
+  @override
+  String get purgeChatHistoryError =>
+      'Não foi possível remover o histórico do chat.';
+
+  @override
+  String get notificationSettingsTitle => 'Gestão de notificações';
+
+  @override
+  String get channelPriorityLabel =>
+      'Prioridade dos canais (arraste para ordenar)';
 
   @override
   String get telegramBotLabel => 'Telegram Bot';
@@ -2132,217 +2201,217 @@ class AppLocalizationsPt extends AppLocalizations {
   String get resendEmailLabel => 'Resend Email';
 
   @override
-  String get lowStockLabel => 'Low Stock';
+  String get lowStockLabel => 'Estoque baixo';
 
   @override
-  String get lowStockHint => 'Alert when a product falls below the minimum.';
+  String get lowStockHint => 'Avisar quando um produto cair abaixo do mínimo.';
 
   @override
-  String get newPresalesLabel => 'New Pre-sales';
+  String get newPresalesLabel => 'Novas pré-vendas';
 
   @override
-  String get newPresalesHint => 'Notify launches detected by AI.';
+  String get newPresalesHint => 'Notificar lançamentos detectados pela IA.';
 
   @override
-  String get loanReminderLabel => 'Loan Reminder';
+  String get loanReminderLabel => 'Lembrete de empréstimos';
 
   @override
-  String get loanReminderHint => 'Alert before the return date.';
+  String get loanReminderHint => 'Avisar antes da data de devolução.';
 
   @override
-  String get overdueLoansLabel => 'Overdue Loans';
+  String get overdueLoansLabel => 'Empréstimos vencidos';
 
   @override
   String get overdueLoansHint =>
-      'Critical alert if an object is not returned on time.';
+      'Alerta crítico se um objeto não for devolvido a tempo.';
 
   @override
-  String get maintenanceLabel => 'Maintenance';
+  String get maintenanceLabel => 'Manutenção';
 
   @override
-  String get maintenanceHint => 'Alert when an asset needs review.';
+  String get maintenanceHint => 'Avisar quando um ativo precisar ser revisado.';
 
   @override
-  String get priceChangeLabel => 'Price Changes';
+  String get priceChangeLabel => 'Mudanças de preço';
 
   @override
-  String get priceChangeHint => 'Notify market value variations.';
+  String get priceChangeHint => 'Notificar variações de valor no mercado.';
 
   @override
-  String get unlinkGithubTitle => 'Disconnect GitHub';
+  String get unlinkGithubTitle => 'Desconectar GitHub';
 
   @override
   String get unlinkGithubMessage =>
-      'Are you sure you want to unlink your GitHub account?';
+      'Tem certeza de que deseja desvincular sua conta do GitHub?';
 
   @override
-  String get updatePasswordButton => 'UPDATE PASSWORD';
+  String get updatePasswordButton => 'ATUALIZAR SENHA';
 
   @override
-  String get newContainerDialog => 'New Container';
+  String get newContainerDialog => 'Novo recipiente';
 
   @override
-  String get descriptionField => 'Description';
+  String get descriptionField => 'Descrição';
 
   @override
-  String get isCollectionQuestion => 'Is it a collection?';
+  String get isCollectionQuestion => 'É uma coleção?';
 
   @override
-  String get createContainerButton => 'Create Container';
+  String get createContainerButton => 'Criar recipiente';
 
   @override
-  String get selectContainerHint => 'Select a container';
+  String get selectContainerHint => 'Selecione um recipiente';
 
   @override
-  String get newAssetTypeTitle => 'New Asset Type';
+  String get newAssetTypeTitle => 'Novo tipo de ativo';
 
   @override
-  String get generalConfiguration => 'General Configuration';
+  String get generalConfiguration => 'Configuração geral';
 
   @override
   String get collectionContainerWarning =>
-      'This container is a collection. You can create serialized or non-serialized types, but possession and desired fields can only be configured on non-serialized types.';
+      'Este recipiente é uma coleção. Você pode criar tipos serializados ou não serializados, mas os campos de posse e desejados só poderão ser configurados em tipos não serializados.';
 
   @override
-  String get createAssetTypeButton => 'Create Asset Type';
+  String get createAssetTypeButton => 'Criar tipo de ativo';
 
   @override
   String assetTypesInContainer(String name) {
-    return 'Asset Types in \"$name\"';
+    return 'Tipos de ativo em \"$name\"';
   }
 
   @override
-  String get createNewTypeButton => 'Create New Type';
+  String get createNewTypeButton => 'Criar novo tipo';
 
   @override
-  String get isSerializedQuestion => 'Is it a serialized item?';
+  String get isSerializedQuestion => 'É um artigo serializado?';
 
   @override
-  String get addNewFieldButton => 'Add New Field';
+  String get addNewFieldButton => 'Adicionar novo campo';
 
   @override
-  String get deleteFieldTooltip => 'Delete field';
+  String get deleteFieldTooltip => 'Excluir campo';
 
   @override
-  String get fieldsOptions => 'Options:';
+  String get fieldsOptions => 'Opções:';
 
   @override
-  String get isRequiredField => 'Is Required';
+  String get isRequiredField => 'É obrigatório';
 
   @override
-  String get isSummativeFieldLabel => 'Is Summative (Added to type total)';
+  String get isSummativeFieldLabel => 'É somativo (somado ao total do tipo)';
 
   @override
-  String get isMonetaryValueLabel => 'Is Monetary Value';
+  String get isMonetaryValueLabel => 'É valor monetário';
 
   @override
   String get monetaryValueDescription =>
-      'Will be used to calculate total investment in Dashboard';
+      'Será usado para calcular o investimento total no painel';
 
   @override
   String get noDataListsAvailable =>
-      '⚠️ No data lists available in this container.';
+      '⚠️ Nenhuma lista de dados disponível neste recipiente.';
 
   @override
-  String get selectDataList => 'Select Data List';
+  String get selectDataList => 'Selecionar lista de dados';
 
   @override
-  String get chooseList => 'Choose a list';
+  String get chooseList => 'Escolha uma lista';
 
   @override
-  String get goToPageLabel => 'Go to page:';
+  String get goToPageLabel => 'Ir para a página:';
 
   @override
-  String get conditionLabel => 'Condition';
+  String get conditionLabel => 'Condição';
 
   @override
-  String get actionsLabel => 'Actions';
+  String get actionsLabel => 'Ações';
 
   @override
-  String get editButtonLabel => 'Edit';
+  String get editButtonLabel => 'Editar';
 
   @override
-  String get deleteButtonLabel => 'Delete';
+  String get deleteButtonLabel => 'Excluir';
 
   @override
-  String get printLabel => 'Print label';
+  String get printLabel => 'Imprimir etiqueta';
 
   @override
-  String get collectionFieldsTooltip => 'Collection Fields';
+  String get collectionFieldsTooltip => 'Campos de coleção';
 
   @override
   String totalLocations(int count) {
-    return '$count locations';
+    return '$count localizações';
   }
 
   @override
   String withoutLocationLabel(int count) {
-    return '$count without location · ';
+    return '$count sem localização · ';
   }
 
   @override
-  String get objectIdColumn => 'Object ID';
+  String get objectIdColumn => 'ID Obj';
 
   @override
   String containerNotFoundError(String id) {
-    return 'Container with ID $id not found.';
+    return 'Recipiente com ID $id não encontrado.';
   }
 
   @override
-  String get invalidContainerIdError => 'Error: Invalid container ID.';
+  String get invalidContainerIdError => 'Erro: ID de recipiente inválido.';
 
   @override
-  String get startConfigurationButton => 'Start configuration';
+  String get startConfigurationButton => 'Iniciar configuração';
 
   @override
-  String get fullNameField => 'Full name';
+  String get fullNameField => 'Nome completo';
 
   @override
-  String get emailField => 'Email address';
+  String get emailField => 'E-mail';
 
   @override
-  String get passwordField => 'Password';
+  String get passwordField => 'Senha';
 
   @override
-  String get confirmPasswordField => 'Confirm password';
+  String get confirmPasswordField => 'Confirmar senha';
 
   @override
-  String get goBackButton => 'Go back';
+  String get goBackButton => 'Voltar';
 
   @override
-  String get createAccountButton => 'Create account';
+  String get createAccountButton => 'Criar conta';
 
   @override
-  String get goToLoginButton => 'Go to login';
+  String get goToLoginButton => 'Ir para o login';
 
   @override
-  String get deleteConfirmationTitle => 'Confirm Deletion';
+  String get deleteConfirmationTitle => 'Confirmar exclusão';
 
   @override
   String deleteItemMessage(String name) {
-    return 'Do you wish to delete \"$name\"?';
+    return 'Deseja excluir \"$name\"?';
   }
 
   @override
-  String get elementDeletedSuccess => 'Element deleted successfully';
+  String get elementDeletedSuccess => 'Elemento excluído com sucesso';
 
   @override
-  String get enterYourNameValidation => 'Enter your name.';
+  String get enterYourNameValidation => 'Insira seu nome.';
 
   @override
-  String get minTwoCharactersValidation => 'Minimum 2 characters.';
+  String get minTwoCharactersValidation => 'Mínimo 2 caracteres.';
 
   @override
-  String get enterEmailValidation => 'Enter an email.';
+  String get enterEmailValidation => 'Insira um e-mail.';
 
   @override
-  String get invalidEmailValidation => 'Invalid email.';
+  String get invalidEmailValidation => 'E-mail inválido.';
 
   @override
-  String get enterPasswordValidation => 'Enter a password.';
+  String get enterPasswordValidation => 'Insira uma senha.';
 
   @override
-  String get minEightCharactersValidation => 'Minimum 8 characters.';
+  String get minEightCharactersValidation => 'Mínimo 8 caracteres.';
 
   @override
   String get threeDbuttonLabel => '3D';
@@ -2363,68 +2432,68 @@ class AppLocalizationsPt extends AppLocalizations {
   }
 
   @override
-  String get invalidIdError => 'Invalid ID';
+  String get invalidIdError => 'ID inválido';
 
   @override
   String assetTypeLoadError(String error) {
-    return 'Error loading data: $error';
+    return 'Erro ao carregar dados: $error';
   }
 
   @override
-  String get assetTypeUpdateSuccess => 'Asset type updated successfully';
+  String get assetTypeUpdateSuccess => 'Tipo de ativo atualizado com sucesso';
 
   @override
   String assetTypeUpdateError(String error) {
-    return 'Error updating: $error';
+    return 'Erro ao atualizar: $error';
   }
 
   @override
   String editAssetTypeTitle(String name) {
-    return 'Edit: $name';
+    return 'Editar: $name';
   }
 
   @override
-  String get achievementCollectionTitle => 'Achievement Collection';
+  String get achievementCollectionTitle => 'Conquistas de coleção';
 
   @override
-  String get achievementSubtitle => 'Unlock milestones using Invenicum';
+  String get achievementSubtitle => 'Desbloqueie marcos usando o Invenicum';
 
   @override
-  String get legendaryAchievementLabel => 'LEGENDARY ACHIEVEMENT';
+  String get legendaryAchievementLabel => 'CONQUISTA LENDÁRIA';
 
   @override
-  String get achievementCompleted => 'Completed';
+  String get achievementCompleted => 'Concluído';
 
   @override
-  String get achievementLocked => 'Locked';
+  String get achievementLocked => 'Bloqueado';
 
   @override
   String achievementUnlockedDate(String date) {
-    return 'Unlocked on $date';
+    return 'Conquistado em $date';
   }
 
   @override
-  String get achievementLockedMessage => 'Fulfill the objective to unlock';
+  String get achievementLockedMessage => 'Cumpra o objetivo para desbloquear';
 
   @override
-  String get closeButtonLabel => 'Got it';
+  String get closeButtonLabel => 'Entendido';
 
   @override
-  String get configurationGeneralSection => 'General Configuration';
+  String get configurationGeneralSection => 'Configuração geral';
 
   @override
   String get assetTypeCollectionWarning =>
-      'This container is a collection. You can create serialized or non-serialized types, but possession and desired fields can only be configured in non-serialized types.';
+      'Este recipiente é uma coleção. Você pode criar tipos serializados ou não serializados, mas os campos de posse e desejados só poderão ser configurados em tipos não serializados.';
 
   @override
-  String get updateAssetTypeButton => 'Update Asset Type';
+  String get updateAssetTypeButton => 'Atualizar tipo de ativo';
 
   @override
-  String get createAssetTypeButtonDefault => 'Create Asset Type';
+  String get createAssetTypeButtonDefault => 'Criar tipo de ativo';
 
   @override
   String get noAssetTypesMessage =>
-      'No Asset Types defined yet in this container.';
+      'Ainda não há tipos de ativo definidos neste recipiente.';
 
   @override
   String totalCountLabel(int count) {
@@ -2433,194 +2502,196 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String possessionCountLabel(int count) {
-    return 'Possession: $count';
+    return 'Posse: $count';
   }
 
   @override
   String desiredCountLabel(int count) {
-    return 'Desired: $count';
+    return 'Desejados: $count';
   }
 
   @override
-  String get marketValueLabel => 'Market: ';
+  String get marketValueLabel => 'Mercado: ';
 
   @override
-  String get defaultSumFieldName => 'Sum';
+  String get defaultSumFieldName => 'Soma';
 
   @override
-  String get calculatingLabel => 'Calculating...';
+  String get calculatingLabel => 'Calculando...';
 
   @override
-  String get unknownError => 'Unknown error';
+  String get unknownError => 'Erro desconhecido';
 
   @override
-  String get noNameItem => 'No name';
+  String get noNameItem => 'Sem nome';
 
   @override
-  String get loadingContainers => 'Loading containers...';
+  String get loadingContainers => 'Carregando recipientes...';
 
   @override
-  String get fieldNameRequired => 'Field name is required';
+  String get fieldNameRequired => 'O nome do campo é obrigatório';
 
   @override
-  String get selectImageButton => 'Select Image';
+  String get selectImageButton => 'Selecionar imagem';
 
   @override
   String assetTypeDeletedSuccess(String name) {
-    return '$name deleted';
+    return '$name excluído';
   }
 
   @override
   String get noLocationValueData =>
-      'No assets with location and sufficient value yet to display this chart.';
+      'Ainda não há ativos com localização e valor suficiente para gerar este gráfico.';
 
   @override
-  String get requiredFieldValidation => 'This field is required';
+  String get requiredFieldValidation => 'Este campo é obrigatório';
 
   @override
-  String get oceanTheme => 'Indian Ocean';
+  String get oceanTheme => 'Oceano Índico';
 
   @override
-  String get cherryBlossomTheme => 'Cherry Blossom';
+  String get cherryBlossomTheme => 'Flor de cerejeira';
 
   @override
-  String get themeBrand => 'Invenicum (Brand)';
+  String get themeBrand => 'Invenicum (Marca)';
 
   @override
-  String get themeEmerald => 'Emerald';
+  String get themeEmerald => 'Esmeralda';
 
   @override
-  String get themeSunset => 'Sunset';
+  String get themeSunset => 'Pôr do sol';
 
   @override
-  String get themeLavender => 'Soft Lavender';
+  String get themeLavender => 'Lavanda suave';
 
   @override
-  String get themeForest => 'Deep Forest';
+  String get themeForest => 'Floresta profunda';
 
   @override
-  String get themeCherry => 'Cherry';
+  String get themeCherry => 'Cereja';
 
   @override
-  String get themeElectricNight => 'Electric Night';
+  String get themeElectricNight => 'Noite elétrica';
 
   @override
-  String get themeAmberGold => 'Amber Gold';
+  String get themeAmberGold => 'Ouro âmbar';
 
   @override
-  String get themeModernSlate => 'Modern Slate';
+  String get themeModernSlate => 'Ardósia moderna';
 
   @override
   String get themeCyberpunk => 'Cyberpunk';
 
   @override
-  String get themeNordicArctic => 'Nordic Arctic';
+  String get themeNordicArctic => 'Ártico nórdico';
 
   @override
-  String get themeDeepNight => 'Deep Night';
+  String get themeDeepNight => 'Noite profunda';
 
   @override
-  String get loginSuccess => 'Login successful';
+  String get loginSuccess => 'Login bem-sucedido';
 
   @override
-  String get reloadListError => 'Failed to reload the list';
+  String get reloadListError => 'Não foi possível recarregar a lista';
 
   @override
-  String get copyItemSuffix => 'Copy';
+  String get copyItemSuffix => 'Cópia';
 
   @override
   String itemCopiedSuccess(String name) {
-    return 'Item copied: $name';
+    return 'Elemento copiado: $name';
   }
 
   @override
-  String get copyError => 'Error copying item';
+  String get copyError => 'Erro ao copiar';
 
   @override
-  String get imageColumnLabel => 'Image';
+  String get imageColumnLabel => 'Imagem';
 
   @override
-  String get viewImageTooltip => 'View image';
+  String get viewImageTooltip => 'Ver imagem';
 
   @override
-  String get currentStockLabel => 'Current Stock';
+  String get currentStockLabel => 'Estoque atual';
 
   @override
-  String get minimumStockLabel => 'Minimum Stock';
+  String get minimumStockLabel => 'Estoque mínimo';
 
   @override
-  String get locationColumnLabel => 'Location';
+  String get locationColumnLabel => 'Localização';
 
   @override
-  String get serialNumberColumnLabel => 'Serial Number';
+  String get serialNumberColumnLabel => 'Número de série';
 
   @override
-  String get marketPriceLabel => 'Market Price';
+  String get marketPriceLabel => 'Preço de mercado';
 
   @override
-  String get conditionColumnLabel => 'Condition';
+  String get conditionColumnLabel => 'Condição';
 
   @override
-  String get actionsColumnLabel => 'Actions';
+  String get actionsColumnLabel => 'Ações';
 
   @override
-  String get imageLoadError => 'Failed to load image';
+  String get imageLoadError => 'Não foi possível carregar a imagem';
 
   @override
   String get imageUrlHint =>
-      'Make sure the URL is correct and the server is active';
+      'Certifique-se de que a URL está correta e o servidor está ativo';
 
   @override
-  String get assetTypeNameHint => 'E.g: Laptop, Chemical Substance';
+  String get assetTypeNameHint => 'Ex: Notebook, Substância química';
 
   @override
-  String get assetTypeNameLabel => 'Asset Type Name';
+  String get assetTypeNameLabel => 'Nome do tipo de ativo';
 
   @override
-  String get underConstruction => 'Under Construction';
+  String get underConstruction => 'Em construção';
 
   @override
-  String get comingSoon => 'Coming Soon';
+  String get comingSoon => 'Em breve';
 
   @override
-  String get constructionSubtitle => 'This feature is being developed';
+  String get constructionSubtitle =>
+      'Esta funcionalidade está sendo desenvolvida';
 
   @override
-  String get selectColor => 'Select Color';
+  String get selectColor => 'Selecionar cor';
 
   @override
-  String get valueDistributionByLocation => 'Value Distribution by Location';
+  String get valueDistributionByLocation =>
+      'Distribuição de valor por localização';
 
   @override
   String get heatmapDescription =>
-      'The donut shows how the market value is distributed among the highest-weight locations.';
+      'O gráfico de rosca mostra como o valor de mercado é distribuído entre as localizações mais relevantes.';
 
   @override
   String locationsCount(int count) {
-    return '$count locations';
+    return '$count localizações';
   }
 
   @override
-  String get unitsLabel => 'units';
+  String get unitsLabel => 'un.';
 
   @override
-  String get recordsLabel => 'records';
+  String get recordsLabel => 'registros';
 
   @override
-  String get totalValueFallback => 'Total value';
+  String get totalValueFallback => 'Valor total';
 
   @override
   String containerFallback(String id) {
-    return 'Container $id';
+    return 'Recipiente $id';
   }
 
   @override
   String locationFallback(String id) {
-    return 'Location $id';
+    return 'Localização $id';
   }
 
   @override
-  String get ofTheValueLabel => 'of the value';
+  String get ofTheValueLabel => 'do valor';
 
   @override
   String get reportsDescription =>
