@@ -1,0 +1,24 @@
+name: Trigger Backend Docker Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Dispatch build to backend repo
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.BACKEND_DISPATCH_TOKEN }}
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'lopiv2',
+              repo: 'invenicum_backend',
+              workflow_id: 'docker-publish.yml',
+              ref: 'main'
+            });
+            console.log('Backend build triggered successfully.');
