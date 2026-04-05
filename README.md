@@ -1,4 +1,4 @@
-<p align="center">
+﻿<p align="center">
   <img src="assets/images/invenicum_logo.png" width="150" alt="Invenicum Logo">
 </p>
 
@@ -59,6 +59,8 @@ Share the love (but keep control). Create accounts for family members or employe
 
 ## 📸 Screenshots
 
+For more screenshots and additional information, visit https://invenicum.com/en/.
+
 <p align="center">
   <img src="assets/screenshots/dashboard.png" width="48%" alt="Dashboard" style="border-radius:10px"> 
   <img src="assets/screenshots/loans.png" width="48%" alt="Loan Management" style="border-radius:10px">
@@ -71,26 +73,14 @@ Share the love (but keep control). Create accounts for family members or employe
 ### Quick Start with Docker
 The easiest way to get started is with Docker Compose.
 
-1. **Create a `docker-compose.yml` file:**
+Use the English website Quick Deploy section as the single source of truth for Docker Compose:
 
-```yaml
-services:
-  app:
-    image: ghcr.io/lopiv2/invenicum:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - DB_URL=postgres://user:pass@db:5432/invenicum
-      - AI_PROVIDER=gemini
-      - GEMINI_API_KEY=your_google_gemini_key_here
-    depends_on:
-      - db
+`https://invenicum.com/en/#quick-deploy`
 
-  db:
-    image: postgres:15-alpine
-    volumes:
-      - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=pass
-      - POSTGRES_DB=invenicum
+1. **Copy the latest compose from the website and save it as `docker-compose.yml`.**
+
+2. **Start Invenicum:**
+
+```bash
+docker compose up -d
+```
