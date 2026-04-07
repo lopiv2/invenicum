@@ -18,7 +18,7 @@ class ApiService {
   Function()? onUnauthorized;
 
   ApiService._internal() {
-    dio.options.baseUrl = '${Environment.apiUrl}${Environment.apiVersion}';
+    dio.options.baseUrl = Environment.baseUrl;
     dio.options.connectTimeout = Duration(
       milliseconds: Environment.connectTimeout,
     );

@@ -12,7 +12,17 @@ class Environment {
 
   static const String apiVersion = '/api/v1';
 
-  static String get baseUrl => '$apiUrl$apiVersion';
+  static String get baseUrl {
+    final normalizedApiUrl = apiUrl.endsWith('/')
+        ? apiUrl.substring(0, apiUrl.length - 1)
+        : apiUrl;
+
+    if (normalizedApiUrl.endsWith(apiVersion)) {
+      return normalizedApiUrl;
+    }
+
+    return '$normalizedApiUrl$apiVersion';
+  }
 
   //Docs
   static const String docsUrl = 'https://docs.invenicum.com';
