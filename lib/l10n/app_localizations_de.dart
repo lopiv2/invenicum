@@ -2768,4 +2768,55 @@ class AppLocalizationsDe extends AppLocalizations {
   String reportGenerateError(String error) {
     return 'Fehler beim Erstellen des Berichts: $error';
   }
+
+  @override
+  String get firstRunWelcomeTitle => 'Willkommen bei Invenicum';
+
+  @override
+  String get firstRunConfigTitle => 'Erstmalige Einrichtung';
+
+  @override
+  String get firstRunWelcomeDescription =>
+      'Es sieht so aus, als würde die App zum ersten Mal gestartet. Lassen Sie uns Ihr Admin-Konto erstellen, um zu beginnen.';
+
+  @override
+  String get firstRunStep1Label => 'Schritt 1 von 2 · Willkommen';
+
+  @override
+  String get firstRunStep2Label => 'Schritt 2 von 2 · Admin erstellen';
+
+  @override
+  String get firstRunSuccessMessage => 'Ihr Konto wurde erstellt';
+
+  @override
+  String get firstRunAdminTitle => 'Admin erstellen';
+
+  @override
+  String get firstRunAdminDescription =>
+      'Dieser Benutzer hat vollständigen Zugriff auf die Plattform.';
+
+  @override
+  String get firstRunFeature1 => 'Erstellen Sie Ihren Admin-Benutzer';
+
+  @override
+  String get firstRunFeature2 => 'Sicherer Zugriff mit Passwort';
+
+  @override
+  String get firstRunFeature3 => 'Einsatzbereit in Sekunden';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwörter stimmen nicht überein.';
+
+  @override
+  String get firstRunSuccessTitle => 'Konto erstellt!';
+
+  @override
+  String get firstRunSuccessSubtitle =>
+      'Ihr Admin-Konto ist bereit.\\nSie können sich jetzt anmelden.';
+
+  @override
+  String get firstRunAccountCreatedLabel => 'KONTO ERSTELLT';
+
+  @override
+  String get firstRunCopyright => 'Invenicum ©';
 }

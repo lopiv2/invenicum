@@ -2766,4 +2766,55 @@ class AppLocalizationsFr extends AppLocalizations {
   String reportGenerateError(String error) {
     return 'Erreur lors de la génération du rapport : $error';
   }
+
+  @override
+  String get firstRunWelcomeTitle => 'Bienvenue chez Invenicum';
+
+  @override
+  String get firstRunConfigTitle => 'Configuration initiale';
+
+  @override
+  String get firstRunWelcomeDescription =>
+      'Il semble que ce soit votre première utilisation de l\'application. Créons votre compte administrateur pour commencer.';
+
+  @override
+  String get firstRunStep1Label => 'Étape 1 sur 2 · Bienvenue';
+
+  @override
+  String get firstRunStep2Label => 'Étape 2 sur 2 · Créer un administrateur';
+
+  @override
+  String get firstRunSuccessMessage => 'Votre compte a été créé';
+
+  @override
+  String get firstRunAdminTitle => 'Créer un administrateur';
+
+  @override
+  String get firstRunAdminDescription =>
+      'Cet utilisateur aura un accès complet à la plateforme.';
+
+  @override
+  String get firstRunFeature1 => 'Créez votre utilisateur administrateur';
+
+  @override
+  String get firstRunFeature2 => 'Accès sécurisé par mot de passe';
+
+  @override
+  String get firstRunFeature3 => 'Prêt à l\'emploi en quelques secondes';
+
+  @override
+  String get passwordsDoNotMatch => 'Les mots de passe ne correspondent pas.';
+
+  @override
+  String get firstRunSuccessTitle => 'Compte créé !';
+
+  @override
+  String get firstRunSuccessSubtitle =>
+      'Votre compte d\'administrateur est prêt.\nVous pouvez maintenant vous connecter.';
+
+  @override
+  String get firstRunAccountCreatedLabel => 'COMPTE CRÉÉ';
+
+  @override
+  String get firstRunCopyright => 'Invenicum ©';
 }

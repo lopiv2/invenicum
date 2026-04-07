@@ -1502,5 +1502,21 @@
       }
     }
   },
-  "reportGenerateError": "Erro ao gerar relatório: {error}"
+  "reportGenerateError": "Erro ao gerar relatório: {error}",
+  "firstRunWelcomeTitle": "Bem-vindo ao Invenicum",
+  "firstRunConfigTitle": "Configuração inicial",
+  "firstRunWelcomeDescription": "Parece que é a primeira vez que você inicia o aplicativo. Vamos criar sua conta de administrador para começar.",
+  "firstRunStep1Label": "Etapa 1 de 2 · Bem-vindo",
+  "firstRunStep2Label": "Etapa 2 de 2 · Criar administrador",
+  "firstRunSuccessMessage": "Sua conta foi criada",
+  "firstRunAdminTitle": "Criar administrador",
+  "firstRunAdminDescription": "Este usuário terá acesso completo à plataforma.",
+  "firstRunFeature1": "Crie seu usuário administrador",
+  "firstRunFeature2": "Acesso seguro com senha",
+  "firstRunFeature3": "Pronto para usar em segundos",
+  "passwordsDoNotMatch": "As senhas não correspondem.",
+  "firstRunSuccessTitle": "Conta criada!",
+  "firstRunSuccessSubtitle": "Sua conta de administrador está pronta.\nVocê pode fazer login agora.",
+  "firstRunAccountCreatedLabel": "CONTA CRIADA",
+  "firstRunCopyright": "Invenicum ©"
 }

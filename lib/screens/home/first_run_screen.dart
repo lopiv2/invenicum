@@ -212,8 +212,8 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
                       // Título encima de la card
                       Text(
                         _currentStep == 2
-                            ? '¡Todo listo!'
-                            : 'Configuración inicial',
+                            ? l10n.firstRunSuccessTitle
+                            : l10n.firstRunConfigTitle,
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w700,
@@ -224,10 +224,10 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
                       const SizedBox(height: 6),
                       Text(
                         _currentStep == 0
-                            ? 'Bienvenido a Invenicum'
+                            ? l10n.firstRunWelcomeTitle
                             : _currentStep == 1
-                                ? 'Paso 2 de 2 · Crear administrador'
-                                : 'Tu cuenta ha sido creada',
+                                ? l10n.firstRunStep2Label
+                                : l10n.firstRunSuccessMessage,
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white.withValues(alpha: 0.7),
@@ -290,7 +290,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
 
                       const SizedBox(height: 24),
                       Text(
-                        'Invenicum © ${DateTime.now().year}',
+                        '${l10n.firstRunCopyright} ${DateTime.now().year}',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.white.withValues(alpha: 0.4),
@@ -331,7 +331,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
       mainAxisSize: MainAxisSize.min,
       children: [
         Text(
-          'Primera configuración',
+          l10n.firstRunConfigTitle,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -341,16 +341,16 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
         ),
         const SizedBox(height: 8),
         Text(
-          'Parece que es la primera vez que arrancas la app. Vamos a crear tu cuenta de administrador para empezar.',
+          l10n.firstRunWelcomeDescription,
           style: TextStyle(
               fontSize: 14, color: subtitleColor, height: 1.6),
         ),
         const SizedBox(height: 28),
 
         ...[
-          (Icons.manage_accounts_outlined, 'Crea tu usuario administrador'),
-          (Icons.lock_outline_rounded, 'Acceso seguro con contraseña'),
-          (Icons.rocket_launch_outlined, 'Listo para usar en segundos'),
+          (Icons.manage_accounts_outlined, l10n.firstRunFeature1),
+          (Icons.lock_outline_rounded, l10n.firstRunFeature2),
+          (Icons.rocket_launch_outlined, l10n.firstRunFeature3),
         ].map(
           (item) => Padding(
             padding: const EdgeInsets.only(bottom: 14),
@@ -403,7 +403,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            'Crear administrador',
+            l10n.firstRunAdminTitle,
             style: TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w800,
@@ -413,7 +413,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
           ),
           const SizedBox(height: 6),
           Text(
-            'Este usuario tendrá acceso total a la plataforma.',
+            l10n.firstRunAdminDescription,
             style: TextStyle(
                 fontSize: 14, color: subtitleColor, height: 1.5),
           ),
@@ -497,7 +497,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
             ),
             validator: (v) {
               if (v != _passwordController.text) {
-                return 'Las contraseñas no coinciden.';
+                return l10n.passwordsDoNotMatch;
               }
               return null;
             },
@@ -610,7 +610,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
         const SizedBox(height: 20),
 
         Text(
-          '¡Cuenta creada!',
+          l10n.firstRunSuccessTitle,
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w800,
@@ -620,7 +620,7 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
         ),
         const SizedBox(height: 8),
         Text(
-          'Tu cuenta de administrador está lista.\nYa puedes iniciar sesión.',
+          l10n.firstRunSuccessSubtitle,
           textAlign: TextAlign.center,
           style: TextStyle(
               fontSize: 14, color: subtitleColor, height: 1.6),
@@ -639,9 +639,9 @@ class _FirstRunSetupScreenState extends State<FirstRunSetupScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'CUENTA CREADA',
-                style: TextStyle(
+              Text(
+                l10n.firstRunAccountCreatedLabel,
+                style: const TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.2,

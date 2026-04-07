@@ -1502,5 +1502,21 @@
       }
     }
   },
-  "reportGenerateError": "Error al generar informe: {error}"
+  "reportGenerateError": "Error al generar informe: {error}",
+  "firstRunWelcomeTitle": "Bienvenido a Invenicum",
+  "firstRunConfigTitle": "Primera configuración",
+  "firstRunWelcomeDescription": "Parece que es la primera vez que arrancas la app. Vamos a crear tu cuenta de administrador para empezar.",
+  "firstRunStep1Label": "Paso 1 de 2 · Bienvenida",
+  "firstRunStep2Label": "Paso 2 de 2 · Crear administrador",
+  "firstRunSuccessMessage": "Tu cuenta ha sido creada",
+  "firstRunAdminTitle": "Crear administrador",
+  "firstRunAdminDescription": "Este usuario tendrá acceso total a la plataforma.",
+  "firstRunFeature1": "Crea tu usuario administrador",
+  "firstRunFeature2": "Acceso seguro con contraseña",
+  "firstRunFeature3": "Listo para usar en segundos",
+  "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+  "firstRunSuccessTitle": "¡Cuenta creada!",
+  "firstRunSuccessSubtitle": "Tu cuenta de administrador está lista.\nYa puedes iniciar sesión.",
+  "firstRunAccountCreatedLabel": "CUENTA CREADA",
+  "firstRunCopyright": "Invenicum ©"
 }

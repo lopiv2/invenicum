@@ -2737,4 +2737,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String reportGenerateError(String error) {
     return 'Error generating report: $error';
   }
+
+  @override
+  String get firstRunWelcomeTitle => 'Welcome to Invenicum';
+
+  @override
+  String get firstRunConfigTitle => 'Initial Setup';
+
+  @override
+  String get firstRunWelcomeDescription =>
+      'It looks like this is your first time launching the app. Let\'s create your admin account to get started.';
+
+  @override
+  String get firstRunStep1Label => 'Step 1 of 2 · Welcome';
+
+  @override
+  String get firstRunStep2Label => 'Step 2 of 2 · Create Admin';
+
+  @override
+  String get firstRunSuccessMessage => 'Your account has been created';
+
+  @override
+  String get firstRunAdminTitle => 'Create Admin';
+
+  @override
+  String get firstRunAdminDescription =>
+      'This user will have full access to the platform.';
+
+  @override
+  String get firstRunFeature1 => 'Create your admin user';
+
+  @override
+  String get firstRunFeature2 => 'Secure access with password';
+
+  @override
+  String get firstRunFeature3 => 'Ready to use in seconds';
+
+  @override
+  String get passwordsDoNotMatch => 'Passwords do not match.';
+
+  @override
+  String get firstRunSuccessTitle => 'Account Created!';
+
+  @override
+  String get firstRunSuccessSubtitle =>
+      'Your admin account is ready.\nYou can now log in.';
+
+  @override
+  String get firstRunAccountCreatedLabel => 'ACCOUNT CREATED';
+
+  @override
+  String get firstRunCopyright => 'Invenicum ©';
 }

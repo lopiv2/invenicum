@@ -5055,6 +5055,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error generating report: {error}'**
   String reportGenerateError(String error);
+
+  /// No description provided for @firstRunWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Invenicum'**
+  String get firstRunWelcomeTitle;
+
+  /// No description provided for @firstRunConfigTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Initial Setup'**
+  String get firstRunConfigTitle;
+
+  /// No description provided for @firstRunWelcomeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'It looks like this is your first time launching the app. Let\'s create your admin account to get started.'**
+  String get firstRunWelcomeDescription;
+
+  /// No description provided for @firstRunStep1Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 1 of 2 · Welcome'**
+  String get firstRunStep1Label;
+
+  /// No description provided for @firstRunStep2Label.
+  ///
+  /// In en, this message translates to:
+  /// **'Step 2 of 2 · Create Admin'**
+  String get firstRunStep2Label;
+
+  /// No description provided for @firstRunSuccessMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account has been created'**
+  String get firstRunSuccessMessage;
+
+  /// No description provided for @firstRunAdminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Admin'**
+  String get firstRunAdminTitle;
+
+  /// No description provided for @firstRunAdminDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This user will have full access to the platform.'**
+  String get firstRunAdminDescription;
+
+  /// No description provided for @firstRunFeature1.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your admin user'**
+  String get firstRunFeature1;
+
+  /// No description provided for @firstRunFeature2.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure access with password'**
+  String get firstRunFeature2;
+
+  /// No description provided for @firstRunFeature3.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to use in seconds'**
+  String get firstRunFeature3;
+
+  /// No description provided for @passwordsDoNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match.'**
+  String get passwordsDoNotMatch;
+
+  /// No description provided for @firstRunSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Created!'**
+  String get firstRunSuccessTitle;
+
+  /// No description provided for @firstRunSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your admin account is ready.\nYou can now log in.'**
+  String get firstRunSuccessSubtitle;
+
+  /// No description provided for @firstRunAccountCreatedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ACCOUNT CREATED'**
+  String get firstRunAccountCreatedLabel;
+
+  /// No description provided for @firstRunCopyright.
+  ///
+  /// In en, this message translates to:
+  /// **'Invenicum ©'**
+  String get firstRunCopyright;
 }
 
 class _AppLocalizationsDelegate
