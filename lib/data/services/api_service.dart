@@ -205,11 +205,19 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>?> completeGitHubOAuth(String code) async {
+  Future<Map<String, dynamic>?> completeGitHubOAuth(
+    String code, {
+    String? redirectUri,
+  }) async {
     try {
+      final Map<String, dynamic> payload = {'code': code};
+      if (redirectUri != null && redirectUri.isNotEmpty) {
+        payload['redirectUri'] = redirectUri;
+      }
+
       final response = await dio.post(
         '/auth/github/complete',
-        data: {'code': code},
+        data: payload,
       );
       return response.data;
     } catch (e) {

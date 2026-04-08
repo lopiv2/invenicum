@@ -259,11 +259,14 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> linkGitHubAccount(String code) async {
+  Future<bool> linkGitHubAccount(String code, {String? redirectUri}) async {
     _setLoading(true);
 
     try {
-      final response = await _apiService.completeGitHubOAuth(code);
+      final response = await _apiService.completeGitHubOAuth(
+        code,
+        redirectUri: redirectUri,
+      );
 
       if (response != null && response['success'] == true) {
         final dynamic rawData = response['data'];

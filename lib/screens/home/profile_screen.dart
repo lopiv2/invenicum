@@ -124,9 +124,21 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void _checkWebQueryParams() {
     if (!kIsWeb) return;
 
-    // Robust parsing of the `code` query param without relying on regex.
+    // Handle both callback styles:
+    // 1) http://host/?code=...
+    // 2) http://host/#/myprofile?code=...
     final Uri currentUri = Uri.parse(web.window.location.href);
-    final String? code = currentUri.queryParameters['code'];
+    String? code = currentUri.queryParameters['code'];
+
+    if (code == null || code.isEmpty) {
+      final String fragment = currentUri.fragment;
+      final int queryIndex = fragment.indexOf('?');
+      if (queryIndex >= 0 && queryIndex < fragment.length - 1) {
+        final String fragmentQuery = fragment.substring(queryIndex + 1);
+        final Uri fragmentUri = Uri.parse('https://dummy.local/?$fragmentQuery');
+        code = fragmentUri.queryParameters['code'];
+      }
+    }
 
     if (code != null && code.isNotEmpty) {
       web.window.history.replaceState(null, 'Profile', '/#/myprofile');
@@ -150,7 +162,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (code != null) {
         // Close the browser (this happens automatically on most OS)
         // Call the backend to validate the code
-        _processGitHubCode(code);
+        _processGitHubCode(code, redirectUri: 'invenicum://auth-callback');
       }
     }
   }
@@ -194,11 +206,14 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  Future<void> _processGitHubCode(String code) async {
+  Future<void> _processGitHubCode(String code, {String? redirectUri}) async {
     final l10n = AppLocalizations.of(context)!;
     try {
       final authProvider = context.read<AuthProvider>();
-      final success = await authProvider.linkGitHubAccount(code);
+      final success = await authProvider.linkGitHubAccount(
+        code,
+        redirectUri: redirectUri,
+      );
 
       if (success && mounted) {
         ToastService.success(l10n.profileGithubLinkedSuccess);
@@ -231,16 +246,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         return;
       }
 
-      // 2. We construct the URL with the ID provided by the server
-      final String redirectUri = kIsWeb
-          ? "${Uri.base.origin}/#/myprofile"
-          : "invenicum://auth-callback";
-
-      final url = Uri.https('github.com', '/login/oauth/authorize', {
+      // For web, do not force redirect_uri. GitHub uses the callback URL configured
+      // in the OAuth app, avoiding redirect_uri mismatch errors.
+      final Map<String, String> oauthParams = {
         'client_id': clientId,
-        'redirect_uri': redirectUri,
         'scope': 'read:user',
-      });
+      };
+
+      if (!kIsWeb) {
+        oauthParams['redirect_uri'] = 'invenicum://auth-callback';
+      }
+
+      final url = Uri.https('github.com', '/login/oauth/authorize', oauthParams);
 
       if (await canLaunchUrl(url)) {
         await launchUrl(
