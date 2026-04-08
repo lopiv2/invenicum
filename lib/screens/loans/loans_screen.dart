@@ -280,16 +280,12 @@ class _LoansScreenState extends State<LoansScreen> {
           if (isLoading) const LinearProgressIndicator(),
           if (loanProvider.currentStats != null)
             _buildQuickStats(loanProvider.currentStats!, l10n),
-          // Filtros
           Padding(
-                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Card(
-                        margin: EdgeInsets.zero,
-                        child: PlutoGrid(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
                 Text(
-                  '${l10n.apply}: ', // O una etiqueta "Filtrar"
+                  '${l10n.apply}: ',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 12),
@@ -312,44 +308,44 @@ class _LoansScreenState extends State<LoansScreen> {
               ],
             ),
           ),
-          // Tabla de préstamos
           Expanded(
             child: loans.isEmpty
                 ? Center(
                     child: Text(
-                      _filterStatus == 'all'
-                          ? l10n.noLoansFound
-                          : l10n.noLoansFound, // Podrías personalizar según filtro si quieres
+                      l10n.noLoansFound,
                       style: const TextStyle(color: Colors.grey),
                     ),
                   )
                 : Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Card(
-                      child: PlutoGrid(
-                        columns: _buildPlutoColumns(l10n),
-                        rows: _buildPlutoRows(loans),
-                        rowColorCallback: (rowColorContext) {
-                          final loan =
-                              rowColorContext.row.cells['loan_object']!.value
-                                  as Loan;
-                          if (loan.status == 'returned') {
-                            return Colors.green.shade50;
-                          }
-                          if (loan.isOverdue) {
-                            return Colors.red.shade50;
-                          }
-                          return Colors.transparent;
-                        },
-                        configuration: PlutoGridConfiguration(
-                          style: PlutoGridStyleConfig(
-                            rowHeight: 80,
-                            cellTextStyle: const TextStyle(fontSize: 13),
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        child: PlutoGrid(
+                          columns: _buildPlutoColumns(l10n),
+                          rows: _buildPlutoRows(loans),
+                          rowColorCallback: (rowColorContext) {
+                            final loan =
+                                rowColorContext.row.cells['loan_object']!.value
+                                    as Loan;
+                            if (loan.status == 'returned') {
+                              return Colors.green.shade50;
+                            }
+                            if (loan.isOverdue) {
+                              return Colors.red.shade50;
+                            }
+                            return Colors.transparent;
+                          },
+                          configuration: PlutoGridConfiguration(
+                            style: PlutoGridStyleConfig(
+                              rowHeight: 80,
+                              cellTextStyle: const TextStyle(fontSize: 13),
+                            ),
                           ),
-                        ),
-                        onLoaded: (event) {
-                          event.stateManager.setShowColumnFilter(true);
-                        },
+                          onLoaded: (event) {
+                            event.stateManager.setShowColumnFilter(true);
+                          },
                         ),
                       ),
                     ),

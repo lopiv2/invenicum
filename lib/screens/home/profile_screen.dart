@@ -321,10 +321,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
 
                       const SizedBox(height: 40),
-                      const Divider(), // Una línea sutil de separación
+                      const Divider(),
                       const SizedBox(height: 24),
 
-                      // EL BOTÓN AHORA ESTÁ CENTRADO Y DESTACADO ABAJO
                       Center(
                         child: ConstrainedBox(
                           constraints: const BoxConstraints(maxWidth: 400),
@@ -411,7 +410,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Botón de guardado extraído
+
   Widget _buildSaveButton(AuthProvider authProvider) {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
@@ -447,7 +446,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final user = authProvider.user;
     final String seed = user?.name ?? AppLocalizations.of(context)!.guest;
 
-    // Prioridad: 1. URL de la base de datos, 2. URL validada en sesión, 3. Null
+
     final String? avatarUrl =
         user?.avatarUrl ?? authProvider.validatedAvatarUrl;
     final bool isGitHubLinked =
