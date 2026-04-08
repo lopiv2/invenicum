@@ -4144,6 +4144,174 @@ abstract class AppLocalizations {
   /// **'UPDATE PASSWORD'**
   String get updatePasswordButton;
 
+  /// No description provided for @profileFillAllFieldsError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in all fields'**
+  String get profileFillAllFieldsError;
+
+  /// No description provided for @profilePasswordUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password updated successfully!'**
+  String get profilePasswordUpdatedSuccess;
+
+  /// No description provided for @profileDisconnectActionUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'DISCONNECT'**
+  String get profileDisconnectActionUpper;
+
+  /// No description provided for @profileGithubUnlinkedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub account unlinked successfully'**
+  String get profileGithubUnlinkedSuccess;
+
+  /// No description provided for @profileGithubLinkedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub account linked successfully!'**
+  String get profileGithubLinkedSuccess;
+
+  /// No description provided for @profileGithubProcessError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error processing GitHub link: {error}'**
+  String profileGithubProcessError(String error);
+
+  /// No description provided for @profileGithubConfigUnavailableError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: GitHub configuration not available'**
+  String get profileGithubConfigUnavailableError;
+
+  /// No description provided for @profileServerConnectionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect to the server: {error}'**
+  String profileServerConnectionError(String error);
+
+  /// No description provided for @profileUpdatedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileUpdatedSuccess;
+
+  /// No description provided for @profileUpdateError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating profile: {error}'**
+  String profileUpdateError(String error);
+
+  /// No description provided for @profileUsernameCommunityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Username (Community)'**
+  String get profileUsernameCommunityLabel;
+
+  /// No description provided for @profileUsernameCommunityHelper.
+  ///
+  /// In en, this message translates to:
+  /// **'Required to publish plugins.'**
+  String get profileUsernameCommunityHelper;
+
+  /// No description provided for @profileUpdateButtonUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'UPDATE PROFILE'**
+  String get profileUpdateButtonUpper;
+
+  /// No description provided for @profileGithubIdentityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub Identity'**
+  String get profileGithubIdentityTitle;
+
+  /// No description provided for @profileGithubLinkedAs.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked as @{username}'**
+  String profileGithubLinkedAs(String username);
+
+  /// No description provided for @profileGithubLinkPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your account to publish plugins'**
+  String get profileGithubLinkPrompt;
+
+  /// No description provided for @profileGithubUsernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Your GitHub username'**
+  String get profileGithubUsernameHint;
+
+  /// No description provided for @profileGithubFieldHint.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is filled automatically after authenticating with GitHub.'**
+  String get profileGithubFieldHint;
+
+  /// No description provided for @profileGithubDefaultMissingKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET'**
+  String get profileGithubDefaultMissingKeys;
+
+  /// No description provided for @profileGithubOAuthNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub OAuth not configured. Missing: {missing}. Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in the backend and restart the server.'**
+  String profileGithubOAuthNotConfigured(String missing);
+
+  /// No description provided for @profileDisconnectGithubButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect GitHub'**
+  String get profileDisconnectGithubButton;
+
+  /// No description provided for @profileLinkGithubButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Link with GitHub'**
+  String get profileLinkGithubButton;
+
+  /// No description provided for @profileSecurityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get profileSecurityTitle;
+
+  /// No description provided for @profileChangeUpper.
+  ///
+  /// In en, this message translates to:
+  /// **'CHANGE'**
+  String get profileChangeUpper;
+
+  /// No description provided for @profileCurrentPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get profileCurrentPasswordLabel;
+
+  /// No description provided for @profileNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get profileNewPasswordLabel;
+
+  /// No description provided for @profileConfirmNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get profileConfirmNewPasswordLabel;
+
+  /// No description provided for @profileChangePasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Change your password periodically to keep your account secure.'**
+  String get profileChangePasswordHint;
+
   /// No description provided for @newContainerDialog.
   ///
   /// In en, this message translates to:

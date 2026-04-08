@@ -1129,6 +1129,67 @@
   "unlinkGithubTitle": "Disconnect GitHub",
   "unlinkGithubMessage": "Are you sure you want to unlink your GitHub account?",
   "updatePasswordButton": "UPDATE PASSWORD",
+  "profileFillAllFieldsError": "Please fill in all fields",
+  "profilePasswordUpdatedSuccess": "Password updated successfully!",
+  "profileDisconnectActionUpper": "DISCONNECT",
+  "profileGithubUnlinkedSuccess": "GitHub account unlinked successfully",
+  "profileGithubLinkedSuccess": "GitHub account linked successfully!",
+  "@profileGithubProcessError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileGithubProcessError": "Error processing GitHub link: {error}",
+  "profileGithubConfigUnavailableError": "Error: GitHub configuration not available",
+  "@profileServerConnectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileServerConnectionError": "Could not connect to the server: {error}",
+  "profileUpdatedSuccess": "Profile updated successfully",
+  "@profileUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileUpdateError": "Error updating profile: {error}",
+  "profileUsernameCommunityLabel": "Username (Community)",
+  "profileUsernameCommunityHelper": "Required to publish plugins.",
+  "profileUpdateButtonUpper": "UPDATE PROFILE",
+  "profileGithubIdentityTitle": "GitHub Identity",
+  "@profileGithubLinkedAs": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "profileGithubLinkedAs": "Linked as @{username}",
+  "profileGithubLinkPrompt": "Link your account to publish plugins",
+  "profileGithubUsernameHint": "Your GitHub username",
+  "profileGithubFieldHint": "This field is filled automatically after authenticating with GitHub.",
+  "profileGithubDefaultMissingKeys": "GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET",
+  "@profileGithubOAuthNotConfigured": {
+    "placeholders": {
+      "missing": { "type": "String" }
+    }
+  },
+  "profileGithubOAuthNotConfigured": "GitHub OAuth not configured. Missing: {missing}. Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in the backend and restart the server.",
+  "profileDisconnectGithubButton": "Disconnect GitHub",
+  "profileLinkGithubButton": "Link with GitHub",
+  "profileSecurityTitle": "Security",
+  "profileChangeUpper": "CHANGE",
+  "profileCurrentPasswordLabel": "Current Password",
+  "profileNewPasswordLabel": "New Password",
+  "profileConfirmNewPasswordLabel": "Confirm New Password",
+  "profileChangePasswordHint": "Change your password periodically to keep your account secure.",
   "newContainerDialog": "New Container",
   "descriptionField": "Description",
   "isCollectionQuestion": "Is it a collection?",

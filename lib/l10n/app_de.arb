@@ -1129,6 +1129,67 @@
   "unlinkGithubTitle": "GitHub trennen",
   "unlinkGithubMessage": "Bist du sicher, dass du dein GitHub-Konto trennen möchtest?",
   "updatePasswordButton": "PASSWORT AKTUALISIEREN",
+  "profileFillAllFieldsError": "Bitte fülle alle Felder aus",
+  "profilePasswordUpdatedSuccess": "Passwort erfolgreich aktualisiert!",
+  "profileDisconnectActionUpper": "TRENNEN",
+  "profileGithubUnlinkedSuccess": "GitHub erfolgreich getrennt",
+  "profileGithubLinkedSuccess": "GitHub erfolgreich verknüpft!",
+  "@profileGithubProcessError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileGithubProcessError": "Fehler beim Verarbeiten der GitHub-Verknüpfung: {error}",
+  "profileGithubConfigUnavailableError": "Fehler: GitHub-Konfiguration nicht verfügbar",
+  "@profileServerConnectionError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileServerConnectionError": "Verbindung zum Server fehlgeschlagen: {error}",
+  "profileUpdatedSuccess": "Profil erfolgreich aktualisiert",
+  "@profileUpdateError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "profileUpdateError": "Fehler beim Aktualisieren des Profils: {error}",
+  "profileUsernameCommunityLabel": "Benutzername (Community)",
+  "profileUsernameCommunityHelper": "Erforderlich, um Plugins zu veröffentlichen.",
+  "profileUpdateButtonUpper": "PROFIL AKTUALISIEREN",
+  "profileGithubIdentityTitle": "GitHub-Identität",
+  "@profileGithubLinkedAs": {
+    "placeholders": {
+      "username": {
+        "type": "String"
+      }
+    }
+  },
+  "profileGithubLinkedAs": "Verknüpft als @{username}",
+  "profileGithubLinkPrompt": "Verknüpfe dein Konto, um Plugins zu veröffentlichen",
+  "profileGithubUsernameHint": "Dein GitHub-Benutzername",
+  "profileGithubFieldHint": "Dieses Feld wird automatisch nach der GitHub-Authentifizierung ausgefüllt.",
+  "profileGithubDefaultMissingKeys": "GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET",
+  "@profileGithubOAuthNotConfigured": {
+    "placeholders": {
+      "missing": { "type": "String" }
+    }
+  },
+  "profileGithubOAuthNotConfigured": "GitHub OAuth nicht konfiguriert. Fehlend: {missing}. Konfiguriere GITHUB_CLIENT_ID und GITHUB_CLIENT_SECRET im Backend und starte den Server neu.",
+  "profileDisconnectGithubButton": "GitHub trennen",
+  "profileLinkGithubButton": "Mit GitHub verknüpfen",
+  "profileSecurityTitle": "Sicherheit",
+  "profileChangeUpper": "ÄNDERN",
+  "profileCurrentPasswordLabel": "Aktuelles Passwort",
+  "profileNewPasswordLabel": "Neues Passwort",
+  "profileConfirmNewPasswordLabel": "Neues Passwort bestätigen",
+  "profileChangePasswordHint": "Ändere dein Passwort regelmäßig, um dein Konto sicher zu halten.",
   "newContainerDialog": "Neuer Container",
   "descriptionField": "Beschreibung",
   "isCollectionQuestion": "Ist es eine Sammlung?",

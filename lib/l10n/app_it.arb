@@ -1129,6 +1129,67 @@
     "unlinkGithubTitle":  "Disconnetti GitHub",
     "unlinkGithubMessage":  "Sei sicuro di voler scollegare il tuo account GitHub?",
     "updatePasswordButton":  "AGGIORNA LA PASSWORD",
+        "profileFillAllFieldsError":  "Per favore, compila tutti i campi",
+        "profilePasswordUpdatedSuccess":  "Password aggiornata con successo!",
+        "profileDisconnectActionUpper":  "DISCONNETTI",
+        "profileGithubUnlinkedSuccess":  "Account GitHub scollegato correttamente",
+        "profileGithubLinkedSuccess":  "Account GitHub collegato correttamente!",
+        "@profileGithubProcessError":  {
+            "placeholders":  {
+                "error":  {
+                    "type":  "String"
+                }
+            }
+        },
+        "profileGithubProcessError":  "Errore durante l'elaborazione del collegamento GitHub: {error}",
+        "profileGithubConfigUnavailableError":  "Errore: configurazione GitHub non disponibile",
+        "@profileServerConnectionError":  {
+            "placeholders":  {
+                "error":  {
+                    "type":  "String"
+                }
+            }
+        },
+        "profileServerConnectionError":  "Impossibile connettersi al server: {error}",
+        "profileUpdatedSuccess":  "Profilo aggiornato correttamente",
+        "@profileUpdateError":  {
+            "placeholders":  {
+                "error":  {
+                    "type":  "String"
+                }
+            }
+        },
+        "profileUpdateError":  "Errore durante l'aggiornamento del profilo: {error}",
+        "profileUsernameCommunityLabel":  "Username (Community)",
+        "profileUsernameCommunityHelper":  "Richiesto per pubblicare plugin.",
+        "profileUpdateButtonUpper":  "AGGIORNA PROFILO",
+        "profileGithubIdentityTitle":  "Identità GitHub",
+        "@profileGithubLinkedAs":  {
+            "placeholders":  {
+                "username":  {
+                    "type":  "String"
+                }
+            }
+        },
+        "profileGithubLinkedAs":  "Collegato come @{username}",
+        "profileGithubLinkPrompt":  "Collega il tuo account per pubblicare plugin",
+        "profileGithubUsernameHint":  "Il tuo username GitHub",
+        "profileGithubFieldHint":  "Questo campo viene compilato automaticamente dopo l'autenticazione con GitHub.",
+        "profileGithubDefaultMissingKeys":  "GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET",
+        "@profileGithubOAuthNotConfigured":  {
+            "placeholders":  {
+                "missing":  { "type":  "String" }
+            }
+        },
+        "profileGithubOAuthNotConfigured":  "GitHub OAuth non configurato. Mancanti: {missing}. Configura GITHUB_CLIENT_ID e GITHUB_CLIENT_SECRET nel backend e riavvia il server.",
+        "profileDisconnectGithubButton":  "Disconnetti GitHub",
+        "profileLinkGithubButton":  "Collega con GitHub",
+        "profileSecurityTitle":  "Sicurezza",
+        "profileChangeUpper":  "CAMBIA",
+        "profileCurrentPasswordLabel":  "Password attuale",
+        "profileNewPasswordLabel":  "Nuova password",
+        "profileConfirmNewPasswordLabel":  "Conferma nuova password",
+        "profileChangePasswordHint":  "Cambia periodicamente la tua password per mantenere sicuro il tuo account.",
     "newContainerDialog":  "Nuovo contenitore",
     "descriptionField":  "Descrizione",
     "isCollectionQuestion":  "È una collezione?",

@@ -85,15 +85,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _handleChangePassword() async {
+    final l10n = AppLocalizations.of(context)!;
     // 1. Validaciones básicas de UI
     if (_currentPasswordController.text.isEmpty ||
         _newPasswordController.text.isEmpty) {
-      ToastService.error("Por favor, rellena todos los campos");
+      ToastService.error(l10n.profileFillAllFieldsError);
       return;
     }
 
     if (_newPasswordController.text != _confirmPasswordController.text) {
-      ToastService.error("Las nuevas contraseñas no coinciden");
+      ToastService.error(l10n.passwordsDoNotMatch);
       return;
     }
 
@@ -105,7 +106,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
 
       if (success && mounted) {
-        ToastService.success("¡Contraseña actualizada!");
+        ToastService.success(l10n.profilePasswordUpdatedSuccess);
         // Limpiamos los campos y cerramos la sección
         _currentPasswordController.clear();
         _newPasswordController.clear();
@@ -123,24 +124,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void _checkWebQueryParams() {
     if (!kIsWeb) return;
 
-    // 1. Obtenemos la URL real que ve el navegador (la que tiene el ?code=)
-    final String fullUrl = web.window.location.href;
+    // Parseo robusto del query param `code` sin depender de regex.
+    final Uri currentUri = Uri.parse(web.window.location.href);
+    final String? code = currentUri.queryParameters['code'];
 
-    // 2. Usamos una RegExp para sacar el código sin importar dónde esté
-    final regExp = RegExp(r'code=([a-zA-Z0-9]+)');
-    final match = regExp.firstMatch(fullUrl);
-
-    if (match != null) {
-      final String? code = match.group(1);
-
-      if (code != null && code.isNotEmpty) {
-        // 🚩 PRIMERO: Limpiamos la URL para que el usuario la vea bien
-        // Esto quita el ?code=... de la vista pero el valor ya está en nuestra variable 'code'
-        web.window.history.replaceState(null, 'Profile', '/#/myprofile');
-
-        // 🚩 SEGUNDO: Procesamos la vinculación con el código que ya guardamos
-        _processGitHubCode(code);
-      }
+    if (code != null && code.isNotEmpty) {
+      web.window.history.replaceState(null, 'Profile', '/#/myprofile');
+      _processGitHubCode(code);
     }
   }
 
@@ -166,6 +156,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   }
 
   Future<void> _handleDisconnectGitHub() async {
+    final l10n = AppLocalizations.of(context)!;
     final authProvider = context.read<AuthProvider>();
 
     // Opcional: Mostrar un diálogo de confirmación
@@ -183,8 +174,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, true),
-              child: const Text(
-                "DESCONECTAR",
+              child: Text(
+                l10n.profileDisconnectActionUpper,
                 style: TextStyle(color: Colors.red),
               ),
             ),
@@ -198,39 +189,51 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       if (mounted) {
         _usernameController.clear(); // Limpiamos el campo de username
         _githubController.clear(); // Limpiamos el input visualmente
-        ToastService.success("GitHub desvinculado correctamente");
+        ToastService.success(l10n.profileGithubUnlinkedSuccess);
       }
     }
   }
 
   Future<void> _processGitHubCode(String code) async {
+    final l10n = AppLocalizations.of(context)!;
     try {
       final authProvider = context.read<AuthProvider>();
       final success = await authProvider.linkGitHubAccount(code);
 
       if (success && mounted) {
-        ToastService.success("¡GitHub vinculado correctamente!");
+        ToastService.success(l10n.profileGithubLinkedSuccess);
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error("Error al procesar la vinculación: $e");
+        ToastService.error(l10n.profileGithubProcessError(e.toString()));
       }
     }
   }
 
   Future<void> _handleGitHubOAuth() async {
+    final l10n = AppLocalizations.of(context)!;
     try {
-      // 1. Obtenemos la configuración desde tu backend
+      // 1. Obtenemos la configuración desde backend
       final response = await context.read<AuthProvider>().getGitHubConfig();
       final String? clientId = response['clientId'];
-      if (clientId == null || clientId.isEmpty) {
-        ToastService.error("Error: Configuración de GitHub no disponible");
+      final bool isConfigured = response['isConfigured'] == true;
+
+      if (!isConfigured || clientId == null || clientId.isEmpty) {
+        final List<dynamic> missing = response['missingKeys'] is List
+            ? response['missingKeys'] as List<dynamic>
+            : const [];
+        final String missingText = missing.isEmpty
+            ? l10n.profileGithubDefaultMissingKeys
+            : missing.join(', ');
+
+        if (!mounted) return;
+        ToastService.error(l10n.profileGithubOAuthNotConfigured(missingText));
         return;
       }
 
       // 2. Construimos la URL con el ID que nos dio el server
       final String redirectUri = kIsWeb
-          ? "${Uri.base.origin}/" // Mandamos a la raíz, el script o el router se encargarán
+          ? "${Uri.base.origin}/#/myprofile"
           : "invenicum://auth-callback";
 
       final url = Uri.parse(
@@ -250,7 +253,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         );
       }
     } catch (e) {
-      ToastService.error("No se pudo conectar con el servidor: $e");
+      ToastService.error(l10n.profileServerConnectionError(e.toString()));
     }
   }
 
@@ -263,16 +266,17 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         username: _usernameController.text.trim().isEmpty
             ? null
             : _usernameController.text.trim(),
-        githubHandle: _githubController.text.trim().isEmpty
-            ? null
-            : _githubController.text.trim(),
       );
       if (mounted) {
-        ToastService.success("Perfil actualizado correctamente");
+        ToastService.success(
+          AppLocalizations.of(context)!.profileUpdatedSuccess,
+        );
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error("Error al actualizar el perfil: $e");
+        ToastService.error(
+          AppLocalizations.of(context)!.profileUpdateError(e.toString()),
+        );
       }
     }
   }
@@ -374,28 +378,33 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Agrupa los campos de Nombre y Username
   Widget _buildGeneralFields() {
-    final l10n = AppLocalizations.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         TextFormField(
           controller: _nameController,
           decoration: InputDecoration(
-            labelText: l10n?.name ?? 'Name',
+            labelText: l10n.name,
             prefixIcon: const Icon(Icons.person_rounded),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           ),
           validator: (value) =>
-              value!.isEmpty ? 'El nombre es requerido' : null,
+              value!.isEmpty ? l10n.fieldRequiredWithName(l10n.name) : null,
         ),
         const SizedBox(height: 16),
-        TextFormField(
-          controller: _usernameController,
-          readOnly: true,
-          decoration: InputDecoration(
-            labelText: 'Username (Comunidad)',
-            helperText: 'Requerido para publicar plugins.',
-            prefixIcon: const Icon(Icons.alternate_email_rounded),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        Tooltip(
+          message: l10n.profileUsernameCommunityHelper,
+          child: TextFormField(
+            controller: _usernameController,
+            readOnly: true,
+            decoration: InputDecoration(
+              labelText: l10n.profileUsernameCommunityLabel,
+              prefixIcon: const Icon(Icons.alternate_email_rounded),
+              suffixIcon: const Icon(Icons.info_outline_rounded, size: 18),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
           ),
         ),
       ],
@@ -404,6 +413,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   // Botón de guardado extraído
   Widget _buildSaveButton(AuthProvider authProvider) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       height: 54,
@@ -419,8 +429,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ),
               )
             : const Icon(Icons.save_rounded),
-        label: const Text(
-          'ACTUALIZAR PERFIL',
+        label: Text(
+          l10n.profileUpdateButtonUpper,
           style: TextStyle(fontWeight: FontWeight.bold, letterSpacing: 1.1),
         ),
         style: FilledButton.styleFrom(
@@ -435,11 +445,13 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Widget _buildAvatarPreview(AuthProvider authProvider) {
     final user = authProvider.user;
-    final String seed = user?.name ?? 'Guest';
+    final String seed = user?.name ?? AppLocalizations.of(context)!.guest;
 
     // Prioridad: 1. URL de la base de datos, 2. URL validada en sesión, 3. Null
     final String? avatarUrl =
         user?.avatarUrl ?? authProvider.validatedAvatarUrl;
+    final bool isGitHubLinked =
+        user?.githubId != null && user!.githubId!.isNotEmpty;
 
     return Stack(
       alignment: Alignment.bottomRight,
@@ -467,7 +479,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           ),
         ),
         // Solo mostramos el check si el backend confirma que está verificado
-        if (user?.githubHandle != null && user!.githubHandle!.isNotEmpty)
+        if (isGitHubLinked)
           Container(
             padding: const EdgeInsets.all(4),
             decoration: const BoxDecoration(
@@ -485,8 +497,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     UserData? user,
     ColorScheme colorScheme,
   ) {
-    final bool isLinked =
-        user?.githubHandle != null && user!.githubHandle!.isNotEmpty;
+    final l10n = AppLocalizations.of(context)!;
+    final bool isLinked = user?.githubId != null && user!.githubId!.isNotEmpty;
 
     return Container(
       width: double.infinity,
@@ -514,8 +526,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "GitHub Identity",
+                    Text(
+                      l10n.profileGithubIdentityTitle,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
@@ -523,8 +535,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ),
                     Text(
                       isLinked
-                          ? "Vinculado como @${user.githubHandle}"
-                          : "Vincula tu cuenta para publicar plugins",
+                          ? l10n.profileGithubLinkedAs(user.githubHandle ?? '')
+                          : l10n.profileGithubLinkPrompt,
                       style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                     ),
                   ],
@@ -535,20 +547,34 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // El campo de texto estilizado
-          TextFormField(
-            controller: _githubController,
-            readOnly: isLinked,
-            enabled: !isLinked,
-            decoration: InputDecoration(
-              hintText: "Tu usuario de GitHub",
-              filled: true,
-              fillColor: Colors.white,
-              prefixText: "github.com/ ",
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: BorderSide.none,
+          // Campo solo informativo: se rellena automáticamente tras OAuth
+          Tooltip(
+            message: isLinked ? '' : l10n.profileGithubFieldHint,
+            child: AbsorbPointer(
+              child: TextFormField(
+                controller: _githubController,
+                readOnly: true,
+                enabled: false,
+                decoration: InputDecoration(
+                  hintText: isLinked
+                      ? (user?.githubHandle ?? '')
+                      : l10n.profileGithubUsernameHint,
+                  filled: true,
+                  fillColor: Colors.white,
+                  prefixText: 'github.com/ ',
+                  suffixIcon: isLinked
+                      ? null
+                      : const Icon(Icons.info_outline_rounded, size: 18),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
               ),
             ),
           ),
@@ -588,7 +614,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        isLinked ? "Desconectar GitHub" : "Vincular con GitHub",
+                        isLinked
+                            ? l10n.profileDisconnectGithubButton
+                            : l10n.profileLinkGithubButton,
                       ),
                     ],
                   ),
@@ -602,6 +630,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     AuthProvider authProvider,
     ColorScheme colorScheme,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return AnimatedSize(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
@@ -620,8 +649,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               children: [
                 const Icon(Icons.lock_outline_rounded, size: 28),
                 const SizedBox(width: 12),
-                const Text(
-                  "Seguridad",
+                Text(
+                  l10n.profileSecurityTitle,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const Spacer(),
@@ -629,7 +658,11 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                   onPressed: () => setState(
                     () => _showPasswordFields = !_showPasswordFields,
                   ),
-                  child: Text(_showPasswordFields ? "CANCELAR" : "CAMBIAR"),
+                  child: Text(
+                    _showPasswordFields
+                        ? l10n.cancelUpper
+                        : l10n.profileChangeUpper,
+                  ),
                 ),
               ],
             ),
@@ -637,19 +670,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               const SizedBox(height: 16),
               _buildPasswordField(
                 _currentPasswordController,
-                'Contraseña Actual',
+                l10n.profileCurrentPasswordLabel,
                 Icons.password,
               ),
               const SizedBox(height: 12),
               _buildPasswordField(
                 _newPasswordController,
-                'Nueva Contraseña',
+                l10n.profileNewPasswordLabel,
                 Icons.security,
               ),
               const SizedBox(height: 12),
               _buildPasswordField(
                 _confirmPasswordController,
-                'Confirmar Nueva Contraseña',
+                l10n.profileConfirmNewPasswordLabel,
                 Icons.verified_user_outlined,
               ),
               const SizedBox(height: 16),
@@ -657,7 +690,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ] else ...[
               const SizedBox(height: 8),
               Text(
-                "Cambia tu contraseña periódicamente para mantener tu cuenta segura.",
+                l10n.profileChangePasswordHint,
                 style: TextStyle(fontSize: 12, color: Colors.grey[600]),
               ),
             ],

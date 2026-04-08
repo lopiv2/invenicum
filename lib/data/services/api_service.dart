@@ -36,11 +36,26 @@ class ApiService {
         },
         onError: (e, handler) async {
           if (e.response?.statusCode == 401) {
-            _cachedToken = null;
-            final prefs = await SharedPreferences.getInstance();
-            await prefs.remove(Environment.authTokenKey);
-            if (onUnauthorized != null) {
-              onUnauthorized!();
+            final dynamic rawData = e.response?.data;
+            final String message = rawData is Map<String, dynamic>
+                ? (rawData['message']?.toString() ?? '')
+                : '';
+
+            final bool hadAuthHeader =
+                e.requestOptions.headers['Authorization'] != null;
+
+            // Solo cerramos sesión si el 401 viene de una validación JWT real.
+            final bool isJwtUnauthorized =
+                message == 'Invalid or expired token' ||
+                message == 'Token no proporcionado';
+
+            if (hadAuthHeader && isJwtUnauthorized) {
+              _cachedToken = null;
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.remove(Environment.authTokenKey);
+              if (onUnauthorized != null) {
+                onUnauthorized!();
+              }
             }
           }
           return handler.next(e);

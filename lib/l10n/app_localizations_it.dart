@@ -2261,6 +2261,109 @@ class AppLocalizationsIt extends AppLocalizations {
   String get updatePasswordButton => 'AGGIORNA LA PASSWORD';
 
   @override
+  String get profileFillAllFieldsError => 'Per favore, compila tutti i campi';
+
+  @override
+  String get profilePasswordUpdatedSuccess =>
+      'Password aggiornata con successo!';
+
+  @override
+  String get profileDisconnectActionUpper => 'DISCONNETTI';
+
+  @override
+  String get profileGithubUnlinkedSuccess =>
+      'Account GitHub scollegato correttamente';
+
+  @override
+  String get profileGithubLinkedSuccess =>
+      'Account GitHub collegato correttamente!';
+
+  @override
+  String profileGithubProcessError(String error) {
+    return 'Errore durante l\'elaborazione del collegamento GitHub: $error';
+  }
+
+  @override
+  String get profileGithubConfigUnavailableError =>
+      'Errore: configurazione GitHub non disponibile';
+
+  @override
+  String profileServerConnectionError(String error) {
+    return 'Impossibile connettersi al server: $error';
+  }
+
+  @override
+  String get profileUpdatedSuccess => 'Profilo aggiornato correttamente';
+
+  @override
+  String profileUpdateError(String error) {
+    return 'Errore durante l\'aggiornamento del profilo: $error';
+  }
+
+  @override
+  String get profileUsernameCommunityLabel => 'Username (Community)';
+
+  @override
+  String get profileUsernameCommunityHelper =>
+      'Richiesto per pubblicare plugin.';
+
+  @override
+  String get profileUpdateButtonUpper => 'AGGIORNA PROFILO';
+
+  @override
+  String get profileGithubIdentityTitle => 'Identità GitHub';
+
+  @override
+  String profileGithubLinkedAs(String username) {
+    return 'Collegato come @$username';
+  }
+
+  @override
+  String get profileGithubLinkPrompt =>
+      'Collega il tuo account per pubblicare plugin';
+
+  @override
+  String get profileGithubUsernameHint => 'Il tuo username GitHub';
+
+  @override
+  String get profileGithubFieldHint =>
+      'Questo campo viene compilato automaticamente dopo l\'autenticazione con GitHub.';
+
+  @override
+  String get profileGithubDefaultMissingKeys =>
+      'GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET';
+
+  @override
+  String profileGithubOAuthNotConfigured(String missing) {
+    return 'GitHub OAuth non configurato. Mancanti: $missing. Configura GITHUB_CLIENT_ID e GITHUB_CLIENT_SECRET nel backend e riavvia il server.';
+  }
+
+  @override
+  String get profileDisconnectGithubButton => 'Disconnetti GitHub';
+
+  @override
+  String get profileLinkGithubButton => 'Collega con GitHub';
+
+  @override
+  String get profileSecurityTitle => 'Sicurezza';
+
+  @override
+  String get profileChangeUpper => 'CAMBIA';
+
+  @override
+  String get profileCurrentPasswordLabel => 'Password attuale';
+
+  @override
+  String get profileNewPasswordLabel => 'Nuova password';
+
+  @override
+  String get profileConfirmNewPasswordLabel => 'Conferma nuova password';
+
+  @override
+  String get profileChangePasswordHint =>
+      'Cambia periodicamente la tua password per mantenere sicuro il tuo account.';
+
+  @override
   String get newContainerDialog => 'Nuovo contenitore';
 
   @override

@@ -24,7 +24,7 @@ class AuthProvider with ChangeNotifier {
 
   // 🚩 NUEVO: Verificación de cuenta de GitHub vinculada
   bool get isGitHubLinked =>
-      _user?.githubHandle != null && _user!.githubHandle!.isNotEmpty;
+      _user?.githubId != null && _user!.githubId!.isNotEmpty;
 
   /// [tokenAlreadyInitialized] — pasar true desde main.dart cuando ya se ha
   /// llamado a ApiService().initializeToken() antes del runApp.
@@ -65,7 +65,9 @@ class AuthProvider with ChangeNotifier {
             // getMe() devolvió null sin excepción — error temporal.
             // Mantenemos token Y creamos un usuario mínimo desde el token
             // para que isAuthenticated = true y el router no redirija al login.
-            debugPrint("⚠️ AuthProvider: getMe() sin datos, manteniendo sesión");
+            debugPrint(
+              "⚠️ AuthProvider: getMe() sin datos, manteniendo sesión",
+            );
             _token = _apiService.currentToken;
             // Si no tenemos _user, usamos el último conocido o uno vacío
             // para que isAuthenticated no falle por _user == null.
@@ -74,12 +76,16 @@ class AuthProvider with ChangeNotifier {
         } on DioException catch (e) {
           if (e.response?.statusCode == 401) {
             // 401 explícito → token inválido → logout
-            debugPrint("⚠️ AuthProvider: token inválido (401) — cerrando sesión");
+            debugPrint(
+              "⚠️ AuthProvider: token inválido (401) — cerrando sesión",
+            );
             await _apiService.logout();
           } else {
             // Error de red, 404, 5xx, timeout → no cerramos sesión.
             // Mantenemos token Y _user para que isAuthenticated siga siendo true.
-            debugPrint("⚠️ AuthProvider: error de red (${e.response?.statusCode}) — manteniendo sesión");
+            debugPrint(
+              "⚠️ AuthProvider: error de red (${e.response?.statusCode}) — manteniendo sesión",
+            );
             _token = _apiService.currentToken;
             _user ??= UserData.empty();
           }
@@ -187,13 +193,17 @@ class AuthProvider with ChangeNotifier {
           }
         } on DioException catch (e) {
           if (e.response?.statusCode == 401) {
-            debugPrint("⚠️ checkAuthStatus: 401 — token expirado, cerrando sesión");
+            debugPrint(
+              "⚠️ checkAuthStatus: 401 — token expirado, cerrando sesión",
+            );
             await _apiService.logout();
             _token = null;
             _user = null;
           } else {
             // Error de red o servidor → mantenemos sesión con usuario vacío
-            debugPrint("⚠️ checkAuthStatus: error de red (${e.response?.statusCode}) — manteniendo sesión");
+            debugPrint(
+              "⚠️ checkAuthStatus: error de red (${e.response?.statusCode}) — manteniendo sesión",
+            );
             _token = savedToken;
             _user ??= UserData.empty();
           }
@@ -211,8 +221,8 @@ class AuthProvider with ChangeNotifier {
   Future<Map<String, dynamic>> getGitHubConfig() async {
     try {
       final config = await _apiService.getGitHubConfig();
-      if (config != null && config['success'] == true) {
-        return {'clientId': config['clientId']};
+      if (config != null) {
+        return Map<String, dynamic>.from(config);
       }
       return {};
     } catch (e) {
@@ -233,8 +243,10 @@ class AuthProvider with ChangeNotifier {
         // Usamos copyWith para limpiar los campos y que la UI reaccione (el tick verde desaparezca)
         if (_user != null) {
           _user = _user!.copyWith(
-            githubHandle: "", // O null si tu copyWith lo permite
-            avatarUrl: "", // Opcional: resetear el avatar
+            githubHandle: "",
+            avatarUrl: "",
+            githubId: "",
+            githubLinkedAt: DateTime.fromMillisecondsSinceEpoch(0),
           );
         }
         notifyListeners();
@@ -254,17 +266,22 @@ class AuthProvider with ChangeNotifier {
       final response = await _apiService.completeGitHubOAuth(code);
 
       if (response != null && response['success'] == true) {
-        final githubData = response['data'];
+        final dynamic rawData = response['data'];
 
-        _user = _user?.copyWith(
-          githubHandle: githubData['githubHandle'],
-          avatarUrl: githubData['avatarUrl'],
-          githubId: githubData['githubId']?.toString(),
-          githubLinkedAt: DateTime.now(),
-          username: githubData['username'],
-        );
-
-        _validatedAvatarUrl = githubData['avatarUrl'];
+        if (rawData is Map<String, dynamic>) {
+          _user = UserData.fromJson(rawData);
+          _validatedAvatarUrl = _user?.avatarUrl;
+        } else {
+          final githubData = Map<String, dynamic>.from(rawData ?? {});
+          _user = _user?.copyWith(
+            githubHandle: githubData['githubHandle'],
+            avatarUrl: githubData['avatarUrl'],
+            githubId: githubData['githubId']?.toString(),
+            githubLinkedAt: DateTime.now(),
+            username: githubData['username'],
+          );
+          _validatedAvatarUrl = githubData['avatarUrl'];
+        }
 
         _setLoading(false);
         notifyListeners(); // Esto redibuja el perfil con el tick verde

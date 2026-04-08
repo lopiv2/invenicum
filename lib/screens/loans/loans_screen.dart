@@ -1,7 +1,6 @@
 // lib/screens/loans_screen.dart
 
 import 'dart:typed_data';
-import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
@@ -13,6 +12,7 @@ import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/data/services/voucher_service.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:pluto_grid/pluto_grid.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
@@ -282,9 +282,12 @@ class _LoansScreenState extends State<LoansScreen> {
             _buildQuickStats(loanProvider.currentStats!, l10n),
           // Filtros
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              children: [
+                    padding: const EdgeInsets.fromLTRB(8, 8, 8, 12),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Card(
+                        margin: EdgeInsets.zero,
+                        child: PlutoGrid(
                 Text(
                   '${l10n.apply}: ', // O una etiqueta "Filtrar"
                   style: const TextStyle(fontWeight: FontWeight.bold),
@@ -323,67 +326,31 @@ class _LoansScreenState extends State<LoansScreen> {
                 : Padding(
                     padding: const EdgeInsets.all(24.0),
                     child: Card(
-                      child: DataTable2(
-                        columnSpacing: 16,
-                        horizontalMargin: 12,
-                        minWidth: 800,
-                        dataRowHeight: 80,
-                        columns: [
-                          DataColumn(label: Text(l10n.loanObject)),
-                          DataColumn(label: Text(l10n.borrowerName)),
-                          DataColumn(
-                            label: Text(l10n.alertInfo),
-                          ), // "Contacto" o info
-                          DataColumn(label: Text(l10n.quantity)),
-                          DataColumn(label: Text(l10n.loanDate)),
-                          DataColumn(label: Text(l10n.dueDate)),
-                          DataColumn(label: Text(l10n.status)),
-                          DataColumn(
-                            label: Text(l10n.apply), // "Acciones"
-                            headingRowAlignment: MainAxisAlignment.center,
-                          ),
-                        ],
-                        rows: loans.map((loan) {
-                          // 🎨 Color de fila basado en el DTO
-                          Color? rowColor;
+                      child: PlutoGrid(
+                        columns: _buildPlutoColumns(l10n),
+                        rows: _buildPlutoRows(loans),
+                        rowColorCallback: (rowColorContext) {
+                          final loan =
+                              rowColorContext.row.cells['loan_object']!.value
+                                  as Loan;
                           if (loan.status == 'returned') {
-                            rowColor = Colors.green.shade50;
-                          } else if (loan.isOverdue) {
-                            // 🚩 Confiamos en el backend
-                            rowColor = Colors.red.shade50;
+                            return Colors.green.shade50;
                           }
-                          return DataRow(
-                            color: WidgetStateProperty.all(rowColor),
-                            cells: [
-                              DataCell(Text(loan.itemName)),
-                              DataCell(Text(loan.borrowerName ?? '-')),
-                              DataCell(
-                                Text(
-                                  loan.borrowerEmail ??
-                                      loan.borrowerPhone ??
-                                      '-',
-                                ),
-                              ),
-                              DataCell(Text(loan.quantity.toString())),
-                              DataCell(
-                                Text(DateFormat.yMd().format(loan.loanDate)),
-                              ),
-                              DataCell(
-                                Text(
-                                  loan.expectedReturnDate != null
-                                      ? DateFormat.yMd().format(
-                                          loan.expectedReturnDate!,
-                                        )
-                                      : '-',
-                                ),
-                              ),
-                              // 🏷️ Badge de Estado
-                              DataCell(_buildStatusBadge(loan, l10n)),
-                              // ⚙️ Botones de Acción
-                              DataCell(_buildActions(loan, l10n)),
-                            ],
-                          );
-                        }).toList(),
+                          if (loan.isOverdue) {
+                            return Colors.red.shade50;
+                          }
+                          return Colors.transparent;
+                        },
+                        configuration: PlutoGridConfiguration(
+                          style: PlutoGridStyleConfig(
+                            rowHeight: 80,
+                            cellTextStyle: const TextStyle(fontSize: 13),
+                          ),
+                        ),
+                        onLoaded: (event) {
+                          event.stateManager.setShowColumnFilter(true);
+                        },
+                        ),
                       ),
                     ),
                   ),
@@ -391,6 +358,100 @@ class _LoansScreenState extends State<LoansScreen> {
         ],
       ),
     );
+  }
+
+  List<PlutoColumn> _buildPlutoColumns(AppLocalizations l10n) {
+    return [
+      PlutoColumn(
+        title: 'loan_object',
+        field: 'loan_object',
+        type: PlutoColumnType.text(),
+        hide: true,
+        enableFilterMenuItem: false,
+        enableSorting: false,
+      ),
+      PlutoColumn(
+        title: l10n.loanObject,
+        field: 'itemName',
+        type: PlutoColumnType.text(),
+        width: 180,
+      ),
+      PlutoColumn(
+        title: l10n.borrowerName,
+        field: 'borrowerName',
+        type: PlutoColumnType.text(),
+        width: 170,
+      ),
+      PlutoColumn(
+        title: l10n.alertInfo,
+        field: 'contact',
+        type: PlutoColumnType.text(),
+        width: 210,
+      ),
+      PlutoColumn(
+        title: l10n.quantity,
+        field: 'quantity',
+        type: PlutoColumnType.number(),
+        width: 90,
+      ),
+      PlutoColumn(
+        title: l10n.loanDate,
+        field: 'loanDate',
+        type: PlutoColumnType.text(),
+        width: 120,
+      ),
+      PlutoColumn(
+        title: l10n.dueDate,
+        field: 'dueDate',
+        type: PlutoColumnType.text(),
+        width: 120,
+      ),
+      PlutoColumn(
+        title: l10n.status,
+        field: 'status',
+        type: PlutoColumnType.text(),
+        width: 130,
+        renderer: (ctx) {
+          final loan = ctx.row.cells['loan_object']!.value as Loan;
+          return Center(child: _buildStatusBadge(loan, l10n));
+        },
+      ),
+      PlutoColumn(
+        title: l10n.apply,
+        field: 'actions',
+        type: PlutoColumnType.text(),
+        width: 150,
+        enableSorting: false,
+        enableFilterMenuItem: false,
+        renderer: (ctx) {
+          final loan = ctx.row.cells['loan_object']!.value as Loan;
+          return Center(child: _buildActions(loan, l10n));
+        },
+      ),
+    ];
+  }
+
+  List<PlutoRow> _buildPlutoRows(List<Loan> loans) {
+    return loans.map((loan) {
+      final String contact = loan.borrowerEmail ?? loan.borrowerPhone ?? '-';
+      final String dueDateText = loan.expectedReturnDate != null
+          ? DateFormat.yMd().format(loan.expectedReturnDate!)
+          : '-';
+
+      return PlutoRow(
+        cells: {
+          'loan_object': PlutoCell(value: loan),
+          'itemName': PlutoCell(value: loan.itemName),
+          'borrowerName': PlutoCell(value: loan.borrowerName ?? '-'),
+          'contact': PlutoCell(value: contact),
+          'quantity': PlutoCell(value: loan.quantity),
+          'loanDate': PlutoCell(value: DateFormat.yMd().format(loan.loanDate)),
+          'dueDate': PlutoCell(value: dueDateText),
+          'status': PlutoCell(value: loan.status),
+          'actions': PlutoCell(value: ''),
+        },
+      );
+    }).toList();
   }
 
   Widget _buildStatusBadge(Loan loan, AppLocalizations l10n) {
