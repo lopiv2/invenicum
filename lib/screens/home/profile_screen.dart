@@ -30,7 +30,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  bool _showPasswordFields = false; // Para expandir/contraer la sección
+  bool _showPasswordFields = false;
 
   @override
   void initState() {
@@ -49,18 +49,18 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  /// Se llama cada vez que un InheritedWidget del que dependemos cambia.
-  /// Usamos esto para sincronizar los controllers cuando AuthProvider
-  /// notifica tras vincular GitHub — evita tener que salir y volver
-  /// a entrar a la pantalla para ver los datos actualizados.
+  /// Called whenever an InheritedWidget we depend on changes.
+  /// We use this to synchronize the controllers when AuthProvider
+  /// notifies after linking GitHub — avoids having to leave and return
+  /// to the screen to see updated data.
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final user = context.read<AuthProvider>().user;
     if (user == null) return;
 
-    // Solo actualizamos si el valor del provider difiere del controller,
-    // para no interrumpir ediciones manuales del usuario en curso.
+    // Only update if the provider's value differs from the controller,
+    // to avoid interrupting ongoing manual edits by the user.
     if (_usernameController.text != (user.username ?? '')) {
       _usernameController.text = user.username ?? '';
     }
@@ -86,7 +86,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<void> _handleChangePassword() async {
     final l10n = AppLocalizations.of(context)!;
-    // 1. Validaciones básicas de UI
+    // 1. Basic UI validations
     if (_currentPasswordController.text.isEmpty ||
         _newPasswordController.text.isEmpty) {
       ToastService.error(l10n.profileFillAllFieldsError);
@@ -99,7 +99,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
 
     try {
-      // 2. Llamada al AuthProvider (el método que pusiste antes)
+      // 2. Call to AuthProvider (the method you added before)
       final success = await context.read<AuthProvider>().updatePassword(
         currentPassword: _currentPasswordController.text,
         newPassword: _newPasswordController.text,
@@ -107,24 +107,24 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
       if (success && mounted) {
         ToastService.success(l10n.profilePasswordUpdatedSuccess);
-        // Limpiamos los campos y cerramos la sección
+        // Clear the fields and close the section
         _currentPasswordController.clear();
         _newPasswordController.clear();
         _confirmPasswordController.clear();
         setState(() => _showPasswordFields = false);
       }
     } catch (e) {
-      // Aquí el error vendrá del backend (ej: "La contraseña actual es incorrecta")
+      // Here the error will come from the backend (e.g., "The current password is incorrect")
       if (mounted)
         ToastService.error(e.toString().replaceAll('Exception: ', ''));
     }
   }
 
-  // NUEVO MÉTODO PARA WEB
+  // NEW METHOD FOR WEB
   void _checkWebQueryParams() {
     if (!kIsWeb) return;
 
-    // Parseo robusto del query param `code` sin depender de regex.
+    // Robust parsing of the `code` query param without relying on regex.
     final Uri currentUri = Uri.parse(web.window.location.href);
     final String? code = currentUri.queryParameters['code'];
 
@@ -137,19 +137,19 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   void _initDeepLinks() {
     _appLinks = AppLinks();
 
-    // Escucha links mientras la app está abierta en segundo plano
+    // Listen to links while the app is running in the background
     _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
       _handleDeepLink(uri);
     });
   }
 
   void _handleDeepLink(Uri uri) async {
-    // Verificamos que el link sea el de nuestro callback
+    // Verify that the link is our callback
     if (uri.scheme == 'invenicum' && uri.host == 'auth-callback') {
       final code = uri.queryParameters['code'];
       if (code != null) {
-        // Cerramos el navegador (esto ocurre automáticamente en la mayoría de OS)
-        // Llamamos al backend para validar el código
+        // Close the browser (this happens automatically on most OS)
+        // Call the backend to validate the code
         _processGitHubCode(code);
       }
     }
@@ -187,8 +187,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     if (confirm == true) {
       await authProvider.disconnectGitHubAccount();
       if (mounted) {
-        _usernameController.clear(); // Limpiamos el campo de username
-        _githubController.clear(); // Limpiamos el input visualmente
+        _usernameController.clear(); // Clear the username field
+        _githubController.clear(); // Clear the input visually, even though the provider should also update it to null/empty
         ToastService.success(l10n.profileGithubUnlinkedSuccess);
       }
     }
@@ -213,7 +213,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Future<void> _handleGitHubOAuth() async {
     final l10n = AppLocalizations.of(context)!;
     try {
-      // 1. Obtenemos la configuración desde backend
+      // 1. We obtain the GitHub OAuth configuration from the backend
       final response = await context.read<AuthProvider>().getGitHubConfig();
       final String? clientId = response['clientId'];
       final bool isConfigured = response['isConfigured'] == true;
@@ -231,17 +231,16 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         return;
       }
 
-      // 2. Construimos la URL con el ID que nos dio el server
+      // 2. We construct the URL with the ID provided by the server
       final String redirectUri = kIsWeb
           ? "${Uri.base.origin}/#/myprofile"
           : "invenicum://auth-callback";
 
-      final url = Uri.parse(
-        'https://github.com/login/oauth/authorize'
-        '?client_id=$clientId'
-        '&redirect_uri=$redirectUri'
-        '&scope=read:user',
-      );
+      final url = Uri.https('github.com', '/login/oauth/authorize', {
+        'client_id': clientId,
+        'redirect_uri': redirectUri,
+        'scope': 'read:user',
+      });
 
       if (await canLaunchUrl(url)) {
         await launchUrl(
@@ -375,7 +374,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-  // Agrupa los campos de Nombre y Username
+  // Groups the Name and Username fields
   Widget _buildGeneralFields() {
     final l10n = AppLocalizations.of(context)!;
     return Column(
@@ -477,7 +476,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 : RandomAvatar(seed, width: 100, height: 100),
           ),
         ),
-        // Solo mostramos el check si el backend confirma que está verificado
+        // Only show the check if the backend confirms it is verified
         if (isGitHubLinked)
           Container(
             padding: const EdgeInsets.all(4),
@@ -514,7 +513,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         children: [
           Row(
             children: [
-              // Logo de GitHub (puedes usar un icono de FontAwesome o una imagen asset)
+              // Github Icon + Title + Status
               const FaIcon(
                 FontAwesomeIcons.github,
                 color: Colors.black,
@@ -546,7 +545,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ],
           ),
           const SizedBox(height: 16),
-          // Campo solo informativo: se rellena automáticamente tras OAuth
+          // Informative field: automatically filled after OAuth
           Tooltip(
             message: isLinked ? '' : l10n.profileGithubFieldHint,
             child: AbsorbPointer(
@@ -556,7 +555,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 enabled: false,
                 decoration: InputDecoration(
                   hintText: isLinked
-                      ? (user?.githubHandle ?? '')
+                      ? (user.githubHandle ?? '')
                       : l10n.profileGithubUsernameHint,
                   filled: true,
                   fillColor: Colors.white,
@@ -578,15 +577,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          // Botón para verificar la cuenta
+          // Button to verify the account
           ElevatedButton(
             onPressed: authProvider.isLoading
                 ? null
                 : (isLinked
-                      ? _handleDisconnectGitHub // Si está vinculado, desconecta
-                      : _handleGitHubOAuth), // Si no, vincula
+                      ? _handleDisconnectGitHub // If linked, disconnect
+                      : _handleGitHubOAuth), // If not, link
             style: ElevatedButton.styleFrom(
-              // Si está vinculado, lo ponemos en un tono rojo/gris para indicar "acción de desconexión"
+              // If linked, use a red/gray tone to indicate "disconnect action"
               backgroundColor: isLinked
                   ? Colors.redAccent.withValues(alpha: 0.8)
                   : Colors.black,
@@ -711,7 +710,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
         labelText: label,
         border: const OutlineInputBorder(),
         prefixIcon: Icon(icon),
-        isDense: true, // Hace el campo un poco más compacto para Web
+        isDense: true,
       ),
     );
   }

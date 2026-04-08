@@ -163,7 +163,7 @@ class ContainerTreeView extends StatelessWidget {
     );
   }
 
-  // --- LÓGICA DE MENÚ CONTEXTUAL ---
+  // --- CONTEXT MENU LOGIC ---
   void _showContextMenu(
     BuildContext context,
     Offset position,
@@ -210,34 +210,38 @@ class ContainerTreeView extends StatelessWidget {
     }
   }
 
-  // --- DIÁLOGOS (REUTILIZANDO TU LÓGICA) ---
+  // --- DIALOGS (REUSING YOUR LOGIC) ---
   Future<void> _showRenameDialog(
     BuildContext context,
     ContainerNode container,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController(text: container.name);
     final formKey = GlobalKey<FormState>();
 
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.renameContainer),
+        title: Text(l10n.renameContainer),
         content: Form(
           key: formKey,
           child: TextFormField(
             controller: controller,
             autofocus: true,
-            validator: (v) => (v == null || v.isEmpty) ? "Vacío" : null,
+            validator: (v) =>
+                (v == null || v.isEmpty)
+                    ? l10n.fieldRequiredWithName(l10n.containerName)
+                    : null,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text("Cancelar"),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text("Renombrar"),
+            child: Text(l10n.rename),
           ),
         ],
       ),
@@ -252,19 +256,20 @@ class ContainerTreeView extends StatelessWidget {
     BuildContext context,
     ContainerNode container,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     final bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text("Confirmar"),
-        content: Text("¿Borrar ${container.name}?"),
+        title: Text(l10n.confirmDeletion),
+        content: Text(l10n.confirmDeleteContainer(container.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text("No"),
+            child: Text(l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text("Sí"),
+            child: Text(l10n.yes),
           ),
         ],
       ),

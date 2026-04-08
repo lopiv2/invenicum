@@ -1,18 +1,18 @@
 // lib/core/routing/route_names.dart
 //
-// Fuente de verdad única para los nombres de ruta de GoRouter.
-// Usar siempre estas constantes en lugar de strings literales al navegar.
-// Si renombras una ruta aquí, el compilador señalará todos los usos rotos.
+// Single source of truth for GoRouter route names.
+// Always use these constants instead of literal strings when navigating.
+// If you rename a route here, the compiler will flag all broken usages.
 
 abstract class RouteNames {
-  // ── Autenticación (fuera del Shell) ───────────────────────────────────────
+  // ── Authentication (outside Shell) ───────────────────────────────────────
   static const login           = 'login';
   static const setup           = 'setup';
 
-  // ── Perfil y cuenta ───────────────────────────────────────────────────────
+  // ── Profile and account ─────────────────────────────────────────────────
   static const myProfile       = 'myProfile';
 
-  // ── Navegación principal ──────────────────────────────────────────────────
+  // ── Main navigation ─────────────────────────────────────────────────────
   static const dashboard       = 'dashboard';
   static const alerts          = 'alerts';
   static const preferences     = 'preferences';    // path: /preferences
@@ -21,38 +21,38 @@ abstract class RouteNames {
   static const achievements    = 'achievements';
   static const integrations    = 'integrations';
 
-  // ── Templates ─────────────────────────────────────────────────────────────
+  // ── Templates ────────────────────────────────────────────────────────────
   static const templates       = 'templates';
   static const templateCreate  = 'templateCreate'; // nested: templates/create
   static const templateDetail  = 'templateDetail'; // nested: templates/details/:templateId
 
-  // ── Plugins ───────────────────────────────────────────────────────────────
+  // ── Plugins ──────────────────────────────────────────────────────────────
   static const plugins         = 'plugins';        // path: /plugins-admin
   static const pluginDetail    = 'pluginDetail';   // path: /plugins/:pluginId
 
-  // ── Asset Types ───────────────────────────────────────────────────────────
+  // ── Asset Types ──────────────────────────────────────────────────────────
   static const assetTypes      = 'assetTypes';
   static const assetTypeCreate = 'assetTypeCreate';
   static const assetTypeEdit   = 'assetTypeEdit';
 
-  // ── Assets (ítems de inventario) ──────────────────────────────────────────
+  // ── Assets (inventory items) ─────────────────────────────────────────────
   static const assetList       = 'assetList';
   static const assetCreate     = 'assetCreate';
   static const assetDetail     = 'assetDetail';
   static const assetEdit       = 'assetEdit';
   static const assetImport     = 'assetImport';
 
-  // ── DataLists ─────────────────────────────────────────────────────────────
+  // ── DataLists ────────────────────────────────────────────────────────────
   static const dataLists       = 'dataLists';
   static const dataListCreate  = 'dataListCreate';
   static const dataListEdit    = 'dataListEdit';
 
-  // ── Locations ─────────────────────────────────────────────────────────────
+  // ── Locations ────────────────────────────────────────────────────────────
   static const locations       = 'locations';
   static const locationCreate  = 'locationCreate';
   static const locationEdit    = 'locationEdit';
 
-  // ── Loans ─────────────────────────────────────────────────────────────────
+  // ── Loans ────────────────────────────────────────────────────────────────
   static const loans           = 'loans';
   static const loanCreate      = 'loanCreate';
 }

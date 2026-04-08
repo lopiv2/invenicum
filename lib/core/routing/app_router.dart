@@ -59,15 +59,15 @@ import 'package:stac/stac.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
-/// Ahora recibe también [firstRunProvider] para que el router pueda
-/// escucharlo y reaccionar cuando la comprobación termine.
+/// Also receives [firstRunProvider] so the router can
+/// listen to it and react when the check finishes.
 GoRouter createAppRouter(
   AuthProvider authProvider,
   FirstRunProvider firstRunProvider, // 🆕
 ) {
   return GoRouter(
-    // 🆕 Escuchamos ambos providers: cuando cualquiera notifique un cambio
-    // GoRouter vuelve a evaluar el redirect automáticamente.
+    // 🆕 We listen to both providers: when either one notifies a change,
+    // GoRouter re-evaluates the redirect automatically.
     refreshListenable: Listenable.merge([authProvider, firstRunProvider]),
     navigatorKey: rootNavigatorKey,
     initialLocation: '/dashboard',
@@ -75,26 +75,26 @@ GoRouter createAppRouter(
       final authProvider = context.read<AuthProvider>();
       final firstRunProvider = context.read<FirstRunProvider>(); // 🆕
 
-      // ── 1. ESPERAR A QUE AMBAS COMPROBACIONES TERMINEN ───────────────────
-      // Mientras AuthProvider está cargando el token del disco O
-      // FirstRunProvider aún no sabe si hay usuarios, no movemos nada.
+      // ── 1. WAIT UNTIL BOTH CHECKS FINISH ──────────────────────────────────
+      // While AuthProvider is loading the token from disk OR
+      // FirstRunProvider still doesn't know whether users exist, do nothing.
       if (authProvider.isLoading || firstRunProvider.isChecking) return null;
 
-      // ── 2. PRIMER USO: redirigir al setup antes que cualquier otra cosa ──
-      // Si el backend dice que no hay usuarios, mandamos al setup
-      // independientemente de si hay token o no.
+      // ── 2. FIRST RUN: redirect to setup before anything else ───────────────
+      // If the backend says there are no users, send to setup
+      // regardless of whether there is a token or not.
       final isSetupRoute = state.matchedLocation == '/setup';
       if (firstRunProvider.isFirstRun) {
-        // Evitamos el bucle: si ya estamos en /setup, no redirigimos.
+        // Avoid loop: if we're already on /setup, do not redirect.
         return isSetupRoute ? null : '/setup';
       }
 
-      // A partir de aquí el backend tiene usuarios → flujo normal.
+      // From here on, the backend has users -> normal flow.
 
       final isAuthenticated = authProvider.isAuthenticated;
       final isLoggingIn = state.matchedLocation == '/login';
 
-      // ── 3. LÓGICA GITHUB ─────────────────────────────────────────────────
+      // ── 3. GITHUB LOGIC ───────────────────────────────────────────────────
       final uri = Uri.parse(html.window.location.href);
       final String? githubCode =
           state.uri.queryParameters['code'] ?? uri.queryParameters['code'];
@@ -104,12 +104,12 @@ GoRouter createAppRouter(
         return '/myprofile?code=$githubCode';
       }
 
-      // ── 4. PROTECCIÓN DE RUTAS ───────────────────────────────────────────
-      // Rutas públicas que nunca deben guardarse como destino de redirectTo.
-      // /setup se incluye porque tras markAsComplete() el router re-evalúa
-      // con matchedLocation='/setup' e isAuthenticated=false — sin esta
-      // guarda generaría redirectTo=/setup y mandaría al usuario de vuelta
-      // al wizard justo después de loguearse.
+      // ── 4. ROUTE PROTECTION ───────────────────────────────────────────────
+      // Public routes that should never be stored as redirectTo destination.
+      // /setup is included because after markAsComplete() the router re-evaluates
+      // with matchedLocation='/setup' and isAuthenticated=false - without this
+      // guard it would generate redirectTo=/setup and send the user back
+      // to the wizard right after logging in.
       final isPublicRoute = isLoggingIn || isSetupRoute;
 
       if (!isAuthenticated && !isPublicRoute) {
@@ -117,7 +117,7 @@ GoRouter createAppRouter(
         return '/login?redirectTo=${Uri.encodeComponent(fromLocation)}';
       }
 
-      // Si ya está logueado y va al login, lo mandamos al dashboard (o al QR)
+      // If already logged in and going to login, send to dashboard (or QR)
       if (isAuthenticated && isLoggingIn) {
         final redirectTo = state.uri.queryParameters['redirectTo'];
         return redirectTo ?? '/dashboard';
@@ -126,17 +126,17 @@ GoRouter createAppRouter(
       return null;
     },
     routes: [
-      // ── Rutas públicas (fuera del Shell) ────────────────────────────────
+      // ── Public routes (outside Shell) ────────────────────────────────────
       GoRoute(name: RouteNames.login, path: '/login', builder: (context, state) => const LoginScreen()),
 
-      // 🆕 Pantalla de configuración de primer uso
+      // 🆕 First-run setup screen
       GoRoute(
         name: RouteNames.setup,
         path: '/setup',
         builder: (context, state) => const FirstRunSetupScreen(),
       ),
 
-      // ── Rutas protegidas dentro del MainLayout ───────────────────────────
+      // ── Protected routes inside MainLayout ────────────────────────────────
       ShellRoute(
         builder: (context, state, child) => MainLayout(child: child),
         routes: [
@@ -192,7 +192,7 @@ GoRouter createAppRouter(
             builder: (context, state) => const DeliveryVoucherEditorScreen(),
           ),
 
-          // --- CONTENEDORES / ASSET TYPES ---
+          // --- CONTAINERS / ASSET TYPES ---
           GoRoute(
             name: RouteNames.assetTypes,
             path: '/container/:containerId/asset-types',

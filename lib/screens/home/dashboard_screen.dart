@@ -83,14 +83,32 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 );
               }
 
-              if (snapshot.hasError || snapshot.data == null) {
-                return Center(child: Text(l10n.errorLoadingData));
-              }
-
-              final stats = snapshot.data!;
+              final stats =
+                  snapshot.data ??
+                  DashboardStats(
+                    totalContainers: 0,
+                    totalItems: 0,
+                    totalAssets: 0,
+                    itemsPending: 0,
+                    itemsLowStock: 0,
+                    totalValue: 0,
+                    topLoanedItems: const [],
+                    loansExpiringToday: const [],
+                  );
 
               return Column(
                 children: [
+                  if (snapshot.hasError)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: Text(
+                        l10n.errorLoadingData,
+                        style: TextStyle(
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                      ),
+                    ),
+
                   // 1. Widget de Inversión - Responsive
                   if (screenWidth > 600)
                     IntrinsicHeight(

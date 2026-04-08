@@ -18,7 +18,7 @@ class UserPreferences {
 
   UserPreferences({
     this.id,
-    this.language = 'es',
+    this.language = 'en',
     this.currency = 'USD',
     this.aiEnabled = true,
     this.aiProvider,
@@ -29,7 +29,7 @@ class UserPreferences {
     this.useSystemTheme = true, // Por defecto sigue al sistema
     this.isDarkMode = false,    // Solo aplica si useSystemTheme es false
     NotificationSettings? notifications,
-  }) : this.notifications = notifications ?? NotificationSettings();
+  }) : notifications = notifications ?? NotificationSettings();
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) {
     Map<String, double>? parsedRates;
@@ -41,7 +41,7 @@ class UserPreferences {
 
     return UserPreferences(
       id: json['id'] as int?,
-      language: json['language'] as String? ?? 'es',
+      language: json['language'] as String? ?? 'en',
       currency: json['currency'] as String? ?? 'USD',
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       aiProvider: (json['aiProvider'] ?? json['ai_provider']) as String?,
@@ -114,7 +114,7 @@ class UserPreferences {
 
   factory UserPreferences.empty() {
     return UserPreferences(
-      language: 'es',
+      language: 'en',
       currency: 'USD',
       aiEnabled: true,
       useSystemTheme: true,
