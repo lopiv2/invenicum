@@ -9,9 +9,9 @@
 
 <p align="center">
   <a href="https://github.com/lopiv2/invenicum/stargazers"><img src="https://img.shields.io/github/stars/lopiv2/invenicum?style=for-the-badge&logo=github&color=24292e" alt="Stars"></a>
-  <a href="https://github.com/lopiv2/invenicum/tags">
-  <img src="https://img.shields.io/github/v/tag/lopiv2/invenicum?sort=semver&style=for-the-badge&logo=github&color=3b82f6" alt="Version">
-</a>
+  <a href="https://github.com/lopiv2/invenicum/releases/latest">
+    <img src="https://img.shields.io/github/v/release/lopiv2/invenicum?style=for-the-badge&logo=github&color=3b82f6" alt="Release">
+  </a>
   <a href="https://ghcr.io/lopiv2/invenicum"><img src="https://img.shields.io/badge/ghcr.io-lopiv2%2Finvenicum-0db7ed?style=for-the-badge&logo=docker" alt="GHCR"></a>
   <img src="https://img.shields.io/github/license/lopiv2/invenicum?style=for-the-badge&color=10b981" alt="License">
 </p>
