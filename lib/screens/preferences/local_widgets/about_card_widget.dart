@@ -103,7 +103,7 @@ class AboutCardWidget extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.secondary.withValues(alpha: 0.16),
+                  color: theme.colorScheme.onErrorContainer.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
@@ -164,11 +164,14 @@ class AboutCardWidget extends StatelessWidget {
                       style: theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
+                    // Use original neutral background when up-to-date,
+                    // otherwise use a translucent error (red) background.
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurfaceVariant
-                            .withValues(alpha: 0.55),
+                        color: (data?.hasUpdate == true)
+                            ? theme.colorScheme.error.withValues(alpha: 0.12)
+                            : theme.colorScheme.onInverseSurface.withValues(alpha: 0.55),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: theme.dividerColor.withValues(alpha: 0.2),
