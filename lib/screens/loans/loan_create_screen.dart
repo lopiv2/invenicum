@@ -18,7 +18,6 @@ import 'package:provider/provider.dart';
 class LoanCreateScreen extends StatefulWidget {
   final String containerId;
 
-  // Ya no recibimos loanId porque esta pantalla es solo para creación
   const LoanCreateScreen({super.key, required this.containerId});
 
   @override
@@ -53,7 +52,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
     final picked = await showDatePicker(
       context: context,
       initialDate: initialDate,
-      firstDate: DateTime.now(), // No tiene sentido prestar hacia el pasado
+      firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
     if (picked != null) {
@@ -167,7 +166,6 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
           context,
           listen: false,
         );
-        // 1. Registramos el préstamo (el backend descuenta stock)
         await loanProvider.createLoan(
           containerIdInt,
           loan,

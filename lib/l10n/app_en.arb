@@ -198,6 +198,11 @@
   },
   "@@locale": "en",
   "aboutInvenicum": "About Invenicum",
+  "deliveryVoucherTitle": "DELIVERY VOUCHER",
+  "@deliveryVoucherTitle": {
+    "description": "Title used in generated delivery voucher PDF",
+    "placeholders": {}
+  },
   "aboutDialogTitle": "About Invenicum",
   "aboutDialogCoolText": "Your inventory, now with extra horsepower. Checking if a fresher version is waiting for you.",
   "aboutCurrentVersionLabel": "Current version",

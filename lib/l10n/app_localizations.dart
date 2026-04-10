@@ -112,6 +112,12 @@ abstract class AppLocalizations {
   /// **'About Invenicum'**
   String get aboutInvenicum;
 
+  /// Title used in generated delivery voucher PDF
+  ///
+  /// In en, this message translates to:
+  /// **'DELIVERY VOUCHER'**
+  String get deliveryVoucherTitle;
+
   /// No description provided for @aboutDialogTitle.
   ///
   /// In en, this message translates to:

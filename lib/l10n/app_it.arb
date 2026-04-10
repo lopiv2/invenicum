@@ -207,6 +207,11 @@
     "aboutVersionUpToDate":  "La tua app è aggiornata.",
     "aboutUpdateAvailable":  "È disponibile una nuova versione.",
     "aboutVersionCheckFailed":  "Non è stato possibile verificare la versione online.",
+        "deliveryVoucherTitle": "VOUCHER DI CONSEGNA",
+        "@deliveryVoucherTitle": {
+            "description": "Titolo usato nel PDF del voucher di consegna",
+            "placeholders": {}
+        },
     "aboutOpenReleases":  "Vedi release",
     "active":  "Risorsa",
     "actives":  "Attività",

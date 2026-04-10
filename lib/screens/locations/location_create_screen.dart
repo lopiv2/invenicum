@@ -43,7 +43,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
     super.dispose();
   }
 
-  // --- Lógica de Guardado (Integración con Provider) ---
+  // --- Save logic (integration with Provider) ---
   void _saveLocation() async {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) {
@@ -58,7 +58,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
       final locationProvider = context.read<LocationProvider>();
       final containerProvider = context.read<ContainerProvider>();
 
-      // LLAMADA AL SERVICE REAL A TRAVÉS DEL PROVIDER
+        // CALL TO THE REAL SERVICE VIA THE PROVIDER
       final newLocation = await locationProvider.createLocation(
         containerId: int.parse(widget.containerId),
         name: _nameController.text,
@@ -70,16 +70,16 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
       );
       await containerProvider.loadDataLists(int.parse(widget.containerId));
 
-      // Mostrar éxito
+      // Show success
       if (mounted) {
         ToastService.success(
           l10n.locationCreatedSuccessfully(newLocation?.name ?? ''),
         );
-        // Volver a la pantalla anterior
+        // Return to the previous screen
         context.pop();
       }
     } catch (e) {
-      // Mostrar error
+      // Show error
       if (mounted) {
         ToastService.error(l10n.errorCreatingLocation(e.toString()));
       }
@@ -95,12 +95,12 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // 🔑 USAMOS CONTEXT.WATCH para obtener la lista de ubicaciones disponibles
+    // 🔑 WE USE context.watch to obtain the list of available locations
     final locationProvider = context.watch<LocationProvider>();
     final allLocations = locationProvider.locations;
     final isLoading = locationProvider.isLoading;
 
-    // Si está cargando y la lista está vacía, mostramos un indicador
+    // If it's loading and the list is empty, show a loading indicator
     if (isLoading && allLocations.isEmpty) {
       return Scaffold(
         appBar: AppBar(
@@ -111,9 +111,9 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
       );
     }
 
-    // Filtramos las ubicaciones para excluir la que se está creando (si fuera una edición)
-    // y asegurarnos que solo mostramos ubicaciones que pertenecen al contenedor actual (asumiendo que LocationsScreen ya filtró).
-    // Aquí usamos la lista tal cual, asumiendo que el provider solo tiene las del containerId.
+    // Filter locations to exclude the one being created (if this were an edit)
+    // and ensure we only show locations that belong to the current container (assuming LocationsScreen already filtered them).
+    // Here we use the list as-is, assuming the provider only contains locations for the given containerId.
 
     return Scaffold(
       appBar: AppBar(
@@ -127,7 +127,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // --- Campo Nombre ---
+              // --- Name Field ---
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -144,7 +144,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
               ),
               const SizedBox(height: 20),
 
-              // --- Campo Descripción ---
+              // --- Description Field ---
               TextFormField(
                 controller: _descriptionController,
                 decoration: InputDecoration(
@@ -156,28 +156,28 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
               ),
               const SizedBox(height: 20),
 
-              // --- Campo Ubicación Padre (Dropdown) ---
+              // --- Parent Location Field (Dropdown) ---
               DropdownButtonFormField<int>(
                 decoration: InputDecoration(
                   labelText: l10n.parentLocationLabel,
                   border: const OutlineInputBorder(),
                 ),
-                value: _selectedParentId,
+                initialValue: _selectedParentId,
                 hint: Text(l10n.noParentRootLocation),
-                // 🔑 Usamos la lista 'allLocations' obtenida del Provider
+                // 🔑 We use the 'allLocations' list obtained from the Provider
                 items: [
-                  // Opción para no tener padre (Raíz)
+                  // Option for having no parent (Root)
                   DropdownMenuItem<int>(
                     value: null,
                     child: Text(l10n.noneRootScheme),
                   ),
-                  // Lista de ubicaciones existentes
+                  // List of existing locations
                   ...allLocations.map((loc) {
                     return DropdownMenuItem<int>(
                       value: loc.id,
                       child: Text(loc.name),
                     );
-                  }).toList(),
+                  })
                 ],
                 onChanged: _isSaving
                     ? null // Deshabilitar si se está guardando
@@ -189,7 +189,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
               ),
               const SizedBox(height: 40),
 
-              // --- Botón de Guardar ---
+              // --- Save Button ---
               ElevatedButton.icon(
                 onPressed: _isSaving ? null : _saveLocation,
                 icon: _isSaving

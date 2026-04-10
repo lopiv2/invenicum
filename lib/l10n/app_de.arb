@@ -198,6 +198,11 @@
   },
   "@@locale": "de",
   "aboutInvenicum": "Über Invenicum",
+  "deliveryVoucherTitle": "ABGABEBESCHEINIGUNG",
+  "@deliveryVoucherTitle": {
+    "description": "Titel im generierten Lieferschein-PDF",
+    "placeholders": {}
+  },
   "aboutDialogTitle": "Über Invenicum",
   "aboutDialogCoolText": "Dein Inventar auf Steroiden. Wir prüfen gerade, ob eine neuere Version verfügbar ist.",
   "aboutCurrentVersionLabel": "Aktuelle Version",

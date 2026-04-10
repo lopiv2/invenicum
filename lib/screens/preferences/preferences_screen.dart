@@ -11,7 +11,7 @@ import 'package:invenicum/screens/preferences/local_widgets/theme_picker_modal_w
 import 'package:invenicum/screens/preferences/local_widgets/notification_settings_card_widget.dart';
 import 'package:provider/provider.dart';
 
-// Definimos las categorías para el menú lateral
+// Define the categories for the side menu
 enum PreferenceCategory { general, ai, notifications, loans, about }
 
 class PreferencesScreen extends StatefulWidget {
@@ -22,12 +22,12 @@ class PreferencesScreen extends StatefulWidget {
 }
 
 class _PreferencesScreenState extends State<PreferencesScreen> {
-  // Categoría seleccionada por defecto
+  // Default selected category
   PreferenceCategory _selectedCategory = PreferenceCategory.general;
 
   @override
   Widget build(BuildContext context) {
-    // Datos de tema necesarios para el widget general
+    // Theme data required by the general widget
     final currentTheme = context.select<ThemeProvider, CustomTheme>(
       (p) => p.currentTheme,
     );
@@ -39,7 +39,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Si el ancho es menor a 700px, usamos la vista clásica de lista (Móvil)
+        // If the width is less than 700px, use the classic list view (Mobile)
         if (constraints.maxWidth < 700) {
           return _buildMobileLayout(
             context,
@@ -49,7 +49,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           );
         }
 
-        // Si hay espacio, usamos la vista dividida (Desktop/Tablet)
+        // If there is space, use the split view (Desktop/Tablet)
         return _buildDesktopLayout(
           context,
           themeName,
@@ -60,7 +60,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     );
   }
 
-  // --- DISEÑO PARA MÓVIL (Lista Vertical) ---
+  // --- MOBILE LAYOUT (Vertical List) ---
   Widget _buildMobileLayout(
     BuildContext context,
     String themeName,
@@ -92,7 +92,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     );
   }
 
-  // --- DISEÑO PARA TABLET/ESCRITORIO (Barra lateral + Contenido) ---
+  // --- TABLET/DESKTOP LAYOUT (Sidebar + Content) ---
   Widget _buildDesktopLayout(
     BuildContext context,
     String themeName,
@@ -102,7 +102,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Panel Izquierdo: Menú de Categorías
+        // Left Panel: Categories menu
         Container(
           width: 280,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
@@ -135,14 +135,14 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           ),
         ),
 
-        // Divisor vertical sutil
+        // Subtle vertical divider
         VerticalDivider(
           width: 1,
           thickness: 1,
           color: Theme.of(context).dividerColor.withValues(alpha: 0.1),
         ),
 
-        // Panel Derecho: Contenido dinámico
+        // Right Panel: Dynamic content
         Expanded(
           child: Container(
             color: Theme.of(
@@ -165,7 +165,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     );
   }
 
-  // --- HELPERS DE UI ---
+  // --- UI HELPERS ---
 
   Widget _buildHeader(BuildContext context) {
     return Text(
@@ -222,7 +222,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     Color themeColor,
     ThemeProvider provider,
   ) {
-    // Cada categoría devuelve su widget correspondiente
+    // Each category returns its corresponding widget
     switch (_selectedCategory) {
       case PreferenceCategory.general:
         return GeneralSettingsCardWidget(

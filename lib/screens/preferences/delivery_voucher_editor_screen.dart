@@ -27,37 +27,37 @@ class _DeliveryVoucherEditorScreenState
   @override
   void initState() {
     super.initState();
-    // Inicializamos con el texto por defecto que tenías
+    // Initialize with your default text
     _templateController = TextEditingController(text: _getDefaultTemplate());
-    // Cargar configuración desde la DB al iniciar
+    // Load configuration from the DB on startup
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadConfig());
   }
 
-  // Tu texto por defecto original
+  // Your original default text
   String _getDefaultTemplate() {
-    return '''Artículo: {itemName}
-Cantidad: {quantity}
+    return '''Item: {itemName}
+Quantity: {quantity}
 
-Prestatario: {borrowerName}
+Borrower: {borrowerName}
 Email: {borrowerEmail}
-Teléfono: {borrowerPhone}
+Phone: {borrowerPhone}
 
-Fecha de Préstamo: {loanDate}
-Fecha de Devolución: {expectedReturnDate}
+Loan Date: {loanDate}
+Expected Return Date: {expectedReturnDate}
 
-Notas: {notes}
-
-_________________________ | _________________________
-Firma de quien entrega    | Firma de quien recibe''
-
-
-
+Notes: {notes}
 
 _________________________ | _________________________
-Firma de quien recibe     | Firma de quien devuelve''';
+Signature of Deliverer    | Signature of Receiver''
+
+
+
+
+_________________________ | _________________________
+Signature of Receiver     | Signature of Returner''';
   }
 
-  // Carga inicial de datos desde el backend
+  // Initial load of data from the backend
   Future<void> _loadConfig() async {
     setState(() => _isInitialLoading = true);
     try {
@@ -83,7 +83,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
     }
   }
 
-  // Lógica de PickImage tal cual la tenías (con FilePicker)
+  // Pick image logic as you had it (using FilePicker)
   Future<void> _pickImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -95,7 +95,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
       final double sizeInMb = sizeInBytes / (1024 * 1024);
 
       if (sizeInMb > 1.0) {
-        // Mostrar error si pesa más de 1MB
+        // Show error if file is larger than 1MB
         if (!mounted) return;
         ToastService.error(
           'El archivo es muy pesado (${sizeInMb.toStringAsFixed(2)} MB). El máximo es 1 MB.',
@@ -109,7 +109,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
     }
   }
 
-  // Insertar tags en la posición del cursor
+  // Insert tags at the cursor position
   void _addFieldToTemplate(String tag) {
     final text = _templateController.text;
     final selection = _templateController.selection;
@@ -120,7 +120,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
     );
   }
 
-  // Guardar en la base de datos
+  // Save to the database
   Future<void> _saveTemplate() async {
     setState(() => _isLoading = true);
     try {
@@ -136,24 +136,34 @@ Firma de quien recibe     | Firma de quien devuelve''';
     }
   }
 
-  // Generación del PDF para vista previa
+  // Generate the PDF for preview
   Future<Uint8List> _generatePreviewPdf() async {
     final doc = pw.Document();
 
-    // Formateo del ID como pediste: V-000000
+    // Get localized strings using the Flutter BuildContext (not pw.Context)
+    final l10n = AppLocalizations.of(context)!;
+    final pdfTitle = l10n.deliveryVoucherTitle;
+
+    // Format the ID as requested: V-000000
     final String voucherId = "V-${"124".padLeft(6, '0')}";
 
     String processedText = _templateController.text
         .replaceAll('{voucherId}', voucherId)
-        .replaceAll('{itemName}', 'Producto de Ejemplo')
+        .replaceAll('{itemName}', 'Example Item')
         .replaceAll('{quantity}', '1')
-        .replaceAll('{borrowerName}', 'Juan Pérez')
+        .replaceAll('{borrowerName}', 'John Doe')
+      .replaceAll('{borrowerEmail}', 'john.doe@example.com')
+      .replaceAll('{borrowerPhone}', '+34 600 000 000')
         .replaceAll('{loanDate}', '10/01/2024');
+    // Additional optional placeholders
+    processedText = processedText
+      .replaceAll('{expectedReturnDate}', '17/01/2024')
+      .replaceAll('{notes}', 'Handle with care');
 
     doc.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) {
+        build: (pw.Context pwContext) {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
@@ -168,7 +178,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
                     crossAxisAlignment: pw.CrossAxisAlignment.end,
                     children: [
                       pw.Text(
-                        'VALE DE ENTREGA',
+                        pdfTitle,
                         style: pw.TextStyle(
                           fontWeight: pw.FontWeight.bold,
                           fontSize: 18,
@@ -247,6 +257,22 @@ Firma de quien recibe     | Firma de quien devuelve''';
                   onTap: () => _addFieldToTemplate('{borrowerName}'),
                 ),
                 _FieldChip(
+                  label: '{borrowerEmail}',
+                  onTap: () => _addFieldToTemplate('{borrowerEmail}'),
+                ),
+                _FieldChip(
+                  label: '{borrowerPhone}',
+                  onTap: () => _addFieldToTemplate('{borrowerPhone}'),
+                ),
+                _FieldChip(
+                  label: '{expectedReturnDate}',
+                  onTap: () => _addFieldToTemplate('{expectedReturnDate}'),
+                ),
+                _FieldChip(
+                  label: '{notes}',
+                  onTap: () => _addFieldToTemplate('{notes}'),
+                ),
+                _FieldChip(
                   label: '{loanDate}',
                   onTap: () => _addFieldToTemplate('{loanDate}'),
                 ),
@@ -302,7 +328,7 @@ Firma de quien recibe     | Firma de quien devuelve''';
   }
 }
 
-// Widget auxiliar para los Chips (estilo el tuyo)
+// Helper widget for the Chips (similar to yours)
 class _FieldChip extends StatelessWidget {
   final String label;
   final VoidCallback onTap;

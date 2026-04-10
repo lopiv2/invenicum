@@ -458,7 +458,6 @@ class _LoansScreenState extends State<LoansScreen> {
       label = l10n.returned;
       color = Colors.green;
     } else if (loan.isOverdue) {
-      // 🚩 El backend ya hizo la comparación de fechas
       label = l10n.overdue;
       color = Colors.red;
     }

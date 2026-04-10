@@ -198,6 +198,11 @@
   },
   "@@locale": "pt",
   "aboutInvenicum": "Sobre o Invenicum",
+  "deliveryVoucherTitle": "RECIBO DE ENTREGA",
+  "@deliveryVoucherTitle": {
+    "description": "Título usado no PDF do recibo de entrega",
+    "placeholders": {}
+  },
   "aboutDialogTitle": "Sobre o Invenicum",
   "aboutDialogCoolText": "Seu inventário, agora turbinado. Estamos verificando se existe uma versão mais nova esperando por você.",
   "aboutCurrentVersionLabel": "Versão atual",

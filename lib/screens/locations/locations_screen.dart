@@ -64,7 +64,7 @@ class _LocationsScreenState extends State<LocationsScreen>
 
   void _deleteLocation(int locationId, String locationName) {
     final l10n = AppLocalizations.of(context)!;
-    // Capturamos el contexto del Scaffold antes de abrir el diálogo.
+    // Capture the Scaffold context before opening the dialog.
     final scaffoldContext = context;
     showDialog(
       context: scaffoldContext,
@@ -99,8 +99,8 @@ class _LocationsScreenState extends State<LocationsScreen>
         context: context,
       );
       if (mounted) {
-        // Deseleccionamos antes de recargar para evitar que el panel
-        // intente mostrar una ubicación que ya no existe.
+        // Deselect before reloading to avoid the panel
+        // trying to show a location that no longer exists.
         setState(() => _selectedLocationId = null);
         ToastService.success(l10n.deleteSuccess);
         _loadLocations();
@@ -131,11 +131,11 @@ class _LocationsScreenState extends State<LocationsScreen>
     }
 
     if (listChanged || (_lastLocations.isEmpty && newLocations.isNotEmpty)) {
-      // Paso 1: vaciamos el grafo para que GraphView procese el estado limpio.
+      // Step 1: clear the graph so GraphView processes a clean state.
       setState(() {
         graph = Graph()..isTree = true;
       });
-      // Paso 2: en el siguiente frame reconstruimos con los datos nuevos.
+      // Step 2: in the next frame rebuild with the new data.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted) return;
         setState(() {
@@ -149,7 +149,7 @@ class _LocationsScreenState extends State<LocationsScreen>
             try {
               _controller.zoomToFit();
             } catch (e) {
-              // ignoramos errores de zoom
+              // ignore zoom errors
             }
           });
         });
@@ -182,9 +182,9 @@ class _LocationsScreenState extends State<LocationsScreen>
       for (var loc in locations) loc.id: loc,
     };
 
-    // Capturamos los valores seleccionados en este frame para que los
-    // closures de los botones no dependan de estado mutable que puede
-    // cambiar entre el tap y la ejecución del callback.
+    // Capture the selected values in this frame so the
+    // button closures don't depend on mutable state that can
+    // change between the tap and the callback execution.
     final selectedId = _selectedLocationId;
     final selectedLocation = _selectedLocation;
 
@@ -304,8 +304,8 @@ class _LocationsScreenState extends State<LocationsScreen>
             Row(
               children: [
                 ElevatedButton.icon(
-                  // Los valores están capturados en variables locales del
-                  // frame actual — no dependen del estado mutable del widget.
+                  // The values are captured in local variables of the
+                  // current frame — they do not depend on the widget's mutable state.
                   onPressed: () => _editLocation(selectedId),
                   icon: const Icon(Icons.edit, size: 18),
                   label: Text(l10n.edit),

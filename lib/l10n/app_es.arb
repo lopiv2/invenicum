@@ -198,6 +198,11 @@
   },
   "@@locale": "es",
   "aboutInvenicum": "Sobre Invenicum",
+  "deliveryVoucherTitle": "VALE DE ENTREGA",
+  "@deliveryVoucherTitle": {
+    "description": "Título usado en el PDF del vale de entrega",
+    "placeholders": {}
+  },
   "aboutDialogTitle": "Sobre Invenicum",
   "aboutDialogCoolText": "Tu inventario, pero con esteroides. Estamos comprobando si hay una versión más fresca para que sigas a tope.",
   "aboutCurrentVersionLabel": "Versión actual",

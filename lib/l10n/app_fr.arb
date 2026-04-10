@@ -198,6 +198,11 @@
   },
   "@@locale": "fr",
   "aboutInvenicum": "À propos d'Invenicum",
+  "deliveryVoucherTitle": "BONS DE LIVRAISON",
+  "@deliveryVoucherTitle": {
+    "description": "Titre utilisé dans le PDF du bon de livraison",
+    "placeholders": {}
+  },
   "aboutDialogTitle": "À propos d'Invenicum",
   "aboutDialogCoolText": "Votre inventaire, mais sous stéroïdes. On vérifie si une version plus fraîche vous attend.",
   "aboutCurrentVersionLabel": "Version actuelle",

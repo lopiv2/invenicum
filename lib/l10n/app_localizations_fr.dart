@@ -12,6 +12,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutInvenicum => 'À propos d\'Invenicum';
 
   @override
+  String get deliveryVoucherTitle => 'BONS DE LIVRAISON';
+
+  @override
   String get aboutDialogTitle => 'À propos d\'Invenicum';
 
   @override
