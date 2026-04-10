@@ -44,7 +44,11 @@ class AboutCardWidget extends StatelessWidget {
 
   String _sanitizeVersion(String raw) {
     final normalized = raw.trim().toLowerCase().replaceFirst(RegExp(r'^v'), '');
-    final match = RegExp(r'\d+(\.\d+){0,2}').firstMatch(normalized);
+    // Strip build metadata (+...) if present
+    final withoutMeta = normalized.split('+').first;
+    // Match semver-like patterns with at least one dot (major.minor[.patch]).
+    // Anchored to the start to avoid matching digits from SHAs (e.g. 'c36fb74').
+    final match = RegExp(r'^\d+\.\d+(?:\.\d+)?').firstMatch(withoutMeta);
     return match?.group(0) ?? '0.0.0';
   }
 
@@ -103,7 +107,7 @@ class AboutCardWidget extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.onErrorContainer.withValues(alpha: 0.16),
+                  color: theme.colorScheme.onPrimary.withValues(alpha: 0.16),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Icon(
