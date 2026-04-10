@@ -135,7 +135,10 @@ class AboutCardWidget extends StatelessWidget {
                 final isLoading = snapshot.connectionState == ConnectionState.waiting;
                 final data = snapshot.data;
 
-                final latestVersion = data?.latestVersion ?? l10n.aboutVersionUnknown;
+                final latestVersionRaw = data?.latestVersion;
+                final latestVersion = latestVersionRaw != null
+                  ? 'v$latestVersionRaw'
+                  : l10n.aboutVersionUnknown;
 
                 String versionStateText;
                 Color stateColor;
