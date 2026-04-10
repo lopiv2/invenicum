@@ -181,7 +181,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                   min: 0.5,
                   max: 10.0,
                   divisions: 19,
-                  label: AppLocalizations.of(context)!.rotationSpeedLabel("${_rotationSpeed.toStringAsFixed(1)}"),
+                  label: AppLocalizations.of(context)!.rotationSpeedLabel(_rotationSpeed.toStringAsFixed(1)),
                   onChanged: (val) => setState(() {
                     _rotationSpeed = val;
                     if (_isPlaying) _startAutoPlay();
@@ -302,7 +302,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                   ),
                   child: Center(
                     child: Text(
-                      tempColor.value.toRadixString(16).padLeft(8, '0').toUpperCase(),
+                      tempColor.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase(),
                       style: TextStyle(
                         color: _getContrainingColor(tempColor),
                         fontWeight: FontWeight.bold,

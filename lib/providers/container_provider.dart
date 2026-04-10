@@ -69,7 +69,7 @@ class ContainerProvider with ChangeNotifier {
 
         _containers = updatedContainers;
       } catch (e) {
-        print('Error loading containers: $e');
+        debugPrint('Error loading containers: $e');
       } finally {
         _isLoading = false;
         notifyListeners(); // 🔑 Notificamos que la carga terminó
@@ -95,7 +95,7 @@ class ContainerProvider with ChangeNotifier {
 
       return newContainer;
     } catch (e) {
-      print('Error creating container: $e');
+      debugPrint('Error creating container: $e');
       rethrow;
     }
   }
@@ -107,7 +107,7 @@ class ContainerProvider with ChangeNotifier {
       _containers = _containers.where((c) => c.id != containerId).toList();
       notifyListeners();
     } catch (e) {
-      print('Error deleting container $containerId: $e');
+      debugPrint('Error deleting container $containerId: $e');
       rethrow;
     }
   }
@@ -142,7 +142,7 @@ class ContainerProvider with ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
-      print('Error renaming container $containerId to "$newName": $e');
+      debugPrint('Error renaming container $containerId to "$newName": $e');
       rethrow;
     }
   }
@@ -173,7 +173,7 @@ class ContainerProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error deleting asset type $assetTypeId: $e');
+      debugPrint('Error deleting asset type $assetTypeId: $e');
       rethrow;
     }
   }
@@ -222,7 +222,7 @@ class ContainerProvider with ChangeNotifier {
 
     try {
       // 1. PASO OPTIMISTA: Actualizar el estado local inmediatamente
-      print(
+      debugPrint(
         '🔄 Updating local state without waiting for server (Optimistic)...',
       );
 
@@ -239,10 +239,10 @@ class ContainerProvider with ChangeNotifier {
 
       _updateLocalAssetType(newAssetType: updatedAssetTypeOptimistic);
 
-      print('✅ Local optimistic state updated.');
+      debugPrint('✅ Local optimistic state updated.');
 
       // 2. LLAMADA AL SERVIDOR: Intentar persistir en el servidor
-      print('📡 Attempting to persist to server...');
+      debugPrint('📡 Attempting to persist to server...');
       final updatedAssetTypeFromApi = await _assetTypeService
           .updateAssetTypeCollectionFields(
             assetTypeId: assetTypeId,
@@ -251,12 +251,12 @@ class ContainerProvider with ChangeNotifier {
           );
 
       // 3. PASO DE CONFIRMACIÓN: Actualizar con la respuesta del servidor (si es diferente o por seguridad)
-      print('🔄 Updating with server response (Confirmation)...');
+      debugPrint('🔄 Updating with server response (Confirmation)...');
       _updateLocalAssetType(newAssetType: updatedAssetTypeFromApi);
 
-      print('✅ Collection fields update completed successfully.');
+      debugPrint('✅ Collection fields update completed successfully.');
     } catch (e) {
-      print('🚨 Error updating collection fields: $e');
+      debugPrint('🚨 Error updating collection fields: $e');
 
       _updateLocalAssetType(newAssetType: oldAssetType);
 
@@ -398,7 +398,7 @@ class ContainerProvider with ChangeNotifier {
           });
         }
       } catch (e) {
-        print('Error in hybrid search: $e');
+        debugPrint('Error in hybrid search: $e');
         // No lanzamos el error para que al menos se vean los resultados locales
       }
     }
@@ -524,7 +524,7 @@ class ContainerProvider with ChangeNotifier {
 
       return newList;
     } catch (e) {
-      print('Error creating data list: $e');
+      debugPrint('Error creating data list: $e');
       rethrow;
     }
   }
@@ -567,7 +567,7 @@ class ContainerProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      print('Error updating data list: $e');
+      debugPrint('Error updating data list: $e');
       rethrow;
     }
   }
@@ -601,7 +601,7 @@ class ContainerProvider with ChangeNotifier {
         }
       }
     } catch (e) {
-      print('Error deleting data list: $e');
+      debugPrint('Error deleting data list: $e');
       rethrow;
     }
   }
@@ -655,7 +655,7 @@ class ContainerProvider with ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      print('Error loading lists and locations: $e');
+      debugPrint('Error loading lists and locations: $e');
       rethrow;
     }
   }
@@ -665,7 +665,7 @@ class ContainerProvider with ChangeNotifier {
     try {
       return await _containerService.getDataList(dataListId);
     } catch (e) {
-      print('Error getting data list: $e');
+      debugPrint('Error getting data list: $e');
       rethrow;
     }
   }

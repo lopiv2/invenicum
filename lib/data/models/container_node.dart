@@ -69,7 +69,7 @@ class ContainerNode {
   }
 
   factory ContainerNode.fromJson(Map<String, dynamic> json) {
-    List<T> _parseList<T>(
+    List<T> parseList<T>(
       dynamic listJson,
       T Function(Map<String, dynamic>) fromJsonFn,
     ) {
@@ -92,16 +92,16 @@ class ContainerNode {
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse(json['updatedAt'])
           : null,
-      dataLists: _parseList<ListData>(
+      dataLists: parseList<ListData>(
         json['dataLists'] ?? json['data_lists'],
         ListData.fromJson,
       ),
-      assetTypes: _parseList<AssetType>(
+      assetTypes: parseList<AssetType>(
         json['assetTypes'] ?? json['asset_types'],
         AssetType.fromJson,
       ),
       // 🎯 Parsear la lista de ubicaciones
-      locations: _parseList<Location>(json['locations'], Location.fromJson),
+      locations: parseList<Location>(json['locations'], Location.fromJson),
       // 🎯 Parsear isCollection
       isCollection: json['isCollection'] ?? json['is_collection'] ?? false,
     );

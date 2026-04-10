@@ -1,6 +1,7 @@
 // lib/services/location_service.dart
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:invenicum/data/models/location.dart'; // Asegúrate de importar tu modelo Location
 import 'api_service.dart'; // Asumimos que ApiService está en un nivel accesible
 
@@ -50,7 +51,9 @@ class LocationService {
       }
       throw Exception('Error de conexión: ${e.message}');
     } catch (e) {
-      print('Error al obtener ubicaciones: $e');
+      if (kDebugMode) {
+        debugPrint('Error al obtener ubicaciones: $e');
+      }
       throw Exception('Error inesperado: $e');
     }
   }

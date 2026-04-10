@@ -69,7 +69,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   bool _isMagicLoading = false;
   bool _isEnrichLoading = false;
-  Set<String> _highlightedFields = {};
+  final Set<String> _highlightedFields = {};
   late AIService _aiService;
   late IntegrationService _integrationService;
   final ScrollController _scrollController = ScrollController();
@@ -95,7 +95,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   late List<InventoryItemImage> _currentImages;
   List<String> _newImagePreviewUrls = [];
-  List<int> _imageIdsToDelete = [];
+  final List<int> _imageIdsToDelete = [];
 
   // ---------------------------------------------------------------------------
   // Imagen helpers
@@ -275,8 +275,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _barcodeController.dispose();
     _serialController.dispose();
     _nameAutocompleteFocusNode.dispose();
-    _dynamicAutocompleteFocusNodes.values.forEach((n) => n.dispose());
-    _dynamicControllers.values.forEach((c) => c.dispose());
+    for (var n in _dynamicAutocompleteFocusNodes.values) {
+      n.dispose();
+    }
+    for (var c in _dynamicControllers.values) {
+      c.dispose();
+    }
     _aiSearchController.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -296,7 +300,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     if (status.isGranted) {
       _handleBarcodeScan();
     } else {
-      ToastService.error(AppLocalizations.of(context)!.cameraPermissionRequired);
+      ToastService.error(
+        AppLocalizations.of(context)!.cameraPermissionRequired,
+      );
     }
   }
 
@@ -389,10 +395,14 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           itemId: selectedId,
           locale: locale,
         );
-        ToastService.success(l10n.itemImportedSuccessfully(enrichedData!['name']?.toString() ?? ''));
+        ToastService.success(
+          l10n.itemImportedSuccessfully(
+            enrichedData!['name']?.toString() ?? '',
+          ),
+        );
 
-      if (mounted) {
-      ToastService.error(l10n.couldNotCompleteImport);
+        if (mounted) {
+          ToastService.error(l10n.couldNotCompleteImport);
           _nameController.text = enrichedData['name'] ?? _nameController.text;
           final enrichedMarketValue = _extractMarketValue(enrichedData);
           if (enrichedMarketValue != null) {
@@ -453,7 +463,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           }
 
           _highlightedFields.addAll(['name', 'description']);
-        };
+        }
         ToastService.success(
           l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''),
         );
@@ -505,7 +515,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         width: 48,
         height: 48,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
+        errorBuilder: (_, _, _) => Container(
           width: 48,
           height: 48,
           color: Colors.grey.shade200,
@@ -532,13 +542,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: candidates.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (_, _) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   final candidate = candidates[index];
                   final subtitle = _buildCandidateSubtitle(candidate);
                   return ListTile(
                     leading: _buildCandidateLeading(candidate),
-                    title: Text(candidate['name']?.toString() ?? l10n.unnamedLabel),
+                    title: Text(
+                      candidate['name']?.toString() ?? l10n.unnamedLabel,
+                    ),
                     subtitle: subtitle.isEmpty ? null : Text(subtitle),
                     onTap: () => Navigator.of(dialogContext).pop(candidate),
                   );
@@ -646,17 +658,20 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
     final currentId = currentItem?.id;
     return itemProvider.allDownloadedItems
-        .where((item) => item.assetTypeId == assetTypeId && item.id != currentId)
+        .where(
+          (item) => item.assetTypeId == assetTypeId && item.id != currentId,
+        )
         .toList();
   }
 
   List<String> _buildNameSuggestions(InventoryItemProvider itemProvider) {
-    final suggestions = _getSameTypeItems(itemProvider)
-        .map((item) => item.name.trim())
-        .where((value) => value.isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    final suggestions =
+        _getSameTypeItems(itemProvider)
+            .map((item) => item.name.trim())
+            .where((value) => value.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     return suggestions;
   }
 
@@ -966,8 +981,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                         nameController: _nameController,
                         descriptionController: _descriptionController,
                         nameSuggestions: nameSuggestions,
-                        nameAutocompleteFocusNode:
-                          _nameAutocompleteFocusNode,
+                        nameAutocompleteFocusNode: _nameAutocompleteFocusNode,
                         availableLocations: _availableLocations,
                         selectedLocationId: _selectedLocationId,
                         onLocationChanged: (v) =>
@@ -1012,7 +1026,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     // ── Especificaciones ──
                     specsBento: _assetType!.fieldDefinitions.isNotEmpty
                         ? BentoBoxWidget(
-                        title: l10n.specificationsTitle,
+                            title: l10n.specificationsTitle,
                             icon: Icons.list_alt,
                             child: CustomFieldsSectionWidget(
                               fieldDefinitions: _assetType!.fieldDefinitions,

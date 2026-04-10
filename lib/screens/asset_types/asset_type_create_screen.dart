@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:typed_data';
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -34,7 +33,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
 
-  List<CustomFieldDefinition> _fieldDefinitions = [];
+  final List<CustomFieldDefinition> _fieldDefinitions = [];
   List<ListData> _availableDataLists = [];
   bool _isLoadingLists = true;
   String? _imagePreviewUrl;

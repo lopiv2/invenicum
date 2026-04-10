@@ -61,8 +61,9 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
 
   static String _buildImageUrl(String rawUrl) {
     if (rawUrl.isEmpty) return '';
-    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://'))
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
       return rawUrl;
+    }
     final host = Environment.apiUrl.endsWith('/')
         ? Environment.apiUrl.substring(0, Environment.apiUrl.length - 1)
         : Environment.apiUrl;
@@ -135,8 +136,9 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
     setState(() {
       _imagePreviewUrl = null;
       _isNewImageBase64 = false;
-      if (_currentAssetType?.images.isNotEmpty ?? false)
+      if (_currentAssetType?.images.isNotEmpty ?? false) {
         _imageWasRemoved = true;
+      }
     });
   }
 

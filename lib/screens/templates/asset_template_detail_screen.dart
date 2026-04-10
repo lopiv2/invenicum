@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
@@ -41,11 +42,13 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
     if (widget.initialTemplate != null) {
       _template = widget.initialTemplate;
 
-      // 🚩 LA CORRECCIÓN CLAVE:
-      // Si el objeto existe pero los campos están vacíos,
-      // significa que viene del resumen del Market y hay que pedir el detalle.
+      // 🚩 KEY FIX:
+      // If the object exists but the fields are empty,
+      // it means it comes from the Market summary and we need to fetch the details.
       if (_template!.fields.isEmpty) {
-        print("Incomplete structure, hydrating from server...");
+        if (kDebugMode) {
+          debugPrint("Incomplete structure, hydrating from server...");
+        }
         await _fetchTemplateData();
       }
     } else {
@@ -56,21 +59,23 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
   Future<void> _fetchTemplateData() async {
     if (!mounted) return;
     setState(() => _isFetching = true);
+    // Capture localizations before any `await` to avoid using BuildContext across async gaps.
+    final l10n = AppLocalizations.of(context)!;
 
     try {
       final provider = context.read<TemplateProvider>();
-      // IMPORTANTE: Asegúrate de que el provider devuelva el objeto hidratado
+      // IMPORTANT: Ensure the provider returns the hydrated object
       final result = await provider.getTemplateById(widget.templateId);
 
       if (mounted) {
         setState(() {
           _template = result;
-          _isFetching = false; // Bajamos el flag aquí
+          _isFetching = false; // Clear the fetching flag here
         });
       }
     } catch (e) {
       if (mounted) setState(() => _isFetching = false);
-      ToastService.error(AppLocalizations.of(context)!.templateDetailFetchError);
+      ToastService.error(l10n.templateDetailFetchError);
     }
   }
 
@@ -130,14 +135,14 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
             _buildTags(),
             const Divider(height: 40),
             _buildFieldsSection(l10n),
-            const SizedBox(height: 100), // Espacio para el botón inferior
+            const SizedBox(height: 100), // Space for the bottom button
           ],
         ),
       ),
     );
   }
 
-  // --- COMPONENTES DE UI ---
+  // --- UI COMPONENTS ---
 
   Widget _buildHeader(AppLocalizations l10n) {
     return Row(
@@ -145,13 +150,13 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
         CircleAvatar(
           radius: 28,
           backgroundColor: Colors.indigo.shade100,
-          // 🚩 backgroundImage maneja la imagen si existe
+          // 🚩 backgroundImage handles the image if it exists
           backgroundImage:
               _template!.authorAvatarUrl != null &&
                   _template!.authorAvatarUrl!.isNotEmpty
               ? NetworkImage(_template!.authorAvatarUrl!)
               : null,
-          // 🚩 child solo se muestra si la imagen falla o no existe
+          // 🚩 child is shown only if the image fails or doesn't exist
           child:
               (_template!.authorAvatarUrl == null ||
                   _template!.authorAvatarUrl!.isEmpty)
@@ -234,7 +239,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: _template!.fields.length,
-          separatorBuilder: (_, __) => const SizedBox(height: 10),
+          separatorBuilder: (_, _) => const SizedBox(height: 10),
           itemBuilder: (context, index) {
             final field = _template!.fields[index];
             String optionsText = "";
@@ -262,7 +267,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 🚩 Nombre del campo + opciones (si existen)
+                        // 🚩 Field name + options (if any)
                         RichText(
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
@@ -337,14 +342,14 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
     );
   }
 
-  // --- LÓGICA ---
+  // --- LOGIC ---
 
   Future<void> _handleSaveOnly() async {
-    final success = await context
-        .read<TemplateProvider>()
-        .saveTemplateToLibrary(_template!);
+    final tProvider = context.read<TemplateProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    final success = await tProvider.saveTemplateToLibrary(_template!);
     if (success) {
-      ToastService.success(AppLocalizations.of(context)!.addedToPersonalLibrary);
+      ToastService.success(l10n.addedToPersonalLibrary);
     }
   }
 
@@ -398,12 +403,15 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
     final navigator = Navigator.of(context);
     final tProvider = context.read<TemplateProvider>();
     final cProvider = context.read<ContainerProvider>();
+    // Capture localizations and other values from the BuildContext
+    // BEFORE any `await` to avoid using BuildContext across async gaps.
+    final l10n = AppLocalizations.of(context)!;
 
     try {
-      // 1. Opcional: Guardar en biblioteca personal
+      // 1. Optional: save to personal library
       await tProvider.saveTemplateToLibrary(_template!);
 
-      // 2. Obtener el contenedor actualizado para verificar listas existentes
+      // 2. Get the updated container to check existing lists
       final currentContainer = cProvider.containers.firstWhere(
         (c) => c.id == container.id,
         orElse: () => container,
@@ -411,15 +419,15 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
 
       List<CustomFieldDefinition> finalFields = [];
 
-      // 3. Procesar cada campo de la plantilla
+      // 3. Process each field from the template
       for (var field in _template!.fields) {
-        // Si el campo es dropdown y tiene opciones definidas
+        // If the field is a dropdown and has defined options
         if (field.type == CustomFieldType.dropdown &&
             field.options != null &&
             field.options!.isNotEmpty) {
           final String listName = '${field.name} (${_template!.name})';
 
-          // --- Lógica de No Duplicar ---
+          // --- No-Duplicate Logic ---
           final existingList = currentContainer.dataLists.firstWhere(
             (l) => l.name == listName,
             orElse: () => ListData(id: -1, name: '', items: []),
@@ -428,47 +436,42 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
           int targetListId;
 
           if (existingList.id != -1) {
-            // Si la lista ya existe (por una instalación previa), usamos su ID
+            // If the list already exists (from a previous installation), use its ID
             targetListId = existingList.id;
           } else {
-            // Si no existe, la creamos en el servidor
+            // If it doesn't exist, create it on the server
             final newList = await cProvider.createDataList(
               containerId: container.id,
               name: listName,
-              description: AppLocalizations.of(context)!
-                  .autoGeneratedListFromTemplate,
+              description: l10n.autoGeneratedListFromTemplate,
               items: field.options!,
             );
             targetListId = newList.id;
           }
 
-          // 🚩 ASIGNACIÓN AUTOMÁTICA:
-          // Inyectamos el dataListId en el campo como si el usuario lo hubiera seleccionado
+          // 🚩 AUTO ASSIGNMENT:
+          // We inject the dataListId into the field as if the user had selected it
           finalFields.add(field.copyWith(dataListId: targetListId));
-        } else {
-          // Campos normales (text, number, etc.) se añaden sin cambios
-          finalFields.add(field);
-        }
+          } else {
+            // Normal fields (text, number, etc.) are added unchanged
+            finalFields.add(field);
+          }
       }
 
-      // 4. Crear el AssetType real con los campos ya vinculados a las listas
+      // 4. Create the real AssetType with fields already linked to lists
       await cProvider.addNewAssetTypeToContainer(
         containerId: container.id,
         name: _template!.name,
-        fieldDefinitions: finalFields, // <-- Aquí ya van los IDs
+        fieldDefinitions: finalFields,
         isSerialized: true,
       );
 
       if (navigator.canPop()) navigator.pop();
-      ToastService.success(
-        AppLocalizations.of(context)!.installationSuccessAutoLists,
-      );
+      ToastService.success(l10n.installationSuccessAutoLists);
       router.go('/container/${container.id}/asset-types');
     } catch (e) {
       if (navigator.canPop()) navigator.pop();
-      ToastService.error(
-        AppLocalizations.of(context)!.errorInstallingTemplate(e.toString()),
-      );
+      ToastService.error(l10n.errorInstallingTemplate(e.toString()));
     }
   }
 }

@@ -18,7 +18,7 @@ class CustomTheme {
   Map<String, dynamic> toJson() => {
     'id': id,
     'name': name,
-    'primaryColor': primaryColor.value,
+    'primaryColor': primaryColor.toARGB32(),
     'brightness': brightness == Brightness.light ? 'light' : 'dark',
   };
 

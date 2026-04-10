@@ -25,7 +25,7 @@ class _AlertsScreenState extends State<AlertsScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _selectedDay = _focusedDay; // Inicializar el día seleccionado
+    _selectedDay = _focusedDay; // Initialize the selected day
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<AlertProvider>().loadAlerts();
     });
@@ -43,7 +43,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     final alertProvider = context.watch<AlertProvider>();
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Separación de listas
+    // Split alerts into lists
     final alerts = alertProvider.alerts.where((a) => !a.isEvent).toList();
     final notifications = alertProvider.alerts.where((a) => a.isEvent).toList();
     final unreadAlerts = alertProvider.alerts
@@ -298,7 +298,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     );
   }
 
-  // --- COMPONENTES DE UI ---
+  // --- UI COMPONENTS ---
 
   Widget _buildEventsCalendar(List<Alert> events, AlertProvider provider) {
     final PreferencesProvider preferencesProvider = context
@@ -564,17 +564,17 @@ class _AlertsScreenState extends State<AlertsScreen>
     final titleCtrl = TextEditingController(text: alert.title);
     final msgCtrl = TextEditingController(text: alert.message);
 
-    // Fecha actual del evento
+    // Current date of the event
     DateTime editedEventDate = alert.scheduledAt ?? DateTime.now();
 
-    // Calculamos la antelación actual para el desplegable
-    // Si no hay notifyAt, ponemos "0" (a la hora del evento)
+    // Compute the current advance notice for the dropdown
+    // If there's no notifyAt, use "0" (at event time)
     String advanceNotice = "0";
     if (alert.notifyAt != null && alert.scheduledAt != null) {
       final difference = alert.scheduledAt!
           .difference(alert.notifyAt!)
           .inMinutes;
-      // Validamos que sea uno de nuestros valores estándar, si no, por defecto "15"
+      // Validate it's one of our standard values, otherwise default to "15"
       advanceNotice =
           ["0", "5", "15", "30", "60"].contains(difference.toString())
           ? difference.toString()
@@ -687,7 +687,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                 foregroundColor: Colors.white,
               ),
               onPressed: () async {
-                // Calculamos el nuevo notifyAt basado en la selección
+                // Compute the new notifyAt based on the selection
                 final minutes = int.parse(advanceNotice);
                 final newNotifyAt = editedEventDate.subtract(
                   Duration(minutes: minutes),
@@ -765,8 +765,9 @@ class _AlertsScreenState extends State<AlertsScreen>
   }
 
   Widget _buildLeadingIcon(String type, bool isRead, bool isEvent) {
-    if (isEvent)
+    if (isEvent) {
       return const Icon(Icons.calendar_today_rounded, color: Colors.indigo);
+    }
     IconData icon;
     Color color;
     switch (type) {
@@ -785,7 +786,7 @@ class _AlertsScreenState extends State<AlertsScreen>
     return Icon(icon, color: isRead ? Colors.grey : color);
   }
 
-  // --- LÓGICA DE CREACIÓN ---
+  // --- CREATION LOGIC ---
 
   void _showUnifiedCreateDialog(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -820,7 +821,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                         firstDate: DateTime.now(),
                         lastDate: DateTime(2030),
                       );
-                      if (date != null)
+                      if (date != null) {
                         setDialogState(
                           () => selectedDate = DateTime(
                             date.year,
@@ -830,6 +831,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                             selectedDate.minute,
                           ),
                         );
+                      }
                     },
                   ),
                   ListTile(
@@ -840,7 +842,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                         context: context,
                         initialTime: TimeOfDay.fromDateTime(selectedDate),
                       );
-                      if (time != null)
+                      if (time != null) {
                         setDialogState(
                           () => selectedDate = DateTime(
                             selectedDate.year,
@@ -850,6 +852,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                             time.minute,
                           ),
                         );
+                      }
                     },
                   ),
                   const SizedBox(height: 10),
@@ -905,7 +908,7 @@ class _AlertsScreenState extends State<AlertsScreen>
             ElevatedButton(
               onPressed: () {
                 final minutes = int.parse(advanceNotice);
-                // Calculamos la fecha de notificación restando la antelación a la fecha elegida
+                // Compute the notification date by subtracting the advance notice from the chosen date
                 final notificationDate = selectedDate.subtract(
                   Duration(minutes: minutes),
                 );

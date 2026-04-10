@@ -1,15 +1,15 @@
 // lib/services/inventory_item_service.dart
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
-// 🔑 Importamos la clase que contiene la lista de ítems Y los totales
+// 🔑 Import the class that contains the list of items AND totals
 import 'package:invenicum/data/models/inventory_item_response.dart';
 import 'package:invenicum/data/models/price_history_point.dart';
 import 'api_service.dart';
-import 'dart:typed_data';
 import 'dart:convert';
 
-// Definimos un TypeDef para hacer la firma más legible
+// Define a TypeDef to make the signature more readable
 typedef FileData = List<Map<String, dynamic>>;
 
 class InventoryItemService {
@@ -18,7 +18,7 @@ class InventoryItemService {
 
   InventoryItemService(this._apiService);
 
-  // --- 1. READ (Lectura) ---
+  // --- 1. READ ---
   Future<InventoryResponse> fetchInventoryItems({
     int? containerId,
     int? assetTypeId,
@@ -41,33 +41,37 @@ class InventoryItemService {
         queryParameters: queryParameters.isNotEmpty ? queryParameters : null,
       );
 
-      // 1. Verificación básica de nulidad
+      // 1. Basic null check
       if (response.data == null) {
-        //return InventoryResponse.empty(); // Asegúrate de tener un constructor vacío
+        throw Exception('No data received from server');
       }
 
       final responseData = response.data as Map<String, dynamic>;
 
-      // 2. Extraer el campo 'data'.
-      // OJO: Si tu backend en la ruta global no envuelve en 'data', usa responseData
+      // 2. Extract the 'data' field.
+      // NOTE: If your backend route doesn't wrap in 'data', use responseData directly
       final dataField = responseData['data'] is Map<String, dynamic>
           ? responseData['data'] as Map<String, dynamic>
           : responseData;
 
       try {
-        // 3. Llamada al parser
+        // 3. Call the parser
         return InventoryResponse.fromJson(dataField);
       } catch (e) {
-        // 🕵️ DEBUG: Esto te dirá qué campo del JSON está rompiendo el modelo
-        print("❌ Error en el parser de InventoryResponse: $e");
-        print("JSON recibido: $dataField");
+        // 🕵️ DEBUG: This will show which JSON field breaks the model
+        if (kDebugMode) {
+          debugPrint("❌ InventoryResponse parser error: $e");
+          debugPrint("Received JSON: $dataField");
+        }
         rethrow;
       }
     } on DioException catch (e) {
-      print("DioError: ${e.response?.data}");
+      if (kDebugMode) {
+        debugPrint("DioError: ${e.response?.data}");
+      }
       rethrow;
     } catch (e) {
-      throw Exception('Error inesperado al obtener ítems: $e');
+      throw Exception('Unexpected error fetching items: $e');
     }
   }
 
@@ -77,33 +81,33 @@ class InventoryItemService {
     return await _apiService.getToken();
   }
 
-  // NUEVO MÉTODO DE CLONACIÓN
+  // NEW CLONE METHOD
   Future<InventoryItem> cloneInventoryItem(InventoryItem item) async {
-    // Asegúrate de que tu cliente HTTP (ej. Dio, http) usa la ruta correcta
+    // Ensure your HTTP client (e.g. Dio, http) uses the correct route
     final containerId = item.containerId;
     final assetTypeId = item.assetTypeId;
 
-    // 🎯 RUTA CLAVE: Llama al nuevo endpoint sin Multer
+    // 🎯 KEY ROUTE: Call the new endpoint without Multer
     final url = '/containers/$containerId/asset-types/$assetTypeId/items/clone';
-    // Realiza la petición POST con el body JSON
+    // Make the POST request with a JSON body
     final response = await _dio.post(
       url,
       data: item
-          .toJson(), // Envía el objeto InventoryItem (con images: [{id: 0, url: '...'}])
+          .toJson(), // Sends the InventoryItem object (with images: [{id: 0, url: '...'}])
     );
 
     return InventoryItem.fromJson(response.data);
   }
 
   // ----------------------------------------------------------------------
-  // --- 2. CREATE (Creación) ---
+  // --- 2. CREATE ---
   // ----------------------------------------------------------------------
   Future<InventoryItem> createInventoryItem(
     InventoryItem item, {
     FileData filesData = const [],
   }) async {
     try {
-      // 1. Construir FormData manualmente para manejar null correctamente
+      // 1. Build FormData manually to handle nulls correctly
       final formData = FormData();
 
       formData.fields.add(MapEntry('name', item.name));
@@ -116,10 +120,10 @@ class InventoryItemService {
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
       formData.fields.add(
         MapEntry('minStock', item.minStock.toString()),
-      ); // 🔑 NUEVA: minStock
+      ); // 🔑 NEW: minStock
       formData.fields.add(MapEntry('marketValue', item.marketValue.toString()));
 
-      // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
+      // 🔑 Handle locationId correctly: only add it if not null
       if (item.locationId != null) {
         formData.fields.add(MapEntry('locationId', item.locationId.toString()));
       }
@@ -128,24 +132,24 @@ class InventoryItemService {
         MapEntry('customFieldValues', jsonEncode(item.customFieldValues)),
       );
 
-      // 2. Añadir los archivos a FormData
+      // 2. Add files to FormData
       for (var file in filesData) {
         final bytes = file['bytes'] as Uint8List;
         final name = file['name'] as String;
 
         final multipartFile = MultipartFile.fromBytes(bytes, filename: name);
 
-        // El backend (Multer) espera 'images'
+        // The backend (Multer) expects 'images'
         formData.files.add(MapEntry('images', multipartFile));
       }
 
-      // 3. Enviar la petición POST con FormData
+      // 3. Send the POST request with FormData
       final response = await _dio.post('/items', data: formData);
       if (response.statusCode == 201) {
-        // El backend devuelve una estructura anidada: { data: { data: InventoryItemJson } }
+        // The backend returns a nested structure: { data: { data: InventoryItemJson } }
         final responseData = response.data;
 
-        // Manejar la posible anidación
+        // Handle possible nesting
         dynamic itemData = responseData;
         if (itemData is Map && itemData.containsKey('data')) {
           itemData = itemData['data'];
@@ -157,26 +161,26 @@ class InventoryItemService {
         return InventoryItem.fromJson(itemData as Map<String, dynamic>);
       } else {
         throw Exception(
-          'Error al crear activo: Código ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
+          'Error creating asset: Code ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
         );
       }
     } on DioException {
       rethrow;
     } catch (e) {
-      throw Exception('Error inesperado al crear activo: $e');
+      throw Exception('Unexpected error creating asset: $e');
     }
   }
 
   // ----------------------------------------------------------------------------------
-  // 🚀 --- 3. UPDATE (Actualización) ---
+  // 🚀 --- 3. UPDATE ---
   // ----------------------------------------------------------------------------------
   Future<InventoryItem> updateInventoryItem(
     InventoryItem item, {
-    FileData filesToUpload = const [], // Nuevos archivos a subir
-    List<int> imageIdsToDelete = const [], // IDs de imágenes a eliminar
+    FileData filesToUpload = const [],
+    List<int> imageIdsToDelete = const [],
   }) async {
     try {
-      // 1. Construir FormData manualmente para manejar null correctamente
+      // 1. Build FormData manually to handle nulls correctly
       final formData = FormData();
 
       formData.fields.add(MapEntry('name', item.name));
@@ -194,10 +198,10 @@ class InventoryItemService {
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
       formData.fields.add(
         MapEntry('minStock', item.minStock.toString()),
-      ); // 🔑 NUEVA: minStock
+      );
       formData.fields.add(MapEntry('marketValue', item.marketValue.toString()));
 
-      // 🔑 Manejar locationId correctamente: solo agregarlo si no es null
+      // 🔑 Handle locationId correctly: only add it if not null
       if (item.locationId != null) {
         formData.fields.add(MapEntry('locationId', item.locationId.toString()));
       }
@@ -209,7 +213,7 @@ class InventoryItemService {
         MapEntry('imageIdsToDelete', jsonEncode(imageIdsToDelete)),
       );
 
-      // 2. Añadir los archivos NUEVOS a FormData
+      // 2. Add NEW files to FormData
       for (var file in filesToUpload) {
         final bytes = file['bytes'] as Uint8List;
         final name = file['name'] as String;
@@ -219,12 +223,12 @@ class InventoryItemService {
         formData.files.add(MapEntry('images', multipartFile));
       }
 
-      // 3. Enviar la petición PATCH con FormData
-      // El backend debe devolver el InventoryItem actualizado directamente.
+      // 3. Send the PATCH request with FormData
+      // The backend should return the updated InventoryItem directly.
       final response = await _dio.patch('/items/${item.id}', data: formData);
 
       if (response.statusCode == 200) {
-        // Manejar la posible estructura anidada
+        // Handle possible nested structure
         dynamic itemData = response.data;
         if (itemData is Map && itemData.containsKey('data')) {
           itemData = itemData['data'];
@@ -236,40 +240,40 @@ class InventoryItemService {
         return InventoryItem.fromJson(itemData as Map<String, dynamic>);
       } else {
         throw Exception(
-          'Error al actualizar activo: Código ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
+          'Error updating asset: Code ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
         );
       }
     } on DioException {
       rethrow;
     } catch (e) {
-      throw Exception('Error inesperado al actualizar activo: $e');
+      throw Exception('Unexpected error updating asset: $e');
     }
   }
 
-  // --- 4. DELETE (Borrado) ---
+  // --- 4. DELETE ---
   Future<void> deleteInventoryItem(int itemId) async {
     try {
       final response = await _dio.delete('/items/$itemId');
 
       if (response.statusCode != 204 && response.statusCode != 200) {
         throw Exception(
-          'Error al eliminar activo: Código ${response.statusCode}',
+          'Error deleting asset: Code ${response.statusCode}',
         );
       }
     } on DioException {
       rethrow;
     } catch (e) {
-      throw Exception('Error inesperado al eliminar activo: $e');
+      throw Exception('Unexpected error deleting asset: $e');
     }
   }
 
   // ----------------------------------------------------------------------
-  // 📦 --- 5. CREATE BATCH (Importación Masiva) ---
+  // 📦 --- 5. CREATE BATCH (Bulk Import) ---
   // ----------------------------------------------------------------------
 
-  /// Envía una lista de datos de activos mapeados a un endpoint de procesamiento por lotes.
+  /// Sends a list of mapped asset data to a batch-processing endpoint.
   ///
-  /// Utiliza una petición POST simple (JSON body) ya que no hay archivos adjuntos.
+  /// Uses a simple POST (JSON body) since there are no file attachments.
   Future<Map<String, dynamic>> createBatchInventoryItems({
     required int containerId,
     required int assetTypeId,
@@ -283,7 +287,7 @@ class InventoryItemService {
 
       if (response.statusCode != 201 && response.statusCode != 200) {
         throw Exception(
-          'Error al importar activos por lotes: Código ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
+          'Error importing assets in batch: Code ${response.statusCode} - ${response.data['message'] ?? response.statusMessage}',
         );
       }
 
@@ -291,27 +295,29 @@ class InventoryItemService {
     } on DioException {
       rethrow;
     } catch (e) {
-      throw Exception('Error inesperado durante la importación por lotes: $e');
+      throw Exception('Unexpected error during batch import: $e');
     }
   }
 
   Future<double> fetchTotalMarketValue() async {
     try {
-      // Llamada al endpoint global definido en el backend
+      // Call the global endpoint defined on the backend
       final response = await _dio.get('/total-market-value');
 
       if (response.statusCode == 200) {
         final data = response.data as Map<String, dynamic>;
-        // Extraemos el valor sumado por el servidor
+        // Extract the summed value returned by the server
         return (data['totalMarketValue'] as num).toDouble();
       } else {
-        throw Exception('Error al obtener el valor de mercado');
+        throw Exception('Error fetching market value');
       }
     } on DioException catch (e) {
-      print("Error Dio en fetchTotalMarketValue: ${e.response?.data}");
+      if (kDebugMode) {
+        debugPrint("Dio error in fetchTotalMarketValue: ${e.response?.data}");
+      }
       rethrow;
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -320,18 +326,20 @@ class InventoryItemService {
       final response = await _dio.get('/items/$itemId/price-history');
 
       if (response.statusCode == 200) {
-        // Si el backend envía el array directamente [{}, {}]
-        // Usamos response.data directamente si Dio ya lo parseó a List
+        // If the backend sends the array directly [{}, {}]
+        // Use response.data directly if Dio already parsed it as a List
         final List data = response.data is List
             ? response.data
             : response.data['data'] ?? [];
 
         return data.map((json) => PriceHistoryPoint.fromJson(json)).toList();
       } else {
-        throw response.data['error'] ?? 'Error al obtener el historial';
+        throw response.data['error'] ?? 'Error fetching price history';
       }
     } catch (e) {
-      print("Error en Service: $e");
+      if (kDebugMode) {
+        debugPrint("Service error: $e");
+      }
       rethrow;
     }
   }
@@ -341,18 +349,16 @@ class InventoryItemService {
       final response = await _dio.post('/market/sync-item/$itemId');
       return InventoryItem.fromJson(response.data['data']);
     } on DioException catch (e) {
-      // 🛡️ Extraemos el mensaje enviado por el backend
-      String errorMessage = "Error al sincronizar";
+      // 🛡️ Extract the message sent by the backend
+      String errorMessage = "Error syncing";
 
       if (e.response?.data != null && e.response?.data['error'] != null) {
-        errorMessage = e
-            .response!
-            .data['error']; // "El ítem no tiene código de barras", etc.
+        errorMessage = e.response!.data['error']; // e.g. "Item has no barcode"
       }
 
-      throw errorMessage; // Lanzamos solo el texto del error
+      throw errorMessage; // Throw only the error text
     } catch (e) {
-      throw "Error inesperado: $e";
+      throw "Unexpected error: $e";
     }
   }
 
@@ -360,12 +366,12 @@ class InventoryItemService {
     try {
       await _dio.patch('/items/$itemId/wishlist', data: {'wishlisted': status});
     } catch (e) {
-      throw Exception('Error al comunicar con el servidor');
+      throw Exception('Error communicating with server');
     }
   }
 
-  /// Sincroniza el valor de mercado de todos los ítems con barcode de un assetType.
-  /// Devuelve el resumen { total, updated, skipped, errors, details }.
+  /// Synchronizes market values for all barcode-bearing items of an assetType.
+  /// Returns a summary map: { total, updated, skipped, errors, details }.
   Future<Map<String, dynamic>> syncAssetTypeMarketValues({
     required int assetTypeId,
     required int containerId,
@@ -378,10 +384,10 @@ class InventoryItemService {
       final data = response.data as Map<String, dynamic>;
       return data['summary'] as Map<String, dynamic>;
     } on DioException catch (e) {
-      final msg = e.response?.data?['error'] ?? 'Error al sincronizar precios';
+      final msg = e.response?.data?['error'] ?? 'Error syncing prices';
       throw Exception(msg);
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 }

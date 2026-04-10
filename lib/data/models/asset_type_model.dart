@@ -59,12 +59,8 @@ class AssetType {
 
       // 🎯 CORRECCIÓN: Conversión segura: si no es nulo, lo convierte a String.
       // Si es un int (como el 5 que causó el error), .toString() lo maneja.
-      possessionFieldId: possessionIdDynamic != null
-          ? possessionIdDynamic.toString()
-          : null,
-      desiredFieldId: desiredIdDynamic != null
-          ? desiredIdDynamic.toString()
-          : null,
+      possessionFieldId: possessionIdDynamic?.toString(),
+      desiredFieldId: desiredIdDynamic?.toString(),
     );
   }
 

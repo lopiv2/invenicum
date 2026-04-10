@@ -80,10 +80,10 @@ class ApiService {
     } on DioException catch (e) {
       // 404 → endpoint no implementado aún → no bloqueamos
       // 5xx → error del servidor → no bloqueamos
-      print('ApiService: checkFirstRun error ${e.response?.statusCode}: $e');
+      debugPrint('ApiService: checkFirstRun error ${e.response?.statusCode}: $e');
       return false;
     } catch (e) {
-      print('ApiService: checkFirstRun unexpected error: $e');
+      debugPrint('ApiService: checkFirstRun unexpected error: $e');
       return false;
     }
   }
@@ -148,7 +148,7 @@ class ApiService {
       );
       return response.data['success'] == true || response.statusCode == 200;
     } catch (e) {
-      print("ApiService: Error en password reset request: $e");
+      debugPrint("ApiService: Error en password reset request: $e");
       return false;
     }
   }
@@ -190,7 +190,7 @@ class ApiService {
       final response = await dio.get('/auth/github/config');
       return response.data;
     } catch (e) {
-      print("ApiService: Error al pedir config de GitHub: $e");
+      debugPrint("ApiService: Error al pedir config de GitHub: $e");
       return null;
     }
   }
@@ -200,7 +200,7 @@ class ApiService {
       final response = await dio.post('/auth/github/disconnect');
       return response.data['success'] == true;
     } catch (e) {
-      print("ApiService: Error al desconectar GitHub: $e");
+      debugPrint("ApiService: Error al desconectar GitHub: $e");
       return false;
     }
   }

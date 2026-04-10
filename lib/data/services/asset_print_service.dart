@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:printing/printing.dart';
 import 'api_service.dart';
 
@@ -18,7 +19,7 @@ class AssetPrintService {
       // 1. Pedimos el PDF al backend
       // Usamos responseType: ResponseType.bytes porque recibimos un archivo, no un JSON
       final response = await _dio.get(
-        '/items/$assetId/print-label',
+        '/items/$assetId/debugPrint-label',
         // 💡 Enviamos las dimensiones al Backend
         queryParameters: {'width': width, 'height': height},
         options: Options(responseType: ResponseType.bytes),
@@ -36,11 +37,11 @@ class AssetPrintService {
       return false;
     } on DioException catch (e) {
       // Log de error similar al que ya usas
-      print("Error Status Code: ${e.response?.statusCode}");
-      print("Error Data: ${e.response?.data}");
+      debugPrint("Error Status Code: ${e.response?.statusCode}");
+      debugPrint("Error Data: ${e.response?.data}");
       return false;
     } catch (e) {
-      print("Error inesperado al imprimir: $e");
+      debugPrint("Error inesperado al imprimir: $e");
       return false;
     }
   }

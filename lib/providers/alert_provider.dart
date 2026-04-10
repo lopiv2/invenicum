@@ -28,9 +28,9 @@ class AlertProvider with ChangeNotifier {
   Future<void> updateAlert(int id, Map<String, dynamic> data) async {
     try {
       await _alertService.updateAlert(id, data);
-      await loadAlerts(); // Recargamos para ver los cambios
+      await loadAlerts(); // Reload to reflect changes
     } catch (e) {
-      print("Error al editar: $e");
+      debugPrint("Error editing alert: $e");
       rethrow;
     }
   }
@@ -43,9 +43,9 @@ class AlertProvider with ChangeNotifier {
     DateTime? scheduledAt,
     DateTime? notifyAt,
     List<String>?
-    priorityChannels, // 👈 Añadimos esto para el orden de Telegram/Email
+    priorityChannels, // 👈 We add this for Telegram/Email priority ordering
   }) async {
-    // 1. Llamamos al servicio pasando TODO lo que ya tenías + los canales
+    // 1. Call the service passing everything you already had + the channels
     final newAlert = await _alertService.createAlert({
       'title': title,
       'message': message,
@@ -58,8 +58,8 @@ class AlertProvider with ChangeNotifier {
           priorityChannels, // 🚀 El Back usará esto para notificar
     });
 
-    // 2. En lugar de hacer un loadAlerts() completo (que gasta red),
-    // insertamos directamente la alerta que nos devuelve el servidor.
+    // 2. Instead of doing a full loadAlerts() (which uses network),
+    // insert the alert returned by the server directly.
     _alerts.insert(0, newAlert);
     notifyListeners();
   }

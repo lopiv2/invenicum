@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:invenicum/data/models/asset_template_model.dart';
 import 'api_service.dart';
 
@@ -41,7 +42,7 @@ class TemplateService {
       await _dio.post(url);
     } on DioException catch (e) {
       // Logueamos el error pero no interrumpimos al usuario
-      print("❌ Error al trackear descarga en GitHub: ${e.message}");
+      debugPrint("❌ Error al trackear descarga en GitHub: ${e.message}");
     }
   }
 

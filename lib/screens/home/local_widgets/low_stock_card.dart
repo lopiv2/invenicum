@@ -81,7 +81,7 @@ class _LowStockCardState extends State<LowStockCard> {
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         itemCount: lowStockItems.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 20),
+                        separatorBuilder: (_, _) => const SizedBox(height: 20),
                         itemBuilder: (context, index) {
                           final item = lowStockItems[index];
                           return _buildStockItem(item, isDark, l10n);

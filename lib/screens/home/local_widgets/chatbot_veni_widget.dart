@@ -343,7 +343,7 @@ class _ChatBubble extends StatelessWidget {
     final theme = Theme.of(context);
     final bubbleColor = isUser
         ? theme.primaryColor
-        : theme.colorScheme.surfaceContainerHighest;
+        : theme.colorScheme.onSurfaceVariant;
     final textColor = isUser ? Colors.white : null;
 
     return Align(

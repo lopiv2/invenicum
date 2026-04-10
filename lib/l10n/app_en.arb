@@ -390,6 +390,7 @@
   "marketPriceObtained": "Market price obtained successfully",
   "marketValueEvolution": "Market Value Evolution",
   "marketValueField": "Market Value",
+  "marketRealRate": "Real market rate",
   "maxStock": "Max stock",
   "may": "May",
   "minStock": "Min stock",
@@ -1229,7 +1230,7 @@
   "actionsLabel": "Actions",
   "editButtonLabel": "Edit",
   "deleteButtonLabel": "Delete",
-  "printLabel": "Print label",
+  "printLabel": "debugPrint label",
   "collectionFieldsTooltip": "Collection Fields",
   "totalLocations": "{count} locations",
   "@totalLocations": {
@@ -1535,7 +1536,7 @@
     "description": "Label for 'of the value'"
   },
   "ofTheValueLabel": "of the value",
-  "reportsDescription": "Generate PDF or Excel reports to print or save on your PC",
+  "reportsDescription": "Generate PDF or Excel reports to debugPrint or save on your PC",
   "reportSectionType": "Report Type",
   "reportSectionFormat": "Output Format",
   "reportSectionPreview": "Current Configuration",

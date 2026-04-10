@@ -338,7 +338,7 @@ class AssetTypeCard extends StatelessWidget {
               ? Image.network(
                   url,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => _buildPlaceholder(theme),
+                  errorBuilder: (_, _, _) => _buildPlaceholder(theme),
                 )
               : _buildPlaceholder(theme),
           Container(
@@ -438,7 +438,7 @@ class AssetTypeCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
-        label + ':',
+        '$label:',
         style: const TextStyle(fontWeight: FontWeight.w500),
       ),
     );
@@ -457,7 +457,7 @@ class AssetTypeCard extends StatelessWidget {
       );
     }
     return DropdownButtonFormField<String?>(
-      value: value,
+      initialValue: value,
       decoration: InputDecoration(
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),

@@ -97,7 +97,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Container(
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+          color: colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: colorScheme.outlineVariant.withValues(alpha: 0.5),
@@ -150,7 +150,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
         helperText: helper,
         helperMaxLines: 2,
         filled: true,
-        fillColor: colorScheme.surfaceContainerHighest.withValues(alpha: 0.45),
+        fillColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         border: OutlineInputBorder(

@@ -175,7 +175,7 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: _items.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          separatorBuilder: (_, _) => const Divider(height: 1),
                           itemBuilder: (context, index) {
                             return ListTile(
                               title: Text(_items[index]),

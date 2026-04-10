@@ -18,7 +18,7 @@ class AchievementsCardWidget extends StatefulWidget {
 
 class _AchievementsCardWidgetState extends State<AchievementsCardWidget> {
   // Cambiar a 'true' para mostrar el overlay, 'false' para ocultarlo
-  bool _showUnderConstruction = true;
+  final bool _showUnderConstruction = true;
 
   @override
   Widget build(BuildContext context) {
@@ -230,7 +230,7 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
     // Color de fondo del ítem: Vidrio esmerilado si está desbloqueado, sutil si no.
     final Color baseColor = widget.ach.unlocked
         ? jewelColor.withValues(alpha: isDark ? 0.15 : 0.1)
-        : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 
+        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 
             isDark ? 0.3 : 0.5,
           );
 

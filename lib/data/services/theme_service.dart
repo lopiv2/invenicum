@@ -1,19 +1,20 @@
 import 'dart:ui';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import '../models/custom_theme_model.dart';
 import 'api_service.dart';
 
 class ThemeService {
   final ApiService _apiService;
 
-  // Acceso a Dio para realizar las peticiones
+  // Access to Dio for making requests
   Dio get _dio => _apiService.dio;
 
   ThemeService(this._apiService);
 
-  /// Actualiza (o crea) la preferencia de tema actual del usuario.
-  /// Esto guarda el color y brillo en la tabla User o Preferences.
+  /// Updates (or creates) the user's current theme preference.
+  /// This saves the color and brightness in the User or Preferences table.
   Future<bool> updateUserTheme({
     required String hexColor,
     required String brightness,
@@ -25,31 +26,31 @@ class ThemeService {
       );
       return response.statusCode == 200;
     } on DioException catch (e) {
-      print('Error de Dio al actualizar tema: ${e.message}');
+      debugPrint('Dio error updating theme: ${e.message}');
       return false;
     } catch (e) {
-      print('Error inesperado al actualizar tema: $e');
+      debugPrint('Unexpected error updating theme: $e');
       return false;
     }
   }
 
-  /// Guarda un nuevo tema en la lista de "Temas Guardados" del usuario.
+  /// Saves a new theme into the user's "Saved Themes" list.
   Future<void> createCustomTheme(CustomTheme theme) async {
     final String hexColor =
-        '#${theme.primaryColor.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+        '#${theme.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
 
     try {
       final response = await _dio.post(
         '/preferences/custom-themes',
         data: {
           "name": theme.name,
-          "primaryColor": hexColor, // 👈 Mandamos el String formateado
+          "primaryColor": hexColor, // 👈 We send the formatted String
           "brightness": theme.brightness == Brightness.dark ? 'dark' : 'light',
         },
       );
       return response.data;
     } catch (e) {
-      print("Error en el servicio: $e");
+      debugPrint("Service error: $e");
       rethrow;
     }
   }
@@ -77,21 +78,22 @@ class ThemeService {
       }
       return [];
     } catch (e) {
-      print('Error al obtener temas personalizados: $e');
+      debugPrint('Error fetching custom themes: $e');
       return [];
     }
   }
 
   /// Elimina un tema personalizado.
-  /// 🛑 La lógica de protección contra temas por defecto se valida aquí por ID.
+  /// Deletes a custom theme.
+  /// 🛑 Protection logic against deleting default themes is validated here by ID.
   Future<void> deleteCustomTheme(String themeId) async {
-    // Protección: No permitimos llamar a la API si el ID es de los predefinidos
+    // Protection: Do not call the API if the ID is one of the predefined themes
     if (themeId == 'brand' ||
         themeId == 'emerald' ||
         themeId == 'sunset' ||
         themeId == 'dark_mode') {
       throw Exception(
-        'No se pueden eliminar los temas por defecto del sistema.',
+        'Cannot delete system default themes.',
       );
     }
 
@@ -99,7 +101,7 @@ class ThemeService {
       final response = await _dio.delete('/preferences/custom-themes/$themeId');
 
       if (response.statusCode != 200 && response.statusCode != 204) {
-        throw Exception('Error al eliminar el tema de la base de datos.');
+        throw Exception('Error deleting theme from database.');
       }
     } catch (e) {
       rethrow;

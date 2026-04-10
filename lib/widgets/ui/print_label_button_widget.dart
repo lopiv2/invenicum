@@ -50,7 +50,7 @@ class PrintLabelButton extends StatelessWidget {
                   children: [
                     // --- SELECTOR DE TAMAÑO ---
                     DropdownButtonFormField<LabelSize>(
-                      value: selectedSize,
+                      initialValue: selectedSize,
                       decoration: const InputDecoration(
                         labelText: "Tamaño de etiqueta",
                         border: OutlineInputBorder(),

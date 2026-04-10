@@ -81,8 +81,8 @@ void showThemePickerModal(BuildContext context, ThemeProvider provider) {
                               : AppLocalizations.of(context)!.lightMode,
                         ),
                         trailing:
-                            themeProvider.currentTheme.primaryColor.value ==
-                                theme.primaryColor.value
+                            themeProvider.currentTheme.primaryColor.toARGB32() ==
+                                theme.primaryColor.toARGB32()
                             ? const Icon(
                                 Icons.check_circle,
                                 color: Colors.green,
@@ -135,13 +135,6 @@ void _showCustomColorPicker(BuildContext context, ThemeProvider provider) {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Si tienes BlockPicker, úsalo aquí
-                // BlockPicker(
-                //   pickerColor: tempColor,
-                //   onColorChanged: (color) {
-                //     setDialogState(() => tempColor = color);
-                //   },
-                // ),
               ],
             ),
           ),

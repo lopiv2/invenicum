@@ -192,7 +192,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest
+                  color: theme.colorScheme.onSurfaceVariant
                       .withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),

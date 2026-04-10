@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:invenicum/data/models/store_plugin_model.dart';
@@ -19,7 +18,7 @@ class PluginAdminScreen extends StatefulWidget {
 class _PluginAdminScreenState extends State<PluginAdminScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  bool _showUnderConstruction = true;
+  final bool _showUnderConstruction = true;
 
   @override
   void initState() {
@@ -134,7 +133,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
       height: 50,
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceVariant.withValues(alpha: 0.3),
+        color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: TabBar(

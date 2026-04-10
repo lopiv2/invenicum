@@ -136,7 +136,7 @@ class NotificationSettingsCardWidget extends StatelessWidget {
       value: val,
       onChanged: onChanged,
       contentPadding: EdgeInsets.zero,
-      activeColor: Theme.of(context).primaryColor,
+      activeThumbColor: Theme.of(context).primaryColor,
     );
   }
 }

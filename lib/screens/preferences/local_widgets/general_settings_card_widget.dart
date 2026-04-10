@@ -106,7 +106,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: Theme.of(
                       context,
-                    ).colorScheme.surfaceVariant.withValues(alpha: 0.5),
+                    ).colorScheme.onPrimaryContainer.withValues(alpha: 0.3),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: Theme.of(context).colorScheme.outlineVariant,
@@ -117,7 +117,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                       Icon(
                         Icons.info_outline,
                         size: 16,
-                        color: Theme.of(context).colorScheme.primary,
+                        color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -130,7 +130,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        "Tasa real de mercado",
+                        l10n.marketRealRate,
                         style: TextStyle(
                           fontSize: 10,
                           fontStyle: FontStyle.italic,

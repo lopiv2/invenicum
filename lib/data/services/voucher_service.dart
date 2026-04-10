@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:invenicum/config/environment.dart';
 import 'api_service.dart';
 
@@ -18,7 +18,7 @@ class VoucherService {
       }
       return null;
     } catch (e) {
-      print('Error al obtener voucher config: $e');
+      debugPrint('Error al obtener voucher config: $e');
       return null;
     }
   }
@@ -43,7 +43,7 @@ class VoucherService {
     try {
       await _dio.post('/voucher-config', data: formData);
     } catch (e) {
-      print('Error al guardar voucher config: $e');
+      debugPrint('Error al guardar voucher config: $e');
       rethrow;
     }
   }
@@ -62,7 +62,7 @@ class VoucherService {
       // URL Final: http://localhost:3000/images/vouchers/logo-xxx.png
       final String fullImageUrl = '${Environment.apiUrl}/images/$fileName';
 
-      print("Descargando logo desde: $fullImageUrl");
+      debugPrint("Descargando logo desde: $fullImageUrl");
 
       final response = await _dio.get(
         fullImageUrl,
@@ -74,7 +74,7 @@ class VoucherService {
 
       return Uint8List.fromList(response.data);
     } catch (e) {
-      print("Error al descargar bytes de imagen: $e");
+      debugPrint("Error al descargar bytes de imagen: $e");
       return null;
     }
   }

@@ -641,6 +641,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get marketValueField => 'Market Value';
 
   @override
+  String get marketRealRate => 'Real market rate';
+
+  @override
   String get maxStock => 'Max stock';
 
   @override
@@ -2419,7 +2422,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteButtonLabel => 'Delete';
 
   @override
-  String get printLabel => 'Print label';
+  String get printLabel => 'debugPrint label';
 
   @override
   String get collectionFieldsTooltip => 'Collection Fields';
@@ -2778,7 +2781,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reportsDescription =>
-      'Generate PDF or Excel reports to print or save on your PC';
+      'Generate PDF or Excel reports to debugPrint or save on your PC';
 
   @override
   String get reportSectionType => 'Report Type';

@@ -82,8 +82,9 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     } else {
       stateManager!.refRows.setFilter((row) {
         return row.cells.entries.any((entry) {
-          if (entry.key == 'item_object' || entry.key == 'actions')
+          if (entry.key == 'item_object' || entry.key == 'actions') {
             return false;
+          }
           final cellValue = entry.value.value;
           if (cellValue == null) return false;
           return cellValue.toString().toLowerCase().contains(term);
@@ -266,7 +267,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                           child: Image.network(
                             fullImageUrl,
                             fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) =>
+                            errorBuilder: (_, _, _) =>
                                 const Icon(Icons.image_not_supported, size: 20),
                           ),
                         ),

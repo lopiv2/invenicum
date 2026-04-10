@@ -1,6 +1,7 @@
 // lib/widgets/main_layout.dart
 
 import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -43,7 +44,7 @@ class _MainLayoutState extends State<MainLayout> {
     super.didChangeDependencies();
     if (!_isInitialized) {
       final size = MediaQuery.of(context).size;
-      // Posición inicial segura: un poco alejada de los bordes (bottom-right)
+      // Safe initial position: slightly away from the edges (bottom-right)
       _veniPosition = Offset(size.width - 60, size.height - 20);
       _isInitialized = true;
     }
@@ -52,7 +53,7 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
-    // Ejecutamos la carga inicial después del primer frame
+    // Run initial load after the first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _hydrateStateFromUrl();
       context.read<AlertProvider>().loadAlerts();
@@ -71,26 +72,26 @@ class _MainLayoutState extends State<MainLayout> {
       final loanProvider = context.read<LoanProvider>();
       final itemProvider = context.read<InventoryItemProvider>();
 
-      // 3. 🛡️ Si la lista está vacía, ESPERAMOS a que cargue
+      // 3. 🛡️ If the list is empty, WAIT for it to load
       if (containerProvider.containers.isEmpty) {
         await containerProvider.loadContainers();
       }
 
       if (!mounted) return;
 
-      // 4. Buscamos de forma segura (sin que explote si no existe)
+      // 4. We search safely (without throwing if it doesn't exist)
       final container = containerProvider.containers.firstWhereOrNull(
         (c) => c.id == containerId,
       );
 
       if (container != null) {
-        // Carga de datos para Sidebar (listas personalizadas + préstamos)
+        // Load data for Sidebar (custom lists + loans)
         await Future.wait([
           containerProvider.loadDataLists(containerId),
           loanProvider.fetchLoans(containerId),
         ]);
 
-        // Carga de datos para la cuadrícula de tipos de activos (Grid)
+        // Load data for the asset types grid
         if (location.contains('/asset-types')) {
           for (var assetType in container.assetTypes) {
             itemProvider.loadInventoryItems(
@@ -100,9 +101,11 @@ class _MainLayoutState extends State<MainLayout> {
           }
         }
       } else {
-        print(
-          "⚠️ Hidratación: El contenedor $containerId no se encontró tras la carga.",
-        );
+        if (kDebugMode) {
+          debugPrint(
+            " Hydration: Container $containerId was not found after loading.",
+          );
+        }
       }
     }
   }
@@ -110,13 +113,13 @@ class _MainLayoutState extends State<MainLayout> {
   void _handleToggleSidebar() {
     setState(() {
       _isSidebarVisible = !_isSidebarVisible;
-      _isAnimating = true; // Empieza la animación
+      _isAnimating = true; // Start the animation
     });
 
-    // Duración coincidente con la del AnimatedContainer (300ms)
+    // Duration matches the AnimatedContainer (300ms)
     Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) {
-        setState(() => _isAnimating = false); // Termina la animación
+        setState(() => _isAnimating = false); // End the animation
       }
     });
   }
@@ -135,25 +138,24 @@ class _MainLayoutState extends State<MainLayout> {
         children: [
           _buildBaseApp(context),
 
-          // Usamos un solo Positioned para el "Contenedor de Veni"
-          // Importante: No le damos ancho/alto fijo aquí para que no bloquee la pantalla
+          // Use a single Positioned for the "Veni" container
+          // Important: Do not give fixed width/height here so it doesn't block the screen
           Positioned(
             right: size.width - _veniPosition.dx,
             bottom: size.height - _veniPosition.dy,
             child: Stack(
               clipBehavior: Clip.none,
-              // Alineamos al centro para que la expansión del chat sea simétrica
-              // o mantén bottomRight si prefieres que crezca hacia arriba/izquierda
+              // Align center so the chat expansion is symmetrical
+              // or keep bottomRight if you prefer it to grow upwards/leftwards
               alignment: Alignment.bottomRight,
               children: [
-                // 1. EL CHAT (Se dibuja primero para que el botón pueda estar encima si coinciden)
+                // 1. THE CHAT (drawn first so the button can sit on top if overlapping)
                 IgnorePointer(
                   ignoring: !showChat,
                   child: AnimatedScale(
                     scale: showChat ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 400),
                     curve: Curves.easeOutBack,
-                    // Alineamos el crecimiento desde donde estaría el botón
                     alignment: Alignment.bottomRight,
                     child: AnimatedOpacity(
                       opacity: showChat ? 1.0 : 0.0,
@@ -167,7 +169,7 @@ class _MainLayoutState extends State<MainLayout> {
                           onDrag: (delta) {
                             setState(() {
                               _veniPosition += delta;
-                              // Ajustamos los límites para que el chat no se salga por ARRIBA (600px)
+                              // Adjust limits so the chat doesn't go off the TOP (600px)
                               _veniPosition = Offset(
                                 _veniPosition.dx.clamp(400.0, size.width),
                                 _veniPosition.dy.clamp(600.0, size.height),
@@ -180,7 +182,7 @@ class _MainLayoutState extends State<MainLayout> {
                   ),
                 ),
 
-                // 2. EL BOTÓN
+                // 2. THE BUTTON
                 IgnorePointer(
                   ignoring: !showFAB,
                   child: AnimatedScale(
@@ -191,7 +193,7 @@ class _MainLayoutState extends State<MainLayout> {
                       onPanUpdate: (details) {
                         setState(() {
                           _veniPosition += details.delta;
-                          // Limites para el BOTÓN (aprox 120 ancho x 50 alto)
+                          // Limits for the BUTTON (approx 120 width x 50 height)
                           _veniPosition = Offset(
                             _veniPosition.dx.clamp(0.0, size.width - 20),
                             _veniPosition.dy.clamp(0.0, size.height - 6),
@@ -217,7 +219,7 @@ class _MainLayoutState extends State<MainLayout> {
     );
   }
 
-  // Método auxiliar para limpiar el build
+  // Helper method to keep the build clean
   Widget _buildBaseApp(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
@@ -237,7 +239,7 @@ class _MainLayoutState extends State<MainLayout> {
                 curve: Curves.easeInOut,
                 width: _isSidebarVisible ? 250 : 0,
                 child: OverflowBox(
-                  // Evita que los hijos intenten recalcularse por falta de espacio
+                  // Prevents children from trying to re-layout due to lack of space
                   minWidth: 250,
                   maxWidth: 250,
                   alignment: Alignment.centerLeft,
@@ -302,7 +304,7 @@ class _HeaderState extends State<_Header> {
     final String avatarSeed = user?.name ?? l10n?.guest ?? 'Guest';
 
     return Container(
-      height: 64, // Un poco más delgado para un look más Pro
+      height: 64, // Slightly slimmer for a more professional look
       width: double.infinity,
       decoration: BoxDecoration(
         color: colorScheme.surface,
@@ -330,20 +332,19 @@ class _HeaderState extends State<_Header> {
             ),
             tooltip: 'Menu',
           ),
-          // Logo Minimalista
           _buildLogo(colorScheme, isDarkMode),
 
           SizedBox(width: MediaQuery.of(context).size.width * 0.025),
 
-          // Barra de búsqueda con autocompletado
+          // Search Bar with Autocomplete
           const Expanded(flex: 3, child: InvenicumSearchBar()),
           const Spacer(),
           const StacSlot(slotName: 'inventory_header'),
           const Spacer(),
 
-          // Perfil de Usuario
+          // User Profile
           Consumer<AlertProvider>(
-            // 🚩 Escuchamos el AlertProvider
+            // 🚩 We listen to the AlertProvider
             builder: (context, alertProvider, child) {
               final int unread = alertProvider.unreadCount;
               return PulsingAvatar(
@@ -354,7 +355,7 @@ class _HeaderState extends State<_Header> {
                   offset: const Offset(
                     -35,
                     0,
-                  ), // Ajusta la posición sobre el avatar
+                  ), // Adjust the position over the avatar
                   backgroundColor: Colors.redAccent,
                   child: PopupMenuButton<String>(
                     offset: const Offset(0, 48),
@@ -365,7 +366,7 @@ class _HeaderState extends State<_Header> {
                         context.goNamed(RouteNames.alerts);
                       }
                       if (value == 'logout') {
-                        // Limpieza de estados antes de salir
+                        // Cleanup states before logging out
                         context.read<InventoryItemProvider>().resetState();
                         await context.read<AuthProvider>().logout();
 
@@ -410,7 +411,7 @@ class _HeaderState extends State<_Header> {
                       if (unread > 0) ...[
                         _buildPopupItem(
                           'alerts',
-                          // En lugar de pasar solo un IconData, personalizamos el icono con animación
+                          // Instead of passing only an IconData, we customize the icon with animation
                           Icons.notifications_active_outlined,
                           '${l10n?.alerts ?? 'Alertas'} ($unread)',
                           isHighlight: true,

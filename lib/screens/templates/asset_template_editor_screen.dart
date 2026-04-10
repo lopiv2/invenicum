@@ -295,7 +295,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
 
   Widget _buildOptionsEditor(int fieldIndex, CustomFieldDefinition field) {
     final l10n = AppLocalizations.of(context)!;
-    final TextEditingController _optionController = TextEditingController();
+    final TextEditingController optionController = TextEditingController();
 
     return Container(
       margin: const EdgeInsets.only(top: 4, left: 8, right: 8),
@@ -356,7 +356,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
                 child: SizedBox(
                   height: 40,
                   child: TextField(
-                    controller: _optionController,
+                    controller: optionController,
                     style: const TextStyle(fontSize: 14),
                     decoration: InputDecoration(
                       hintText: l10n.writeOptionAndPressEnter,
@@ -366,7 +366,7 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
                       fillColor: Colors.white,
                     ),
                     onSubmitted: (val) =>
-                        _addOption(fieldIndex, field, val, _optionController),
+                        _addOption(fieldIndex, field, val, optionController),
                   ),
                 ),
               ),
@@ -375,8 +375,8 @@ class _AssetTemplateEditorScreenState extends State<AssetTemplateEditorScreen> {
                 onPressed: () => _addOption(
                   fieldIndex,
                   field,
-                  _optionController.text,
-                  _optionController,
+                  optionController.text,
+                  optionController,
                 ),
                 icon: const Icon(Icons.add),
               ),

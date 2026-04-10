@@ -350,7 +350,7 @@ class _AssetGridViewState extends State<AssetGridView> {
                             ? Image.network(
                                 url,
                                 fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) =>
+                                errorBuilder: (_, _, _) =>
                                     _buildPlaceholderIcon(theme),
                               )
                             : _buildPlaceholderIcon(theme),

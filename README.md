@@ -45,7 +45,7 @@ Keep an eye on the money. Visualize your collection's value with **slick charts 
 
 ### 🏷️ 4. Physical Meets Digital (QR Labels)
 
-Generate and print **QR codes** for your items. Stick them on boxes or tools, scan them with your phone, and _boom_—instant access to the technical sheet. No more digging through boxes to know what's inside.
+Generate and debugPrint **QR codes** for your items. Stick them on boxes or tools, scan them with your phone, and _boom_—instant access to the technical sheet. No more digging through boxes to know what's inside.
 
 ### 🧩 5. Plugin & Template Marketplace
 

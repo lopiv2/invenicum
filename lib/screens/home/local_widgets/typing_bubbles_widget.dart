@@ -34,7 +34,7 @@ class _TypingIndicatorState extends State<TypingIndicator> with TickerProviderSt
         margin: const EdgeInsets.symmetric(vertical: 4),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
-          color: theme.colorScheme.surfaceContainerHighest,
+          color: theme.colorScheme.onSurfaceVariant,
           borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(16),
             topRight: Radius.circular(16),

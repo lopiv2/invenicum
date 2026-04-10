@@ -180,7 +180,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                       : l10n.pluginPrivateDescription,
                 ),
                 value: _isPublic,
-                activeColor: Colors.blue,
+                activeThumbColor: Colors.blue,
                 secondary: Icon(
                   _isPublic ? Icons.public : Icons.public_off,
                   color: _isPublic ? Colors.blue : Colors.grey,

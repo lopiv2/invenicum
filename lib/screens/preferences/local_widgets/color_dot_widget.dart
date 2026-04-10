@@ -15,7 +15,7 @@ class ThemeColorDot extends StatelessWidget {
   Widget build(BuildContext context) {
     // Escuchamos el provider para saber cuál es el tema actual
     final themeProvider = context.watch<ThemeProvider>();
-    final isSelected = themeProvider.currentTheme.primaryColor.value == theme.primaryColor.value;
+    final isSelected = themeProvider.currentTheme.primaryColor.toARGB32() == theme.primaryColor.toARGB32();
 
     return GestureDetector(
       onTap: () => themeProvider.setTheme(theme),

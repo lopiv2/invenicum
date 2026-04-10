@@ -344,8 +344,9 @@ class ModernPluginCard extends StatelessWidget {
 
   Widget _buildStacPreview(BuildContext context) {
     try {
-      if (plugin.ui != null)
+      if (plugin.ui != null) {
         return Stac.fromJson(plugin.ui!, context) ?? const SizedBox();
+      }
     } catch (_) {}
     return const Icon(Icons.extension_rounded, color: Colors.grey, size: 40);
   }

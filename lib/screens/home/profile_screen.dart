@@ -115,8 +115,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       }
     } catch (e) {
       // Here the error will come from the backend (e.g., "The current password is incorrect")
-      if (mounted)
+      if (mounted) {
         ToastService.error(e.toString().replaceAll('Exception: ', ''));
+      }
     }
   }
 

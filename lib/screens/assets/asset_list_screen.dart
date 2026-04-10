@@ -2,7 +2,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
-import 'dart:typed_data';
 import 'package:csv/csv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -357,7 +356,7 @@ class _AssetListScreenState extends State<AssetListScreen>
           children: [
             DropdownButtonFormField<String>(
               decoration: InputDecoration(labelText: l10n.fieldToCount),
-              value: tempFieldId,
+              initialValue: tempFieldId,
               items: assetType.fieldDefinitions
                   .map(
                     (def) => DropdownMenuItem(
@@ -538,7 +537,7 @@ class _AssetListScreenState extends State<AssetListScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
                       decoration: BoxDecoration(
-                        color: colorScheme.surfaceContainerHighest.withValues(
+                        color: colorScheme.onSurfaceVariant.withValues(
                           alpha: 0.72,
                         ),
                         borderRadius: BorderRadius.circular(18),

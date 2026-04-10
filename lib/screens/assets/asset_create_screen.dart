@@ -394,7 +394,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         width: 48,
         height: 48,
         fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
+        errorBuilder: (_, _, _) => Container(
           width: 48,
           height: 48,
           color: Colors.grey.shade200,
@@ -421,7 +421,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
               child: ListView.separated(
                 shrinkWrap: true,
                 itemCount: candidates.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                separatorBuilder: (_, _) => const Divider(height: 1),
                 itemBuilder: (context, index) {
                   final candidate = candidates[index];
                   final subtitle = _buildCandidateSubtitle(candidate);
@@ -709,7 +709,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _aiSearchController.dispose();
     _scrollController.dispose();
     _nameAutocompleteFocusNode.dispose();
-    _customAutocompleteFocusNodes.values.forEach((n) => n.dispose());
+    for (var n in _customAutocompleteFocusNodes.values) {
+      n.dispose();
+    }
     _customControllers.forEach((_, c) => c.dispose());
     super.dispose();
   }

@@ -1240,6 +1240,12 @@ abstract class AppLocalizations {
   /// **'Market Value'**
   String get marketValueField;
 
+  /// No description provided for @marketRealRate.
+  ///
+  /// In en, this message translates to:
+  /// **'Real market rate'**
+  String get marketRealRate;
+
   /// No description provided for @maxStock.
   ///
   /// In en, this message translates to:
@@ -4483,7 +4489,7 @@ abstract class AppLocalizations {
   /// No description provided for @printLabel.
   ///
   /// In en, this message translates to:
-  /// **'Print label'**
+  /// **'debugPrint label'**
   String get printLabel;
 
   /// No description provided for @collectionFieldsTooltip.
@@ -5113,7 +5119,7 @@ abstract class AppLocalizations {
   /// No description provided for @reportsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Generate PDF or Excel reports to print or save on your PC'**
+  /// **'Generate PDF or Excel reports to debugPrint or save on your PC'**
   String get reportsDescription;
 
   /// No description provided for @reportSectionType.

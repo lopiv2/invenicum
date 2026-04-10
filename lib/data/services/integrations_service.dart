@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'api_service.dart';
 
@@ -20,10 +20,14 @@ class IntegrationService {
       );
       return response.data;
     } on DioException catch (e) {
-      print("Status Code: ${e.response?.statusCode}");
-      print(
+      if (kDebugMode) {
+        debugPrint("Status Code: ${e.response?.statusCode}");
+      }
+      if (kDebugMode) {
+        debugPrint(
         "Data del Error: ${e.response?.data}",
-      ); // <--- ESTO te dirá el error real del backend
+      );
+      } // <--- ESTO te dirá el error real del backend
       return {
         'success': false,
         'message': e.response?.data['message'] ?? 'Error de conexión',

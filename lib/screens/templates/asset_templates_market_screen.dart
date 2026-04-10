@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -142,7 +143,7 @@ class _AssetTemplatesMarketScreenState
                               )
                             : ListView.separated(
                                 itemCount: filteredTags.length,
-                                separatorBuilder: (_, __) =>
+                                separatorBuilder: (_, _) =>
                                     const SizedBox(height: 6),
                                 itemBuilder: (context, index) {
                                   final tag = filteredTags[index];
@@ -875,15 +876,18 @@ class _TemplateCard extends StatelessWidget {
                                   // 🚩 Si la URL existe pero el servidor falla (ej. 404)
                                   errorBuilder: (context, error, stackTrace) {
                                     // Si falla, imprime el error exacto en consola para ver qué dice
-                                    print(
+                                    if (kDebugMode) {
+                                      debugPrint(
                                       "Avatar load error ${template.id}: $error",
                                     );
+                                    }
                                     return _buildInitial();
                                   },
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
+                                        if (loadingProgress == null) {
                                           return child;
+                                        }
                                         return const Center(
                                           child: SizedBox(
                                             width: 15,

@@ -207,7 +207,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
             // 2. Tipo de Campo (Dropdown)
             DropdownButtonFormField<CustomFieldType>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: const InputDecoration(
                 labelText: 'Tipo de Dato',
                 border: OutlineInputBorder(),
@@ -291,7 +291,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                   l10n.monetaryValueDescription,
                 ),
                 value: _isMonetary,
-                activeColor: Colors.green, // Color sugerente para dinero
+                activeThumbColor: Colors.green, // Color sugerente para dinero
                 onChanged: (bool newValue) {
                   setState(() {
                     _isMonetary = newValue;
@@ -316,7 +316,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 )
               else
                 DropdownButtonFormField<int>(
-                  value: _selectedListDataId,
+                  initialValue: _selectedListDataId,
                   decoration: InputDecoration(
                     labelText: l10n.selectDataList,
                     border: const OutlineInputBorder(),

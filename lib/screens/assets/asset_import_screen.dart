@@ -457,7 +457,7 @@ class _AssetImportScreenState extends State<AssetImportScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: DropdownButtonFormField<String>(
-                            value: mapping.csvHeader,
+                            initialValue: mapping.csvHeader,
                             hint: Text(l10n.selectCsvColumn),
                             decoration: InputDecoration(
                               contentPadding: const EdgeInsets.symmetric(

@@ -94,7 +94,7 @@ class TopDemandedItemsWidget extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: items.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 20),
+                  separatorBuilder: (_, _) => const SizedBox(height: 20),
                   itemBuilder: (context, index) {
                     final item = items[index];
                     final double progress = maxLoans > 0

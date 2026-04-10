@@ -44,7 +44,7 @@ class IntegrationCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Theme.of(context)
                       .colorScheme
-                      .surfaceContainerHighest
+                      .onSurfaceVariant
                       .withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(12),
                 ),

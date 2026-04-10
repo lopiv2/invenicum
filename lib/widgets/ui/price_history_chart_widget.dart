@@ -152,7 +152,7 @@ class PriceHistoryChart extends StatelessWidget {
                 ],
                 lineTouchData: LineTouchData(
                   touchTooltipData: LineTouchTooltipData(
-                    getTooltipColor: (spot) => theme.colorScheme.surfaceVariant,
+                    getTooltipColor: (spot) => theme.colorScheme.onSurfaceVariant,
                     getTooltipItems: (List<LineBarSpot> touchedBarSpots) {
                       return touchedBarSpots.map((barSpot) {
                         final date = DateTime.fromMillisecondsSinceEpoch(

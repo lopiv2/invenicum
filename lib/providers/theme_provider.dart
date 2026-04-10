@@ -94,7 +94,7 @@ class ThemeProvider with ChangeNotifier {
     );
   }
 
-  setInitializing() {
+  void setInitializing() {
     _isInitialized = true;
   }
 
@@ -143,7 +143,7 @@ class ThemeProvider with ChangeNotifier {
     try {
       // 3. Buscamos si el color y brillo coinciden con alguno que tenga nombre
       _currentTheme = allPossibleThemes.firstWhere(
-        (t) => t.primaryColor.value == colorValue && t.brightness == brightness,
+        (t) => t.primaryColor.toARGB32() == colorValue && t.brightness == brightness,
       );
     } catch (_) {
       // 4. Si realmente no existe en ningún lado, queda como Personalizado
@@ -169,7 +169,7 @@ class ThemeProvider with ChangeNotifier {
     try {
       // Esto actualiza la tabla UserThemeConfig en el backend
       final String hexColor =
-          '#${theme.primaryColor.value.toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+          '#${theme.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
       await _themeService.updateUserTheme(
         hexColor: hexColor,
         brightness: theme.brightness == Brightness.dark ? 'dark' : 'light',
@@ -213,7 +213,7 @@ class ThemeProvider with ChangeNotifier {
       // 3. Buscamos el tema que coincida en color y brillo
       _currentTheme = allPossibleThemes.firstWhere(
         (t) =>
-            t.primaryColor.value == color.value && t.brightness == brightness,
+            t.primaryColor.toARGB32() == color.toARGB32() && t.brightness == brightness,
       );
     } catch (_) {
       // 4. Si no existe, lo dejamos como personalizado

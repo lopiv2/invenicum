@@ -130,7 +130,9 @@ Signature of Receiver     | Signature of Returner''';
       );
       ToastService.success(AppLocalizations.of(context)!.configurationSaved);
     } catch (e) {
-      ToastService.error(AppLocalizations.of(context)!.errorSaving(e.toString()));
+      ToastService.error(
+        AppLocalizations.of(context)!.errorSaving(e.toString()),
+      );
     } finally {
       setState(() => _isLoading = false);
     }
@@ -152,13 +154,13 @@ Signature of Receiver     | Signature of Returner''';
         .replaceAll('{itemName}', 'Example Item')
         .replaceAll('{quantity}', '1')
         .replaceAll('{borrowerName}', 'John Doe')
-      .replaceAll('{borrowerEmail}', 'john.doe@example.com')
-      .replaceAll('{borrowerPhone}', '+34 600 000 000')
+        .replaceAll('{borrowerEmail}', 'john.doe@example.com')
+        .replaceAll('{borrowerPhone}', '+34 600 000 000')
         .replaceAll('{loanDate}', '10/01/2024');
     // Additional optional placeholders
     processedText = processedText
-      .replaceAll('{expectedReturnDate}', '17/01/2024')
-      .replaceAll('{notes}', 'Handle with care');
+        .replaceAll('{expectedReturnDate}', '17/01/2024')
+        .replaceAll('{notes}', 'Handle with care');
 
     doc.addPage(
       pw.Page(
@@ -214,7 +216,9 @@ Signature of Receiver     | Signature of Returner''';
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppLocalizations.of(context)!.configureDeliveryVoucher)),
+      appBar: AppBar(
+        title: Text(AppLocalizations.of(context)!.configureDeliveryVoucher),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -315,7 +319,9 @@ Signature of Receiver     | Signature of Returner''';
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save),
-                    label: Text(AppLocalizations.of(context)!.saveConfiguration),
+                    label: Text(
+                      AppLocalizations.of(context)!.saveConfiguration,
+                    ),
                     onPressed: _isLoading ? null : _saveTemplate,
                   ),
                 ),

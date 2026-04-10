@@ -644,6 +644,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get marketValueField => 'Valeur de marché';
 
   @override
+  String get marketRealRate => 'Taux réel du marché';
+
+  @override
   String get maxStock => 'Stock maximum';
 
   @override

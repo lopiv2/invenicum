@@ -42,7 +42,7 @@ class LocationProvider with ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       if (kDebugMode) {
-        print('Error al cargar ubicaciones: $_errorMessage');
+        debugPrint('Error al cargar ubicaciones: $_errorMessage');
       }
     } finally {
       _isLoading = false;
