@@ -54,7 +54,7 @@ class CommonFormField extends StatelessWidget {
       filled: true,
       fillColor: isHighlighted
           ? colorScheme.primaryContainer.withValues(alpha: 0.35)
-          : colorScheme.onSurfaceVariant.withValues(alpha: 0.45),
+          : colorScheme.onSurfaceVariant.withValues(alpha: 0.10),
       contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),

@@ -538,7 +538,7 @@ class _AssetListScreenState extends State<AssetListScreen>
                       padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
                       decoration: BoxDecoration(
                         color: colorScheme.onSurfaceVariant.withValues(
-                          alpha: 0.72,
+                          alpha: 0.22,
                         ),
                         borderRadius: BorderRadius.circular(18),
                         border: Border.all(

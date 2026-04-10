@@ -69,7 +69,7 @@ class AssetListHeader extends StatelessWidget {
               : l10n.activeFilterLabel,
           color: selectedCountFieldId != null
               ? theme.colorScheme.inversePrimary
-              : theme.colorScheme.onSurfaceVariant,
+              : theme.colorScheme.onPrimary,
           isMobile: isMobile,
         ),
         _buildActionButton(
@@ -77,7 +77,7 @@ class AssetListHeader extends StatelessWidget {
           onPressed: onImportCSV,
           icon: Icons.file_upload,
           label: l10n.importLabel,
-          color: theme.colorScheme.onSurfaceVariant,
+          color: theme.colorScheme.onPrimary,
           isMobile: isMobile,
         ),
         _buildActionButton(
@@ -85,7 +85,7 @@ class AssetListHeader extends StatelessWidget {
           onPressed: onExportCSV,
           icon: Icons.file_download,
           label: l10n.exportLabel,
-          color: theme.colorScheme.onSurfaceVariant,
+          color: theme.colorScheme.onPrimary,
           isMobile: isMobile,
         ),
         Selector<InventoryItemProvider, (bool, int)>(
@@ -111,7 +111,7 @@ class AssetListHeader extends StatelessWidget {
                 onPressed: isSyncing ? () {} : onSyncPrices,
                 icon: Icons.sync_alt_rounded,
                 label: isSyncing ? l10n.syncingLabel : l10n.syncLabel,
-                color: theme.colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.onPrimary,
                 isMobile: isMobile,
                 isLoading: isSyncing,
               ),

@@ -343,7 +343,7 @@ class _ChatBubble extends StatelessWidget {
     final theme = Theme.of(context);
     final bubbleColor = isUser
         ? theme.primaryColor
-        : theme.colorScheme.onSurfaceVariant;
+        : theme.colorScheme.onSurfaceVariant.withAlpha(50);
     final textColor = isUser ? Colors.white : null;
 
     return Align(
@@ -366,10 +366,7 @@ class _ChatBubble extends StatelessWidget {
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 240),
-              child: SelectableText(
-                text,
-                style: TextStyle(color: textColor),
-              ),
+              child: SelectableText(text, style: TextStyle(color: textColor)),
             ),
           ),
         ),
