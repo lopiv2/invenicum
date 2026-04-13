@@ -15,7 +15,7 @@ class AlertService {
       final List<dynamic> data = response.data['data'];
       return data.map((json) => Alert.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Error al obtener alertas: $e');
+      throw Exception('Error when fetching alerts: $e');
     }
   }
 

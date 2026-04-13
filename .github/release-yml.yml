@@ -1,0 +1,36 @@
+changelog:
+  categories:
+    - title: "📦 New Features & Collection Tools"
+      labels:
+        - enhancement
+        - feat
+        - feature
+    - title: "🛠️ System Improvements & Fixes"
+      labels:
+        - bug
+        - fix
+        - performance
+    - title: "📖 Documentation & Guides"
+      labels:
+        - documentation
+        - docs
+    - title: "⚙️ Internal & Maintenance"
+      labels:
+        - refactor
+        - chore
+        - build
+        - dependencies
+    - title: "🌍 Community Contributions"
+      labels:
+        - community
+        - contribution
+
+  exclude:
+    labels:
+      - skip-changelog
+      - duplicate
+    authors:
+      - github-actions[bot]
+      - dependabot[bot]
+
+  render_next_release_date: true

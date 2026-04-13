@@ -10,7 +10,7 @@ class ApiService {
   static final ApiService _instance = ApiService._internal();
   final Dio dio = Dio();
 
-  // 🚀 MEMORIA SÍNCRONA: El secreto para ganar la carrera de milisegundos.
+  // 🚀 SYNCHRONOUS CACHE: The secret to win the milliseconds race.
   String? _cachedToken;
 
   factory ApiService() => _instance;
@@ -44,8 +44,8 @@ class ApiService {
             final bool hadAuthHeader =
                 e.requestOptions.headers['Authorization'] != null;
 
-            // Solo cerramos sesión si el 401 viene de una validación JWT real.
-            final bool isJwtUnauthorized =
+              // Only log out if the 401 comes from a real JWT validation.
+              final bool isJwtUnauthorized =
                 message == 'Invalid or expired token' ||
                 message == 'Token no proporcionado';
 
@@ -68,18 +68,18 @@ class ApiService {
   // 🆕 PRIMER USO / SETUP
   // ----------------------------------------------------
 
-  /// Consulta al backend si la app necesita configuración inicial.
-  /// Devuelve [true] si es el primer arranque (tabla users vacía o no existe),
-  /// [false] si ya hay al menos un usuario registrado.
-  /// En caso de error de red se devuelve [false] para no bloquear el arranque.
+  /// Checks with the backend whether the app requires initial setup.
+  /// Returns [true] if this is the first run (users table empty or missing),
+  /// [false] if there's at least one registered user.
+  /// On network errors returns [false] so startup is not blocked.
   Future<bool> checkFirstRun() async {
     try {
       final response = await dio.get('/auth/first-run');
-      // Se espera: { "firstRun": true } o { "firstRun": false }
+      // Expected: { "firstRun": true } or { "firstRun": false }
       return response.data['firstRun'] == true;
     } on DioException catch (e) {
-      // 404 → endpoint no implementado aún → no bloqueamos
-      // 5xx → error del servidor → no bloqueamos
+      // 404 → endpoint not implemented yet → don't block
+      // 5xx → server error → don't block
       debugPrint('ApiService: checkFirstRun error ${e.response?.statusCode}: $e');
       return false;
     } catch (e) {
@@ -88,9 +88,9 @@ class ApiService {
     }
   }
 
-  /// Crea el primer usuario administrador de la plataforma.
-  /// Solo debe poder llamarse cuando [checkFirstRun()] devuelve [true].
-  /// Lanza [Exception] con el mensaje del backend si falla.
+  /// Creates the first administrator user for the platform.
+  /// Should only be called when [checkFirstRun()] returns [true].
+  /// Throws [Exception] with the backend message on failure.
   Future<void> createFirstAdmin({
     required String name,
     required String email,
@@ -101,23 +101,23 @@ class ApiService {
         '/auth/setup',
         data: {'name': name, 'email': email, 'password': password},
       );
-      // El backend simplemente devuelve 201. No necesitamos el cuerpo.
+      // The backend simply returns 201. We don't need the body.
     } on DioException catch (e) {
       final message =
           e.response?.data['message'] ??
           e.response?.data['error'] ??
-          'Error al crear el administrador';
+          'Error creating administrator';
       throw Exception(message);
     } catch (e) {
-      throw Exception('Error de conexión: $e');
+      throw Exception('Connection error: $e');
     }
   }
 
   // ----------------------------------------------------
-  // MÉTODOS DE SEGURIDAD
+  // SECURITY METHODS
   // ----------------------------------------------------
 
-  /// Cambia la contraseña del usuario actual
+  /// Change the current user's password
   Future<bool> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -132,14 +132,14 @@ class ApiService {
       final errorMessage =
           e.response?.data['message'] ??
           e.response?.data['error'] ??
-          'Error al cambiar la contraseña';
+          'Error changing password';
       throw Exception(errorMessage);
     } catch (e) {
-      throw Exception('Error de conexión al cambiar contraseña');
+      throw Exception('Connection error while changing password');
     }
   }
 
-  /// Solicita un correo de recuperación
+  /// Requests a password recovery email
   Future<bool> requestPasswordReset(String email) async {
     try {
       final response = await dio.post(
@@ -148,13 +148,13 @@ class ApiService {
       );
       return response.data['success'] == true || response.statusCode == 200;
     } catch (e) {
-      debugPrint("ApiService: Error en password reset request: $e");
+      debugPrint("ApiService: Error in password reset request: $e");
       return false;
     }
   }
 
   // ----------------------------------------------------
-  // MÉTODOS DE USUARIO
+  // USER METHODS
   // ----------------------------------------------------
 
   Future<UserData?> updateProfile({
@@ -178,10 +178,10 @@ class ApiService {
       return null;
     } on DioException catch (e) {
       final errorMessage =
-          e.response?.data['error'] ?? 'Error al actualizar perfil';
+          e.response?.data['error'] ?? 'Error updating profile';
       throw Exception(errorMessage);
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -190,7 +190,7 @@ class ApiService {
       final response = await dio.get('/auth/github/config');
       return response.data;
     } catch (e) {
-      debugPrint("ApiService: Error al pedir config de GitHub: $e");
+      debugPrint("ApiService: Error requesting GitHub config: $e");
       return null;
     }
   }
@@ -200,7 +200,7 @@ class ApiService {
       final response = await dio.post('/auth/github/disconnect');
       return response.data['success'] == true;
     } catch (e) {
-      debugPrint("ApiService: Error al desconectar GitHub: $e");
+      debugPrint("ApiService: Error disconnecting GitHub: $e");
       return false;
     }
   }
@@ -240,11 +240,11 @@ class ApiService {
     }
   }
 
-  /// Consulta al backend por el estado de versión de la app.
+  /// Checks the app version status with the backend.
   ///
-  /// Endpoint esperado en backend:
+  /// Expected backend endpoint:
   /// GET /app/version/check?currentVersion=x.y.z
-  /// Respuesta esperada (ejemplo):
+  /// Example response:
   /// {
   ///   "latestVersion": "1.2.0",
   ///   "hasUpdate": true,
@@ -278,7 +278,7 @@ class ApiService {
   }
 
   // ----------------------------------------------------
-  // MÉTODOS DE AUTENTICACIÓN
+  // AUTHENTICATION METHODS
   // ----------------------------------------------------
 
   Future<LoginResponse> login(String username, String password) async {
@@ -304,12 +304,12 @@ class ApiService {
     } on DioException catch (e) {
       return LoginResponse(
         success: false,
-        message: e.response?.data['message'] ?? 'Error de autenticación',
+        message: e.response?.data['message'] ?? 'Authentication error',
       );
     }
   }
 
-  /// Se llama UNA SOLA VEZ al arrancar la app (en main.dart)
+  /// Called ONCE at app startup (in main.dart)
   Future<void> initializeToken() async {
     final prefs = await SharedPreferences.getInstance();
     _cachedToken = prefs.getString(Environment.authTokenKey);
@@ -329,8 +329,8 @@ class ApiService {
       return UserData.fromJson(response.data['user'] ?? response.data);
     } on DioException catch (e) {
       debugPrint(e.toString());
-      // Propagamos para que AuthProvider distinga 401 (token inválido)
-      // de errores de red/timeout (mantener sesión)
+      // Re-throw so AuthProvider can distinguish 401 (invalid token)
+      // from network/timeout errors (keep session)
       rethrow;
     } catch (_) {
       return null;

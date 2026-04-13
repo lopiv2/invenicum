@@ -15,6 +15,7 @@ import 'package:invenicum/data/services/ai_service.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/core/utils/asset_form_utils.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/custom_fields_section.dart';
@@ -395,78 +396,94 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           itemId: selectedId,
           locale: locale,
         );
-        ToastService.success(
-          l10n.itemImportedSuccessfully(
-            enrichedData!['name']?.toString() ?? '',
-          ),
-        );
 
-        if (mounted) {
-          ToastService.error(l10n.couldNotCompleteImport);
-          _nameController.text = enrichedData['name'] ?? _nameController.text;
-          final enrichedMarketValue = _extractMarketValue(enrichedData);
-          if (enrichedMarketValue != null) {
-            _marketValue = enrichedMarketValue;
-          }
-          String baseDescription = enrichedData['description'] ?? '';
+        if (enrichedData != null && mounted) {
+          // Apply basic fields
+          setState(() {
+            _nameController.text = enrichedData!['name'] ?? _nameController.text;
+            final enrichedMarketValue = _extractMarketValue(enrichedData);
+            if (enrichedMarketValue != null) _marketValue = enrichedMarketValue;
+            final String baseDescription = enrichedData['description'] ?? '';
+            if (enrichedData['images'] != null && (enrichedData['images'] as List).isNotEmpty) {
+              final imageUrl = enrichedData['images'][0]['url'];
+              if (imageUrl != null) _newImagePreviewUrls.insert(0, imageUrl);
+            } else if (enrichedData['imageUrl'] != null) {
+              _newImagePreviewUrls.insert(0, enrichedData['imageUrl']);
+            }
+            _descriptionController.text = baseDescription;
+          });
 
-          if (enrichedData['images'] != null &&
-              (enrichedData['images'] as List).isNotEmpty) {
-            final imageUrl = enrichedData['images'][0]['url'];
-            if (imageUrl != null) _newImagePreviewUrls.insert(0, imageUrl);
-          } else if (enrichedData['imageUrl'] != null) {
-            _newImagePreviewUrls.insert(0, enrichedData['imageUrl']);
-          }
-
-          final Map<String, dynamic> aiFields =
-              enrichedData['customFieldValues'] ?? {};
+          // Automatic mapping
+          final Map<String, dynamic> aiFields = Map<String, dynamic>.from(enrichedData['customFieldValues'] ?? {});
           final Set<String> usedAiKeys = {};
-          final List<String> unusedDataLines = [];
 
-          for (var fieldDef in _assetType!.fieldDefinitions) {
-            final entry = aiFields.entries.firstWhere(
+          for (final fieldDef in _assetType!.fieldDefinitions) {
+            final matchEntry = aiFields.entries.firstWhere(
               (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
               orElse: () => const MapEntry('', null),
             );
-            if (entry.value != null) {
-              usedAiKeys.add(entry.key);
-              final val = entry.value.toString();
+            if (matchEntry.value != null) {
+              usedAiKeys.add(matchEntry.key);
+              final val = matchEntry.value;
               if (fieldDef.type == CustomFieldType.boolean) {
-                _booleanValues[fieldDef.id!] = val.toLowerCase() == 'true';
+                _booleanValues[fieldDef.id!] = (val is bool) ? val : val.toString().toLowerCase() == 'true';
               } else if (fieldDef.type == CustomFieldType.dropdown) {
                 final options = _listFieldValues[fieldDef.id] ?? [];
                 final match = options.firstWhere(
-                  (o) => o.toLowerCase() == val.toLowerCase(),
+                  (o) => o.toLowerCase() == val.toString().toLowerCase(),
                   orElse: () => '',
                 );
                 if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
               } else {
-                _dynamicControllers[fieldDef.id]?.text = val;
+                _dynamicControllers[fieldDef.id]?.text = val?.toString() ?? '';
               }
               _highlightedFields.add(fieldDef.name);
             }
           }
 
+          // Collect unmapped keys (exclude dropdowns)
+          final Map<String, dynamic> unmapped = {};
           aiFields.forEach((key, value) {
-            if (!usedAiKeys.contains(key) &&
-                key.toLowerCase() != 'external_id') {
-              unusedDataLines.add("$key: $value");
-            }
+            if (key.toLowerCase() == 'external_id') return;
+            if (usedAiKeys.contains(key)) return;
+            final hasNonDropdownMatch = _assetType!.fieldDefinitions.any((f) => f.type != CustomFieldType.dropdown && f.name.toLowerCase() == key.toLowerCase());
+            if (!hasNonDropdownMatch) unmapped[key] = value;
           });
 
-          if (unusedDataLines.isNotEmpty) {
-            final extraInfo =
-                '\n\n--- ${l10n.technicalDetailsTitle} ---\n${unusedDataLines.join('\n')}';
-            _descriptionController.text = baseDescription + extraInfo;
-          } else {
-            _descriptionController.text = baseDescription;
+          if (unmapped.isNotEmpty) {
+            final availableFields = _assetType!.fieldDefinitions.where((f) => f.type != CustomFieldType.dropdown).toList();
+            final Map<int, dynamic>? mappingResult = await showDialog<Map<int, dynamic>>(
+              context: context,
+              builder: (_) => ApiFieldMappingDialog(unmappedFields: unmapped, availableFields: availableFields),
+            );
+            if (mappingResult != null && mappingResult.isNotEmpty) {
+              setState(() {
+                mappingResult.forEach((fieldId, value) {
+                  if (_dynamicControllers.containsKey(fieldId)) {
+                    _dynamicControllers[fieldId]?.text = value?.toString() ?? '';
+                  }
+                  final idx = _assetType!.fieldDefinitions.indexWhere((f) => f.id == fieldId);
+                  if (idx != -1) _highlightedFields.add(_assetType!.fieldDefinitions[idx].name);
+                });
+              });
+            }
           }
 
-          _highlightedFields.addAll(['name', 'description']);
+          // Append leftovers to description
+          final List<String> leftover = [];
+          aiFields.forEach((key, value) {
+            final mappedToField = _assetType!.fieldDefinitions.any((f) => f.name.toLowerCase() == key.toLowerCase());
+            if (!mappedToField && key.toLowerCase() != 'external_id') leftover.add('$key: $value');
+          });
+          if (leftover.isNotEmpty) {
+            setState(() {
+              final base = _descriptionController.text.isNotEmpty ? '${_descriptionController.text}\n\n' : '';
+              _descriptionController.text = '$base--- ${l10n.technicalDetailsTitle} ---\n${leftover.join('\n')}';
+            });
+          }
+
+          ToastService.success(l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''));
         }
-        ToastService.success(
-          l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''),
-        );
       }
     } catch (e) {
       ToastService.error(l10n.couldNotCompleteImport);
@@ -959,7 +976,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                         : null,
 
                     // ── Importar desde fuente externa ──
-                    importBento: BentoBoxWidget(
+                    importBento: aiEnabled ? BentoBoxWidget(
                       title: l10n.externalImportTitle,
                       icon: Icons.auto_awesome,
                       child: ExternalImportWidget(
@@ -971,7 +988,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                             setState(() => _selectedSource = val),
                         onSearch: _handleEnrichSearch,
                       ),
-                    ),
+                    ) : null,
 
                     // ── Datos Principales ──
                     mainDataBento: BentoBoxWidget(

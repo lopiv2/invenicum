@@ -7,6 +7,7 @@ import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
@@ -286,66 +287,98 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       }
 
       if (enrichedData != null && mounted) {
+        // 1) Apply basic fields (name, images, market value)
         setState(() {
           _nameController.text = enrichedData!['name'] ?? _nameController.text;
           final enrichedMarketValue = _extractMarketValue(enrichedData);
-          if (enrichedMarketValue != null) {
-            _marketValue = enrichedMarketValue;
-          }
-          String baseDescription = enrichedData['description'] ?? '';
-          if (enrichedData['images'] != null &&
-              (enrichedData['images'] as List).isNotEmpty) {
+          if (enrichedMarketValue != null) _marketValue = enrichedMarketValue;
+          final String baseDescription = enrichedData['description'] ?? '';
+          if (enrichedData['images'] != null && (enrichedData['images'] as List).isNotEmpty) {
             final imageUrl = enrichedData['images'][0]['url'];
             if (imageUrl != null) _imagePreviewUrls.insert(0, imageUrl);
           } else if (enrichedData['imageUrl'] != null) {
             _imagePreviewUrls.insert(0, enrichedData['imageUrl']);
           }
-          final Map<String, dynamic> aiFields =
-              enrichedData['customFieldValues'] ?? {};
-          final Set<String> usedAiKeys = {};
-          final List<String> unusedDataLines = [];
-          for (var fieldDef in _assetType!.fieldDefinitions) {
-            final entry = aiFields.entries.firstWhere(
-              (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
-              orElse: () => const MapEntry('', null),
-            );
-            if (entry.value != null) {
-              usedAiKeys.add(entry.key);
-              final val = entry.value.toString();
-              if (fieldDef.type == CustomFieldType.boolean) {
-                _booleanFieldValues[fieldDef.id!] = val.toLowerCase() == 'true';
-              } else if (fieldDef.type == CustomFieldType.dropdown) {
-                final options = _listFieldValues[fieldDef.id] ?? [];
-                final match = options.firstWhere(
-                  (o) => o.toLowerCase() == val.toLowerCase(),
-                  orElse: () => '',
-                );
-                if (match.isNotEmpty) {
-                  _selectedListValues[fieldDef.id!] = match;
-                }
-              } else {
-                _customControllers[fieldDef.id]?.text = val;
-              }
-              _highlightedFields.add(fieldDef.name);
-            }
-          }
-          aiFields.forEach((key, value) {
-            if (!usedAiKeys.contains(key) &&
-                key.toLowerCase() != 'external_id') {
-              unusedDataLines.add("$key: $value");
-            }
-          });
-          if (unusedDataLines.isNotEmpty) {
-            _descriptionController.text =
-                "$baseDescription\n\n--- ${l10n.technicalDetailsTitle} ---\n${unusedDataLines.join('\n')}";
-          } else {
-            _descriptionController.text = baseDescription;
-          }
-          _highlightedFields.addAll(['name', 'description']);
+          _descriptionController.text = baseDescription;
         });
-        ToastService.success(
-          l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''),
-        );
+
+        // 2) Automatic mapping for known fields
+        final Map<String, dynamic> aiFields = Map<String, dynamic>.from(enrichedData['customFieldValues'] ?? {});
+        final Set<String> usedAiKeys = {};
+
+        for (final fieldDef in _assetType!.fieldDefinitions) {
+          // Find AI key that matches this field name (case-insensitive)
+          final matchEntry = aiFields.entries.firstWhere(
+            (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
+            orElse: () => const MapEntry('', null),
+          );
+          if (matchEntry.value != null) {
+            usedAiKeys.add(matchEntry.key);
+            final val = matchEntry.value;
+            if (fieldDef.type == CustomFieldType.boolean) {
+              _booleanFieldValues[fieldDef.id!] = (val is bool) ? val : val.toString().toLowerCase() == 'true';
+            } else if (fieldDef.type == CustomFieldType.dropdown) {
+              final options = _listFieldValues[fieldDef.id] ?? [];
+              final match = options.firstWhere(
+                (o) => o.toLowerCase() == val.toString().toLowerCase(),
+                orElse: () => '',
+              );
+              if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
+            } else {
+              _customControllers[fieldDef.id]?.text = val?.toString() ?? '';
+            }
+            _highlightedFields.add(fieldDef.name);
+          }
+        }
+
+        // 3) Collect unmapped keys (exclude dropdowns from being mappable here)
+        final Map<String, dynamic> unmapped = {};
+        aiFields.forEach((key, value) {
+          if (key.toLowerCase() == 'external_id') return;
+          final alreadyMapped = usedAiKeys.contains(key);
+          if (alreadyMapped) return;
+          // if key doesn't match any non-dropdown field name, add to unmapped
+          final hasNonDropdownMatch = _assetType!.fieldDefinitions.any((f) => f.type != CustomFieldType.dropdown && f.name.toLowerCase() == key.toLowerCase());
+          if (!hasNonDropdownMatch) unmapped[key] = value;
+        });
+
+        // 4) If unmapped exist, show mapping dialog for non-dropdown fields
+        if (unmapped.isNotEmpty) {
+          final availableFields = _assetType!.fieldDefinitions.where((f) => f.type != CustomFieldType.dropdown).toList();
+          final Map<int, dynamic>? mappingResult = await showDialog<Map<int, dynamic>>(
+            context: context,
+            builder: (_) => ApiFieldMappingDialog(unmappedFields: unmapped, availableFields: availableFields),
+          );
+
+          if (mappingResult != null && mappingResult.isNotEmpty) {
+            setState(() {
+              mappingResult.forEach((fieldId, value) {
+                if (_customControllers.containsKey(fieldId)) {
+                  _customControllers[fieldId]?.text = value?.toString() ?? '';
+                }
+                final idx = _assetType!.fieldDefinitions.indexWhere((f) => f.id == fieldId);
+                if (idx != -1) _highlightedFields.add(_assetType!.fieldDefinitions[idx].name);
+              });
+            });
+          }
+        }
+
+        // 5) Append remaining unmapped data to description
+        final List<String> leftover = [];
+        aiFields.forEach((key, value) {
+          final mappedToField = _assetType!.fieldDefinitions.any((f) => f.name.toLowerCase() == key.toLowerCase());
+          if (!mappedToField && key.toLowerCase() != 'external_id') {
+            leftover.add('$key: $value');
+          }
+        });
+        if (leftover.isNotEmpty) {
+          setState(() {
+            final base = _descriptionController.text.isNotEmpty ? '${_descriptionController.text}\n\n' : '';
+            _descriptionController.text = '$base--- ${l10n.technicalDetailsTitle} ---\n${leftover.join('\n')}';
+          });
+        }
+
+        ToastService.success(l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''));
       }
     } catch (e) {
       ToastService.error(l10n.couldNotCompleteImport);
