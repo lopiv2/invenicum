@@ -4,20 +4,20 @@ import 'package:invenicum/data/models/veni_response.dart';
 import 'api_service.dart';
 
 class ChatService extends ChangeNotifier {
-  // 1. Agregamos ChangeNotifier
+  // 1. Add ChangeNotifier
   final ApiService _apiService;
 
-  // 2. Lista privada de mensajes que persistirá en memoria
+  // 2. Private list of messages that will persist in memory
   List<Map<String, dynamic>> _messages = [];
 
-  // Getter para que el Widget pueda leer los mensajes
+  // Getter so the Widget can read the messages
   List<Map<String, dynamic>> get messages => _messages;
 
   Dio get _dio => _apiService.dio;
 
   ChatService(this._apiService);
 
-  // Llama a esto después del login o en el initState del MainLayout
+  // Call this after login or in the MainLayout initState
   Future<void> loadRemoteHistory() async {
     try {
       final response = await _dio.get('/ai/chat/history');
@@ -26,23 +26,23 @@ class ChatService extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint("Error cargando historial remoto: $e");
+      debugPrint("Error loading remote history: $e");
     }
   }
 
-  /// Agrega un mensaje a la lista y notifica a la UI
+  /// Add a message to the list and notify the UI
   void addMessage(String text, bool isUser) {
     _messages.add({'text': text, 'isUser': isUser});
     notifyListeners();
   }
 
-  /// Limpia el historial (Llamar esto al cerrar sesión)
+  /// Clear the history (call this on logout)
   void clearHistory() {
     _messages.clear();
     notifyListeners();
   }
 
-  /// Purga el historial remoto de chat y limpia el estado local.
+  /// Purge remote chat history and clear local state.
   Future<void> purgeRemoteHistory() async {
     try {
       final response = await _dio.delete('/ai/chat/history');
@@ -65,8 +65,8 @@ class ChatService extends ChangeNotifier {
     required String locale, // 👈 Nuevo parámetro obligatorio
     Map<String, dynamic>? contextData,
   }) async {
-    // Solo mostramos el mensaje del usuario si no es el comando interno de saludo.
-    // SAY_HELLO_INITIAL se procesa en el backend pero nunca aparece en el chat.
+    // Only show the user message if it is not the internal greeting command.
+    // SAY_HELLO_INITIAL is processed in the backend but never appears in the chat.
     final bool isInternalCommand = message == "SAY_HELLO_INITIAL";
     if (!isInternalCommand) {
       _messages.add({'text': message, 'isUser': true});
@@ -74,10 +74,10 @@ class ChatService extends ChangeNotifier {
     }
 
     try {
-      // 2. Combinamos el contexto existente con el locale
+      // 2. Combine existing context with locale
       final Map<String, dynamic> finalContext = {
         ...?contextData,
-        'locale': locale, // 👈 Enviamos 'es', 'en', etc.
+        'locale': locale, // 👈 We send 'es', 'en', etc.
       };
 
       final response = await _apiService.dio.post(
@@ -93,7 +93,7 @@ class ChatService extends ChangeNotifier {
         return veniRes;
       }
     } catch (e) {
-      debugPrint("Error en ChatService: $e");
+      debugPrint("Error in ChatService: $e");
     }
     return null;
   }

@@ -8,48 +8,48 @@ import 'api_service.dart';
 class ContainerService {
   final ApiService _apiService;
 
-  // Acceso directo al Dio configurado en ApiService
+  // Direct access to the Dio instance configured in ApiService
   Dio get _dio => _apiService.dio;
 
   ContainerService(this._apiService);
 
-  // --- Helpers Privados ---
+  // --- Private helpers ---
 
-  /// Extrae la clave 'data' de la respuesta de forma segura
+  /// Safely extract the 'data' key from the response
   dynamic _extractData(Response response) {
     final Map<String, dynamic> responseData = response.data;
     if (responseData.containsKey('data') && responseData['data'] != null) {
       return responseData['data'];
     }
-    throw Exception('La respuesta del servidor no contiene el campo "data".');
+    throw Exception('Server response does not contain the "data" field.');
   }
 
-  /// Centraliza el manejo de excepciones de Dio
+  /// Centralized Dio exception handler
   Exception _handleError(DioException e, String context) {
     if (e.response?.statusCode == 401) {
-      return Exception('No autorizado: Sesión expirada o token inválido.');
+      return Exception('Unauthorized: session expired or invalid token.');
     }
     if (e.response?.statusCode == 404) {
-      return Exception('Recurso no encontrado ($context).');
+      return Exception('Resource not found ($context).');
     }
     final message = e.response?.data?['message'] ?? e.message;
-    return Exception('Error en $context: $message');
+    return Exception('Error in $context: $message');
   }
 
-  // --- Métodos de Contenedores ---
+  // --- Container methods ---
 
   Future<List<dynamic>> searchItemsGlobal(String query) async {
     try {
-      // Asumimos que tu API tiene un endpoint de búsqueda global
+      // Assume the API has a global search endpoint
       final response = await _dio.get(
         '/search/assets',
         queryParameters: {'q': query},
       );
 
-      // Usamos tu helper privado para extraer los datos
+      // Use the private helper to extract data
       return _extractData(response) as List<dynamic>;
     } on DioException catch (e) {
-      throw _handleError(e, 'buscar elementos en la API');
+      throw _handleError(e, 'search items in API');
     }
   }
 
@@ -69,26 +69,26 @@ class ContainerService {
       );
       return ContainerNode.fromJson(_extractData(response));
     } on DioException catch (e) {
-      throw _handleError(e, 'crear contenedor');
+      throw _handleError(e, 'create container');
     }
   }
 
   Future<List<ContainerNode>> getContainers() async {
     try {
-      // Cargamos relaciones para evitar N+1 queries en el backend
+      // Load relations to avoid N+1 queries on the backend
       final response = await _dio.get(
         '/containers?include=datalists,assettypes',
       );
       final List<dynamic> list = _extractData(response);
 
       return list.map((json) {
-        // Normalización: Aseguramos que existan las listas aunque el backend no las envíe
+        // Normalization: ensure lists exist even if the backend doesn't send them
         json['dataLists'] ??= json['data_lists'] ?? [];
         json['assetTypes'] ??= json['asset_types'] ?? [];
         return ContainerNode.fromJson(json);
       }).toList();
     } on DioException catch (e) {
-      throw _handleError(e, 'obtener contenedores');
+      throw _handleError(e, 'get containers');
     }
   }
 
@@ -100,7 +100,7 @@ class ContainerService {
       );
       return ContainerNode.fromJson(_extractData(response));
     } on DioException catch (e) {
-      throw _handleError(e, 'actualizar contenedor');
+      throw _handleError(e, 'update container');
     }
   }
 
@@ -108,11 +108,11 @@ class ContainerService {
     try {
       await _dio.delete('/containers/$containerId');
     } on DioException catch (e) {
-      throw _handleError(e, 'eliminar contenedor');
+      throw _handleError(e, 'delete container');
     }
   }
 
-  // --- Métodos de DataLists (Listas Personalizadas) ---
+  // --- DataLists methods (custom lists) ---
 
   Future<ListData> createDataList({
     required int containerId,
@@ -127,7 +127,7 @@ class ContainerService {
       );
       return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {
-      throw _handleError(e, 'crear lista personalizada');
+      throw _handleError(e, 'create datalist');
     }
   }
 
@@ -144,7 +144,7 @@ class ContainerService {
       );
       return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {
-      throw _handleError(e, 'actualizar lista personalizada');
+      throw _handleError(e, 'update datalist');
     }
   }
 
@@ -152,7 +152,7 @@ class ContainerService {
     try {
       await _dio.delete('/datalists/$dataListId');
     } on DioException catch (e) {
-      throw _handleError(e, 'eliminar lista personalizada');
+      throw _handleError(e, 'delete datalist');
     }
   }
 
@@ -161,7 +161,7 @@ class ContainerService {
       final response = await _dio.get('/datalists/$dataListId');
       return ListData.fromJson(_extractData(response));
     } on DioException catch (e) {
-      throw _handleError(e, 'obtener lista personalizada');
+      throw _handleError(e, 'get datalist');
     }
   }
 
@@ -171,7 +171,7 @@ class ContainerService {
       final List<dynamic> list = _extractData(response);
       return list.map((json) => ListData.fromJson(json)).toList();
     } on DioException catch (e) {
-      throw _handleError(e, 'obtener listas del contenedor');
+      throw _handleError(e, 'get container datalists');
     }
   }
 }
