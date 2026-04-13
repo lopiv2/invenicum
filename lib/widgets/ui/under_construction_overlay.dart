@@ -2,28 +2,28 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:invenicum/l10n/app_localizations.dart';
 
-/// Widget overlay que muestra una pantalla de "En construcción" con efecto de cristal
-/// 
-/// Muestra un fondo difuminado y un panel de cristal traslúcido con:
-/// - Ícono de construcción
-/// - Título (En construcción / Próximamente)
-/// - Descripción
-/// 
-/// Se puede personalizar el título y subtitle si se desea
+/// Overlay widget that displays an "Under Construction" screen with a glass effect
+///
+/// Shows a blurred background and a translucent glass panel with:
+/// - Construction icon
+/// - Title (Under construction / Coming soon)
+/// - Description
+///
+/// Title and subtitle can be customized if desired
 class UnderConstructionOverlay extends StatelessWidget {
-  /// Título personalizado (si es null, usa "underConstruction")
+  /// Custom title (if null, uses "underConstruction")
   final String? title;
   
-  /// Subtítulo personalizado (si es null, usa "constructionSubtitle")
+  /// Custom subtitle (if null, uses "constructionSubtitle")
   final String? subtitle;
   
-  /// Ícono a mostrar (por defecto: construcción)
+  /// Icon to show (default: construction)
   final IconData icon;
   
-  /// Color del ícono
+  /// Icon color
   final Color? iconColor;
   
-  /// Blur sigma para el efecto de difuminado
+  /// Blur sigma for the blur effect
   final double blurSigma;
 
   const UnderConstructionOverlay({
@@ -45,7 +45,7 @@ class UnderConstructionOverlay extends StatelessWidget {
 
     return Stack(
       children: [
-        // Fondo con difuminado (BackdropFilter)
+        // Background with blur (BackdropFilter)
         BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
           child: Container(
@@ -53,7 +53,7 @@ class UnderConstructionOverlay extends StatelessWidget {
           ),
         ),
         
-        // Panel de cristal traslúcido centrado
+        // Centered translucent glass panel
         Center(
           child: SingleChildScrollView(
             child: Padding(
@@ -97,7 +97,7 @@ class UnderConstructionOverlay extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Ícono
+                          // Icon
                           Container(
                             height: 80,
                             width: 80,
@@ -118,7 +118,7 @@ class UnderConstructionOverlay extends StatelessWidget {
                           ),
                           const SizedBox(height: 24),
                           
-                          // Título
+                          // Title
                           Text(
                             displayTitle,
                             style: theme.textTheme.headlineSmall?.copyWith(
@@ -132,7 +132,7 @@ class UnderConstructionOverlay extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           
-                          // Subtítulo
+                          // Subtitle
                           Text(
                             displaySubtitle,
                             style: theme.textTheme.bodyLarge?.copyWith(
@@ -146,7 +146,7 @@ class UnderConstructionOverlay extends StatelessWidget {
                           ),
                           const SizedBox(height: 32),
                           
-                          // Puntos animados de carga
+                          // Animated loading dots
                           _AnimatedLoadingDots(
                             color: theme.primaryColor,
                           ),
@@ -188,7 +188,7 @@ class _AnimatedLoadingDotsState extends State<_AnimatedLoadingDots>
       )..repeat(reverse: true);
     });
 
-    // Desfasamos cada punto para que no se animen al mismo tiempo
+    // We offset each dot so they don't animate at the same time
     for (int i = 0; i < controllers.length; i++) {
       controllers[i].forward(from: (i * 0.2));
     }

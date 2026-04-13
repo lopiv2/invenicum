@@ -9,7 +9,7 @@ class VoucherService {
 
   VoucherService(this._apiService);
 
-  // Obtener la configuración global única
+  // Get the single global configuration
   Future<Map<String, dynamic>?> getVoucherConfig() async {
     try {
       final response = await _dio.get('/voucher-config');
@@ -18,12 +18,12 @@ class VoucherService {
       }
       return null;
     } catch (e) {
-      debugPrint('Error al obtener voucher config: $e');
+      debugPrint('Error fetching voucher config: $e');
       return null;
     }
   }
 
-  // Guardar configuración global (Multipart para texto e imagen)
+  // Save global configuration (Multipart for text and image)
   Future<void> saveVoucherTemplate(
     String template,
     Uint8List? logoBytes,
@@ -43,26 +43,26 @@ class VoucherService {
     try {
       await _dio.post('/voucher-config', data: formData);
     } catch (e) {
-      debugPrint('Error al guardar voucher config: $e');
+      debugPrint('Error saving voucher config: $e');
       rethrow;
     }
   }
 
-  // NUEVO: Obtener bytes de una imagen (URL) usando Dio
+  // NEW: Get image bytes (URL) using Dio
   Future<Uint8List?> fetchImageBytes(String logoPathFromDb) async {
     try {
-      // 1. Obtenemos solo el nombre del archivo o la subruta limpia
-      // Si el backend guarda "vouchers/imagen.png", lo dejamos así.
-      // Si guarda "uploads/inventory/vouchers/imagen.png", limpiamos la base.
+      // 1. Extract only the file name or the clean subpath
+      // If the backend stores "vouchers/image.png", we leave it as is.
+      // If it stores "uploads/inventory/vouchers/image.png", we clean the base.
       String fileName = logoPathFromDb.replaceFirst('uploads/inventory/', '');
       if (fileName.startsWith('/')) fileName = fileName.substring(1);
 
-      // 2. Construimos la URL usando el prefijo estático definido en tu app.js
-      // En app.js: STATIC_URL_PREFIX = "/images"
-      // URL Final: http://localhost:3000/images/vouchers/logo-xxx.png
+      // 2. Build the URL using the static prefix defined in your app.js
+      // In app.js: STATIC_URL_PREFIX = "/images"
+      // Final URL: http://localhost:3000/images/vouchers/logo-xxx.png
       final String fullImageUrl = '${Environment.apiUrl}/images/$fileName';
 
-      debugPrint("Descargando logo desde: $fullImageUrl");
+      debugPrint("Downloading logo from: $fullImageUrl");
 
       final response = await _dio.get(
         fullImageUrl,
@@ -74,7 +74,7 @@ class VoucherService {
 
       return Uint8List.fromList(response.data);
     } catch (e) {
-      debugPrint("Error al descargar bytes de imagen: $e");
+      debugPrint("Error downloading image bytes: $e");
       return null;
     }
   }

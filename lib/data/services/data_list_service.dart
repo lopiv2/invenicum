@@ -5,7 +5,7 @@ import 'package:invenicum/data/services/api_service.dart';
 class DataListService {
   final ApiService _apiService;
   
-  // Usamos el Dio del ApiService
+  // Use Dio from ApiService
   Dio get _dio => _apiService.dio;
 
   DataListService(this._apiService);
@@ -32,21 +32,21 @@ class DataListService {
           return ListData.fromJson(responseData['data']);
         } else {
           throw Exception(
-            'Respuesta de API exitosa, pero el objeto lista ("data") está ausente o es nulo.',
+            'API returned success but the list object ("data") is missing or null.',
           );
         }
       } else {
         throw Exception(
-          'Error al crear la lista personalizada: ${response.statusCode}',
+          'Error creating custom list: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+        throw Exception('Unauthorized. Please log in again.');
       }
-      throw Exception('Error de conexión: ${e.message}');
+      throw Exception('Connection error: ${e.message}');
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -61,21 +61,21 @@ class DataListService {
           return lists.map((json) => ListData.fromJson(json)).toList();
         } else {
           throw Exception(
-            'Respuesta de API exitosa, pero la lista ("data") está ausente o es nula.',
+            'API returned success but the list ("data") is missing or null.',
           );
         }
       } else {
         throw Exception(
-          'Error al obtener las listas personalizadas: ${response.statusCode}',
+          'Error fetching custom lists: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+        throw Exception('Unauthorized. Please log in again.');
       }
-      throw Exception('Error de conexión: ${e.message}');
+      throw Exception('Connection error: ${e.message}');
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -85,19 +85,19 @@ class DataListService {
 
       if (response.statusCode != 204) {
         throw Exception(
-          'Error al eliminar la lista personalizada: ${response.statusCode}',
+          'Error deleting custom list: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+        throw Exception('Unauthorized. Please log in again.');
       }
       if (e.response?.statusCode == 404) {
-        throw Exception('Lista personalizada no encontrada.');
+        throw Exception('Custom list not found.');
       }
-      throw Exception('Error de conexión: ${e.message}');
+      throw Exception('Connection error: ${e.message}');
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 
@@ -123,24 +123,24 @@ class DataListService {
           return ListData.fromJson(responseData['data']);
         } else {
           throw Exception(
-            'Respuesta de API exitosa, pero el objeto lista ("data") está ausente o es nulo.',
+            'API returned success but the list object ("data") is missing or null.',
           );
         }
-      } else {
+        } else {
         throw Exception(
-          'Error al actualizar la lista personalizada: ${response.statusCode}',
+          'Error updating custom list: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
-        throw Exception('No autorizado. Por favor, inicie sesión nuevamente.');
+        throw Exception('Unauthorized. Please log in again.');
       }
       if (e.response?.statusCode == 404) {
-        throw Exception('Lista personalizada no encontrada.');
+        throw Exception('Custom list not found.');
       }
-      throw Exception('Error de conexión: ${e.message}');
+      throw Exception('Connection error: ${e.message}');
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('Unexpected error: $e');
     }
   }
 }

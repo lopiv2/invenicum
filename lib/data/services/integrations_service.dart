@@ -25,76 +25,76 @@ class IntegrationService {
       }
       if (kDebugMode) {
         debugPrint(
-        "Data del Error: ${e.response?.data}",
+        "Error data: ${e.response?.data}",
       );
-      } // <--- ESTO te dirá el error real del backend
+      } // <--- This will show the real backend error
       return {
         'success': false,
-        'message': e.response?.data['message'] ?? 'Error de conexión',
+        'message': e.response?.data['message'] ?? 'Connection error',
       };
     }
   }
 
-  // Nuevo método para eliminar una integración
+  // New method to delete an integration
   Future<void> deleteIntegration(String type) async {
     await _dio.delete('/integrations/$type');
   }
 
-  // Obtiene qué integraciones están activas (para los checks verdes)
+  // Get which integrations are active (for green checks)
   Future<Map<String, bool>> getIntegrationStatuses() async {
     final response = await _dio.get('/integrations/status');
-    // Accedemos a response.data['data'] porque el backend envía { data: { ... } }
+    // Access response.data['data'] because backend sends { data: { ... } }
     final Map<String, dynamic> rawMap = response.data['data'];
     return rawMap.map((key, value) => MapEntry(key, value as bool));
   }
 
-  // Obtiene la configuración guardada (para rellenar los campos del modal)
+  // Get saved configuration (to prefill modal fields)
   Future<Map<String, dynamic>?> getIntegrationConfig(String type) async {
     try {
       final response = await _dio.get('/integrations/$type');
       return response.data['data']['config'];
     } catch (e) {
-      // Si no existe, devolvemos null en lugar de explotar
+      // If it doesn't exist, return null instead of throwing
       return null;
     }
   }
 
-  // Guarda o actualiza una integración
+  // Save or update an integration
   Future<void> saveIntegration(String type, Map<String, dynamic> config) async {
     try {
       await _dio.post('/integrations', data: {'type': type, 'config': config});
     } catch (e) {
-      throw Exception('Error al guardar la integración $type: $e');
+      throw Exception('Error saving integration $type: $e');
     }
   }
 
-  /// Llama al endpoint de enriquecimiento con IA (Gemini + API Externa)
-  /// Devuelve un mapa con [name, description, imageUrl, customFieldValues, etc.]
+  /// Calls the AI enrichment endpoint (Gemini + External API)
+  /// Returns a map with [name, description, imageUrl, customFieldValues, etc.]
   Future<Map<String, dynamic>?> enrichItem({
     required String query,
     required String source,
     String locale = "es",
   }) async {
     try {
-      // Llamada al endpoint: /api/integrations/enrich?query=...&source=...&locale=...
+      // Call to endpoint: /api/integrations/enrich?query=...&source=...&locale=...
       final response = await _dio.get(
         '/integrations/enrich',
         queryParameters: {'query': query, 'source': source, 'locale': locale},
       );
 
-      // Verificamos la estructura de tu backend { success: true, data: { ... } }
+      // Verify backend structure { success: true, data: { ... } }
       if (response.data['success'] == true && response.data['data'] != null) {
         return response.data['data'] as Map<String, dynamic>;
       }
 
       return null;
     } on DioException catch (e) {
-      // Capturamos errores específicos (404 no encontrado, 412 sin API Key, etc.)
+      // Capture specific errors (404 not found, 412 missing API Key, etc.)
       final errorMessage =
-          e.response?.data['error'] ?? 'Error al enriquecer el objeto';
+          e.response?.data['error'] ?? 'Error enriching item';
       debugPrint("[ENRICH-SERVICE-ERROR]: $errorMessage");
 
-      // Lanzamos la excepción para que el UI (ToastService) pueda mostrar el mensaje real
+      // Throw the exception so UI (ToastService) can show the real message
       throw Exception(errorMessage);
     } catch (e) {
       debugPrint("[ENRICH-SERVICE-FATAL]: $e");
@@ -102,7 +102,7 @@ class IntegrationService {
     }
   }
 
-  /// Procesa un candidato concreto cuando /enrich devuelve múltiples resultados
+  /// Process a specific candidate when /enrich returns multiple results
   Future<Map<String, dynamic>?> enrichSelectedItem({
     required String source,
     required String itemId,
@@ -121,7 +121,7 @@ class IntegrationService {
       return null;
     } on DioException catch (e) {
       final errorMessage =
-          e.response?.data['error'] ?? 'Error al procesar el resultado seleccionado';
+          e.response?.data['error'] ?? 'Error processing selected result';
       debugPrint("[ENRICH-SELECT-SERVICE-ERROR]: $errorMessage");
       throw Exception(errorMessage);
     } catch (e) {
@@ -135,12 +135,11 @@ class IntegrationService {
       final response = await _dio.get('/integrations/barcode/lookup/$barcode');
 
       if (response.data['data'] != null) {
-        // Usamos tu factory blindado para convertir el JSON en objeto
         return InventoryItem.fromJson(response.data['data']);
       }
       return null;
     } on DioException catch (e) {
-      debugPrint("Error en lookup de barcode: ${e.response?.data}");
+      debugPrint("Error in barcode lookup: ${e.response?.data}");
       return null;
     }
   }

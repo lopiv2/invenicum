@@ -3,7 +3,6 @@ changelog:
     - title: "📦 New Features & Collection Tools"
       labels:
         - enhancement
-        - feat
         - feature
     - title: "🛠️ System Improvements & Fixes"
       labels:
