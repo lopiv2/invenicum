@@ -26,7 +26,7 @@ class ExternalImportWidget extends StatelessWidget {
         final isWide = constraints.maxWidth >= 480;
 
         final dropdown = DropdownButtonFormField<String>(
-          value: selectedSource,
+          initialValue: selectedSource,
           isExpanded: true,
           decoration: const InputDecoration(
             labelText: "Fuente de datos",

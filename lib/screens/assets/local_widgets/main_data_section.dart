@@ -106,35 +106,36 @@ class MainDataSectionWidget extends StatelessWidget {
                         offset: selection.length,
                       );
                   },
-                  fieldViewBuilder: (
-                    context,
-                    textController,
-                    focusNode,
-                    onFieldSubmitted,
-                  ) {
-                    return CommonFormField(
-                      controller: textController,
-                      focusNode: focusNode,
-                      onFieldSubmitted: (_) => onFieldSubmitted(),
-                      label: l10n.assetName,
-                      icon: Icons.label_outline,
-                      highlighted: highlightedFields.contains('name'),
-                      suffixIcon: const Icon(Icons.history_outlined, size: 18),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return l10n.pleaseEnterAName;
-                        }
-                        return null;
+                  fieldViewBuilder:
+                      (context, textController, focusNode, onFieldSubmitted) {
+                        return CommonFormField(
+                          controller: textController,
+                          focusNode: focusNode,
+                          onFieldSubmitted: (_) => onFieldSubmitted(),
+                          label: l10n.assetName,
+                          icon: Icons.label_outline,
+                          highlighted: highlightedFields.contains('name'),
+                          suffixIcon: const Icon(
+                            Icons.history_outlined,
+                            size: 18,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return l10n.pleaseEnterAName;
+                            }
+                            return null;
+                          },
+                        );
                       },
-                    );
-                  },
                 ),
           const SizedBox(height: 16),
           CommonFormField(
             controller: descriptionController,
             label: l10n.description,
             icon: Icons.notes_outlined,
-            maxLines: 3,
+            keyboardType: TextInputType.multiline,
+            minLines: 3,
+            maxLines: 8,
             highlighted: highlightedFields.contains('description'),
           ),
           const SizedBox(height: 16),

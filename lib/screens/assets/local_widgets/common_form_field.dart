@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 /// Widget reutilizable para campos de texto comunes con decoración consistente
 class CommonFormField extends StatelessWidget {
   final TextEditingController controller;
+  final int? minLines;
   final String label;
   final String? hint;
   final String? helper;
@@ -28,6 +29,7 @@ class CommonFormField extends StatelessWidget {
     this.helper,
     this.keyboardType = TextInputType.text,
     this.maxLines = 1,
+    this.minLines,
     this.highlighted = false,
     this.prefix,
     this.inputFormatters = const [],
@@ -66,7 +68,8 @@ class CommonFormField extends StatelessWidget {
             ? BorderSide(color: colorScheme.primary, width: 1.5)
             : BorderSide(
                 color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-                width: 1),
+                width: 1,
+              ),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -91,6 +94,7 @@ class CommonFormField extends StatelessWidget {
       controller: controller,
       focusNode: focusNode,
       keyboardType: keyboardType,
+      minLines: minLines,
       maxLines: maxLines,
       inputFormatters: inputFormatters,
       validator: validator,

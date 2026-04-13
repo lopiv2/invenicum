@@ -424,12 +424,12 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       borderRadius: BorderRadius.circular(8),
       child: Image.network(
         image,
-        width: 48,
-        height: 48,
+        width: 100,
+        height: 100,
         fit: BoxFit.cover,
         errorBuilder: (_, _, _) => Container(
-          width: 48,
-          height: 48,
+          width: 100,
+          height: 100,
           color: Colors.grey.shade200,
           alignment: Alignment.center,
           child: Icon(Icons.image_not_supported, color: Colors.grey.shade500),
