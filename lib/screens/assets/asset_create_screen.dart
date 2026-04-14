@@ -9,6 +9,7 @@ import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/candidate_card_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
 import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
@@ -68,6 +69,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   ItemCondition _selectedCondition = ItemCondition.loose;
   bool _isMagicLoading = false;
   final Set<String> _highlightedFields = {};
+  String? selectedId;
 
   int? _selectedLocationId;
   List<String> _imagePreviewUrls = [];
@@ -197,7 +199,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     if (status.isGranted) {
       _handleBarcodeScan();
     } else {
-      ToastService.error(AppLocalizations.of(context)!.cameraPermissionRequired);
+      ToastService.error(
+        AppLocalizations.of(context)!.cameraPermissionRequired,
+      );
     }
   }
 
@@ -293,7 +297,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           final enrichedMarketValue = _extractMarketValue(enrichedData);
           if (enrichedMarketValue != null) _marketValue = enrichedMarketValue;
           final String baseDescription = enrichedData['description'] ?? '';
-          if (enrichedData['images'] != null && (enrichedData['images'] as List).isNotEmpty) {
+          if (enrichedData['images'] != null &&
+              (enrichedData['images'] as List).isNotEmpty) {
             final imageUrl = enrichedData['images'][0]['url'];
             if (imageUrl != null) _imagePreviewUrls.insert(0, imageUrl);
           } else if (enrichedData['imageUrl'] != null) {
@@ -303,7 +308,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         });
 
         // 2) Automatic mapping for known fields
-        final Map<String, dynamic> aiFields = Map<String, dynamic>.from(enrichedData['customFieldValues'] ?? {});
+        final Map<String, dynamic> aiFields = Map<String, dynamic>.from(
+          enrichedData['customFieldValues'] ?? {},
+        );
         final Set<String> usedAiKeys = {};
 
         for (final fieldDef in _assetType!.fieldDefinitions) {
@@ -316,7 +323,9 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
             usedAiKeys.add(matchEntry.key);
             final val = matchEntry.value;
             if (fieldDef.type == CustomFieldType.boolean) {
-              _booleanFieldValues[fieldDef.id!] = (val is bool) ? val : val.toString().toLowerCase() == 'true';
+              _booleanFieldValues[fieldDef.id!] = (val is bool)
+                  ? val
+                  : val.toString().toLowerCase() == 'true';
             } else if (fieldDef.type == CustomFieldType.dropdown) {
               final options = _listFieldValues[fieldDef.id] ?? [];
               final match = options.firstWhere(
@@ -338,17 +347,27 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           final alreadyMapped = usedAiKeys.contains(key);
           if (alreadyMapped) return;
           // if key doesn't match any non-dropdown field name, add to unmapped
-          final hasNonDropdownMatch = _assetType!.fieldDefinitions.any((f) => f.type != CustomFieldType.dropdown && f.name.toLowerCase() == key.toLowerCase());
+          final hasNonDropdownMatch = _assetType!.fieldDefinitions.any(
+            (f) =>
+                f.type != CustomFieldType.dropdown &&
+                f.name.toLowerCase() == key.toLowerCase(),
+          );
           if (!hasNonDropdownMatch) unmapped[key] = value;
         });
 
         // 4) If unmapped exist, show mapping dialog for non-dropdown fields
         if (unmapped.isNotEmpty) {
-          final availableFields = _assetType!.fieldDefinitions.where((f) => f.type != CustomFieldType.dropdown).toList();
-          final Map<int, dynamic>? mappingResult = await showDialog<Map<int, dynamic>>(
-            context: context,
-            builder: (_) => ApiFieldMappingDialog(unmappedFields: unmapped, availableFields: availableFields),
-          );
+          final availableFields = _assetType!.fieldDefinitions
+              .where((f) => f.type != CustomFieldType.dropdown)
+              .toList();
+          final Map<int, dynamic>? mappingResult =
+              await showDialog<Map<int, dynamic>>(
+                context: context,
+                builder: (_) => ApiFieldMappingDialog(
+                  unmappedFields: unmapped,
+                  availableFields: availableFields,
+                ),
+              );
 
           if (mappingResult != null && mappingResult.isNotEmpty) {
             setState(() {
@@ -356,8 +375,13 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                 if (_customControllers.containsKey(fieldId)) {
                   _customControllers[fieldId]?.text = value?.toString() ?? '';
                 }
-                final idx = _assetType!.fieldDefinitions.indexWhere((f) => f.id == fieldId);
-                if (idx != -1) _highlightedFields.add(_assetType!.fieldDefinitions[idx].name);
+                final idx = _assetType!.fieldDefinitions.indexWhere(
+                  (f) => f.id == fieldId,
+                );
+                if (idx != -1)
+                  _highlightedFields.add(
+                    _assetType!.fieldDefinitions[idx].name,
+                  );
               });
             });
           }
@@ -366,19 +390,26 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         // 5) Append remaining unmapped data to description
         final List<String> leftover = [];
         aiFields.forEach((key, value) {
-          final mappedToField = _assetType!.fieldDefinitions.any((f) => f.name.toLowerCase() == key.toLowerCase());
+          final mappedToField = _assetType!.fieldDefinitions.any(
+            (f) => f.name.toLowerCase() == key.toLowerCase(),
+          );
           if (!mappedToField && key.toLowerCase() != 'external_id') {
             leftover.add('$key: $value');
           }
         });
         if (leftover.isNotEmpty) {
           setState(() {
-            final base = _descriptionController.text.isNotEmpty ? '${_descriptionController.text}\n\n' : '';
-            _descriptionController.text = '$base--- ${l10n.technicalDetailsTitle} ---\n${leftover.join('\n')}';
+            final base = _descriptionController.text.isNotEmpty
+                ? '${_descriptionController.text}\n\n'
+                : '';
+            _descriptionController.text =
+                '$base--- ${l10n.technicalDetailsTitle} ---\n${leftover.join('\n')}';
           });
         }
 
-        ToastService.success(l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''));
+        ToastService.success(
+          l10n.itemImportedSuccessfully(enrichedData['name']?.toString() ?? ''),
+        );
       }
     } catch (e) {
       ToastService.error(l10n.couldNotCompleteImport);
@@ -414,30 +445,6 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     return parts.join(' • ');
   }
 
-  Widget? _buildCandidateLeading(Map<String, dynamic> candidate) {
-    final image = candidate['image']?.toString();
-    if (image == null || image.isEmpty) {
-      return null;
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.network(
-        image,
-        width: 100,
-        height: 100,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => Container(
-          width: 100,
-          height: 100,
-          color: Colors.grey.shade200,
-          alignment: Alignment.center,
-          child: Icon(Icons.image_not_supported, color: Colors.grey.shade500),
-        ),
-      ),
-    );
-  }
-
   Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
     List<Map<String, dynamic>> candidates,
   ) {
@@ -451,18 +458,29 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
             width: 520,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 420),
-              child: ListView.separated(
+              child: GridView.builder(
                 shrinkWrap: true,
                 itemCount: candidates.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, // 3 columns
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.7,
+                ),
                 itemBuilder: (context, index) {
                   final candidate = candidates[index];
                   final subtitle = _buildCandidateSubtitle(candidate);
-                  return ListTile(
-                    leading: _buildCandidateLeading(candidate),
-                    title: Text(candidate['name']?.toString() ?? l10n.unnamedLabel),
-                    subtitle: subtitle.isEmpty ? null : Text(subtitle),
-                    onTap: () => Navigator.of(dialogContext).pop(candidate),
+
+                  return CandidateCard(
+                    candidate: candidate,
+                    subtitle: subtitle,
+                    isSelected: selectedId == candidate['id'],
+                    onTap: () {
+                      setState(() {
+                        selectedId = candidate['id'];
+                      });
+                      Navigator.of(dialogContext).pop(candidate);
+                    },
                   );
                 },
               ),
@@ -829,8 +847,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                           nameController: _nameController,
                           descriptionController: _descriptionController,
                           nameSuggestions: nameSuggestions,
-                            nameAutocompleteFocusNode:
-                              _nameAutocompleteFocusNode,
+                          nameAutocompleteFocusNode: _nameAutocompleteFocusNode,
                           availableLocations: liveLocations,
                           selectedLocationId: _selectedLocationId,
                           onLocationChanged: (v) =>
@@ -877,7 +894,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       // ── Fila 4: Especificaciones (full width si hay campos) ──
                       specsBento: _assetType!.fieldDefinitions.isNotEmpty
                           ? BentoBoxWidget(
-                            title: l10n.specificationsTitle,
+                              title: l10n.specificationsTitle,
                               icon: Icons.list_alt,
                               child: CustomFieldsSectionWidget(
                                 fieldDefinitions: _assetType!.fieldDefinitions,
