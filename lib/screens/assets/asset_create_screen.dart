@@ -251,6 +251,16 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       ToastService.error(l10n.typeSomethingToSearch);
       return;
     }
+    // Construye un mapa con los campos dropdown y sus opciones disponibles
+    final Map<String, List<String>> dropdownContext = {};
+    for (final fieldDef in _assetType!.fieldDefinitions) {
+      if (fieldDef.type == CustomFieldType.dropdown) {
+        final options = _listFieldValues[fieldDef.id!] ?? [];
+        if (options.isNotEmpty) {
+          dropdownContext[fieldDef.name] = options;
+        }
+      }
+    }
     setState(() => _isEnrichLoading = true);
     try {
       final locale = Localizations.localeOf(context).languageCode;
@@ -258,6 +268,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         query: query,
         source: _selectedSource!,
         locale: locale,
+        dropdownContext: dropdownContext
       );
 
       if (enrichedData != null && enrichedData['multipleResults'] == true) {
@@ -313,46 +324,50 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         );
         final Set<String> usedAiKeys = {};
 
-        for (final fieldDef in _assetType!.fieldDefinitions) {
-          // Find AI key that matches this field name (case-insensitive)
-          final matchEntry = aiFields.entries.firstWhere(
-            (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
-            orElse: () => const MapEntry('', null),
-          );
-          if (matchEntry.value != null) {
-            usedAiKeys.add(matchEntry.key);
-            final val = matchEntry.value;
-            if (fieldDef.type == CustomFieldType.boolean) {
-              _booleanFieldValues[fieldDef.id!] = (val is bool)
-                  ? val
-                  : val.toString().toLowerCase() == 'true';
-            } else if (fieldDef.type == CustomFieldType.dropdown) {
-              final options = _listFieldValues[fieldDef.id] ?? [];
-              final match = options.firstWhere(
-                (o) => o.toLowerCase() == val.toString().toLowerCase(),
-                orElse: () => '',
-              );
-              if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
-            } else {
-              _customControllers[fieldDef.id]?.text = val?.toString() ?? '';
+        setState(() {
+          for (final fieldDef in _assetType!.fieldDefinitions) {
+            final matchEntry = aiFields.entries.firstWhere(
+              (e) => e.key.toLowerCase() == fieldDef.name.toLowerCase(),
+              orElse: () => const MapEntry('', null),
+            );
+            if (matchEntry.value != null) {
+              usedAiKeys.add(matchEntry.key);
+              final val = matchEntry.value;
+              if (fieldDef.type == CustomFieldType.boolean) {
+                _booleanFieldValues[fieldDef.id!] = (val is bool)
+                    ? val
+                    : val.toString().toLowerCase() == 'true';
+              } else if (fieldDef.type == CustomFieldType.dropdown) {
+                final options = _listFieldValues[fieldDef.id!] ?? [];
+                final match = options.firstWhere(
+                  (o) =>
+                      o.toLowerCase().contains(val.toString().toLowerCase()) ||
+                      val.toString().toLowerCase().contains(o.toLowerCase()),
+                  orElse: () => '',
+                );
+                if (match.isNotEmpty) _selectedListValues[fieldDef.id!] = match;
+              } else {
+                _customControllers[fieldDef.id!]?.text = val?.toString() ?? '';
+              }
+              _highlightedFields.add(fieldDef.name);
             }
-            _highlightedFields.add(fieldDef.name);
           }
-        }
+        });
 
         // 3) Collect unmapped keys (exclude dropdowns from being mappable here)
         final Map<String, dynamic> unmapped = {};
         aiFields.forEach((key, value) {
           if (key.toLowerCase() == 'external_id') return;
           final alreadyMapped = usedAiKeys.contains(key);
-          if (alreadyMapped) return;
+          //if (alreadyMapped) return;
+          if (!alreadyMapped) unmapped[key] = value;
           // if key doesn't match any non-dropdown field name, add to unmapped
-          final hasNonDropdownMatch = _assetType!.fieldDefinitions.any(
+          /*final hasNonDropdownMatch = _assetType!.fieldDefinitions.any(
             (f) =>
                 f.type != CustomFieldType.dropdown &&
                 f.name.toLowerCase() == key.toLowerCase(),
           );
-          if (!hasNonDropdownMatch) unmapped[key] = value;
+          if (!hasNonDropdownMatch) unmapped[key] = value;*/
         });
 
         // 4) If unmapped exist, show mapping dialog for non-dropdown fields
