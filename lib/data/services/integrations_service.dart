@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
@@ -24,9 +26,7 @@ class IntegrationService {
         debugPrint("Status Code: ${e.response?.statusCode}");
       }
       if (kDebugMode) {
-        debugPrint(
-        "Error data: ${e.response?.data}",
-      );
+        debugPrint("Error data: ${e.response?.data}");
       } // <--- This will show the real backend error
       return {
         'success': false,
@@ -74,12 +74,19 @@ class IntegrationService {
     required String query,
     required String source,
     String locale = "es",
+    Map<String, List<String>>? dropdownContext,
   }) async {
     try {
       // Call to endpoint: /api/integrations/enrich?query=...&source=...&locale=...
       final response = await _dio.get(
         '/integrations/enrich',
-        queryParameters: {'query': query, 'source': source, 'locale': locale},
+        queryParameters: {
+          'query': query,
+          'source': source,
+          'locale': locale,
+          if (dropdownContext != null)
+            'fieldOptions': jsonEncode(dropdownContext),
+        },
       );
 
       // Verify backend structure { success: true, data: { ... } }
@@ -90,8 +97,7 @@ class IntegrationService {
       return null;
     } on DioException catch (e) {
       // Capture specific errors (404 not found, 412 missing API Key, etc.)
-      final errorMessage =
-          e.response?.data['error'] ?? 'Error enriching item';
+      final errorMessage = e.response?.data['error'] ?? 'Error enriching item';
       debugPrint("[ENRICH-SERVICE-ERROR]: $errorMessage");
 
       // Throw the exception so UI (ToastService) can show the real message
