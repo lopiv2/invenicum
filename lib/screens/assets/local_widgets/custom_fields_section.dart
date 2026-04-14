@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:invenicum/core/utils/asset_form_utils.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -48,14 +49,17 @@ class CustomFieldsSectionWidget extends StatelessWidget {
       return CardSectionWidget(
         child: Row(
           children: [
-            Icon(Icons.tune_outlined,
-                color: colorScheme.onSurfaceVariant, size: 20),
+            Icon(
+              Icons.tune_outlined,
+              color: colorScheme.onSurfaceVariant,
+              size: 20,
+            ),
             const SizedBox(width: 12),
             Text(
               l10n.noCustomFields,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ],
         ),
@@ -79,9 +83,69 @@ class CustomFieldsSectionWidget extends StatelessWidget {
               return _buildDropdownField(context, fieldDef);
             }
 
+            if (fieldDef.type == CustomFieldType.date) {
+              return _buildDateField(
+                context,
+                fieldDef,
+                customControllers.putIfAbsent(
+                  fieldDef.id!,
+                  () => TextEditingController(),
+                ),
+              );
+            }
+
             return _buildTextField(context, fieldDef);
-          }).toList(),
+          }),
         ],
+      ),
+    );
+  }
+
+  Widget _buildDateField(
+    BuildContext context,
+    CustomFieldDefinition fieldDef,
+    TextEditingController controller,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
+    Future<void> pickDate() async {
+      final now = DateTime.now();
+
+      DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: now,
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2100),
+        locale: Localizations.localeOf(context),
+      );
+
+      if (picked != null) {
+        final formatted = AppUtils.formatDate(context, picked);
+
+        controller.text = formatted;
+        onControllerText(fieldDef.id!, controller);
+      }
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: GestureDetector(
+        onTap: pickDate,
+        child: AbsorbPointer(
+          child: CommonFormField(
+            controller: controller,
+            label: fieldDef.name,
+            icon: Icons.calendar_today_outlined,
+            hint: 'DD/MM/YYYY',
+            helper: fieldDef.isRequired ? 'Obligatorio' : null,
+            validator: (value) {
+              if (fieldDef.isRequired && (value == null || value.isEmpty)) {
+                return l10n.requiredFieldValidation;
+              }
+              return null;
+            },
+          ),
+        ),
       ),
     );
   }
@@ -111,10 +175,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
           subtitle: fieldDef.isRequired
               ? Text(
                   l10n.optional,
-                  style: TextStyle(
-                    color: colorScheme.primary,
-                    fontSize: 12,
-                  ),
+                  style: TextStyle(color: colorScheme.primary, fontSize: 12),
                 )
               : null,
           value: booleanFieldValues[fieldDef.id] ?? false,
@@ -151,8 +212,10 @@ class CustomFieldsSectionWidget extends StatelessWidget {
         helperMaxLines: 2,
         filled: true,
         fillColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.10),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
@@ -187,10 +250,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(14),
         items: values.map((value) {
-          return DropdownMenuItem<String>(
-            value: value,
-            child: Text(value),
-          );
+          return DropdownMenuItem<String>(value: value, child: Text(value));
         }).toList(),
         onChanged: (newValue) {
           onDropdownChanged(fieldDef.id!, newValue);
@@ -205,18 +265,17 @@ class CustomFieldsSectionWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(
-    BuildContext context,
-    CustomFieldDefinition fieldDef,
-  ) {
+  Widget _buildTextField(BuildContext context, CustomFieldDefinition fieldDef) {
     final controller = customControllers[fieldDef.id];
     final preferences = context.read<PreferencesProvider>();
 
     if (controller == null) return const SizedBox.shrink();
 
-    final inputFormatters = AssetFormUtils.getInputFormatters(fieldDef.type) ?? [];
+    final inputFormatters =
+        AssetFormUtils.getInputFormatters(fieldDef.type) ?? [];
 
-    final suggestions = (autocompleteSuggestionsByField[fieldDef.id] ?? const <String>[]);
+    final suggestions =
+        (autocompleteSuggestionsByField[fieldDef.id] ?? const <String>[]);
     final autocompleteFocusNode = autocompleteFocusNodesByField[fieldDef.id];
 
     String? validator(String? value) {
@@ -305,19 +364,15 @@ class CustomFieldsSectionWidget extends StatelessWidget {
                   );
                 onControllerText(fieldDef.id!, controller);
               },
-              fieldViewBuilder: (
-                context,
-                textController,
-                focusNode,
-                onFieldSubmitted,
-              ) {
-                return buildBaseField(
-                  effectiveController: textController,
-                  focusNode: focusNode,
-                  onFieldSubmitted: (_) => onFieldSubmitted(),
-                  suffixIcon: const Icon(Icons.history_outlined, size: 18),
-                );
-              },
+              fieldViewBuilder:
+                  (context, textController, focusNode, onFieldSubmitted) {
+                    return buildBaseField(
+                      effectiveController: textController,
+                      focusNode: focusNode,
+                      onFieldSubmitted: (_) => onFieldSubmitted(),
+                      suffixIcon: const Icon(Icons.history_outlined, size: 18),
+                    );
+                  },
             ),
     );
   }

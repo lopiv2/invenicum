@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetMetadataSection extends StatelessWidget {
@@ -17,7 +18,7 @@ class AssetMetadataSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
+    final locale = Localizations.localeOf(context).toString();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -29,9 +30,9 @@ class AssetMetadataSection extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 l10n.additionalInformation,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -40,16 +41,35 @@ class AssetMetadataSection extends StatelessWidget {
           spacing: 12,
           runSpacing: 12,
           children: [
-            if (createdAt != null) _buildChip(context, Icons.access_time, l10n.createdAt, _formatDate(createdAt!)),
-            if (updatedAt != null) _buildChip(context, Icons.update, l10n.updatedAt, _formatDate(updatedAt!)),
-            if (assetId != null) _buildChip(context, Icons.tag, 'ID', assetId!, isId: true),
+            if (createdAt != null)
+              _buildChip(
+                context,
+                Icons.access_time,
+                l10n.createdAt,
+                AppUtils.formatDate(context, createdAt!),
+              ),
+            if (updatedAt != null)
+              _buildChip(
+                context,
+                Icons.update,
+                l10n.updatedAt,
+                AppUtils.formatDate(context, updatedAt!),
+              ),
+            if (assetId != null)
+              _buildChip(context, Icons.tag, 'ID', assetId!, isId: true),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildChip(BuildContext context, IconData icon, String label, String value, {bool isId = false}) {
+  Widget _buildChip(
+    BuildContext context,
+    IconData icon,
+    String label,
+    String value, {
+    bool isId = false,
+  }) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
@@ -99,13 +119,5 @@ class AssetMetadataSection extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDate(DateTime dateTime) {
-    try {
-      return DateFormat('dd/MM/yyyy HH:mm').format(dateTime);
-    } catch (e) {
-      return dateTime.toString().substring(0, 19);
-    }
   }
 }

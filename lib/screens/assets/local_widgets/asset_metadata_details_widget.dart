@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
@@ -14,18 +15,19 @@ class AssetMetadataWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final locale = Localizations.localeOf(context).toString();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildMetaRow(
           l10n.createdAt, 
-          _formatDate(item.createdAt),
+          AppUtils.formatDate(context, item.createdAt!),
           Icons.calendar_today_rounded,
         ),
         const SizedBox(height: 12),
         _buildMetaRow(
           l10n.updatedAt, 
-          _formatDate(item.updatedAt),
+          AppUtils.formatDate(context, item.updatedAt!),
           Icons.update_rounded,
         ),
         const SizedBox(height: 12),
@@ -36,12 +38,6 @@ class AssetMetadataWidget extends StatelessWidget {
         ),
       ],
     );
-  }
-
-  String _formatDate(DateTime? date) {
-    if (date == null) return "—";
-    // Podrías usar el package 'intl' aquí si prefieres formatos más complejos
-    return "${date.day}/${date.month}/${date.year}";
   }
 
   Widget _buildMetaRow(String label, String value, IconData icon) {
