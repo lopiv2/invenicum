@@ -25,8 +25,9 @@ class AppUtils {
     if (!await launchUrl(uri)) throw 'No se pudo abrir el correo';
   }
 
-  /// 📅 Formatea una fecha de forma legible (ej: 10 Feb 2026)
-  static String formatDate(DateTime date, {String locale = 'es'}) {
+  ///  Format a date in a readable way (e.g., Feb 10, 2026)
+  static String formatDate(BuildContext context, DateTime date) {
+    final locale = Localizations.localeOf(context).toString();
     return DateFormat.yMMMd(locale).format(date);
   }
 
