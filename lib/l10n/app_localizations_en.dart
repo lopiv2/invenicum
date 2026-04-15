@@ -785,6 +785,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get primaryImage => 'Primary Image';
 
   @override
+  String get processing => 'Processing...';
+
+  @override
   String get productUrlLabel => 'Product URL';
 
   @override
@@ -2596,7 +2599,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String possessionCountLabel(int count) {
-    return 'Possession: $count';
+    return 'Owned: $count';
   }
 
   @override

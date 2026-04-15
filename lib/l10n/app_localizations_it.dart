@@ -793,6 +793,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get primaryImage => 'Immagine principale';
 
   @override
+  String get processing => 'Elaborazione...';
+
+  @override
   String get productUrlLabel => 'URL del prodotto';
 
   @override

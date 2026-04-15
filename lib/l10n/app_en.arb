@@ -356,7 +356,7 @@
   "ignoreField": "🚫 Ignore Field",
   "importAssetsTo": "Import Assets To",
   "importSuccessMessage": "Import Successful! {count} assets created.",
-  "importSerializedWarning": "Import successful. This asset type is serialized \u2014 all items were created with quantity 1.",
+  "importSerializedWarning": "Import successful. This asset type is serialized — all items were created with quantity 1.",
   "integrations": "Integrations",
   "integrationGeminiDesc": "Connect Invenicum with Google's Gemini to leverage advanced AI capabilities in managing your inventory.",
   "integrationTelegramDesc": "Connect Invenicum with Telegram to receive instant notifications about your inventory directly on your device.",
@@ -437,6 +437,7 @@
   "previewPDF": "Preview",
   "previous": "Previous",
   "primaryImage": "Primary Image",
+  "processing": "Processing...",
   "productUrlLabel": "Product URL",
   "quantity": "Quantity",
   "refresh": "Refresh data",
@@ -1186,7 +1187,9 @@
   "profileGithubDefaultMissingKeys": "GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET",
   "@profileGithubOAuthNotConfigured": {
     "placeholders": {
-      "missing": { "type": "String" }
+      "missing": {
+        "type": "String"
+      }
     }
   },
   "profileGithubOAuthNotConfigured": "GitHub OAuth not configured. Missing: {missing}. Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET in the backend and restart the server.",
@@ -1399,7 +1402,7 @@
       }
     }
   },
-  "possessionCountLabel": "Possession: {count}",
+  "possessionCountLabel": "Owned: {count}",
   "@desiredCountLabel": {
     "placeholders": {
       "count": {

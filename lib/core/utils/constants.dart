@@ -6,16 +6,16 @@ import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 
 enum ItemCondition {
-  mint, // Impecable, en caja original
-  loose, // Sin caja, pero completo
-  incomplete, // Le faltan piezas
-  damaged, // Roto o con marcas claras
-  new_, // Nuevo de tienda
-  digital, // Bien no tangible
+  mint, // Mint, inside box, like new
+  loose, // Loose, without box, but complete
+  incomplete, // Missing pieces
+  damaged, // Broken or with clear marks
+  new_, // New from store
+  digital, // Non-tangible item
 }
 
 extension ItemConditionExtension on ItemCondition {
-  /// Traducciones automáticas desde los archivos .arb
+  /// Automatic translations from .arb files
   String getLocalizedString(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -35,7 +35,7 @@ extension ItemConditionExtension on ItemCondition {
     }
   }
 
-  /// Icono representativo de cada estado
+  /// Representative icon for each condition
   IconData get icon {
     switch (this) {
       case ItemCondition.mint:
@@ -53,7 +53,7 @@ extension ItemConditionExtension on ItemCondition {
     }
   }
 
-  /// Color temático asociado al estado
+  /// Thematic color associated with the condition
   Color get color {
     switch (this) {
       case ItemCondition.mint:
@@ -71,10 +71,10 @@ extension ItemConditionExtension on ItemCondition {
     }
   }
 
-  /// Helper para convertir String de DB a Enum
+  /// Helper to convert String from DB to Enum
   static ItemCondition fromString(String? value) {
     if (value == null) return ItemCondition.loose;
-    // Manejo especial para 'new' ya que el enum usa 'new_' por ser palabra reservada
+    // Special handling for 'new' since the enum uses 'new_' due to reserved word
     if (value == 'new' || value == 'new_') return ItemCondition.new_;
 
     return ItemCondition.values.firstWhere(
@@ -85,7 +85,7 @@ extension ItemConditionExtension on ItemCondition {
 }
 
 class AppIntegrations {
-  // IDs Únicos (Los que entiende el Backend)
+  // Unique IDs (The ones understood by the Backend)
   static const String gemini = 'gemini';
   static const String openai = 'openai';
   static const String claude = 'claude';
@@ -98,12 +98,12 @@ class AppIntegrations {
   static const String pokemon = 'pokemon';
   static const String tcgdex = 'tcgdex';
 
-  /// Retorna la lista de modelos completa para la UI
+  /// Returns the complete list of models for the UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
     return [
-      // --- IA ---
+      // --- AI ---
       IntegrationModel(
         id: gemini,
         name: 'Google Gemini AI',
@@ -172,7 +172,7 @@ class AppIntegrations {
         ],
       ),
 
-      // --- MENSAJERÍA ---
+      // --- MESSAGING ---
       IntegrationModel(
         id: telegram,
         name: 'Telegram Bot',
@@ -181,13 +181,13 @@ class AppIntegrations {
         description: l10n.integrationTelegramDesc,
         fields: [
           IntegrationField(
-            id: 'botToken', // Antes 'bot_token'
+            id: 'botToken', // Previously 'bot_token'
             label: 'Bot Token',
             type: IntegrationFieldType.password,
             helperText: l10n.integrationTelegramBotTokenHint,
           ),
           IntegrationField(
-            id: 'chatId', // Antes 'chat_id'
+            id: 'chatId', // Previously 'chat_id'
             label: 'Chat ID',
             type: IntegrationFieldType.text,
             helperText: l10n.integrationTelegramChatIdHint,
@@ -202,7 +202,7 @@ class AppIntegrations {
         description: l10n.integrationEmailDesc,
         fields: [
           IntegrationField(
-            id: 'apiKey', // sensitiveIds lo ocultará automáticamente
+            id: 'apiKey', // sensitiveIds will automatically hide it
             label: 'Resend API Key',
             type: IntegrationFieldType.password,
             helperText: l10n.integrationEmailApiKeyHint,
@@ -221,7 +221,7 @@ class AppIntegrations {
         name: 'BoardGameGeek',
         isDataSource: true,
         image: Image.asset(
-          'assets/images/powered_by_BGG_02_MED.png', // Tu ruta de asset
+          'assets/images/powered_by_BGG_02_MED.png', // Your asset path
           height: 35,
         ),
         icon: const FaIcon(FontAwesomeIcons.boardGameGeek, color: Colors.red),
@@ -245,7 +245,7 @@ class AppIntegrations {
         fields: [],
       ),
 
-      // --- HERRAMIENTAS ---
+      // --- TOOLS ---
       /*IntegrationModel(
         id: qrLabels,
         name: l10n.integrationQrGeneratorName,
@@ -286,7 +286,7 @@ class AppIntegrations {
         icon: FaIcon(FontAwesomeIcons.barcode),
         description: l10n.integrationUpcitemdbDesc,
         fields: [
-          // Campo para que el usuario pegue su API Key de UPCitemdb
+          // Field for the user to paste their UPCitemdb API Key
           IntegrationField(
             id: 'apiKey',
             label: 'API Key (user_key)',
@@ -298,20 +298,20 @@ class AppIntegrations {
   }
 }
 
-// ── Modelos de IA disponibles (espejo de aiConstants.js) ─────────────────────
+// ── Available AI Models (mirror of aiConstants.js) ─────────────────────
 class AiModelInfo {
   final String id;
   final String label;
   const AiModelInfo({required this.id, required this.label});
 }
 
-// Metadata visual de cada proveedor — única fuente de verdad para
-// iconos, colores y labels usados en la UI (IntegrationsScreen,
+// Visual metadata for each provider — single source of truth for
+// icons, colors, and labels used in the UI (IntegrationsScreen,
 // AiProviderCardWidget, etc.)
 class AiProviderInfo {
   final String id;
   final String label;
-  final Widget icon; // Widget para soportar Icon y FaIcon
+  final Widget icon; // Widget to support both Icon and FaIcon
   final Color color;
   const AiProviderInfo({
     required this.id,
@@ -322,7 +322,7 @@ class AiProviderInfo {
 }
 
 class AiModels {
-  // ── Listas de modelos ─────────────────────────────────────────────────────
+  // ── Lists of models ─────────────────────────────────────────────────────
   static const List<AiModelInfo> gemini = [
     AiModelInfo(
       id: 'gemini-3-flash-preview',
@@ -345,7 +345,7 @@ class AiModels {
     AiModelInfo(id: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5'),
   ];
 
-  // ── Metadata visual de proveedores ────────────────────────────────────────
+  // ── Visual metadata for providers ────────────────────────────────────────
   static const List<AiProviderInfo> providers = [
     AiProviderInfo(
       id: AppIntegrations.gemini,
@@ -367,13 +367,13 @@ class AiModels {
     ),
   ];
 
-  /// Devuelve el AiProviderInfo de un proveedor por su ID
+  /// Returns the AiProviderInfo of a provider by its ID
   static AiProviderInfo providerInfo(String providerId) => providers.firstWhere(
     (p) => p.id == providerId,
     orElse: () => providers.first,
   );
 
-  /// Todos los modelos de un proveedor dado por su ID string
+  /// Returns all models of a provider given its ID string
   static List<AiModelInfo> forProvider(String provider) {
     switch (provider) {
       case 'openai':
@@ -386,7 +386,7 @@ class AiModels {
     }
   }
 
-  /// Modelo por defecto de un proveedor
+  /// Default model for a provider
   static String defaultFor(String provider) => forProvider(provider).first.id;
 }
 
@@ -427,7 +427,7 @@ class AppSlots {
 }
 
 class AppAchievements {
-  // IDs para evitar errores de escritura (Hardcoded IDs)
+  // IDs to avoid typos (Hardcoded IDs)
   static const String firstItem = 'first_item';
   static const String catalogerSmall = 'cataloger_small';
   static const String catalogerMedium = 'cataloger_medium';
@@ -449,158 +449,158 @@ class AppAchievements {
   static const String forecaster = 'forecaster';
   static const String masterUser = 'master_user';
 
-  /// Retorna la lista oficial de los 20 logros de Invenicum
+  /// Returns the official list of the 20 Invenicum achievements
   static List<AchievementDefinition> getDefinitions(BuildContext context) {
-    // Nota: Aquí podrías usar AppLocalizations.of(context) si quieres traducirlos
+    // Note: Here you could use AppLocalizations.of(context) if you want to translate them
     return const [
-      // --- COLECCIONISMO ---
+      // --- COLLECTION ---
       AchievementDefinition(
         id: firstItem,
-        title: 'Bienvenido a la Mansión',
-        desc: 'Añade tu primer objeto al inventario',
+        title: 'Welcome to the Mansion',
+        desc: 'Add your first item to the inventory',
         icon: Icons.home_repair_service_outlined,
         category: 'collection',
       ),
       AchievementDefinition(
         id: catalogerSmall,
-        title: 'Pequeño Almacén',
-        desc: 'Registra 10 objetos en total',
+        title: 'Small Warehouse',
+        desc: 'Register 10 items in your collectiontotal',
         icon: Icons.inventory_2_outlined,
         category: 'collection',
       ),
       AchievementDefinition(
         id: catalogerMedium,
-        title: 'Curador de Museo',
-        desc: 'Registra 50 objetos en tu colección',
+        title: 'Museum Curator',
+        desc: 'Register 50 items in your collection',
         icon: Icons.account_balance_outlined,
         category: 'collection',
       ),
       AchievementDefinition(
         id: catalogerLarge,
-        title: 'Dueño de un Imperio',
-        desc: 'Registra 200 objetos (Nivel Legendario)',
+        title: 'Owner of an Empire',
+        desc: 'Register 200 items (Legendary Level)',
         icon: Icons.fort_outlined,
         category: 'collection',
         isLegendary: true,
       ),
       AchievementDefinition(
         id: orderMaster,
-        title: 'Orden Absoluto',
-        desc: 'Asigna una ubicación física a 20 objetos',
+        title: 'Absolute Order',
+        desc: 'Assign a physical location to 20 items',
         icon: Icons.shelves,
         category: 'collection',
       ),
 
-      // --- MERCADO ---
+      // --- MARKET ---
       AchievementDefinition(
         id: eyeForValue,
-        title: 'Ojo para el Valor',
-        desc: 'Registra el precio de compra de 5 objetos',
+        title: 'Eye for Value',
+        desc: 'Register the purchase price of 5 items',
         icon: Icons.visibility_outlined,
         category: 'market',
       ),
       AchievementDefinition(
         id: firstGrail,
-        title: 'Primer "Grial"',
-        desc: 'Añade un objeto que valga más de 100€',
+        title: 'First "Grail"',
+        desc: 'Add an item worth more than 100€',
         icon: Icons.workspace_premium_outlined,
         category: 'market',
       ),
       AchievementDefinition(
         id: museumPiece,
-        title: 'Pieza de Museo',
-        desc: 'Añade un objeto de más de 500€',
+        title: 'Museum Piece',
+        desc: 'Add an item worth more than 500€',
         icon: Icons.diamond_outlined,
         category: 'market',
         isLegendary: true,
       ),
       AchievementDefinition(
         id: growingWealth,
-        title: 'Patrimonio Creciente',
-        desc: 'Tu inventario total supera los 1.000€',
+        title: 'Growing Wealth',
+        desc: 'Your total inventory exceeds 1,000€',
         icon: Icons.trending_up_rounded,
         category: 'market',
       ),
       AchievementDefinition(
         id: wallStreetWolf,
-        title: 'El Lobo de Wall Street',
-        desc: 'Tu inventario total supera los 10.000€',
+        title: 'Wall Street Wolf',
+        desc: 'Your total inventory exceeds 10,000€',
         icon: Icons.query_stats_rounded,
         category: 'market',
         isLegendary: true,
       ),
       AchievementDefinition(
         id: bargainHunter,
-        title: 'Caza-Gangas',
-        desc: 'Registra un objeto que valga el doble de lo que pagaste',
+        title: 'Bargain Hunter',
+        desc: 'Register an item worth double what you paid',
         icon: Icons.auto_graph_rounded,
         category: 'market',
       ),
 
-      // --- PRÉSTAMOS ---
+      // --- LOANS ---
       AchievementDefinition(
         id: blindTrust,
-        title: 'Confianza Ciega',
-        desc: 'Realiza tu primer préstamo a un contacto',
+        title: 'Blind Trust',
+        desc: 'Make your first loan to a contact',
         icon: Icons.handshake_outlined,
         category: 'loans',
       ),
       AchievementDefinition(
         id: librarian,
-        title: 'Bibliotecario',
-        desc: 'Gestiona 3 préstamos activos simultáneamente',
+        title: 'Librarian',
+        desc: 'Manage 3 active loans simultaneously',
         icon: Icons.menu_book_rounded,
         category: 'loans',
       ),
       AchievementDefinition(
         id: allInOrder,
-        title: 'Todo en Orden',
-        desc: 'Recupera y marca como devuelto un objeto prestado',
+        title: 'All in Order',
+        desc: 'Retrieve and mark a loaned item as returned',
         icon: Icons.assignment_turned_in_outlined,
         category: 'loans',
       ),
       AchievementDefinition(
         id: legendaryLender,
-        title: 'Prestamista Legendario',
-        desc: 'Completa 20 préstamos con éxito',
+        title: 'Legendary Lender',
+        desc: 'Complete 20 loans successfully',
         icon: Icons.verified_user_outlined,
         category: 'loans',
         isLegendary: true,
       ),
 
-      // --- HERRAMIENTAS E IA ---
+      // --- TOOLS AND AI ---
       AchievementDefinition(
         id: cyberCollector,
-        title: 'Ciber-Coleccionista',
-        desc: 'Identifica un objeto usando la IA por primera vez',
+        title: 'Cyber Collector',
+        desc: 'Identify an item using AI for the first time',
         icon: Icons.psychology_outlined,
         category: 'tools',
       ),
       AchievementDefinition(
         id: hawkEye,
-        title: 'Ojo de Halcón',
-        desc: 'Usa Gemini para identificar 15 objetos',
+        title: 'Hawk Eye',
+        desc: 'Use Gemini to identify 15 items',
         icon: Icons.camera_enhance_outlined,
         category: 'tools',
       ),
       AchievementDefinition(
         id: polyglot,
-        title: 'Políglota',
-        desc: 'Cambia la divisa global de la aplicación',
+        title: 'Polyglot',
+        desc: 'Change the global currency of the app',
         icon: Icons.currency_exchange_rounded,
         category: 'tools',
       ),
       AchievementDefinition(
         id: forecaster,
-        title: 'Previsor',
-        desc: 'Activa 3 alertas de mantenimiento diferentes',
+        title: 'Forecaster',
+        desc: 'Activate 3 different maintenance alerts',
         icon: Icons.fmd_bad_outlined,
         category: 'tools',
       ),
       AchievementDefinition(
         id: masterUser,
-        title: 'Usuario Maestro',
-        desc: 'Personaliza el orden de tus notificaciones',
+        title: 'Master User',
+        desc: 'Customize the order of your notifications',
         icon: Icons.reorder_rounded,
         category: 'tools',
       ),

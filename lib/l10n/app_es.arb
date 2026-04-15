@@ -437,6 +437,7 @@
   "previewPDF": "Vista Previa",
   "previous": "Anterior",
   "primaryImage": "Imagen Principal",
+  "processing": "Procesando...",
   "productUrlLabel": "URL del producto",
   "quantity": "Cantidad",
   "refresh": "Recargar datos",
@@ -1186,7 +1187,9 @@
   "profileGithubDefaultMissingKeys": "GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET",
   "@profileGithubOAuthNotConfigured": {
     "placeholders": {
-      "missing": { "type": "String" }
+      "missing": {
+        "type": "String"
+      }
     }
   },
   "profileGithubOAuthNotConfigured": "GitHub OAuth no configurado. Faltan: {missing}. Configura GITHUB_CLIENT_ID y GITHUB_CLIENT_SECRET en el backend y reinicia el servidor.",

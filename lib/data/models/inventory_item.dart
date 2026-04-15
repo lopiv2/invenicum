@@ -4,7 +4,6 @@ import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/data/models/price_history_point.dart';
 
-// --- CLASE PARA LAS IMÁGENES BLINDADA ---
 class InventoryItemImage {
   final int id;
   final String url;
@@ -20,7 +19,6 @@ class InventoryItemImage {
 
   factory InventoryItemImage.fromJson(Map<String, dynamic> json) {
     return InventoryItemImage(
-      // 🛡️ Cambiado 'as int' por protección contra nulos y casts de JS
       id: (json['id'] ?? 0).toInt(),
       url: json['url'] as String? ?? '',
       altText: json['altText'] as String?,
@@ -46,8 +44,6 @@ class InventoryItemImage {
     );
   }
 }
-
-// --- CLASE PRINCIPAL BLINDADA ---
 class InventoryItem {
   final int id;
   final String name;
@@ -67,7 +63,7 @@ class InventoryItem {
   final List<PriceHistoryPoint>? priceHistory;
   ItemCondition condition = ItemCondition.mint;
 
-  // Mercado
+  // Market
   final double marketValue;
   final String currency;
   final double totalMarketValue;
@@ -98,16 +94,16 @@ class InventoryItem {
   });
 
   factory InventoryItem.fromJson(Map<String, dynamic> json) {
-    // 1. Desempaquetado seguro (soporta wrappers del backend)
+    // 1. Safe unpacking (supports backend wrappers)
     final itemData = json['itemData'] ?? json;
 
-    // 2. Custom fields con limpieza de llaves (JS a veces envía ints como keys)
+    // 2. Custom fields with key cleanup (JS sometimes sends ints as keys)
     final Map<String, dynamic>? rawCustomFields =
         itemData['customFieldValues'] is Map
         ? Map<String, dynamic>.from(itemData['customFieldValues'])
         : null;
 
-    // 3. Imágenes con filtrado de nulos y tipos
+    // 3. Images with null and type filtering
     final List<dynamic> imageListJson =
         itemData['images'] as List<dynamic>? ?? [];
     final List<InventoryItemImage> images = imageListJson
@@ -139,7 +135,6 @@ class InventoryItem {
     }
 
     return InventoryItem(
-      // 🛡️ PROTECCIÓN TOTAL CONTRA TIPOS NULOS E INT/DOUBLE EN WEB
       id: (itemData['id'] ?? 0).toInt(),
       name: itemData['name'] as String? ?? 'N/A',
       description: itemData['description'] as String?,
@@ -151,7 +146,7 @@ class InventoryItem {
       containerId: (itemData['containerId'] ?? 0).toInt(),
       assetTypeId: (itemData['assetTypeId'] ?? 0).toInt(),
       priceHistory: history,
-      // Para campos opcionales usamos chequeo de nulidad previo
+      // For optional fields we use prior nullability check
       locationId: itemData['locationId'] != null
           ? (itemData['locationId'] as num).toInt()
           : null,
@@ -186,11 +181,9 @@ class InventoryItem {
     'name': name,
     'description': description,
     'condition': (condition as Enum).name,
-    // Forzamos null si está vacío para evitar el error P2002 de Prisma
     'barcode': (barcode?.trim().isEmpty ?? true) ? null : barcode,
     'serialNumber': (serialNumber?.trim().isEmpty ?? true) ? null : serialNumber,
 
-    // 🔥 CORRECCIÓN CRUCIAL: Añadimos Map.from para que sea un Map real encodable
     'customFieldValues': customFieldValues != null 
         ? Map<String, dynamic>.from(customFieldValues!.map((k, v) => MapEntry(k.toString(), v))) 
         : null,
