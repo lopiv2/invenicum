@@ -1,28 +1,29 @@
 import 'package:graphview/GraphView.dart';
 import 'package:invenicum/data/models/location.dart';
 
-/// Construye un [Graph] a partir de una lista de ubicaciones.
+/// Builds a [Graph] from a list of locations.
 ///
-/// Problema: [BuchheimWalkerConfiguration] / [TidierTreeLayoutAlgorithm]
-/// solo procesa un árbol con una única raíz. Si hay varias ubicaciones sin
-/// padre (múltiples raíces), el algoritmo ignora todas menos la primera.
+/// Problem: [BuchheimWalkerConfiguration] / [TidierTreeLayoutAlgorithm]
+/// only processes a tree with a single root. If there are multiple locations without
+/// a parent (multiple roots), the algorithm ignores all but the first.
 ///
-/// Solución: se añade un **nodo raíz virtual** con id = -1 que conecta todas
-/// las ubicaciones sin padre como hijos directos. El nodo virtual es invisible
-/// en la UI — el builder en LocationsScreen devuelve SizedBox.shrink() para id=-1.
+/// Solution: a **virtual root node** with id = -1 is added, connecting all
+/// rootless locations as direct children. The virtual node is invisible
+/// in the UI — the builder in LocationsScreen returns SizedBox.shrink() for
+/// locations with id=-1.
 Graph buildLocationGraph(List<Location> locations) {
   final graph = Graph()..isTree = true;
 
   if (locations.isEmpty) return graph;
 
-  // Identificamos las raíces reales (ubicaciones sin padre)
+  // We identify the real roots (locations without a parent)
   final rootLocations = locations.where((loc) => loc.parentId == null).toList();
 
-  // Mapa de id → Node para construir las aristas eficientemente
+  // Map of id → Node for efficient edge construction
   final nodeMap = <int, Node>{};
 
-  // Nodo raíz virtual — solo se añade si hay más de una raíz real
-  // (con una sola raíz el grafo funciona sin él)
+  // Virtual root node — only added if there is more than one real root
+  // (with a single root, the graph works without it)
   final bool needsVirtualRoot = rootLocations.length > 1;
   Node? virtualRoot;
 
@@ -31,22 +32,22 @@ Graph buildLocationGraph(List<Location> locations) {
     nodeMap[-1] = virtualRoot;
   }
 
-  // Creamos todos los nodos
+  // Create all nodes
   for (final loc in locations) {
     nodeMap[loc.id] = Node.Id(loc.id);
   }
 
-  // Construimos las aristas
+  // Build edges
   for (final loc in locations) {
     final childNode = nodeMap[loc.id]!;
 
     if (loc.parentId != null) {
-      // Tiene padre real → conectamos padre → hijo
+      // Has a real parent → connect parent → child
       final parentNode = nodeMap[loc.parentId];
       if (parentNode != null) {
         graph.addEdge(parentNode, childNode);
       } else {
-        // Padre no encontrado en la lista (huérfano) — lo tratamos como raíz
+        // Parent not found in the list (orphan) — treat it as a root
         if (needsVirtualRoot) {
           graph.addEdge(virtualRoot!, childNode);
         } else {
@@ -54,12 +55,12 @@ Graph buildLocationGraph(List<Location> locations) {
         }
       }
     } else {
-      // Sin padre → es raíz real
+      // No parent → it's a real root
       if (needsVirtualRoot) {
-        // Conectamos al nodo virtual para unificar todos los árboles
+        // Connect to the virtual node to unify all trees
         graph.addEdge(virtualRoot!, childNode);
       } else {
-        // Única raíz — la añadimos directamente sin virtual
+        // Single root — add it directly without virtual
         graph.addNode(childNode);
       }
     }

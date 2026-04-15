@@ -791,6 +791,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get primaryImage => 'Imagem principal';
 
   @override
+  String get processing => 'Processando...';
+
+  @override
   String get productUrlLabel => 'URL do produto';
 
   @override

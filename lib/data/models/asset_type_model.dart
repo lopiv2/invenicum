@@ -13,7 +13,7 @@ class AssetType {
   final String? possessionFieldId;
   final String? desiredFieldId;
   final bool
-  isSerialized; // true = seriado (quantity = 1), false = no seriado (quantity variable)
+  isSerialized; // true = serialized (quantity = 1), false = non-serialized (quantity variable)
 
   AssetType({
     required this.id,
@@ -22,10 +22,10 @@ class AssetType {
     this.images = const [],
     this.possessionFieldId,
     this.desiredFieldId,
-    this.isSerialized = true, // Por defecto, los elementos son seriados
+    this.isSerialized = true, // By default, items are serialized
   });
 
-  // --- CONSTRUCTOR DE FÁBRICA Y JSON ---
+  // --- FACTORY CONSTRUCTOR AND JSON ---
 
   factory AssetType.fromJson(Map<String, dynamic> json) {
     final List<dynamic> imageListJson = json['images'] as List<dynamic>? ?? [];
@@ -37,7 +37,7 @@ class AssetType {
         )
         .toList();
 
-    // 🔑 Obtener el valor dinámico del JSON (puede ser int, String o null)
+    // 🔑 Get the dynamic value from JSON (can be int, String, or null)
     final possessionIdDynamic =
         json['possessionFieldId'] ?? json['possession_field_id'];
     final desiredIdDynamic = json['desiredFieldId'] ?? json['desired_field_id'];
@@ -57,8 +57,8 @@ class AssetType {
               .toList() ??
           [],
 
-      // 🎯 CORRECCIÓN: Conversión segura: si no es nulo, lo convierte a String.
-      // Si es un int (como el 5 que causó el error), .toString() lo maneja.
+      // 🎯 CORRECTION: Safe conversion: if not null, convert to String.
+      // If it's an int (like the 5 that caused the error), .toString() handles it.
       possessionFieldId: possessionIdDynamic?.toString(),
       desiredFieldId: desiredIdDynamic?.toString(),
     );
@@ -76,10 +76,9 @@ class AssetType {
     };
   }
 
-  // 🌟 MÉTODO copyWith AÑADIDO 🌟
-  /// Crea una copia de esta instancia con los valores proporcionados.
-  /// Los valores nulos en los argumentos (possessionFieldId, desiredFieldId)
-  /// SOBREESCRIBEN el valor actual, ya que son campos opcionales.
+  /// Creates a copy of this instance with the provided values.
+  /// Null values in the arguments (possessionFieldId, desiredFieldId)
+  /// OVERWRITE the current value, as they are optional fields.
   AssetType copyWith({
     int? id,
     String? name,

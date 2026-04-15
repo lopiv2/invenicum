@@ -790,6 +790,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get primaryImage => 'Image principale';
 
   @override
+  String get processing => 'Traitement en cours...';
+
+  @override
   String get productUrlLabel => 'URL du produit';
 
   @override

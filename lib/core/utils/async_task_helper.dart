@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import '../../data/services/toast_service.dart';
 
 Future<T> runAsyncTask<T>(
@@ -10,8 +11,9 @@ Future<T> runAsyncTask<T>(
   Duration delayBeforeLoader = const Duration(milliseconds: 200),
 }) async {
   bool dialogShown = false;
-
-  // Timer para evitar flicker si la operación es rápida
+  final l10n = AppLocalizations.of(context)!;
+  loadingMessage = l10n.processing;
+  // Timer to avoid flicker if the operation is fast
   final timer = Timer(delayBeforeLoader, () {
     if (!context.mounted) return;
 

@@ -21,7 +21,6 @@ class TotalMarketValueWidget extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
-        // Sutil sombra de color para dar profundidad sin ensuciar
         boxShadow: [
           BoxShadow(
             color: Colors.indigo.withValues(alpha:0.15),
@@ -54,7 +53,6 @@ class TotalMarketValueWidget extends StatelessWidget {
             ),
             child: Stack(
               children: [
-                // Círculo decorativo de fondo (Aura cool)
                 Positioned(
                   right: -20,
                   top: -20,
@@ -102,7 +100,6 @@ class TotalMarketValueWidget extends StatelessWidget {
                             ],
                           ),
                         ),
-                        // Badge de porcentaje o estatus (Opcional)
                         Icon(
                           Icons.more_horiz,
                           color: Colors.white.withValues(alpha:0.5),
@@ -127,7 +124,7 @@ class TotalMarketValueWidget extends StatelessWidget {
                         child: PriceDisplayWidget(
                           value: marketValue,
                           style: const TextStyle(
-                            fontSize: 36, // Más grande, más impacto
+                            fontSize: 36,
                             fontWeight: FontWeight.w900,
                             color: Colors.white,
                             letterSpacing: -1,

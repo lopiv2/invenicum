@@ -1522,6 +1522,12 @@ abstract class AppLocalizations {
   /// **'Primary Image'**
   String get primaryImage;
 
+  /// No description provided for @processing.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing...'**
+  String get processing;
+
   /// No description provided for @productUrlLabel.
   ///
   /// In en, this message translates to:
@@ -4783,7 +4789,7 @@ abstract class AppLocalizations {
   /// No description provided for @possessionCountLabel.
   ///
   /// In en, this message translates to:
-  /// **'Possession: {count}'**
+  /// **'Owned: {count}'**
   String possessionCountLabel(int count);
 
   /// No description provided for @desiredCountLabel.
