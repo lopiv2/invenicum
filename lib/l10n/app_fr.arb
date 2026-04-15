@@ -474,6 +474,8 @@
   "settings": "Paramètres",
   "showAsGrid": "Afficher en tant que grille",
   "showAsList": "Afficher sous forme de liste",
+  "sortAsc": "Croissant",
+  "sortDesc": "Décroissant",
   "slotDashboardBottom": "Panneau inférieur du tableau de bord",
   "slotDashboardTop": "Panneau supérieur du tableau de bord",
   "slotFloatingActionButton": "Bouton flottant",

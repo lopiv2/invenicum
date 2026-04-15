@@ -907,6 +907,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get showAsList => 'Afficher sous forme de liste';
 
   @override
+  String get sortAsc => 'Croissant';
+
+  @override
+  String get sortDesc => 'Décroissant';
+
+  @override
   String get slotDashboardBottom => 'Panneau inférieur du tableau de bord';
 
   @override

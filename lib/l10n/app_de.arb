@@ -474,6 +474,8 @@
   "settings": "Einstellungen",
   "showAsGrid": "Als Raster anzeigen",
   "showAsList": "Als Liste anzeigen",
+  "sortAsc": "Aufsteigend",
+  "sortDesc": "Absteigend",
   "slotDashboardBottom": "Dashboard unten",
   "slotDashboardTop": "Dashboard oben",
   "slotFloatingActionButton": "Schwebende Aktionsschaltfläche",

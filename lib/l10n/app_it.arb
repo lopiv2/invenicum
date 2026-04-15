@@ -474,6 +474,8 @@
     "settings":  "Impostazioni",
     "showAsGrid":  "Mostra come griglia",
     "showAsList":  "Mostra come elenco",
+    "sortAsc":  "Crescente",
+    "sortDesc":  "Decrescente",
     "slotDashboardBottom":  "Pannello di controllo inferiore",
     "slotDashboardTop":  "Pannello di controllo superiore",
     "slotFloatingActionButton":  "Pulsante mobile",

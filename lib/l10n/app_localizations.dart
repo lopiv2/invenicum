@@ -1744,6 +1744,18 @@ abstract class AppLocalizations {
   /// **'Show as List'**
   String get showAsList;
 
+  /// No description provided for @sortAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Ascending'**
+  String get sortAsc;
+
+  /// No description provided for @sortDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Descending'**
+  String get sortDesc;
+
   /// No description provided for @slotDashboardBottom.
   ///
   /// In en, this message translates to:

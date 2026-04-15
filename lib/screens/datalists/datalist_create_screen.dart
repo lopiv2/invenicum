@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
-import 'package:provider/provider.dart';
+import 'package:invenicum/screens/datalists/local_widgets/draggable_drag_icon.dart';
+import 'package:invenicum/screens/datalists/local_widgets/sort_buttons.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
 
 class DataListCreateScreen extends StatefulWidget {
   final String containerId;
@@ -46,6 +48,16 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
     });
   }
 
+  void _moveItem(int oldIndex, int newIndex) {
+    setState(() {
+      if (newIndex > oldIndex) {
+        newIndex -= 1;
+      }
+      final item = _items.removeAt(oldIndex);
+      _items.insert(newIndex, item);
+    });
+  }
+
   Future<void> _saveList() async {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
@@ -57,7 +69,6 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
 
     try {
       final provider = context.read<ContainerProvider>();
-      // TODO: Implementar la lógica de guardado en el provider
       await provider.createDataList(
         containerId: int.parse(widget.containerId),
         name: _nameController.text.trim(),
@@ -88,12 +99,36 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // --- TÍTULO ---
-            Text(
-              l10n.newCustomDataListTitle,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+            // --- TÍTULO Y BOTONES ---
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.newCustomDataListTitle,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    FilledButton.icon(
+                      onPressed: _saveList,
+                      icon: const Icon(Icons.save),
+                      label: Text(l10n.saveListLabel),
+                    ),
+                    SizedBox(width: 16),
+                    FilledButton.icon(
+                      onPressed: () => context.goNamed(
+                        RouteNames.dataLists,
+                        pathParameters: {'containerId': widget.containerId},
+                      ),
+                      icon: const Icon(Icons.cancel),
+                      label: Text(l10n.cancel),
+                    ),
+                  ],
+                ),
+              ],
             ),
             const SizedBox(height: 32),
 
@@ -162,8 +197,12 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Lista de elementos
+                    SortButtons(
+                      items: _items,
+                      onChanged: () => setState(() {}),
+                    ),
+                    const SizedBox(height: 12),
+                    // Elements list
                     if (_items.isEmpty)
                       Text(
                         l10n.addElementsToListHint,
@@ -171,46 +210,39 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                       )
                     else
                       Card(
-                        child: ListView.separated(
+                        child: ReorderableListView(
+                          buildDefaultDragHandles: false,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _items.length,
-                          separatorBuilder: (_, _) => const Divider(height: 1),
-                          itemBuilder: (context, index) {
+                          onReorder: _moveItem,
+                          children: _items.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final item = entry.value;
                             return ListTile(
-                              title: Text(_items[index]),
+                              key: ValueKey('$item-$index'),
+                              leading: DraggableDragIcon(
+                                index: index,
+                              ),
+                              title: TextFormField(
+                                initialValue: item,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  _items[index] = value;
+                                },
+                              ),
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete_outline),
                                 onPressed: () => _removeItem(index),
                               ),
                             );
-                          },
+                          }).toList(),
                         ),
                       ),
                   ],
                 ),
               ),
-            ),
-
-            // --- BOTONES DE ACCIÓN ---
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => context.goNamed(
-                    RouteNames.dataLists,
-                    pathParameters: {'containerId': widget.containerId},
-                  ),
-                  child: Text(l10n.cancel),
-                ),
-                const SizedBox(width: 16),
-                FilledButton.icon(
-                  onPressed: _saveList,
-                  icon: const Icon(Icons.save),
-                  label: Text(l10n.saveListLabel),
-                ),
-              ],
             ),
           ],
         ),
@@ -218,3 +250,4 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
     );
   }
 }
+

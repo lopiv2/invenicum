@@ -474,6 +474,8 @@
   "settings": "Settings",
   "showAsGrid": "Show as Grid",
   "showAsList": "Show as List",
+  "sortAsc": "Ascending",
+  "sortDesc": "Descending",
   "slotDashboardBottom": "Bottom Dashboard Panel",
   "slotDashboardTop": "Top Dashboard Panel",
   "slotFloatingActionButton": "Floating Button",

@@ -908,6 +908,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get showAsList => 'Mostrar como Lista';
 
   @override
+  String get sortAsc => 'Ascendente';
+
+  @override
+  String get sortDesc => 'Descendente';
+
+  @override
   String get slotDashboardBottom => 'Panel de control Inferior';
 
   @override
