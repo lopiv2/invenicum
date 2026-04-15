@@ -93,4 +93,16 @@ class AppUtils {
         return CustomFieldType.text;
     }
   }
+
+  /// 🔤 Sorts a list of strings in ascending order (case-insensitive).
+  static List<String> sortAscending(List<String> items) {
+    items.sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    return items;
+  }
+
+  /// 🔤 Sorts a list of strings in descending order (case-insensitive).
+  static List<String> sortDescending(List<String> items) {
+    items.sort((a, b) => b.toLowerCase().compareTo(a.toLowerCase()));
+    return items;
+  }
 }

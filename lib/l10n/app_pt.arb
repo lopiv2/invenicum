@@ -474,6 +474,8 @@
   "settings": "Configurações",
   "showAsGrid": "Mostrar como grade",
   "showAsList": "Mostrar como lista",
+  "sortAsc": "Crescente",
+  "sortDesc": "Decrescente",
   "slotDashboardBottom": "Painel inferior",
   "slotDashboardTop": "Painel superior",
   "slotFloatingActionButton": "Botão flutuante",

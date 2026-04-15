@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
-import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/list_data.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/screens/datalists/local_widgets/draggable_drag_icon.dart';
+import 'local_widgets/sort_buttons.dart';
+import 'package:provider/provider.dart';
 
 class DataListEditScreen extends StatefulWidget {
   final String containerId;
@@ -213,8 +215,12 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                       ],
                     ),
                     const SizedBox(height: 16),
-
-                    // Lista de elementos
+                    SortButtons(
+                      items: _items,
+                      onChanged: () => setState(() {}),
+                    ),
+                    const SizedBox(height: 12),
+                    // Elements list
                     if (_items.isEmpty)
                       Text(
                         l10n.addElementsToListHint,
@@ -223,6 +229,7 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                     else
                       Card(
                         child: ReorderableListView(
+                          buildDefaultDragHandles: false,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           onReorder: _moveItem,
@@ -230,9 +237,19 @@ class _DataListEditScreenState extends State<DataListEditScreen> {
                             final index = entry.key;
                             final item = entry.value;
                             return ListTile(
-                              key: ValueKey(item),
-                              title: Text(item),
-                              leading: const Icon(Icons.drag_handle),
+                              key: ValueKey('$item-$index'),
+                              leading: DraggableDragIcon(
+                                index: index,
+                              ),
+                              title: TextFormField(
+                                initialValue: item,
+                                decoration: const InputDecoration(
+                                  border: InputBorder.none,
+                                ),
+                                onChanged: (value) {
+                                  _items[index] = value;
+                                },
+                              ),
                               trailing: IconButton(
                                 icon: const Icon(Icons.delete_outline),
                                 onPressed: () => _removeItem(index),
