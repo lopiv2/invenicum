@@ -2924,4 +2924,15 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get firstRunCopyright => 'Invenicum ©';
+
+  @override
+  String get addImageFromUrl => 'Adicionar imagem de URL';
+
+  @override
+  String get imageDownloadedSuccessfully => 'Imagem baixada com sucesso';
+
+  @override
+  String errorDownloadingImage(String error) {
+    return 'Erro ao baixar imagem: $error';
+  }
 }

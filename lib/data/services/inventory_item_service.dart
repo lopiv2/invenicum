@@ -99,6 +99,30 @@ class InventoryItemService {
     return InventoryItem.fromJson(response.data);
   }
 
+  /// Descarga una imagen desde URL y la convierte en Data URL Base64.
+  Future<String> downloadImageAsDataUrl(String imageUrl) async {
+    try {
+      // Ask backend to fetch the image server-side to avoid CORS issues
+      // Backend endpoint expected: POST /proxy/image { url: string }
+      final proxyPath = '/items/image-url-to-base64';
+      final response = await _dio.post(
+        proxyPath,
+        data: {'url': imageUrl},
+        options: Options(responseType: ResponseType.bytes),
+      );
+
+      final contentType = response.headers.value('content-type') ?? 'image/jpeg';
+      final bytes = response.data as List<int>;
+      final base64String = base64Encode(bytes);
+      return 'data:$contentType;base64,$base64String';
+    } on DioException catch (e) {
+      // Provide a friendly error message
+      throw Exception('Error descargando la imagen desde el servidor: ${e.message}');
+    } catch (e) {
+      throw Exception('Error descargando la imagen: $e');
+    }
+  }
+
   // ----------------------------------------------------------------------
   // --- 2. CREATE ---
   // ----------------------------------------------------------------------

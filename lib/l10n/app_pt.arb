@@ -1590,5 +1590,15 @@
   "firstRunSuccessTitle": "Conta criada!",
   "firstRunSuccessSubtitle": "Sua conta de administrador está pronta.\nVocê pode fazer login agora.",
   "firstRunAccountCreatedLabel": "CONTA CRIADA",
-  "firstRunCopyright": "Invenicum ©"
+  "firstRunCopyright": "Invenicum ©",
+  "addImageFromUrl": "Adicionar imagem de URL",
+  "imageDownloadedSuccessfully": "Imagem baixada com sucesso",
+  "errorDownloadingImage": "Erro ao baixar imagem: {error}",
+  "@errorDownloadingImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }

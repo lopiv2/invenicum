@@ -1590,5 +1590,15 @@
   "firstRunSuccessTitle": "Konto erstellt!",
   "firstRunSuccessSubtitle": "Ihr Admin-Konto ist bereit.\\nSie können sich jetzt anmelden.",
   "firstRunAccountCreatedLabel": "KONTO ERSTELLT",
-  "firstRunCopyright": "Invenicum ©"
+  "firstRunCopyright": "Invenicum ©",
+  "addImageFromUrl": "Bild von URL hinzufügen",
+  "imageDownloadedSuccessfully": "Bild erfolgreich heruntergeladen",
+  "errorDownloadingImage": "Fehler beim Herunterladen des Bildes: {error}",
+  "@errorDownloadingImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
 }
