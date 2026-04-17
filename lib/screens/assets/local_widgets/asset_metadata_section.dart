@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
@@ -18,7 +17,7 @@ class AssetMetadataSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context).toString();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

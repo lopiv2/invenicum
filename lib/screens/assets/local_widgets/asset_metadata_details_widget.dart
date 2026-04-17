@@ -15,7 +15,6 @@ class AssetMetadataWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final locale = Localizations.localeOf(context).toString();
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [

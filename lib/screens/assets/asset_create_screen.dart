@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:invenicum/data/services/inventory_item_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
@@ -268,7 +269,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         query: query,
         source: _selectedSource!,
         locale: locale,
-        dropdownContext: dropdownContext
+        dropdownContext: dropdownContext,
       );
 
       if (enrichedData != null && enrichedData['multipleResults'] == true) {
@@ -755,6 +756,28 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
   }
 
+  Future<void> _addImageFromUrl(String imageUrl) async {
+    final l10n = AppLocalizations.of(context)!;
+    final inventoryItemService = context.read<InventoryItemService>();
+    try {
+      final dataUrl = await inventoryItemService.downloadImageAsDataUrl(
+        imageUrl,
+      );
+
+      if (mounted) {
+        setState(() {
+          _imagePreviewUrls.add(dataUrl);
+        });
+
+        ToastService.success(l10n.imageDownloadedSuccessfully);
+      }
+    } catch (e) {
+      if (mounted) {
+        ToastService.error(l10n.errorDownloadingImage(e.toString()));
+      }
+    }
+  }
+
   void _showMagicDialog() async {
     final url = await showDialog<String>(
       context: context,
@@ -881,6 +904,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                           onAddImage: _addImage,
                           onRemoveImage: (url) =>
                               setState(() => _imagePreviewUrls.remove(url)),
+                          onAddImageFromUrl: _addImageFromUrl,
                         ),
                       ),
 

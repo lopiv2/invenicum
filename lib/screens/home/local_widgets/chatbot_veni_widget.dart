@@ -267,7 +267,7 @@ class _VeniChatbotState extends State<VeniChatbot> {
                 actions: [
                   IconButton(
                     icon: const Icon(Icons.close, color: Colors.white),
-                    onPressed: widget.onClose, // USA EL CALLBACK, NO EL POP
+                    onPressed: widget.onClose,
                   ),
                 ],
               ),
@@ -281,8 +281,9 @@ class _VeniChatbotState extends State<VeniChatbot> {
                   padding: const EdgeInsets.all(16),
                   itemCount: chatService.messages.length + (_isLoading ? 1 : 0),
                   itemBuilder: (context, index) {
-                    if (index == chatService.messages.length)
+                    if (index == chatService.messages.length) {
                       return const TypingIndicator();
+                    }
                     final msg = chatService.messages[index];
                     return _ChatBubble(
                       text: msg['text'],
@@ -343,7 +344,7 @@ class _ChatBubble extends StatelessWidget {
     final theme = Theme.of(context);
     final bubbleColor = isUser
         ? theme.primaryColor
-        : theme.colorScheme.onSurfaceVariant.withAlpha(50);
+        : theme.colorScheme.onSurface.withAlpha(50);
     final textColor = isUser ? Colors.white : null;
 
     return Align(

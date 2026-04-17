@@ -5349,6 +5349,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invenicum ©'**
   String get firstRunCopyright;
+
+  /// No description provided for @addImageFromUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Image from URL'**
+  String get addImageFromUrl;
+
+  /// No description provided for @imageDownloadedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Image downloaded successfully'**
+  String get imageDownloadedSuccessfully;
+
+  /// No description provided for @errorDownloadingImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error downloading image: {error}'**
+  String errorDownloadingImage(String error);
 }
 
 class _AppLocalizationsDelegate

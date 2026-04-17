@@ -9,12 +9,14 @@ class ImagesSectionWidget extends StatelessWidget {
   final List<String> imageUrls;
   final VoidCallback onAddImage;
   final ValueChanged<String> onRemoveImage;
+  final Future<void> Function(String)? onAddImageFromUrl;
 
   const ImagesSectionWidget({
     super.key,
     required this.imageUrls,
     required this.onAddImage,
     required this.onRemoveImage,
+    this.onAddImageFromUrl,
   });
 
   @override
@@ -33,6 +35,7 @@ class ImagesSectionWidget extends StatelessWidget {
             imageUrls: imageUrls,
             onAddImage: onAddImage,
             onRemoveImage: onRemoveImage,
+            onAddImageFromUrl: onAddImageFromUrl,
           ),
         ],
       ),
