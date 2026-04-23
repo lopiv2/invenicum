@@ -459,6 +459,7 @@
   "saveChanges": "Änderungen speichern",
   "saveConfiguration": "Konfiguration speichern",
   "saveCustomTheme": "Benutzerdefiniertes Design speichern",
+  "searchByName": "Nach Namen suchen...",
   "searchInAllColumns": "In allen Spalten suchen...",
   "selectAndUploadImage": "Bild auswählen und hochladen",
   "selectApplicationCurrency": "App-Währung auswählen",

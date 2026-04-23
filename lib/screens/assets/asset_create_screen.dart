@@ -13,6 +13,7 @@ import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.da
 import 'package:invenicum/screens/assets/local_widgets/candidate_card_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
+import 'package:invenicum/screens/assets/local_widgets/scraper_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -778,6 +779,56 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
   }
 
+  void _handleScraperResults(Map<String, dynamic> results) {
+    setState(() {
+      // Nombre
+      if (results['name'] != null) {
+        _nameController.text = results['name'].toString();
+        _highlightedFields.add('name');
+      }
+      // Descripción
+      if (results['description'] != null) {
+        _descriptionController.text = results['description'].toString();
+        _highlightedFields.add('description');
+      }
+      // Imagen: si viene URL absoluta la añade directamente
+      final imageVal =
+          results['image'] ?? results['imageUrl'] ?? results['imagen'];
+      if (imageVal != null) {
+        _addImageFromUrl(imageVal.toString());
+      }
+      // Campos custom: busca por nombre de campo
+      for (final fieldDef in _assetType?.fieldDefinitions ?? []) {
+        final key = fieldDef.name.toLowerCase();
+        final match = results.entries.firstWhere(
+          (e) => e.key.toLowerCase() == key,
+          orElse: () => const MapEntry('', null),
+        );
+        if (match.value == null) continue;
+        _highlightedFields.add(fieldDef.name);
+        if (fieldDef.type == CustomFieldType.boolean) {
+          _booleanFieldValues[fieldDef.id!] =
+              match.value.toString().toLowerCase() == 'true';
+        } else if (fieldDef.type == CustomFieldType.dropdown) {
+          final options = _listFieldValues[fieldDef.id!] ?? [];
+          final opt = options.firstWhere(
+            (o) =>
+                o.toLowerCase().contains(match.value.toString().toLowerCase()),
+            orElse: () => '',
+          );
+          if (opt.isNotEmpty) _selectedListValues[fieldDef.id!] = opt;
+        } else {
+          _customControllers[fieldDef.id!]?.text = match.value.toString();
+        }
+      }
+    });
+
+    ToastService.success('Data extracted successfully');
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _highlightedFields.clear());
+    });
+  }
+
   void _showMagicDialog() async {
     final url = await showDialog<String>(
       context: context,
@@ -861,8 +912,16 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                               onPressed: _showMagicDialog,
                             )
                           : null,
-
-                      // ── Fila 1: Importar desde fuente externa ──
+                      // ── Row 1a: Scraper ──
+                      scraperBento: BentoBoxWidget(
+                        title: 'Scraper Import',
+                        icon: Icons.travel_explore,
+                        child: ScraperImportWidget(
+                          containerId: _containerId!,
+                          onResults: _handleScraperResults,
+                        ),
+                      ),
+                      // ── Row 1b: Import from external source ──
                       importBento: BentoBoxWidget(
                         title: l10n.externalImportTitle,
                         icon: Icons.auto_awesome,
@@ -980,6 +1039,7 @@ class _AssetFormLayout extends StatelessWidget {
   final Widget statusWidget;
   final Widget stockBento;
   final Widget? specsBento;
+  final Widget? scraperBento;
 
   const _AssetFormLayout({
     this.aiBanner,
@@ -989,6 +1049,7 @@ class _AssetFormLayout extends StatelessWidget {
     required this.statusWidget,
     required this.stockBento,
     this.specsBento,
+    this.scraperBento,
   });
 
   @override
@@ -998,6 +1059,12 @@ class _AssetFormLayout extends StatelessWidget {
       children: [
         // ── Banner IA ──────────────────────────────────────────────────────
         if (aiBanner != null) ...[aiBanner!, const SizedBox(height: 24)],
+
+        // ── Scraper (full width, solo si hay campos) ─────────────
+        if (scraperBento != null) ...[
+          const SizedBox(height: 24),
+          scraperBento!,
+        ],
 
         // ── Importar (solo create) ─────────────────────────────────────────
         if (importBento != null) ...[importBento!, const SizedBox(height: 24)],

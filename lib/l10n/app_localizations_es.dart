@@ -857,6 +857,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get saveCustomTheme => 'Guardar Tema Personalizado';
 
   @override
+  String get searchByName => 'Buscar por nombre...';
+
+  @override
   String get searchInAllColumns => 'Buscar en todas las columnas...';
 
   @override
@@ -2517,6 +2520,45 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get elementDeletedSuccess => 'Elemento eliminado correctamente';
+
+  @override
+  String get scrapers => 'Scrapers';
+
+  @override
+  String get newScraperLabel => 'Nuevo scrapper';
+
+  @override
+  String get noScrapers => 'No hay scrapers. Crea uno nuevo.';
+
+  @override
+  String get confirmDeleteScraper => 'Eliminar Scraper';
+
+  @override
+  String confirmDeleteScraperMessage(String name) {
+    return '¿Estás seguro de que quieres eliminar el scraper \"$name\"? Esta acción no se puede deshacer.';
+  }
+
+  @override
+  String get scraperDeletedSuccess => 'Scraper eliminado con éxito.';
+
+  @override
+  String errorDeletingScraper(String error) {
+    return 'Error al eliminar el scraper: $error';
+  }
+
+  @override
+  String get testScraper => 'Probar';
+
+  @override
+  String get runResultTitle => 'Resultado de la prueba';
+
+  @override
+  String runError(String error) {
+    return 'Error al ejecutar la prueba: $error';
+  }
+
+  @override
+  String get ok => 'Aceptar';
 
   @override
   String get enterYourNameValidation => 'Introduce tu nombre.';

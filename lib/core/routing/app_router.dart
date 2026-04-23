@@ -38,6 +38,9 @@ import 'package:invenicum/screens/home/dashboard_screen.dart';
 import 'package:invenicum/screens/datalists/datalist_create_screen.dart';
 import 'package:invenicum/screens/datalists/datalist_edit_screen.dart';
 import 'package:invenicum/screens/datalists/datalist_grid_screen.dart';
+import 'package:invenicum/screens/scrapers/scraper_grid_screen.dart';
+import 'package:invenicum/screens/scrapers/scraper_create_screen.dart';
+import 'package:invenicum/screens/scrapers/scraper_edit_screen.dart';
 import 'package:invenicum/screens/preferences/delivery_voucher_editor_screen.dart';
 import 'package:invenicum/screens/loans/loan_create_screen.dart';
 import 'package:invenicum/screens/loans/loans_screen.dart';
@@ -372,6 +375,36 @@ GoRouter createAppRouter(
                     containerId: state.pathParameters['containerId']!,
                     dataListId: state.pathParameters['dataListId']!,
                     initialData: listData!,
+                  );
+                },
+              ),
+            ],
+          ),
+
+          // --- SCRAPERS ---
+          GoRoute(
+            name: RouteNames.scrapers,
+            path: '/container/:containerId/scrapers',
+            builder: (context, state) => ScraperGridScreen(
+              containerId: state.pathParameters['containerId']!,
+            ),
+            routes: [
+              GoRoute(
+                name: RouteNames.scraperCreate,
+                path: 'new',
+                builder: (context, state) => ScraperCreateScreen(
+                  containerId: state.pathParameters['containerId']!,
+                ),
+              ),
+              GoRoute(
+                name: RouteNames.scraperEdit,
+                path: ':scraperId/edit',
+                builder: (context, state) {
+                  final scraper = state.extra as dynamic;
+                  return ScraperEditScreen(
+                    containerId: state.pathParameters['containerId']!,
+                    scraperId: state.pathParameters['scraperId']!,
+                    initial: scraper!,
                   );
                 },
               ),

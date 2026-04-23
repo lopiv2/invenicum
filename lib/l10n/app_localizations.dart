@@ -1654,6 +1654,12 @@ abstract class AppLocalizations {
   /// **'Save Custom Theme'**
   String get saveCustomTheme;
 
+  /// No description provided for @searchByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name...'**
+  String get searchByName;
+
   /// No description provided for @searchInAllColumns.
   ///
   /// In en, this message translates to:
@@ -4611,6 +4617,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Element deleted successfully'**
   String get elementDeletedSuccess;
+
+  /// No description provided for @scrapers.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrapers'**
+  String get scrapers;
+
+  /// No description provided for @newScraperLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New scraper'**
+  String get newScraperLabel;
+
+  /// No description provided for @noScrapers.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no scrapers. Create a new one.'**
+  String get noScrapers;
+
+  /// No description provided for @confirmDeleteScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Scraper'**
+  String get confirmDeleteScraper;
+
+  /// No description provided for @confirmDeleteScraperMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete scraper \"{name}\"? This action cannot be undone.'**
+  String confirmDeleteScraperMessage(String name);
+
+  /// No description provided for @scraperDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Scraper deleted successfully.'**
+  String get scraperDeletedSuccess;
+
+  /// No description provided for @errorDeletingScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting scraper: {error}'**
+  String errorDeletingScraper(String error);
+
+  /// No description provided for @testScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get testScraper;
+
+  /// No description provided for @runResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Test result'**
+  String get runResultTitle;
+
+  /// No description provided for @runError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error running test: {error}'**
+  String runError(String error);
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
 
   /// No description provided for @enterYourNameValidation.
   ///

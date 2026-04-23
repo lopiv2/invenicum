@@ -47,6 +47,11 @@ abstract class RouteNames {
   static const dataListCreate  = 'dataListCreate';
   static const dataListEdit    = 'dataListEdit';
 
+  // ── Scrapers (web scrapers / custom mapping) ─────────────────────────────
+  static const scrapers        = 'scrapers';
+  static const scraperCreate   = 'scraperCreate';
+  static const scraperEdit     = 'scraperEdit';
+
   // ── Locations ────────────────────────────────────────────────────────────
   static const locations       = 'locations';
   static const locationCreate  = 'locationCreate';

@@ -1,1 +1,57 @@
-{}
+{
+  "de": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok"
+  ],
+
+  "fr": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok"
+  ],
+
+  "it": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok"
+  ],
+
+  "pt": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok"
+  ]
+}

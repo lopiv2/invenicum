@@ -856,6 +856,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get saveCustomTheme => 'Benutzerdefiniertes Design speichern';
 
   @override
+  String get searchByName => 'Nach Namen suchen...';
+
+  @override
   String get searchInAllColumns => 'In allen Spalten suchen...';
 
   @override
@@ -2521,6 +2524,45 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get elementDeletedSuccess => 'Element erfolgreich gelöscht';
+
+  @override
+  String get scrapers => 'Scrapers';
+
+  @override
+  String get newScraperLabel => 'New scraper';
+
+  @override
+  String get noScrapers => 'There are no scrapers. Create a new one.';
+
+  @override
+  String get confirmDeleteScraper => 'Delete Scraper';
+
+  @override
+  String confirmDeleteScraperMessage(String name) {
+    return 'Are you sure you want to delete scraper \"$name\"? This action cannot be undone.';
+  }
+
+  @override
+  String get scraperDeletedSuccess => 'Scraper deleted successfully.';
+
+  @override
+  String errorDeletingScraper(String error) {
+    return 'Error deleting scraper: $error';
+  }
+
+  @override
+  String get testScraper => 'Test';
+
+  @override
+  String get runResultTitle => 'Test result';
+
+  @override
+  String runError(String error) {
+    return 'Error running test: $error';
+  }
+
+  @override
+  String get ok => 'OK';
 
   @override
   String get enterYourNameValidation => 'Gib deinen Namen ein.';

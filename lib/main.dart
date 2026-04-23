@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/services/asset_print_service.dart';
+import 'package:invenicum/data/services/scraper_service.dart';
 import 'package:invenicum/providers/achievement_provider.dart';
 import 'package:invenicum/providers/first_run_provider.dart'; // 🆕
 import 'package:invenicum/providers/integrations_provider.dart';
@@ -26,6 +27,7 @@ import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
+import 'package:invenicum/providers/scraper_provider.dart';
 import 'package:invenicum/providers/theme_provider.dart';
 import 'package:invenicum/providers/dashboard_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
@@ -78,6 +80,7 @@ void main() async {
         Provider(create: (c) => ThemeService(c.read<ApiService>())),
         Provider(create: (c) => PreferencesService(c.read<ApiService>())),
         Provider(create: (c) => ContainerService(c.read<ApiService>())),
+        Provider(create: (c) => ScraperService(c.read<ApiService>())),
         Provider(create: (c) => LocationService(c.read<ApiService>())),
         Provider(create: (c) => AssetTypeService(c.read<ApiService>())),
         Provider(create: (c) => InventoryItemService(c.read<ApiService>())),
@@ -220,6 +223,10 @@ void main() async {
             }
             return prev!;
           },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, ScraperProvider>(
+          create: (c) => ScraperProvider(c.read<ScraperService>()),
+          update: (_, auth, prev) => prev!,
         ),
         ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
           create: (c) => LocationProvider(c.read<LocationService>()),

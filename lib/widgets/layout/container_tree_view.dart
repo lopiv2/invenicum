@@ -116,6 +116,17 @@ class ContainerTreeView extends StatelessWidget {
                     ),
                     _buildSubItem(
                       context,
+                      icon: Icons.web_outlined,
+                      label: 'Scrapers',
+                      onTap: () => context.goNamed(
+                        RouteNames.scrapers,
+                        pathParameters: {
+                          'containerId': container.id.toString(),
+                        },
+                      ),
+                    ),
+                    _buildSubItem(
+                      context,
                       icon: Icons.handshake_outlined,
                       label:
                           "${AppLocalizations.of(context)!.loans} (${loanProvider.loans.length})",
