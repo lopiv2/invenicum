@@ -459,6 +459,7 @@
   "saveChanges": "Enregistrer les modifications",
   "saveConfiguration": "Enregistrer la configuration",
   "saveCustomTheme": "Enregistrer le thème personnalisé",
+  "searchByName": "Rechercher par nom...",
   "searchInAllColumns": "Rechercher dans toutes les colonnes...",
   "selectAndUploadImage": "Sélectionner et télécharger une image",
   "selectApplicationCurrency": "Sélectionnez la devise de l'application",

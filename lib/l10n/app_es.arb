@@ -459,6 +459,7 @@
   "saveChanges": "Guardar Cambios",
   "saveConfiguration": "Guardar Configuración",
   "saveCustomTheme": "Guardar Tema Personalizado",
+  "searchByName": "Buscar por nombre...",
   "searchInAllColumns": "Buscar en todas las columnas...",
   "selectAndUploadImage": "Seleccionar y Subir Imagen",
   "selectApplicationCurrency": "Selecciona la moneda de la aplicación",
@@ -1281,6 +1282,30 @@
     }
   },
   "elementDeletedSuccess": "Elemento eliminado correctamente",
+  "scrapers": "Scrapers",
+  "newScraperLabel": "Nuevo scrapper",
+  "noScrapers": "No hay scrapers. Crea uno nuevo.",
+  "confirmDeleteScraper": "Eliminar Scraper",
+  "confirmDeleteScraperMessage": "¿Estás seguro de que quieres eliminar el scraper \"{name}\"? Esta acción no se puede deshacer.",
+  "scraperDeletedSuccess": "Scraper eliminado con éxito.",
+  "errorDeletingScraper": "Error al eliminar el scraper: {error}",
+  "@confirmDeleteScraperMessage": {
+    "placeholders": {
+      "name": { "type": "String" }
+    }
+  },
+  "@errorDeletingScraper": {
+    "placeholders": {
+      "error": { "type": "String" }
+    }
+  },
+  "testScraper": "Probar",
+  "runResultTitle": "Resultado de la prueba",
+  "runError": "Error al ejecutar la prueba: {error}",
+  "ok": "Aceptar",
+  "@runError": {
+    "placeholders": { "error": { "type": "String" } }
+  },
   "enterYourNameValidation": "Introduce tu nombre.",
   "minTwoCharactersValidation": "Mínimo 2 caracteres.",
   "enterEmailValidation": "Introduce un email.",
