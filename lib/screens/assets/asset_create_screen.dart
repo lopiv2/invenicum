@@ -795,7 +795,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       final imageVal =
           results['image'] ?? results['imageUrl'] ?? results['imagen'];
       if (imageVal != null) {
-        _imagePreviewUrls.insert(0, imageVal.toString());
+        _addImageFromUrl(imageVal.toString());
       }
       // Campos custom: busca por nombre de campo
       for (final fieldDef in _assetType?.fieldDefinitions ?? []) {

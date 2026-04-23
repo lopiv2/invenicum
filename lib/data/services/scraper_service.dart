@@ -10,9 +10,10 @@ class ScraperService {
   ScraperService(this._apiService);
   Future<List<Scraper>> getScrapers([int? containerId]) async {
     try {
-      final response = await _dio.get('/scrapers', queryParameters: {
-        if (containerId != null) 'containerId': containerId,
-      });
+      final response = await _dio.get(
+        '/scrapers',
+        queryParameters: {if (containerId != null) 'containerId': containerId},
+      );
 
       if (response.statusCode == 200) {
         final data = response.data;
@@ -22,7 +23,10 @@ class ScraperService {
         } else if (data is List) {
           list = data;
         }
-        return list.where((e) => e is Map<String, dynamic>).map((e) => Scraper.fromJson(e as Map<String, dynamic>)).toList();
+        return list
+            .where((e) => e is Map<String, dynamic>)
+            .map((e) => Scraper.fromJson(e as Map<String, dynamic>))
+            .toList();
       }
       throw Exception('Error fetching scrapers: ${response.statusCode}');
     } on DioException catch (e) {
@@ -93,7 +97,9 @@ class ScraperService {
       throw Exception('Error updating scraper: ${response.statusCode}');
     } on DioException catch (e) {
       // Surface backend error message when available
-      final msg = e.response?.data is Map ? (e.response?.data['error'] ?? e.response?.data['message']) : e.message;
+      final msg = e.response?.data is Map
+          ? (e.response?.data['error'] ?? e.response?.data['message'])
+          : e.message;
       throw Exception('Connection error while updating scraper: $msg');
     } catch (e) {
       rethrow;
@@ -112,35 +118,24 @@ class ScraperService {
     }
   }
 
-  Future<Map<String, dynamic>> addField(int scraperId, {required String name, required String xpath, int? order}) async {
+  Future<Map<String, dynamic>> addField(
+    int scraperId, {
+    required String name,
+    required String xpath,
+    int? order,
+  }) async {
     try {
-      final response = await _dio.post('/scrapers/$scraperId/fields', data: {
-        'name': name,
-        'xpath': xpath,
-        if (order != null) 'order': order,
-      });
+      final response = await _dio.post(
+        '/scrapers/$scraperId/fields',
+        data: {'name': name, 'xpath': xpath, if (order != null) 'order': order},
+      );
       if (response.statusCode == 201 || response.statusCode == 200) {
         final data = response.data;
-        if (data is Map<String, dynamic> && data.containsKey('data')) return data['data'] as Map<String, dynamic>;
+        if (data is Map<String, dynamic> && data.containsKey('data'))
+          return data['data'] as Map<String, dynamic>;
         if (data is Map<String, dynamic>) return data;
       }
       throw Exception('Error adding field: ${response.statusCode}');
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Future<Map<String, dynamic>> runScrape(int scraperId, {String? url}) async {
-    try {
-      final response = await _dio.get('/scrapers/$scraperId/run', queryParameters: {
-        if (url != null) 'url': url,
-      });
-      if (response.statusCode == 200) {
-        final data = response.data;
-        if (data is Map<String, dynamic>) return data;
-        return {'result': data};
-      }
-      throw Exception('Error running scraper: ${response.statusCode}');
     } catch (e) {
       rethrow;
     }
@@ -166,7 +161,9 @@ class ScraperService {
       final response = await _dio.post('/scrapers/run-ad-hoc', data: payload);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data;
-        if (data is Map<String, dynamic> && data.containsKey('data')) return data['data'] as Map<String, dynamic>;
+        print(data); // Debug log to inspect response structure
+        if (data is Map<String, dynamic> && data.containsKey('data'))
+          return data['data'] as Map<String, dynamic>;
         if (data is Map<String, dynamic>) return data;
         return {'result': data};
       }
