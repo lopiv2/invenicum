@@ -28,6 +28,7 @@ class PreferencesProvider with ChangeNotifier {
   String? get aiModel => _prefs.aiModel;
   // 🔑 Ahora la moneda viene de las preferencias guardadas
   String get selectedCurrency => _prefs.currency;
+  bool get showAssetTypeLogo => _prefs.showAssetTypeLogo;
 
   PreferencesProvider(this._preferencesService);
 
@@ -69,7 +70,7 @@ class PreferencesProvider with ChangeNotifier {
       _isDarkMode = oldDarkValue;
       _prefs = oldPrefs;
       notifyListeners();
-      debugPrint('Error al persistir tema de sistema: $e');
+      debugPrint('Error persisting visual status: $e');
       rethrow;
     }
   }
@@ -109,7 +110,26 @@ class PreferencesProvider with ChangeNotifier {
       _useSystemTheme = oldSystemValue;
       _prefs = oldPrefs;
       notifyListeners();
-      debugPrint('Error al persistir modo oscuro: $e');
+      debugPrint('Error persisting dark mode: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updatePreference(String key, dynamic value) async {
+    // Optimistic update
+    _prefs = _prefs.copyWith(
+      showAssetTypeLogo: key == 'showAssetTypeLogo'
+          ? value as bool
+          : _prefs.showAssetTypeLogo,
+    );
+    notifyListeners();
+
+    try {
+      final updated = await _preferencesService.updatePreference(key, value);
+      _prefs = updated;
+      notifyListeners();
+    } catch (e) {
+      await loadPreferences(); // rollback
       rethrow;
     }
   }
@@ -274,7 +294,7 @@ class PreferencesProvider with ChangeNotifier {
     } catch (e) {
       _prefs = previousPrefs; // Revertimos si falla
       notifyListeners();
-      debugPrint('Error actualizando idioma: $e');
+      debugPrint('Error updating language: $e');
       rethrow;
     }
   }

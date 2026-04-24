@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 class AssetFormLayout extends StatelessWidget {
   final Widget? aiBanner;
-  final Widget? importBento;   // Solo en Create
+  final Widget? importBento; // Solo en Create
   final Widget mainDataBento;
   final Widget galleryBento;
   final Widget statusWidget;
   final Widget stockBento;
   final Widget? specsBento;
+  final Widget? scraperBento;
 
   const AssetFormLayout({
     this.aiBanner,
@@ -17,6 +18,7 @@ class AssetFormLayout extends StatelessWidget {
     required this.statusWidget,
     required this.stockBento,
     this.specsBento,
+    this.scraperBento,
   });
 
   @override
@@ -25,16 +27,16 @@ class AssetFormLayout extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         // ── Banner IA ──────────────────────────────────────────────────────
-        if (aiBanner != null) ...[
-          aiBanner!,
+        if (aiBanner != null) ...[aiBanner!, const SizedBox(height: 24)],
+
+        // ── Scraper (full width, solo si hay campos) ─────────────
+        if (scraperBento != null) ...[
           const SizedBox(height: 24),
+          scraperBento!,
         ],
 
         // ── Importar (solo create) ─────────────────────────────────────────
-        if (importBento != null) ...[
-          importBento!,
-          const SizedBox(height: 24),
-        ],
+        if (importBento != null) ...[importBento!, const SizedBox(height: 24)],
 
         // ── Fila: Datos Principales (2/3) + Galería (1/3) ─────────────────
         LayoutBuilder(
@@ -84,20 +86,13 @@ class AssetFormLayout extends StatelessWidget {
               );
             }
             return Column(
-              children: [
-                statusWidget,
-                const SizedBox(height: 16),
-                stockBento,
-              ],
+              children: [statusWidget, const SizedBox(height: 16), stockBento],
             );
           },
         ),
 
         // ── Especificaciones (full width, solo si hay campos) ─────────────
-        if (specsBento != null) ...[
-          const SizedBox(height: 24),
-          specsBento!,
-        ],
+        if (specsBento != null) ...[const SizedBox(height: 24), specsBento!],
       ],
     );
   }

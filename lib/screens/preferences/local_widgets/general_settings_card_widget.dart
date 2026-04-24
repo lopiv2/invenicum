@@ -72,6 +72,23 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                   ? null
                   : (bool value) => prefsProvider.setDarkMode(value),
             ),
+            SwitchListTile(
+              title: const Text('Show asset type logo'),
+              subtitle: const Text(
+                'Display the asset type image in the asset detail screen',
+              ),
+              secondary: const Icon(Icons.image_outlined),
+              value: context.watch<PreferencesProvider>().showAssetTypeLogo,
+              onChanged: (val) => {
+                context.read<PreferencesProvider>().updatePreference(
+                  'showAssetTypeLogo',
+                  val,
+                ),
+                ToastService.success(
+                  AppLocalizations.of(context)!.preferencesUpdated,
+                ),
+              },
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.language),
@@ -149,7 +166,10 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               subtitle: !isGeminiConnected
                   ? Text(
                       l10n.requiresGeminiLinking,
-                      style: const TextStyle(color: Colors.orange, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 12,
+                      ),
                     )
                   : Text(l10n.aiOrganizeInventory),
               secondary: Icon(
@@ -165,9 +185,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               onChanged: (bool value) async {
                 if (!isGeminiConnected) {
                   // Si intenta activarlo sin estar vinculado, avisamos
-                  ToastService.info(
-                    l10n.requiresGeminiLinking,
-                  );
+                  ToastService.info(l10n.requiresGeminiLinking);
                   return;
                 }
 

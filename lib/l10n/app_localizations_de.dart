@@ -781,6 +781,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get preferences => 'Einstellungen';
 
   @override
+  String get preferencesUpdated => 'Einstellungen aktualisiert';
+
+  @override
   String get previewPDF => 'Vorschau';
 
   @override
