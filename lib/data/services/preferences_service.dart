@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
+import 'package:invenicum/data/models/user_preferences.dart';
 import 'package:invenicum/data/services/api_service.dart';
 
 class PreferencesService {
@@ -8,6 +9,25 @@ class PreferencesService {
   PreferencesService(this._apiService);
 
   Dio get _dio => _apiService.dio;
+
+  Future<UserPreferences> updatePreference(String key, dynamic value) async {
+    try {
+      final response = await _dio.patch('/preferences', data: {key: value});
+      if (response.statusCode == 200) {
+        final data = response.data;
+        final json = data is Map<String, dynamic> && data.containsKey('data')
+            ? data['data'] as Map<String, dynamic>
+            : data as Map<String, dynamic>;
+        return UserPreferences.fromJson(json);
+      }
+      throw Exception('Error updating preference: ${response.statusCode}');
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map
+          ? (e.response?.data['error'] ?? e.response?.data['message'])
+          : e.message;
+      throw Exception('Connection error: $msg');
+    }
+  }
 
   /// Obtiene todas las preferencias del usuario desde el backend
   Future<Map<String, dynamic>> getPreferences() async {
@@ -59,23 +79,20 @@ class PreferencesService {
   }
 
   /// Actualiza el estado del modo oscuro y sistema (Configuración de comportamiento)
-Future<void> updateVisualStatus({
-  required bool useSystemTheme,
-  required bool isDarkMode,
-}) async {
-  try {
-    // Usamos PATCH al endpoint raíz o un sub-recurso de comportamiento
-    await _dio.patch(
-      '/preferences/visual-settings', 
-      data: {
-        'useSystemTheme': useSystemTheme,
-        'isDarkMode': isDarkMode,
-      },
-    );
-  } catch (e) {
-    rethrow;
+  Future<void> updateVisualStatus({
+    required bool useSystemTheme,
+    required bool isDarkMode,
+  }) async {
+    try {
+      // Usamos PATCH al endpoint raíz o un sub-recurso de comportamiento
+      await _dio.patch(
+        '/preferences/visual-settings',
+        data: {'useSystemTheme': useSystemTheme, 'isDarkMode': isDarkMode},
+      );
+    } catch (e) {
+      rethrow;
+    }
   }
-}
 
   /// Actualiza el proveedor de IA activo y el modelo seleccionado
   Future<void> updateAiProvider(String provider, String model) async {

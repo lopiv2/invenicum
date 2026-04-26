@@ -1504,6 +1504,12 @@ abstract class AppLocalizations {
   /// **'Preferences'**
   String get preferences;
 
+  /// No description provided for @preferencesUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences updated'**
+  String get preferencesUpdated;
+
   /// No description provided for @previewPDF.
   ///
   /// In en, this message translates to:

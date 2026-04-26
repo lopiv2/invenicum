@@ -781,6 +781,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get preferences => 'Préférences';
 
   @override
+  String get preferencesUpdated => 'Préférences mises à jour';
+
+  @override
   String get previewPDF => 'Aperçu PDF';
 
   @override

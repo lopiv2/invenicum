@@ -25,6 +25,7 @@ import 'package:invenicum/screens/assets/local_widgets/images_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/inventory_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/main_data_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
+import 'package:invenicum/screens/assets/local_widgets/scraper_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 import 'package:invenicum/widgets/ui/magic_ai_dialog_widget.dart';
@@ -988,6 +989,56 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     }
   }
 
+  void _handleScraperResults(Map<String, dynamic> results) {
+    setState(() {
+      // Nombre
+      if (results['name'] != null) {
+        _nameController.text = results['name'].toString();
+        _highlightedFields.add('name');
+      }
+      // Descripción
+      if (results['description'] != null) {
+        _descriptionController.text = results['description'].toString();
+        _highlightedFields.add('description');
+      }
+      // Imagen: si viene URL absoluta la añade directamente
+      final imageVal =
+          results['image'] ?? results['imageUrl'] ?? results['imagen'];
+      if (imageVal != null) {
+        _addImageFromUrl(imageVal.toString());
+      }
+      // Campos custom: busca por nombre de campo
+      for (final fieldDef in _assetType?.fieldDefinitions ?? []) {
+        final key = fieldDef.name.toLowerCase();
+        final match = results.entries.firstWhere(
+          (e) => e.key.toLowerCase() == key,
+          orElse: () => const MapEntry('', null),
+        );
+        if (match.value == null) continue;
+        _highlightedFields.add(fieldDef.name);
+        if (fieldDef.type == CustomFieldType.boolean) {
+          _booleanValues[fieldDef.id!] =
+              match.value.toString().toLowerCase() == 'true';
+        } else if (fieldDef.type == CustomFieldType.dropdown) {
+          final options = _listFieldValues[fieldDef.id!] ?? [];
+          final opt = options.firstWhere(
+            (o) =>
+                o.toLowerCase().contains(match.value.toString().toLowerCase()),
+            orElse: () => '',
+          );
+          if (opt.isNotEmpty) _selectedListValues[fieldDef.id!] = opt;
+        } else {
+          _dynamicControllers[fieldDef.id!]?.text = match.value.toString();
+        }
+      }
+    });
+
+    ToastService.success('Data extracted successfully');
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _highlightedFields.clear());
+    });
+  }
+
   // ---------------------------------------------------------------------------
   // BUILD
   // ---------------------------------------------------------------------------
@@ -1028,7 +1079,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                             onPressed: _showMagicDialog,
                           )
                         : null,
-
+                    // ── Row 1a: Scraper ──
+                      scraperBento: BentoBoxWidget(
+                        title: 'Scraper Import',
+                        icon: Icons.travel_explore,
+                        child: ScraperImportWidget(
+                          containerId: int.parse(widget.containerId),
+                          onResults: _handleScraperResults,
+                        ),
+                      ),
                     // ── Importar desde fuente externa ──
                     importBento: aiEnabled
                         ? BentoBoxWidget(

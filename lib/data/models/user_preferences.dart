@@ -4,6 +4,7 @@ class UserPreferences {
   final int? id;
   final String language;
   final String currency;
+  final bool showAssetTypeLogo;
   final bool aiEnabled;
   final String? aiProvider;
   final String? aiModel;
@@ -20,6 +21,7 @@ class UserPreferences {
     this.id,
     this.language = 'en',
     this.currency = 'USD',
+    this.showAssetTypeLogo = true,
     this.aiEnabled = true,
     this.aiProvider,
     this.aiModel,
@@ -43,6 +45,7 @@ class UserPreferences {
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'en',
       currency: json['currency'] as String? ?? 'USD',
+      showAssetTypeLogo: json['showAssetTypeLogo'] ?? json['show_asset_type_logo'] ?? true,
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       aiProvider: (json['aiProvider'] ?? json['ai_provider']) as String?,
       aiModel: (json['aiModel'] ?? json['ai_model']) as String?,
@@ -73,6 +76,8 @@ class UserPreferences {
       'userId': userId,
       'useSystemTheme': useSystemTheme,
       'isDarkMode': isDarkMode,
+      'showAssetTypeLogo': showAssetTypeLogo,
+      'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
     };
   }
@@ -89,6 +94,7 @@ class UserPreferences {
     int? id,
     String? language,
     String? currency,
+    bool? showAssetTypeLogo,
     bool? aiEnabled,
     String? aiProvider,
     String? aiModel,
@@ -101,6 +107,7 @@ class UserPreferences {
       id: id ?? this.id,
       language: language ?? this.language,
       currency: currency ?? this.currency,
+      showAssetTypeLogo: showAssetTypeLogo ?? this.showAssetTypeLogo,
       aiEnabled: aiEnabled ?? this.aiEnabled,
       aiProvider: aiProvider ?? this.aiProvider,
       aiModel: aiModel ?? this.aiModel,
@@ -116,6 +123,7 @@ class UserPreferences {
     return UserPreferences(
       language: 'en',
       currency: 'USD',
+      showAssetTypeLogo: true,
       aiEnabled: true,
       useSystemTheme: true,
       isDarkMode: false,
