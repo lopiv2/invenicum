@@ -477,6 +477,8 @@
   "settings": "Settings",
   "showAsGrid": "Show as Grid",
   "showAsList": "Show as List",
+  "showAssetTypeLogo": "Show Asset Type Logo",
+  "showAssetTypeLogoDescription": "If the asset type has an image, display it as a logo in the list view.",
   "sortAsc": "Ascending",
   "sortDesc": "Descending",
   "slotDashboardBottom": "Bottom Dashboard Panel",

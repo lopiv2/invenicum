@@ -1762,6 +1762,18 @@ abstract class AppLocalizations {
   /// **'Show as List'**
   String get showAsList;
 
+  /// No description provided for @showAssetTypeLogo.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Asset Type Logo'**
+  String get showAssetTypeLogo;
+
+  /// No description provided for @showAssetTypeLogoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'If the asset type has an image, display it as a logo in the list view.'**
+  String get showAssetTypeLogoDescription;
+
   /// No description provided for @sortAsc.
   ///
   /// In en, this message translates to:

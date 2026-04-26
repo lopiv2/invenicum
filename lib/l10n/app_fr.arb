@@ -477,6 +477,8 @@
   "settings": "Paramètres",
   "showAsGrid": "Afficher en tant que grille",
   "showAsList": "Afficher sous forme de liste",
+  "showAssetTypeLogo": "Afficher le logo du type d'actif",
+  "showAssetTypeLogoDescription": "Si le type d'actif a une image, l'afficher comme logo dans la vue en liste.",
   "sortAsc": "Croissant",
   "sortDesc": "Décroissant",
   "slotDashboardBottom": "Panneau inférieur du tableau de bord",

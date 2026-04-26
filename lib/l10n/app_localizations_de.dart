@@ -914,6 +914,13 @@ class AppLocalizationsDe extends AppLocalizations {
   String get showAsList => 'Als Liste anzeigen';
 
   @override
+  String get showAssetTypeLogo => 'Asset-Typ-Logo anzeigen';
+
+  @override
+  String get showAssetTypeLogoDescription =>
+      'Wenn der Asset-Typ ein Bild hat, dieses als Logo in der Listenansicht anzeigen.';
+
+  @override
   String get sortAsc => 'Aufsteigend';
 
   @override

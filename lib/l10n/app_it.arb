@@ -477,6 +477,8 @@
   "settings": "Impostazioni",
   "showAsGrid": "Mostra come griglia",
   "showAsList": "Mostra come elenco",
+  "showAssetTypeLogo": "Mostra logo del tipo di bene",
+  "showAssetTypeLogoDescription": "Se il tipo di bene ha un'immagine, visualizzala come logo nella vista a lista.",
   "sortAsc": "Crescente",
   "sortDesc": "Decrescente",
   "slotDashboardBottom": "Pannello di controllo inferiore",

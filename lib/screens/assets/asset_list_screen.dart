@@ -8,6 +8,7 @@ import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/async_task_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_search_bar.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_type_main_content.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_cylinder_gallery.dart';
@@ -449,6 +450,7 @@ class _AssetListScreenState extends State<AssetListScreen>
         final statsItems = _filterForStats(data.items);
         final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
         final colorScheme = Theme.of(context).colorScheme;
+        final showLogo = context.watch<PreferencesProvider>().showAssetTypeLogo;
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
@@ -551,6 +553,7 @@ class _AssetListScreenState extends State<AssetListScreen>
                         children: [
                           AssetListHeader(
                             assetType: assetType,
+                            showAssetTypeLogo: showLogo,
                             onSyncPrices: () => _syncMarketPrices(context),
                             onGoToCreateAsset: () async {
                               await context.pushNamed(

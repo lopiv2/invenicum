@@ -477,6 +477,8 @@
   "settings": "Configurações",
   "showAsGrid": "Mostrar como grade",
   "showAsList": "Mostrar como lista",
+  "showAssetTypeLogo": "Mostrar logo do tipo de ativo",
+  "showAssetTypeLogoDescription": "Se o tipo de ativo tiver uma imagem, exibi-la como logo na vista em lista.",
   "sortAsc": "Crescente",
   "sortDesc": "Decrescente",
   "slotDashboardBottom": "Painel inferior",

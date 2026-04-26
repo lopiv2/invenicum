@@ -918,6 +918,13 @@ class AppLocalizationsIt extends AppLocalizations {
   String get showAsList => 'Mostra come elenco';
 
   @override
+  String get showAssetTypeLogo => 'Mostra logo del tipo di bene';
+
+  @override
+  String get showAssetTypeLogoDescription =>
+      'Se il tipo di bene ha un\'immagine, visualizzala come logo nella vista a lista.';
+
+  @override
   String get sortAsc => 'Crescente';
 
   @override

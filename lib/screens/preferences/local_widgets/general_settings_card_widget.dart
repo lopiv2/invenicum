@@ -73,10 +73,8 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                   : (bool value) => prefsProvider.setDarkMode(value),
             ),
             SwitchListTile(
-              title: const Text('Show asset type logo'),
-              subtitle: const Text(
-                'Display the asset type image in the asset detail screen',
-              ),
+              title: Text(l10n.showAssetTypeLogo),
+              subtitle: Text(l10n.showAssetTypeLogoDescription),
               secondary: const Icon(Icons.image_outlined),
               value: context.watch<PreferencesProvider>().showAssetTypeLogo,
               onChanged: (val) => {

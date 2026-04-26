@@ -478,6 +478,8 @@
   "showAsGrid": "Als Raster anzeigen",
   "showAsList": "Als Liste anzeigen",
   "sortAsc": "Aufsteigend",
+  "showAssetTypeLogo": "Asset-Typ-Logo anzeigen",
+  "showAssetTypeLogoDescription": "Wenn der Asset-Typ ein Bild hat, dieses als Logo in der Listenansicht anzeigen.",
   "sortDesc": "Absteigend",
   "slotDashboardBottom": "Dashboard unten",
   "slotDashboardTop": "Dashboard oben",

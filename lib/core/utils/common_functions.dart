@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -92,6 +93,36 @@ class AppUtils {
       default:
         return CustomFieldType.text;
     }
+  }
+
+  /// Build the full public URL of an image safely.
+  ///
+  /// Handles the three possible cases that can come from the DB:
+  ///   1. Absolute URL: "http://server/images/asset-types/file.jpg" → returns as is
+  ///   2. Relative URL with leading slash: "/images/asset-types/file.jpg"       → appends the host
+  ///   3. Relative URL without leading slash: "asset-types/file.jpg" (old records) → appends host + /images/
+  static String buildImageUrl(String rawUrl) {
+    if (rawUrl.isEmpty) return '';
+
+    // Case 1: already absolute
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+      return rawUrl;
+    }
+
+    // Host without trailing slash
+    final host = Environment.apiUrl.endsWith('/')
+        ? Environment.apiUrl.substring(0, Environment.apiUrl.length - 1)
+        : Environment.apiUrl;
+
+    // Case 2: correct relative URL ("/images/...")
+    if (rawUrl.startsWith('/')) {
+      return '$host$rawUrl';
+    }
+
+    // Case 3: relative URL without leading slash (old records)
+    // Add the /images/ prefix that it should have
+    final staticPrefix = '/images';
+    return '$host$staticPrefix/$rawUrl';
   }
 
   /// 🔤 Sorts a list of strings in ascending order (case-insensitive).

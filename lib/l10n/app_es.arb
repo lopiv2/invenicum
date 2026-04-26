@@ -477,6 +477,8 @@
   "settings": "Ajustes",
   "showAsGrid": "Mostrar como Grid",
   "showAsList": "Mostrar como Lista",
+  "showAssetTypeLogo": "Mostrar logo del tipo de activo",
+  "showAssetTypeLogoDescription": "Si el tipo de activo tiene una imagen, mostrarla como logo en la vista de lista.",
   "sortAsc": "Ascendente",
   "sortDesc": "Descendente",
   "slotDashboardBottom": "Panel de control Inferior",
