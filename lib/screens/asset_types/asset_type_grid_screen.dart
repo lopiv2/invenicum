@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/screens/asset_types/local_widgets/asset_type_badge.dart';
 import 'package:provider/provider.dart';
 
 import 'package:invenicum/data/models/asset_type_model.dart';
@@ -95,9 +96,6 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final collectionColor =
-        Colors.lightGreen; // El color que usas para colecciones
-    final inventoryColor = theme.primaryColor;
     final screenWidth = MediaQuery.of(context).size.width;
     // ✅ watch() aquí es correcto para reaccionar a cambios de datos,
     // siempre que no disparemos lógica de carga aquí dentro.
@@ -152,7 +150,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                           color: theme.colorScheme.onSurface,
                         ),
                       ),
-                      _buildTypeChip(theme, container.isCollection, l10n),
+                      AssetTypeBadge(isCollection: container.isCollection,),
                     ],
                   ),
                 ),
@@ -183,7 +181,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                         color: theme.colorScheme.onSurface,
                       ),
                     ),
-                    _buildTypeChip(theme, container.isCollection, l10n),
+                    AssetTypeBadge(isCollection: container.isCollection,),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -252,43 +250,4 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
       ),
     );
   }
-}
-
-Widget _buildTypeChip(
-  ThemeData theme,
-  bool isCollection,
-  AppLocalizations l10n,
-) {
-  final color = isCollection ? Colors.lightGreen : theme.primaryColor;
-
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-    decoration: BoxDecoration(
-      // Usamos withValues para Flutter 3.27+ o withOpacity para versiones anteriores
-      color: color.withValues(alpha: 0.15),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          isCollection ? Icons.auto_awesome_motion : Icons.inventory_2,
-          size: 12,
-          color: isCollection ? Colors.green[800] : theme.primaryColor,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          (isCollection ? l10n.collectionLabel : l10n.inventoryLabel)
-              .toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.5,
-            color: isCollection ? Colors.green[800] : theme.primaryColor,
-          ),
-        ),
-      ],
-    ),
-  );
 }
