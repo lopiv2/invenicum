@@ -6,7 +6,6 @@ import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
-import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetTypeCard extends StatelessWidget {

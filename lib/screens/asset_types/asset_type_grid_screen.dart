@@ -95,6 +95,9 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
+    final collectionColor =
+        Colors.lightGreen; // El color que usas para colecciones
+    final inventoryColor = theme.primaryColor;
     final screenWidth = MediaQuery.of(context).size.width;
     // ✅ watch() aquí es correcto para reaccionar a cambios de datos,
     // siempre que no disparemos lógica de carga aquí dentro.
@@ -138,12 +141,19 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    l10n.assetTypesInContainer(container.name),
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 12,
+                    children: [
+                      Text(
+                        l10n.assetTypesInContainer(container.name),
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      _buildTypeChip(theme, container.isCollection, l10n),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -162,12 +172,19 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.assetTypesInContainer(container.name),
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  children: [
+                    Text(
+                      l10n.assetTypesInContainer(container.name),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    _buildTypeChip(theme, container.isCollection, l10n),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -184,6 +201,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 ),
               ],
             ),
+          // COLOR LEGENDS
           const SizedBox(height: 20),
           if (assetTypes.isEmpty)
             Expanded(
@@ -191,7 +209,9 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 child: Text(
                   l10n.noAssetTypesMessage,
                   style: TextStyle(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.7,
+                    ),
                   ),
                 ),
               ),
@@ -200,7 +220,9 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             Expanded(
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: screenWidth > 900 ? 420 : (screenWidth > 600 ? 320 : 220),
+                  maxCrossAxisExtent: screenWidth > 900
+                      ? 420
+                      : (screenWidth > 600 ? 320 : 220),
                   crossAxisSpacing: screenWidth > 600 ? 20 : 12,
                   mainAxisSpacing: screenWidth > 600 ? 20 : 12,
                   mainAxisExtent: screenWidth > 600 ? 165 : 130,
@@ -230,4 +252,43 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
       ),
     );
   }
+}
+
+Widget _buildTypeChip(
+  ThemeData theme,
+  bool isCollection,
+  AppLocalizations l10n,
+) {
+  final color = isCollection ? Colors.lightGreen : theme.primaryColor;
+
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+    decoration: BoxDecoration(
+      // Usamos withValues para Flutter 3.27+ o withOpacity para versiones anteriores
+      color: color.withValues(alpha: 0.15),
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(color: color.withValues(alpha: 0.5), width: 1),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          isCollection ? Icons.auto_awesome_motion : Icons.inventory_2,
+          size: 12,
+          color: isCollection ? Colors.green[800] : theme.primaryColor,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          (isCollection ? l10n.collectionLabel : l10n.inventoryLabel)
+              .toUpperCase(),
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 0.5,
+            color: isCollection ? Colors.green[800] : theme.primaryColor,
+          ),
+        ),
+      ],
+    ),
+  );
 }

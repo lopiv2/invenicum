@@ -215,6 +215,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get collectionFieldsConfigured => 'Campi di raccolta configurati.';
 
   @override
+  String get collectionLabel => 'Collezione';
+
+  @override
+  String get collectionsLabel => 'Collezioni';
+
+  @override
   String get condition => 'Condizione';
 
   @override
@@ -559,6 +565,9 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get inventoryLabel => 'Inventario';
+
+  @override
+  String get inventoriesLabel => 'Inventari';
 
   @override
   String get january => 'Gennaio';
