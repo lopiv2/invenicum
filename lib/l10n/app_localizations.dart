@@ -496,6 +496,18 @@ abstract class AppLocalizations {
   /// **'Collection fields configured.'**
   String get collectionFieldsConfigured;
 
+  /// No description provided for @collectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection'**
+  String get collectionLabel;
+
+  /// No description provided for @collectionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get collectionsLabel;
+
   /// No description provided for @condition.
   ///
   /// In en, this message translates to:
@@ -1077,6 +1089,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Inventory'**
   String get inventoryLabel;
+
+  /// No description provided for @inventoriesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventories'**
+  String get inventoriesLabel;
 
   /// No description provided for @january.
   ///
