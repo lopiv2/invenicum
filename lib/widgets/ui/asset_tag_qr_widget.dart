@@ -83,7 +83,8 @@ class BentoPrintTile extends StatelessWidget {
 
     if (!showButton) return labelContent;
 
-    return BentoBoxWidget(
+    return CollapsibleBentoBoxWidget(
+      collapsible: false,
       width: 350,
       title: "Etiqueta de Inventario",
       icon: Icons.print_outlined,
