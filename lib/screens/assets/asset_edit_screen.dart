@@ -1080,7 +1080,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                           )
                         : null,
                     // ── Row 1a: Scraper ──
-                      scraperBento: BentoBoxWidget(
+                      scraperBento: CollapsibleBentoBoxWidget(
                         title: 'Scraper Import',
                         icon: Icons.travel_explore,
                         child: ScraperImportWidget(
@@ -1090,7 +1090,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                       ),
                     // ── Importar desde fuente externa ──
                     importBento: aiEnabled
-                        ? BentoBoxWidget(
+                        ? CollapsibleBentoBoxWidget(
                             title: l10n.externalImportTitle,
                             icon: Icons.auto_awesome,
                             child: ExternalImportWidget(
@@ -1106,7 +1106,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                         : null,
 
                     // ── Datos Principales ──
-                    mainDataBento: BentoBoxWidget(
+                    mainDataBento: CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       title: l10n.mainDataTitle,
                       icon: Icons.info_outline,
                       child: MainDataSectionWidget(
@@ -1123,7 +1124,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     ),
 
                     // ── Galería ──
-                    galleryBento: BentoBoxWidget(
+                    galleryBento: CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       title: l10n.galleryTitle,
                       icon: Icons.camera_alt_outlined,
                       child: ImagesSectionWidget(
@@ -1142,7 +1144,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     ),
 
                     // ── Stock y Codificación ──
-                    stockBento: BentoBoxWidget(
+                    stockBento: CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       title: l10n.stockAndCodingTitle,
                       icon: Icons.qr_code_scanner,
                       child: InventorySectionWidget(
@@ -1158,7 +1161,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
                     // ── Especificaciones ──
                     specsBento: _assetType!.fieldDefinitions.isNotEmpty
-                        ? BentoBoxWidget(
+                        ? CollapsibleBentoBoxWidget(
+                            collapsible: false,
                             title: l10n.specificationsTitle,
                             icon: Icons.list_alt,
                             child: CustomFieldsSectionWidget(

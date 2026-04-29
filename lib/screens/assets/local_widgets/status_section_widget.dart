@@ -17,7 +17,8 @@ class StatusSectionWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return BentoBoxWidget(
+    return CollapsibleBentoBoxWidget(
+      collapsible: false,
       width: 450,
       title: l10n.statusAndPreferences,
       icon: Icons.stars_outlined,
