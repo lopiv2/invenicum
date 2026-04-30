@@ -16,7 +16,7 @@ class CollapsibleBentoBoxWidget extends StatefulWidget {
     required this.icon,
     required this.child,
     this.padding = const EdgeInsets.all(24),
-    this.initiallyExpanded = true,
+    this.initiallyExpanded = false,
     this.collapsible = true, // ← por defecto colapsable
   });
 

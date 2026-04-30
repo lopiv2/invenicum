@@ -427,27 +427,26 @@ class AppSlots {
 }
 
 class AppAchievements {
-  // IDs to avoid typos (Hardcoded IDs)
-  static const String firstItem = 'first_item';
-  static const String catalogerSmall = 'cataloger_small';
-  static const String catalogerMedium = 'cataloger_medium';
-  static const String catalogerLarge = 'cataloger_large';
-  static const String orderMaster = 'order_master';
-  static const String eyeForValue = 'eye_for_value';
-  static const String firstGrail = 'first_grail';
-  static const String museumPiece = 'museum_piece';
-  static const String growingWealth = 'growing_wealth';
-  static const String wallStreetWolf = 'wall_street_wolf';
-  static const String bargainHunter = 'bargain_hunter';
-  static const String blindTrust = 'blind_trust';
+  static const String firstItem = 'firstItem';
+  static const String catalogerSmall = 'catalogerSmall';
+  static const String catalogerMedium = 'catalogerMedium';
+  static const String catalogerLarge = 'catalogerLarge';
+  static const String orderMaster = 'orderMaster';
+  static const String eyeForValue = 'eyeForValue';
+  static const String firstGrail = 'firstGrail';
+  static const String museumPiece = 'museumPiece';
+  static const String growingWealth = 'growingWealth';
+  static const String wallStreetWolf = 'wallStreetWolf';
+  static const String bargainHunter = 'bargainHunter';
+  static const String blindTrust = 'blindTrust';
   static const String librarian = 'librarian';
-  static const String allInOrder = 'all_in_order';
-  static const String legendaryLender = 'legendary_lender';
-  static const String cyberCollector = 'cyber_collector';
-  static const String hawkEye = 'hawk_eye';
+  static const String allInOrder = 'allInOrder';
+  static const String legendaryLender = 'legendaryLender';
+  static const String cyberCollector = 'cyberCollector';
+  static const String hawkEye = 'hawkEye';
   static const String polyglot = 'polyglot';
   static const String forecaster = 'forecaster';
-  static const String masterUser = 'master_user';
+  static const String masterUser = 'masterUser';
 
   /// Returns the official list of the 20 Invenicum achievements
   static List<AchievementDefinition> getDefinitions(BuildContext context) {
@@ -464,7 +463,7 @@ class AppAchievements {
       AchievementDefinition(
         id: catalogerSmall,
         title: 'Small Warehouse',
-        desc: 'Register 10 items in your collectiontotal',
+        desc: 'Register 10 items in your collection',
         icon: Icons.inventory_2_outlined,
         category: 'collection',
       ),

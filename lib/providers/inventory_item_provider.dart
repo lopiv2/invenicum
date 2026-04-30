@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/inventory_item_response.dart';
@@ -394,25 +395,16 @@ class InventoryItemProvider with ChangeNotifier {
     notifyListeners();
     try {
       await _itemService.createInventoryItem(newItem, filesData: filesData);
-      // ------------------------------------
-      // ACHIEVEMENTS: EVENT TRACKING
-      // ------------------------------------
-      final newUnlocks = await context.read<AchievementProvider>().trackEvent(
-        context,
-        'ITEM_CREATED',
-      );
-      // ------------------------------------
-      // ------------------------------------
       await loadInventoryItems(
         containerId: newItem.containerId,
         assetTypeId: newItem.assetTypeId,
         forceReload: true,
       );
-      if (newUnlocks.isNotEmpty) {
-        for (final ach in newUnlocks) {
-          ToastService.achievement(ach.title);
-        }
+      await AppUtils.trackAndToast(context, 'ITEM_CREATED');
+      if (newItem.locationId != null) {
+        await AppUtils.trackAndToast(context, 'ITEM_WITH_LOCATION');
       }
+      await AppUtils.trackAndToast(context, 'PRICE_REGISTERED');
     } catch (e) {
       _isLoading = false;
       notifyListeners();
