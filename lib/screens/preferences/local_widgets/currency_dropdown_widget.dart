@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:provider/provider.dart';
@@ -94,11 +96,12 @@ class CurrencyDropdownWidget extends StatelessWidget {
 
 
   Future<void> _changeCurrency(BuildContext context, String currencyCode) async {
+    AppLocalizations l10n = AppLocalizations.of(context)!;
     try {
       // Este método en tu provider ahora actualiza _prefs y notifica al backend
       await context.read<PreferencesProvider>().setCurrency(currencyCode);
-      
-      ToastService.success("Moneda: $currencyCode"); 
+      await AppUtils.trackAndToast(context, 'CURRENCY_CHANGED');
+      ToastService.success("${l10n.currency}: $currencyCode"); 
     } catch (e) {
       ToastService.error("Error: ${e.toString()}");
     }

@@ -18,7 +18,7 @@ class AchievementsCardWidget extends StatefulWidget {
 
 class _AchievementsCardWidgetState extends State<AchievementsCardWidget> {
   // Cambiar a 'true' para mostrar el overlay, 'false' para ocultarlo
-  final bool _showUnderConstruction = true;
+  final bool _showUnderConstruction = false;
 
   @override
   Widget build(BuildContext context) {

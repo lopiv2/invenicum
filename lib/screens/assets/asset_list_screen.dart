@@ -6,6 +6,7 @@ import 'package:csv/csv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/async_task_helper.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
@@ -199,6 +200,7 @@ class _AssetListScreenState extends State<AssetListScreen>
         loadingMessage: l10n.syncingMarketPrices,
         errorMessage: l10n.couldNotSyncPrices,
       );
+      await AppUtils.trackAndToast(context, 'PRICE_REGISTERED', value: summary['updated'] ?? 0);
 
       if (!context.mounted) return;
 

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/l10n/app_localizations.dart'; // Asegúrate de que la ruta sea correcta
 import 'package:invenicum/data/models/loan.dart';
 import 'package:invenicum/providers/loan_provider.dart';
@@ -81,6 +82,7 @@ class _LoansScreenState extends State<LoansScreen> {
       await loanProvider.returnLoan(containerIdInt, loan.id);
       if (mounted) {
         ToastService.success(context.l10n.configurationSaved);
+        await AppUtils.trackAndToast(context, 'LOAN_RETURNED');
       }
     } catch (e) {
       if (mounted) ToastService.error(e.toString());
