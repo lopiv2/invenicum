@@ -1036,3 +1036,4 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 // ---------------------------------------------------------------------------
 // Layout compartido — usado tanto en Create como en Edit
 // ---------------------------------------------------------------------------
+

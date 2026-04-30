@@ -1081,6 +1081,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                         : null,
                     // ── Row 1a: Scraper ──
                       scraperBento: CollapsibleBentoBoxWidget(
+                        collapsible: true,
                         title: 'Scraper Import',
                         icon: Icons.travel_explore,
                         child: ScraperImportWidget(
@@ -1091,6 +1092,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     // ── Importar desde fuente externa ──
                     importBento: aiEnabled
                         ? CollapsibleBentoBoxWidget(
+                            collapsible: true,
                             title: l10n.externalImportTitle,
                             icon: Icons.auto_awesome,
                             child: ExternalImportWidget(
