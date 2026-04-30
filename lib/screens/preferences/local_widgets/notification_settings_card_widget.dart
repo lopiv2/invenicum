@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -43,8 +44,9 @@ class NotificationSettingsCardWidget extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: channels.length,
-                onReorder: (oldIndex, newIndex) {
+                onReorder: (oldIndex, newIndex) async{
                   prefsProv.reorderChannels(oldIndex, newIndex);
+                  await AppUtils.trackAndToast(context, 'NOTIFICATION_REORDERED');
                 },
                 itemBuilder: (context, index) {
                   final channel = channels[index];

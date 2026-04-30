@@ -2,9 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
-import 'dart:convert';
 
-import 'package:invenicum/data/services/scraper_service.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/scraper_provider.dart';

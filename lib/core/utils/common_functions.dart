@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/providers/achievement_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
 class AppUtils {
-
   /// 🌐 Launches an external URL (Docs, Web, etc.)
   static Future<void> launchUrlWeb(String url) async {
     final Uri uri = Uri.parse(url.startsWith('http') ? url : 'https://$url');
@@ -123,6 +125,23 @@ class AppUtils {
     // Add the /images/ prefix that it should have
     final staticPrefix = '/images';
     return '$host$staticPrefix/$rawUrl';
+  }
+
+  static Future<void> trackAndToast(
+    BuildContext context,
+    String eventType, {
+    int value = 1,
+    Map<String, dynamic>? metadata,
+  }) async {
+    final newUnlocks = await context.read<AchievementProvider>().trackEvent(
+      context,
+      eventType,
+      value: value,
+      metadata: metadata,
+    );
+    for (final ach in newUnlocks) {
+      ToastService.achievement(ach.title);
+    }
   }
 
   /// 🔤 Sorts a list of strings in ascending order (case-insensitive).

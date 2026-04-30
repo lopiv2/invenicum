@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/loan.dart';
 import 'package:invenicum/providers/alert_provider.dart';
@@ -179,6 +180,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
             RouteNames.loans,
             pathParameters: {'containerId': widget.containerId.toString()},
           );
+          await AppUtils.trackAndToast(context, 'LOAN_CREATED');
         }
       } catch (e) {
         if (mounted) {
