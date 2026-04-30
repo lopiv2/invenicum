@@ -178,6 +178,246 @@ abstract class AppLocalizations {
   /// **'View releases'**
   String get aboutOpenReleases;
 
+  /// No description provided for @achievementFirstItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the Mansion'**
+  String get achievementFirstItemTitle;
+
+  /// No description provided for @achievementFirstItemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first item to the inventory'**
+  String get achievementFirstItemDesc;
+
+  /// No description provided for @achievementCatalogerSmallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Small Warehouse'**
+  String get achievementCatalogerSmallTitle;
+
+  /// No description provided for @achievementCatalogerSmallDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register 10 items in your collection'**
+  String get achievementCatalogerSmallDesc;
+
+  /// No description provided for @achievementCatalogerMediumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Museum Curator'**
+  String get achievementCatalogerMediumTitle;
+
+  /// No description provided for @achievementCatalogerMediumDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register 50 items in your collection'**
+  String get achievementCatalogerMediumDesc;
+
+  /// No description provided for @achievementCatalogerLargeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner of an Empire'**
+  String get achievementCatalogerLargeTitle;
+
+  /// No description provided for @achievementCatalogerLargeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register 200 items (Legendary Level)'**
+  String get achievementCatalogerLargeDesc;
+
+  /// No description provided for @achievementOrderMasterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Absolute Order'**
+  String get achievementOrderMasterTitle;
+
+  /// No description provided for @achievementOrderMasterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign a physical location to 20 items'**
+  String get achievementOrderMasterDesc;
+
+  /// No description provided for @achievementEyeForValueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Eye for Value'**
+  String get achievementEyeForValueTitle;
+
+  /// No description provided for @achievementEyeForValueDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register the purchase price of 5 items'**
+  String get achievementEyeForValueDesc;
+
+  /// No description provided for @achievementFirstGrailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First Grail'**
+  String get achievementFirstGrailTitle;
+
+  /// No description provided for @achievementFirstGrailDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an item worth more than 100€'**
+  String get achievementFirstGrailDesc;
+
+  /// No description provided for @achievementMuseumPieceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Museum Piece'**
+  String get achievementMuseumPieceTitle;
+
+  /// No description provided for @achievementMuseumPieceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an item worth more than 500€'**
+  String get achievementMuseumPieceDesc;
+
+  /// No description provided for @achievementGrowingWealthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Growing Wealth'**
+  String get achievementGrowingWealthTitle;
+
+  /// No description provided for @achievementGrowingWealthDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your total inventory exceeds 1,000€'**
+  String get achievementGrowingWealthDesc;
+
+  /// No description provided for @achievementWallStreetWolfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall Street Wolf'**
+  String get achievementWallStreetWolfTitle;
+
+  /// No description provided for @achievementWallStreetWolfDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your total inventory exceeds 10,000€'**
+  String get achievementWallStreetWolfDesc;
+
+  /// No description provided for @achievementBargainHunterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bargain Hunter'**
+  String get achievementBargainHunterTitle;
+
+  /// No description provided for @achievementBargainHunterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register an item worth double what you paid'**
+  String get achievementBargainHunterDesc;
+
+  /// No description provided for @achievementBlindTrustTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blind Trust'**
+  String get achievementBlindTrustTitle;
+
+  /// No description provided for @achievementBlindTrustDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Make your first loan to a contact'**
+  String get achievementBlindTrustDesc;
+
+  /// No description provided for @achievementLibrarianTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Librarian'**
+  String get achievementLibrarianTitle;
+
+  /// No description provided for @achievementLibrarianDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage 3 active loans simultaneously'**
+  String get achievementLibrarianDesc;
+
+  /// No description provided for @achievementAllInOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All in Order'**
+  String get achievementAllInOrderTitle;
+
+  /// No description provided for @achievementAllInOrderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrieve and mark a loaned item as returned'**
+  String get achievementAllInOrderDesc;
+
+  /// No description provided for @achievementLegendaryLenderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legendary Lender'**
+  String get achievementLegendaryLenderTitle;
+
+  /// No description provided for @achievementLegendaryLenderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 20 loans successfully'**
+  String get achievementLegendaryLenderDesc;
+
+  /// No description provided for @achievementCyberCollectorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyber Collector'**
+  String get achievementCyberCollectorTitle;
+
+  /// No description provided for @achievementCyberCollectorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Identify an item using AI for the first time'**
+  String get achievementCyberCollectorDesc;
+
+  /// No description provided for @achievementHawkEyeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hawk Eye'**
+  String get achievementHawkEyeTitle;
+
+  /// No description provided for @achievementHawkEyeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use AI to identify 15 items'**
+  String get achievementHawkEyeDesc;
+
+  /// No description provided for @achievementPolyglotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Polyglot'**
+  String get achievementPolyglotTitle;
+
+  /// No description provided for @achievementPolyglotDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the global currency of the app'**
+  String get achievementPolyglotDesc;
+
+  /// No description provided for @achievementForecasterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecaster'**
+  String get achievementForecasterTitle;
+
+  /// No description provided for @achievementForecasterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate 3 different maintenance alerts'**
+  String get achievementForecasterDesc;
+
+  /// No description provided for @achievementMasterUserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Master User'**
+  String get achievementMasterUserTitle;
+
+  /// No description provided for @achievementMasterUserDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize the order of your notifications'**
+  String get achievementMasterUserDesc;
+
   /// No description provided for @active.
   ///
   /// In en, this message translates to:

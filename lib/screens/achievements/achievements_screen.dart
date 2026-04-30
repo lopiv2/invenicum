@@ -5,7 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/providers/achievement_provider.dart';
 // Asegúrate de tener estas constantes o cámbialas por tus valores de diseño
-import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/widgets/ui/under_construction_overlay.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
@@ -21,32 +20,26 @@ class _AchievementsCardWidgetState extends State<AchievementsCardWidget> {
   final bool _showUnderConstruction = false;
 
   @override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    final prov = context.read<AchievementProvider>();
+    
+    if (prov.achievements.isEmpty && !prov.isLoading) {
+      await prov.fetchAchievements();
+    }
+    
+    if (mounted) prov.applyLocalizations(context);
+  });
+}
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final achProv = context.watch<AchievementProvider>();
-    // Supongamos que AppAchievements devuelve la lista de definiciones base.
-    final baseDefinitions = AppAchievements.getDefinitions(context);
 
     // Mapeo para combinar estado base con estado del usuario
-    final List<AchievementDefinition> finalAchievements = baseDefinitions.map((
-      def,
-    ) {
-      final userStatus = achProv.achievements.firstWhere(
-        (a) => a.id == def.id,
-        // Si no está en el provider, devolvemos la definición base (bloqueado)
-        orElse: () => def,
-      );
-      return AchievementDefinition(
-        id: def.id,
-        title: def.title,
-        desc: def.desc,
-        icon: def.icon,
-        category: def.category,
-        isLegendary: def.isLegendary,
-        unlocked: userStatus.unlocked,
-        unlockedAt: userStatus.unlockedAt,
-      );
-    }).toList();
+    final List<AchievementDefinition> finalAchievements = achProv.achievements;
 
     if (achProv.isLoading && achProv.achievements.isEmpty) {
       return const Center(child: CircularProgressIndicator());
@@ -67,7 +60,9 @@ class _AchievementsCardWidgetState extends State<AchievementsCardWidget> {
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
+            border: Border.all(
+              color: theme.dividerColor.withValues(alpha: 0.05),
+            ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.03),
@@ -143,9 +138,7 @@ class _AchievementsCardWidgetState extends State<AchievementsCardWidget> {
         ),
         if (_showUnderConstruction)
           Positioned.fill(
-            child: AbsorbPointer(
-              child: const UnderConstructionOverlay(),
-            ),
+            child: AbsorbPointer(child: const UnderConstructionOverlay()),
           ),
       ],
     );
@@ -230,8 +223,8 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
     // Color de fondo del ítem: Vidrio esmerilado si está desbloqueado, sutil si no.
     final Color baseColor = widget.ach.unlocked
         ? jewelColor.withValues(alpha: isDark ? 0.15 : 0.1)
-        : theme.colorScheme.onSurfaceVariant.withValues(alpha: 
-            isDark ? 0.3 : 0.5,
+        : theme.colorScheme.onSurfaceVariant.withValues(
+            alpha: isDark ? 0.3 : 0.5,
           );
 
     return MouseRegion(
@@ -263,7 +256,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                 border: Border.all(
                   color: widget.ach.unlocked
                       ? jewelColor.withValues(alpha: 0.5)
-                      : theme.dividerColor.withValues(alpha: isDark ? 0.05 : 0.1),
+                      : theme.dividerColor.withValues(
+                          alpha: isDark ? 0.05 : 0.1,
+                        ),
                   width: widget.ach.unlocked ? 1.5 : 1,
                 ),
                 // Efecto de brillo si está bloqueado y hover
@@ -288,7 +283,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                         size: 28,
                         color: widget.ach.unlocked
                             ? jewelColor
-                            : theme.hintColor.withValues(alpha: isDark ? 0.2 : 0.4),
+                            : theme.hintColor.withValues(
+                                alpha: isDark ? 0.2 : 0.4,
+                              ),
                       ),
                     ),
 
@@ -300,8 +297,8 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                         child: Icon(
                           Icons.star_rounded,
                           size: 12,
-                          color: Colors.amber.withValues(alpha: 
-                            widget.ach.unlocked ? 1 : 0.3,
+                          color: Colors.amber.withValues(
+                            alpha: widget.ach.unlocked ? 1 : 0.3,
                           ),
                         ),
                       ),
@@ -316,7 +313,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             colors: [
-                              Colors.white.withValues(alpha: isDark ? 0.05 : 0.2),
+                              Colors.white.withValues(
+                                alpha: isDark ? 0.05 : 0.2,
+                              ),
                               Colors.transparent,
                             ],
                           ),
@@ -334,7 +333,10 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
   }
 
   // MODAL MODERNO ESTILO "BOTTOM SHEET" (En lugar de un Dialog central)
-  void _showModernAchievementSheet(BuildContext context, AppLocalizations l10n) {
+  void _showModernAchievementSheet(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final jewelColor = widget.ach.isLegendary
@@ -350,9 +352,13 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           decoration: BoxDecoration(
-            color: theme.colorScheme.surface.withValues(alpha: isDark ? 0.8 : 0.95),
+            color: theme.colorScheme.surface.withValues(
+              alpha: isDark ? 0.8 : 0.95,
+            ),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
-            border: Border.all(color: theme.dividerColor.withValues(alpha: 0.05)),
+            border: Border.all(
+              color: theme.dividerColor.withValues(alpha: 0.05),
+            ),
           ),
           padding: EdgeInsets.only(
             left: 24,
@@ -462,8 +468,8 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                 decoration: BoxDecoration(
                   color: widget.ach.unlocked
                       ? Colors.green.withValues(alpha: isDark ? 0.1 : 0.05)
-                      : theme.colorScheme.primary.withValues(alpha: 
-                          isDark ? 0.1 : 0.05,
+                      : theme.colorScheme.primary.withValues(
+                          alpha: isDark ? 0.1 : 0.05,
                         ),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
@@ -501,8 +507,9 @@ class _ModernAchievementItemState extends State<_ModernAchievementItem> {
                           Text(
                             widget.ach.unlocked && widget.ach.unlockedAt != null
                                 ? l10n.achievementUnlockedDate(
-                                    DateFormat('d MMMM, yyyy')
-                                        .format(widget.ach.unlockedAt!),
+                                    DateFormat(
+                                      'd MMMM, yyyy',
+                                    ).format(widget.ach.unlockedAt!),
                                   )
                                 : l10n.achievementLockedMessage,
                             style: theme.textTheme.bodySmall?.copyWith(

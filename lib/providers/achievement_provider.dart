@@ -9,6 +9,7 @@ class AchievementProvider with ChangeNotifier {
 
   List<AchievementDefinition> _achievements = [];
   bool _isLoading = false;
+  List<Map<String, dynamic>> _serverData = [];
 
   List<AchievementDefinition> get achievements => _achievements;
   bool get isLoading => _isLoading;
@@ -16,36 +17,57 @@ class AchievementProvider with ChangeNotifier {
   double get progressPercentage =>
       _achievements.isEmpty ? 0 : unlockedCount / _achievements.length;
 
-  Future<void> fetchAchievements(BuildContext context) async {
+  int get serverDataLength => _serverData.length;
+
+  Future<void> fetchAchievements() async {
+    // ← sin BuildContext
     _isLoading = true;
     notifyListeners();
     try {
-      final serverData = await _service.getAchievements();
-      final staticDefs = AppAchievements.getDefinitions(context);
-      final map = {for (final s in serverData) s['id'].toString(): s};
-
-      _achievements = staticDefs.map((def) {
-        final s = map[def.id] ?? {};
-        return AchievementDefinition(
-          id: def.id,
-          title: def.title,
-          desc: def.desc,
-          icon: def.icon,
-          category: def.category,
-          isLegendary: def.isLegendary,
-          unlocked: s['unlocked'] ?? false,
-          progress: s['progress'] ?? 0,
-          requiredValue: s['requiredValue'],
-          unlockedAt: s['unlockedAt'] != null
-              ? DateTime.tryParse(s['unlockedAt'])
-              : null,
-        );
-      }).toList();
+      _serverData = await _service.getAchievements();
+      _buildAchievements(null);
     } catch (e) {
+      debugPrint('[AchievementProvider] fetchAchievements error: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void applyLocalizations(BuildContext context) {
+    if (_serverData.isEmpty) return;
+    _buildAchievements(context);
+    notifyListeners();
+  }
+
+  void _buildAchievements(BuildContext? context) {
+    final staticDefs = context != null
+        ? AppAchievements.getDefinitions(context)
+        : _achievements.isNotEmpty
+        ? _achievements
+        : [];
+
+    if (staticDefs.isEmpty) return;
+
+    final map = {for (final s in _serverData) s['id'].toString(): s};
+
+    _achievements = staticDefs.map((def) {
+      final s = map[def.id] ?? {};
+      return AchievementDefinition(
+        id: def.id,
+        title: def.title,
+        desc: def.desc,
+        icon: def.icon,
+        category: def.category,
+        isLegendary: def.isLegendary,
+        unlocked: s['unlocked'] ?? false,
+        progress: s['progress'] ?? 0,
+        requiredValue: s['requiredValue'],
+        unlockedAt: s['unlockedAt'] != null
+            ? DateTime.tryParse(s['unlockedAt'])
+            : null,
+      );
+    }).toList();
   }
 
   /// Llama a esto después de cualquier acción que pueda desbloquear logros.
