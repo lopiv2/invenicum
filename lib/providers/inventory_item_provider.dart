@@ -6,6 +6,9 @@ import 'package:invenicum/data/models/inventory_item_response.dart';
 import 'package:invenicum/data/models/price_history_point.dart';
 import 'package:invenicum/data/services/asset_print_service.dart';
 import 'package:invenicum/data/services/inventory_item_service.dart';
+import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/providers/achievement_provider.dart';
+import 'package:provider/provider.dart';
 
 typedef FileData = List<Map<String, dynamic>>;
 
@@ -334,7 +337,7 @@ class InventoryItemProvider with ChangeNotifier {
   }
 
   // ----------------------------------------------------------------------
-  // VALOR ECONÓMICO GLOBAL
+  // GLOBAL ECONOMIC VALUE
   // ----------------------------------------------------------------------
 
   double getTotalGlobalEconomicValue(
@@ -362,7 +365,7 @@ class InventoryItemProvider with ChangeNotifier {
   }
 
   // ----------------------------------------------------------------------
-  // BÚSQUEDA EN CACHÉ
+  // CACHE SEARCHING
   // ----------------------------------------------------------------------
 
   InventoryItem? getItemFromCache(int id) {
@@ -376,7 +379,6 @@ class InventoryItemProvider with ChangeNotifier {
     return null;
   }
 
-  // Alias para compatibilidad con código existente
   InventoryItem? getItemById(int id) => getItemFromCache(id);
 
   // ----------------------------------------------------------------------
@@ -384,6 +386,7 @@ class InventoryItemProvider with ChangeNotifier {
   // ----------------------------------------------------------------------
 
   Future<void> createInventoryItem(
+    BuildContext context,
     InventoryItem newItem, {
     FileData filesData = const [],
   }) async {
@@ -391,11 +394,25 @@ class InventoryItemProvider with ChangeNotifier {
     notifyListeners();
     try {
       await _itemService.createInventoryItem(newItem, filesData: filesData);
+      // ------------------------------------
+      // ACHIEVEMENTS: EVENT TRACKING
+      // ------------------------------------
+      final newUnlocks = await context.read<AchievementProvider>().trackEvent(
+        context,
+        'ITEM_CREATED',
+      );
+      // ------------------------------------
+      // ------------------------------------
       await loadInventoryItems(
         containerId: newItem.containerId,
         assetTypeId: newItem.assetTypeId,
         forceReload: true,
       );
+      if (newUnlocks.isNotEmpty) {
+        for (final ach in newUnlocks) {
+          ToastService.achievement(ach.title);
+        }
+      }
     } catch (e) {
       _isLoading = false;
       notifyListeners();
