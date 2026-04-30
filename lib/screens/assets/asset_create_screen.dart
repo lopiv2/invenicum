@@ -915,7 +915,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                             )
                           : null,
                       // ── Row 1a: Scraper ──
-                      scraperBento: BentoBoxWidget(
+                      scraperBento: CollapsibleBentoBoxWidget(
                         title: 'Scraper Import',
                         icon: Icons.travel_explore,
                         child: ScraperImportWidget(
@@ -924,7 +924,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         ),
                       ),
                       // ── Row 1b: Import from external source ──
-                      importBento: BentoBoxWidget(
+                      importBento: CollapsibleBentoBoxWidget(
                         title: l10n.externalImportTitle,
                         icon: Icons.auto_awesome,
                         child: ExternalImportWidget(
@@ -939,7 +939,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       ),
 
                       // ── Fila 2a: Datos principales ──
-                      mainDataBento: BentoBoxWidget(
+                      mainDataBento: CollapsibleBentoBoxWidget(
+                        collapsible: false,
                         title: l10n.mainDataTitle,
                         icon: Icons.info_outline,
                         child: MainDataSectionWidget(
@@ -957,7 +958,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       ),
 
                       // ── Fila 2b: Galería ──
-                      galleryBento: BentoBoxWidget(
+                      galleryBento: CollapsibleBentoBoxWidget(
+                        collapsible: false,
                         title: l10n.galleryTitle,
                         icon: Icons.camera_alt_outlined,
                         child: ImagesSectionWidget(
@@ -977,7 +979,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       ),
 
                       // ── Fila 3b: Stock y Codificación ──
-                      stockBento: BentoBoxWidget(
+                      stockBento: CollapsibleBentoBoxWidget(
+                        collapsible: false,
                         title: l10n.stockAndCodingTitle,
                         icon: Icons.qr_code_scanner,
                         child: InventorySectionWidget(
@@ -993,7 +996,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
                       // ── Fila 4: Especificaciones (full width si hay campos) ──
                       specsBento: _assetType!.fieldDefinitions.isNotEmpty
-                          ? BentoBoxWidget(
+                          ? CollapsibleBentoBoxWidget(
+                              collapsible: false,
                               title: l10n.specificationsTitle,
                               icon: Icons.list_alt,
                               child: CustomFieldsSectionWidget(
@@ -1032,3 +1036,4 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 // ---------------------------------------------------------------------------
 // Layout compartido — usado tanto en Create como en Edit
 // ---------------------------------------------------------------------------
+

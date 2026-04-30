@@ -34,7 +34,7 @@ class AssetFormLayout extends StatelessWidget {
           const SizedBox(height: 24),
           scraperBento!,
         ],
-
+        const SizedBox(height: 16),
         // ── Importar (solo create) ─────────────────────────────────────────
         if (importBento != null) ...[importBento!, const SizedBox(height: 24)],
 

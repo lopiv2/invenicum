@@ -110,7 +110,8 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                   spacing: 20,
                   runSpacing: 20,
                   children: [
-                    BentoBoxWidget(
+                    CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       width: 780,
                       title: l10n.visualGalleryTitle,
                       icon: Icons.photo_library_outlined,
@@ -124,14 +125,16 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       ),
                     ),
 
-                    BentoBoxWidget(
+                    CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       width: 400,
                       title: l10n.statusAndMarketTitle,
                       icon: Icons.analytics_outlined,
                       child: AssetMarketStatusWidget(item: item, l10n: l10n),
                     ),
 
-                    BentoBoxWidget(
+                    CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       width: 1200,
                       title: l10n.valuationHistoryTitle,
                       icon: Icons.insights_rounded,
@@ -151,7 +154,8 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       ),
                     ),
 
-                    BentoBoxWidget(
+                    CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       width: 720,
                       title: l10n.specificationsTitle,
                       icon: Icons.fact_check_outlined,
@@ -162,7 +166,8 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       ),
                     ),
 
-                    BentoBoxWidget(
+                    CollapsibleBentoBoxWidget(
+                      collapsible: false,
                       width: 460,
                       title: l10n.traceabilityTitle,
                       icon: Icons.history_toggle_off_rounded,
