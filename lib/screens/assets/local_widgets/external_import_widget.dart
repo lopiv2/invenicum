@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/data/models/integration_field_type.dart';
-import 'package:invenicum/l10n/app_localizations.dart'; // Ajusta la ruta si es necesario
+import 'package:invenicum/data/models/integration_field_type.dart'; // Ajusta la ruta si es necesario
 
 class ExternalImportWidget extends StatelessWidget {
   final String? selectedSource;
@@ -22,7 +21,6 @@ class ExternalImportWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth >= 480;
@@ -59,8 +57,8 @@ class ExternalImportWidget extends StatelessWidget {
         final searchField = TextFormField(
           controller: searchController,
           decoration: InputDecoration(
-            labelText: l10n.searchByName,
-            hintText: "Ex: Pikachu, Catan, El Quijote...",
+            labelText: "Buscar por nombre",
+            hintText: "Ej: Pikachu, Catan, El Quijote...",
             suffixIcon: isLoading
                 ? const Padding(
                     padding: EdgeInsets.all(12),
