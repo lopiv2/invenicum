@@ -713,6 +713,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         customFieldValues: customFieldValues,
       );
       await context.read<InventoryItemProvider>().createInventoryItem(
+        context,
         newItem,
         filesData: AssetFormUtils.processImages(_imagePreviewUrls),
       );
@@ -1031,5 +1032,3 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 // ---------------------------------------------------------------------------
 // Layout compartido — usado tanto en Create como en Edit
 // ---------------------------------------------------------------------------
-
-

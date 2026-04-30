@@ -9,6 +9,8 @@ class AchievementDefinition {
   final bool isLegendary;
   final bool unlocked;
   final DateTime? unlockedAt;
+  final int progress;
+  final int? requiredValue;
 
   const AchievementDefinition({
     required this.id,
@@ -19,6 +21,8 @@ class AchievementDefinition {
     this.isLegendary = false,
     this.unlocked = false,
     this.unlockedAt,
+    this.progress = 0,
+    this.requiredValue,
   });
 
   factory AchievementDefinition.fromJson(Map<String, dynamic> json) {
@@ -33,6 +37,8 @@ class AchievementDefinition {
       unlockedAt: json['unlockedAt'] != null
           ? DateTime.parse(json['unlockedAt'])
           : null,
+      progress: json['progress'] ?? 0,
+      requiredValue: json['requiredValue'],
     );
   }
 }
