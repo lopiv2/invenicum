@@ -7,9 +7,6 @@ import 'package:invenicum/data/models/inventory_item_response.dart';
 import 'package:invenicum/data/models/price_history_point.dart';
 import 'package:invenicum/data/services/asset_print_service.dart';
 import 'package:invenicum/data/services/inventory_item_service.dart';
-import 'package:invenicum/data/services/toast_service.dart';
-import 'package:invenicum/providers/achievement_provider.dart';
-import 'package:provider/provider.dart';
 
 typedef FileData = List<Map<String, dynamic>>;
 

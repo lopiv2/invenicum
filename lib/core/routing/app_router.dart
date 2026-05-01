@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/screens/home/first_run_screen.dart';
+import 'package:invenicum/screens/scrapers/scraper_create_screen.dart';
+import 'package:invenicum/screens/scrapers/scraper_edit_screen.dart';
+import 'package:invenicum/screens/scrapers/scraper_grid_screen.dart';
 import 'package:web/web.dart' as html;
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/data/models/asset_template_model.dart';
@@ -127,7 +130,11 @@ GoRouter createAppRouter(
     },
     routes: [
       // ── Public routes (outside Shell) ────────────────────────────────────
-      GoRoute(name: RouteNames.login, path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        name: RouteNames.login,
+        path: '/login',
+        builder: (context, state) => const LoginScreen(),
+      ),
 
       // 🆕 First-run setup screen
       GoRoute(
@@ -256,8 +263,7 @@ GoRouter createAppRouter(
                 builder: (context, state) {
                   final AssetTemplate? templateFromExtra =
                       state.extra as AssetTemplate?;
-                  final String templateId =
-                      state.pathParameters['templateId']!;
+                  final String templateId = state.pathParameters['templateId']!;
                   return AssetTemplateDetailScreen(
                     templateId: templateId,
                     initialTemplate: templateFromExtra,
@@ -292,7 +298,8 @@ GoRouter createAppRouter(
               final l10n = AppLocalizations.of(context)!;
               return Scaffold(
                 appBar: AppBar(title: Text(plugin.name)),
-                body: Stac.fromJson(processedUi, context) ??
+                body:
+                    Stac.fromJson(processedUi, context) ??
                     Center(child: Text(l10n.pluginLoadError)),
               );
             },
@@ -377,6 +384,35 @@ GoRouter createAppRouter(
               ),
             ],
           ),
+          // --- SCRAPERS ---
+          GoRoute(
+            name: RouteNames.scrapers,
+            path: '/container/:containerId/scrapers',
+            builder: (context, state) => ScraperGridScreen(
+              containerId: state.pathParameters['containerId']!,
+            ),
+            routes: [
+              GoRoute(
+                name: RouteNames.scraperCreate,
+                path: 'new',
+                builder: (context, state) => ScraperCreateScreen(
+                  containerId: state.pathParameters['containerId']!,
+                ),
+              ),
+              GoRoute(
+                name: RouteNames.scraperEdit,
+                path: ':scraperId/edit',
+                builder: (context, state) {
+                  final scraper = state.extra as dynamic;
+                  return ScraperEditScreen(
+                    containerId: state.pathParameters['containerId']!,
+                    scraperId: state.pathParameters['scraperId']!,
+                    initial: scraper!,
+                  );
+                },
+              ),
+            ],
+          ),
 
           // --- LOCATIONS ---
           GoRoute(
@@ -405,8 +441,9 @@ GoRouter createAppRouter(
                   if (location == null && locationId != null) {
                     final provider = context.read<LocationProvider>();
                     try {
-                      location =
-                          provider.locations.firstWhere((l) => l.id == locationId);
+                      location = provider.locations.firstWhere(
+                        (l) => l.id == locationId,
+                      );
                     } catch (_) {}
                   }
                   return LocationEditScreen(
@@ -422,9 +459,8 @@ GoRouter createAppRouter(
           GoRoute(
             name: RouteNames.loans,
             path: '/container/:containerId/loans',
-            builder: (context, state) => LoansScreen(
-              containerId: state.pathParameters['containerId']!,
-            ),
+            builder: (context, state) =>
+                LoansScreen(containerId: state.pathParameters['containerId']!),
             routes: [
               GoRoute(
                 name: RouteNames.loanCreate,
