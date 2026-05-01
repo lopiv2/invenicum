@@ -240,15 +240,24 @@ void main() async {
           create: (c) => AlertProvider(c.read<AlertService>()),
           update: (_, auth, prev) => prev!,
         ),
-        ChangeNotifierProxyProvider<AuthProvider, AchievementProvider>(
+        ChangeNotifierProxyProvider2<
+          AuthProvider,
+          PreferencesProvider,
+          AchievementProvider
+        >(
           create: (c) => AchievementProvider(c.read<AchievementService>()),
-          update: (context, auth, prev) {
-            // 🚩 Protección añadida
+          update: (context, auth, prefs, prev) {
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
               if (prev != null &&
                   prev.achievements.isEmpty &&
                   !prev.isLoading) {
-                Future.microtask(() => prev.fetchAchievements(context));
+                Future.microtask(() => prev.fetchAchievements());
+              }
+              // Cuando preferences ya está inicializado (locale listo), aplica traducciones
+              if (prev != null &&
+                  prefs.isInitialized &&
+                  prev.serverDataLength > 0) {
+                Future.microtask(() => prev.applyLocalizations(context));
               }
             }
             return prev!;

@@ -47,6 +47,145 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aboutOpenReleases => 'Releases ansehen';
 
   @override
+  String get achievementFirstItemTitle => 'Willkommen im Herrenhaus';
+
+  @override
+  String get achievementFirstItemDesc =>
+      'Füge dein erstes Objekt zum Inventar hinzu';
+
+  @override
+  String get achievementCatalogerSmallTitle => 'Kleines Lager';
+
+  @override
+  String get achievementCatalogerSmallDesc =>
+      'Registriere 10 Objekte in deiner Sammlung';
+
+  @override
+  String get achievementCatalogerMediumTitle => 'Museumskurator';
+
+  @override
+  String get achievementCatalogerMediumDesc =>
+      'Registriere 50 Objekte in deiner Sammlung';
+
+  @override
+  String get achievementCatalogerLargeTitle => 'Besitzer eines Imperiums';
+
+  @override
+  String get achievementCatalogerLargeDesc =>
+      'Registriere 200 Objekte (Legendäre Stufe)';
+
+  @override
+  String get achievementOrderMasterTitle => 'Absolute Ordnung';
+
+  @override
+  String get achievementOrderMasterDesc =>
+      'Weise 20 Objekten einen physischen Standort zu';
+
+  @override
+  String get achievementEyeForValueTitle => 'Blick für Werte';
+
+  @override
+  String get achievementEyeForValueDesc =>
+      'Erfasse den Kaufpreis von 5 Objekten';
+
+  @override
+  String get achievementFirstGrailTitle => 'Erster Gral';
+
+  @override
+  String get achievementFirstGrailDesc =>
+      'Füge ein Objekt hinzu, das mehr als 100€ wert ist';
+
+  @override
+  String get achievementMuseumPieceTitle => 'Museumsstück';
+
+  @override
+  String get achievementMuseumPieceDesc =>
+      'Füge ein Objekt hinzu, das mehr als 500€ wert ist';
+
+  @override
+  String get achievementGrowingWealthTitle => 'Wachsender Reichtum';
+
+  @override
+  String get achievementGrowingWealthDesc =>
+      'Dein Gesamtinventar übersteigt 1.000€';
+
+  @override
+  String get achievementWallStreetWolfTitle => 'Wall-Street-Wolf';
+
+  @override
+  String get achievementWallStreetWolfDesc =>
+      'Dein Gesamtinventar übersteigt 10.000€';
+
+  @override
+  String get achievementBargainHunterTitle => 'Schnäppchenjäger';
+
+  @override
+  String get achievementBargainHunterDesc =>
+      'Erfasse ein Objekt, das doppelt so viel wert ist wie du bezahlt hast';
+
+  @override
+  String get achievementBlindTrustTitle => 'Blindes Vertrauen';
+
+  @override
+  String get achievementBlindTrustDesc =>
+      'Verleihe zum ersten Mal etwas an einen Kontakt';
+
+  @override
+  String get achievementLibrarianTitle => 'Bibliothekar';
+
+  @override
+  String get achievementLibrarianDesc =>
+      'Verwalte 3 aktive Ausleihen gleichzeitig';
+
+  @override
+  String get achievementAllInOrderTitle => 'Alles in Ordnung';
+
+  @override
+  String get achievementAllInOrderDesc =>
+      'Hole ein ausgeliehenes Objekt zurück und markiere es als zurückgegeben';
+
+  @override
+  String get achievementLegendaryLenderTitle => 'Legendärer Verleiher';
+
+  @override
+  String get achievementLegendaryLenderDesc =>
+      'Schließe 20 Ausleihen erfolgreich ab';
+
+  @override
+  String get achievementCyberCollectorTitle => 'Cyber-Sammler';
+
+  @override
+  String get achievementCyberCollectorDesc =>
+      'Identifiziere zum ersten Mal ein Objekt mit KI';
+
+  @override
+  String get achievementHawkEyeTitle => 'Falkenblick';
+
+  @override
+  String get achievementHawkEyeDesc =>
+      'Nutze KI, um 15 Objekte zu identifizieren';
+
+  @override
+  String get achievementPolyglotTitle => 'Polyglott';
+
+  @override
+  String get achievementPolyglotDesc => 'Ändere die globale Währung der App';
+
+  @override
+  String get achievementForecasterTitle => 'Vorausplaner';
+
+  @override
+  String get achievementForecasterDesc =>
+      'Aktiviere 3 verschiedene Wartungserinnerungen';
+
+  @override
+  String get achievementMasterUserTitle => 'Meisternutzer';
+
+  @override
+  String get achievementMasterUserDesc =>
+      'Passe die Reihenfolge deiner Benachrichtigungen an';
+
+  @override
   String get active => 'Aktiv';
 
   @override

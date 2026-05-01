@@ -47,6 +47,144 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutOpenReleases => 'Voir les releases';
 
   @override
+  String get achievementFirstItemTitle => 'Bienvenue au Manoir';
+
+  @override
+  String get achievementFirstItemDesc =>
+      'Ajoutez votre premier objet à l\'inventaire';
+
+  @override
+  String get achievementCatalogerSmallTitle => 'Petit Entrepôt';
+
+  @override
+  String get achievementCatalogerSmallDesc =>
+      'Enregistrez 10 objets dans votre collection';
+
+  @override
+  String get achievementCatalogerMediumTitle => 'Conservateur de Musée';
+
+  @override
+  String get achievementCatalogerMediumDesc =>
+      'Enregistrez 50 objets dans votre collection';
+
+  @override
+  String get achievementCatalogerLargeTitle => 'Propriétaire d\'un Empire';
+
+  @override
+  String get achievementCatalogerLargeDesc =>
+      'Enregistrez 200 objets (Niveau Légendaire)';
+
+  @override
+  String get achievementOrderMasterTitle => 'Ordre Absolu';
+
+  @override
+  String get achievementOrderMasterDesc =>
+      'Assignez un emplacement physique à 20 objets';
+
+  @override
+  String get achievementEyeForValueTitle => 'Œil pour la Valeur';
+
+  @override
+  String get achievementEyeForValueDesc =>
+      'Enregistrez le prix d\'achat de 5 objets';
+
+  @override
+  String get achievementFirstGrailTitle => 'Premier Graal';
+
+  @override
+  String get achievementFirstGrailDesc =>
+      'Ajoutez un objet valant plus de 100€';
+
+  @override
+  String get achievementMuseumPieceTitle => 'Pièce de Musée';
+
+  @override
+  String get achievementMuseumPieceDesc =>
+      'Ajoutez un objet valant plus de 500€';
+
+  @override
+  String get achievementGrowingWealthTitle => 'Richesse Croissante';
+
+  @override
+  String get achievementGrowingWealthDesc =>
+      'Votre inventaire total dépasse 1 000€';
+
+  @override
+  String get achievementWallStreetWolfTitle => 'Loup de Wall Street';
+
+  @override
+  String get achievementWallStreetWolfDesc =>
+      'Votre inventaire total dépasse 10 000€';
+
+  @override
+  String get achievementBargainHunterTitle => 'Chasseur de Bonnes Affaires';
+
+  @override
+  String get achievementBargainHunterDesc =>
+      'Enregistrez un objet valant le double de ce que vous avez payé';
+
+  @override
+  String get achievementBlindTrustTitle => 'Confiance Aveugle';
+
+  @override
+  String get achievementBlindTrustDesc =>
+      'Effectuez votre premier prêt à un contact';
+
+  @override
+  String get achievementLibrarianTitle => 'Bibliothécaire';
+
+  @override
+  String get achievementLibrarianDesc => 'Gérez 3 prêts actifs simultanément';
+
+  @override
+  String get achievementAllInOrderTitle => 'Tout en Ordre';
+
+  @override
+  String get achievementAllInOrderDesc =>
+      'Récupérez et marquez un objet prêté comme rendu';
+
+  @override
+  String get achievementLegendaryLenderTitle => 'Prêteur Légendaire';
+
+  @override
+  String get achievementLegendaryLenderDesc => 'Complétez 20 prêts avec succès';
+
+  @override
+  String get achievementCyberCollectorTitle => 'Cyber Collectionneur';
+
+  @override
+  String get achievementCyberCollectorDesc =>
+      'Identifiez un objet avec l\'IA pour la première fois';
+
+  @override
+  String get achievementHawkEyeTitle => 'Œil de Faucon';
+
+  @override
+  String get achievementHawkEyeDesc =>
+      'Utilisez l\'IA pour identifier 15 objets';
+
+  @override
+  String get achievementPolyglotTitle => 'Polyglotte';
+
+  @override
+  String get achievementPolyglotDesc =>
+      'Changez la devise globale de l\'application';
+
+  @override
+  String get achievementForecasterTitle => 'Prévisionniste';
+
+  @override
+  String get achievementForecasterDesc =>
+      'Activez 3 alertes de maintenance différentes';
+
+  @override
+  String get achievementMasterUserTitle => 'Utilisateur Expert';
+
+  @override
+  String get achievementMasterUserDesc =>
+      'Personnalisez l\'ordre de vos notifications';
+
+  @override
   String get active => 'Actif';
 
   @override

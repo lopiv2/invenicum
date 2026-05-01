@@ -46,6 +46,138 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutOpenReleases => 'View releases';
 
   @override
+  String get achievementFirstItemTitle => 'Welcome to the Mansion';
+
+  @override
+  String get achievementFirstItemDesc => 'Add your first item to the inventory';
+
+  @override
+  String get achievementCatalogerSmallTitle => 'Small Warehouse';
+
+  @override
+  String get achievementCatalogerSmallDesc =>
+      'Register 10 items in your collection';
+
+  @override
+  String get achievementCatalogerMediumTitle => 'Museum Curator';
+
+  @override
+  String get achievementCatalogerMediumDesc =>
+      'Register 50 items in your collection';
+
+  @override
+  String get achievementCatalogerLargeTitle => 'Owner of an Empire';
+
+  @override
+  String get achievementCatalogerLargeDesc =>
+      'Register 200 items (Legendary Level)';
+
+  @override
+  String get achievementOrderMasterTitle => 'Absolute Order';
+
+  @override
+  String get achievementOrderMasterDesc =>
+      'Assign a physical location to 20 items';
+
+  @override
+  String get achievementEyeForValueTitle => 'Eye for Value';
+
+  @override
+  String get achievementEyeForValueDesc =>
+      'Register the purchase price of 5 items';
+
+  @override
+  String get achievementFirstGrailTitle => 'First Grail';
+
+  @override
+  String get achievementFirstGrailDesc => 'Add an item worth more than 100€';
+
+  @override
+  String get achievementMuseumPieceTitle => 'Museum Piece';
+
+  @override
+  String get achievementMuseumPieceDesc => 'Add an item worth more than 500€';
+
+  @override
+  String get achievementGrowingWealthTitle => 'Growing Wealth';
+
+  @override
+  String get achievementGrowingWealthDesc =>
+      'Your total inventory exceeds 1,000€';
+
+  @override
+  String get achievementWallStreetWolfTitle => 'Wall Street Wolf';
+
+  @override
+  String get achievementWallStreetWolfDesc =>
+      'Your total inventory exceeds 10,000€';
+
+  @override
+  String get achievementBargainHunterTitle => 'Bargain Hunter';
+
+  @override
+  String get achievementBargainHunterDesc =>
+      'Register an item worth double what you paid';
+
+  @override
+  String get achievementBlindTrustTitle => 'Blind Trust';
+
+  @override
+  String get achievementBlindTrustDesc => 'Make your first loan to a contact';
+
+  @override
+  String get achievementLibrarianTitle => 'Librarian';
+
+  @override
+  String get achievementLibrarianDesc => 'Manage 3 active loans simultaneously';
+
+  @override
+  String get achievementAllInOrderTitle => 'All in Order';
+
+  @override
+  String get achievementAllInOrderDesc =>
+      'Retrieve and mark a loaned item as returned';
+
+  @override
+  String get achievementLegendaryLenderTitle => 'Legendary Lender';
+
+  @override
+  String get achievementLegendaryLenderDesc => 'Complete 20 loans successfully';
+
+  @override
+  String get achievementCyberCollectorTitle => 'Cyber Collector';
+
+  @override
+  String get achievementCyberCollectorDesc =>
+      'Identify an item using AI for the first time';
+
+  @override
+  String get achievementHawkEyeTitle => 'Hawk Eye';
+
+  @override
+  String get achievementHawkEyeDesc => 'Use AI to identify 15 items';
+
+  @override
+  String get achievementPolyglotTitle => 'Polyglot';
+
+  @override
+  String get achievementPolyglotDesc => 'Change the global currency of the app';
+
+  @override
+  String get achievementForecasterTitle => 'Forecaster';
+
+  @override
+  String get achievementForecasterDesc =>
+      'Activate 3 different maintenance alerts';
+
+  @override
+  String get achievementMasterUserTitle => 'Master User';
+
+  @override
+  String get achievementMasterUserDesc =>
+      'Customize the order of your notifications';
+
+  @override
   String get active => 'Active';
 
   @override
