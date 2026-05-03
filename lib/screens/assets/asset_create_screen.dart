@@ -13,7 +13,7 @@ import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/candidate_card_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
-import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
+import 'package:invenicum/screens/assets/local_widgets/asset_save_button_bar.dart';
 import 'package:invenicum/screens/assets/local_widgets/scraper_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
@@ -740,6 +740,104 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     }
   }
 
+  Future<void> _saveAndContinue() async {
+    final l10n = AppLocalizations.of(context)!;
+    final itemProvider = context.read<InventoryItemProvider>();
+    if (!AssetFormUtils.validateForm(_formKey) ||
+        _assetType == null ||
+        _selectedLocationId == null) {
+      if (_selectedLocationId == null) {
+        ToastService.error(l10n.selectLocationRequired);
+      } else {
+        ToastService.error(l10n.completeRequiredFields);
+      }
+      return;
+    }
+    final Map<String, dynamic> customFieldValues = {};
+    for (var fieldDef in _assetType!.fieldDefinitions) {
+      if (fieldDef.type == CustomFieldType.dropdown) {
+        if (_selectedListValues[fieldDef.id] != null) {
+          customFieldValues[fieldDef.id.toString()] =
+              _selectedListValues[fieldDef.id];
+        }
+      } else if (fieldDef.type == CustomFieldType.boolean) {
+        customFieldValues[fieldDef.id.toString()] =
+            _booleanFieldValues[fieldDef.id] ?? false;
+      } else {
+        final controller = _customControllers[fieldDef.id];
+        if (controller != null && controller.text.isNotEmpty) {
+          String val = controller.text;
+          if (fieldDef.type == CustomFieldType.price) {
+            double localVal = double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
+            val = context
+                .read<PreferencesProvider>()
+                .convertToBase(localVal)
+                .toStringAsFixed(2);
+          }
+          customFieldValues[fieldDef.id.toString()] = val;
+        }
+      }
+    }
+    try {
+      final newItem = InventoryItem(
+        id: 0,
+        containerId: _containerId!,
+        assetTypeId: _assetTypeId!,
+        barcode: _barcodeController.text.trim(),
+        serialNumber: _serialController.text.trim(),
+        locationId: _selectedLocationId,
+        quantity: int.tryParse(_quantityController.text) ?? 1,
+        minStock: int.tryParse(_minStockController.text) ?? 1,
+        name: _nameController.text.trim(),
+        condition: _selectedCondition,
+        description: _descriptionController.text.trim(),
+        marketValue: _marketValue,
+        customFieldValues: customFieldValues,
+      );
+      await context.read<InventoryItemProvider>().createInventoryItem(
+        context,
+        newItem,
+        filesData: AssetFormUtils.processImages(_imagePreviewUrls),
+      );
+      if (mounted) {
+        ToastService.success(l10n.assetCreatedSuccess);
+        await itemProvider.loadInventoryItems(
+          containerId: _containerId!,
+          assetTypeId: _assetTypeId!,
+        );
+        _imagePreviewUrls.clear();
+        final shouldReset = context
+            .read<PreferencesProvider>()
+            .autoResetFieldsOnSaveAndContinue;
+        if (shouldReset) {
+          _nameController.clear();
+          _descriptionController.clear();
+          _barcodeController.clear();
+          _serialController.clear();
+          _quantityController.text = '1';
+          _minStockController.text = '1';
+          _selectedCondition = ItemCondition.loose;
+          _marketValue = 0.0;
+          for (var entry in _customControllers.entries) {
+            entry.value.clear();
+          }
+          _selectedListValues.clear();
+          _booleanFieldValues.clear();
+          _scrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
+          );
+        }
+        if (mounted) {
+          setState(() {});
+        }
+      }
+    } catch (e) {
+      ToastService.error(l10n.errorCreatingAsset(e.toString()));
+    }
+  }
+
   Future<void> _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
@@ -1025,7 +1123,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                 ),
               ),
             ),
-            SaveAssetFloatingButton(onPressed: _saveAsset),
+            AssetSaveButtonBar(
+              onSaveAsset: _saveAsset,
+              onSaveAndContinue: _saveAndContinue,
+            ),
           ],
         ),
       ),
@@ -1036,4 +1137,3 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 // ---------------------------------------------------------------------------
 // Layout compartido — usado tanto en Create como en Edit
 // ---------------------------------------------------------------------------
-

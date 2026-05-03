@@ -1001,6 +1001,17 @@ class AppLocalizationsIt extends AppLocalizations {
   String get saveAsset => 'Salva attivo';
 
   @override
+  String get saveAndContinueAsset => 'Salva e continua';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue =>
+      'Reimposta i campi al salvataggio';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Cancella il modulo automaticamente dopo il salvataggio';
+
+  @override
   String get saveChanges => 'Salva modifiche';
 
   @override

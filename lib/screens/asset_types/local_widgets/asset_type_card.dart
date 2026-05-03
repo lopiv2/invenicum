@@ -297,7 +297,6 @@ class AssetTypeCard extends StatelessWidget {
     ThemeData theme,
     double width,
   ) {
-    print(url);
     return Container(
       width: width,
       height: double.infinity,

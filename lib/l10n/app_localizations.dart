@@ -1900,6 +1900,24 @@ abstract class AppLocalizations {
   /// **'Save Asset'**
   String get saveAsset;
 
+  /// No description provided for @saveAndContinueAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Continue'**
+  String get saveAndContinueAsset;
+
+  /// No description provided for @autoResetFieldsOnSaveAndContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset fields on save & continue'**
+  String get autoResetFieldsOnSaveAndContinue;
+
+  /// No description provided for @autoResetFieldsOnSaveAndContinueDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Clears the form automatically after saving an item'**
+  String get autoResetFieldsOnSaveAndContinueDescription;
+
   /// No description provided for @saveChanges.
   ///
   /// In en, this message translates to:

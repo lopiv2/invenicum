@@ -998,6 +998,17 @@ class AppLocalizationsDe extends AppLocalizations {
   String get saveAsset => 'Aktiv speichern';
 
   @override
+  String get saveAndContinueAsset => 'Speichern & fortfahren';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue =>
+      'Felder beim Speichern zurücksetzen';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Formular nach dem Speichern automatisch leeren';
+
+  @override
   String get saveChanges => 'Änderungen speichern';
 
   @override

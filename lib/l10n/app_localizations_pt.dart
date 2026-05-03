@@ -997,6 +997,16 @@ class AppLocalizationsPt extends AppLocalizations {
   String get saveAsset => 'Salvar ativo';
 
   @override
+  String get saveAndContinueAsset => 'Salvar e continuar';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue => 'Redefinir campos ao salvar';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Limpa o formulário automaticamente após salvar um item';
+
+  @override
   String get saveChanges => 'Salvar alterações';
 
   @override

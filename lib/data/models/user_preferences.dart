@@ -16,6 +16,7 @@ class UserPreferences {
   // 🔔 NUEVOS CAMPOS
   final bool useSystemTheme;
   final bool isDarkMode;
+  final bool autoResetFieldsOnSaveAndContinue;
 
   UserPreferences({
     this.id,
@@ -28,8 +29,9 @@ class UserPreferences {
     this.userId,
     this.updatedAt,
     this.exchangeRates,
-    this.useSystemTheme = true, // Por defecto sigue al sistema
-    this.isDarkMode = false,    // Solo aplica si useSystemTheme es false
+    this.useSystemTheme = true,
+    this.isDarkMode = false,
+    this.autoResetFieldsOnSaveAndContinue = true,
     NotificationSettings? notifications,
   }) : notifications = notifications ?? NotificationSettings();
 
@@ -58,6 +60,8 @@ class UserPreferences {
       // 🔔 MAPEO DE NUEVOS CAMPOS (Vienen del DTO de Node)
       useSystemTheme: json['useSystemTheme'] as bool? ?? true,
       isDarkMode: json['isDarkMode'] as bool? ?? false,
+      autoResetFieldsOnSaveAndContinue:
+          json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
 
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
@@ -77,6 +81,7 @@ class UserPreferences {
       'useSystemTheme': useSystemTheme,
       'isDarkMode': isDarkMode,
       'showAssetTypeLogo': showAssetTypeLogo,
+      'autoResetFieldsOnSaveAndContinue': autoResetFieldsOnSaveAndContinue,
       'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
     };
@@ -102,6 +107,7 @@ class UserPreferences {
     NotificationSettings? notifications,
     bool? useSystemTheme,
     bool? isDarkMode,
+    bool? autoResetFieldsOnSaveAndContinue,
   }) {
     return UserPreferences(
       id: id ?? this.id,
@@ -113,9 +119,10 @@ class UserPreferences {
       aiModel: aiModel ?? this.aiModel,
       exchangeRates: exchangeRates ?? this.exchangeRates,
       notifications: notifications ?? this.notifications,
-      // 🔔 NUEVOS
       useSystemTheme: useSystemTheme ?? this.useSystemTheme,
       isDarkMode: isDarkMode ?? this.isDarkMode,
+      autoResetFieldsOnSaveAndContinue:
+          autoResetFieldsOnSaveAndContinue ?? this.autoResetFieldsOnSaveAndContinue,
     );
   }
 
@@ -127,6 +134,7 @@ class UserPreferences {
       aiEnabled: true,
       useSystemTheme: true,
       isDarkMode: false,
+      autoResetFieldsOnSaveAndContinue: true,
       exchangeRates: {},
       notifications: NotificationSettings(),
     );

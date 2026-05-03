@@ -997,6 +997,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get saveAsset => 'Enregistrer la ressource';
 
   @override
+  String get saveAndContinueAsset => 'Enregistrer et continuer';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue =>
+      'Réinitialiser les champs lors de l\'enregistrement';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Efface le formulaire automatiquement après l\'enregistrement';
+
+  @override
   String get saveChanges => 'Enregistrer les modifications';
 
   @override
