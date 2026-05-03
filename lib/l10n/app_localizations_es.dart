@@ -998,6 +998,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get saveAsset => 'Guardar Activo';
 
   @override
+  String get saveAndContinueAsset => 'Guardar y seguir';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue =>
+      'Resetear campos al guardar y continuar';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Limpia el formulario automáticamente tras guardar un item';
+
+  @override
   String get saveChanges => 'Guardar Cambios';
 
   @override

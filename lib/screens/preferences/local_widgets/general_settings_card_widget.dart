@@ -87,6 +87,20 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                 ),
               },
             ),
+            SwitchListTile(
+              title: Text(l10n.autoResetFieldsOnSaveAndContinue),
+              subtitle: Text(l10n.autoResetFieldsOnSaveAndContinueDescription),
+              secondary: const Icon(Icons.restart_alt_outlined),
+              value: context.watch<PreferencesProvider>()
+                  .autoResetFieldsOnSaveAndContinue,
+              onChanged: (val) => {
+                context.read<PreferencesProvider>()
+                    .setAutoResetFieldsOnSaveAndContinue(val),
+                ToastService.success(
+                  AppLocalizations.of(context)!.preferencesUpdated,
+                ),
+              },
+            ),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.language),

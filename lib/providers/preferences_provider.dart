@@ -29,6 +29,8 @@ class PreferencesProvider with ChangeNotifier {
   // 🔑 Ahora la moneda viene de las preferencias guardadas
   String get selectedCurrency => _prefs.currency;
   bool get showAssetTypeLogo => _prefs.showAssetTypeLogo;
+  bool get autoResetFieldsOnSaveAndContinue =>
+      _prefs.autoResetFieldsOnSaveAndContinue;
 
   PreferencesProvider(this._preferencesService);
 
@@ -321,13 +323,11 @@ class PreferencesProvider with ChangeNotifier {
   Future<void> updateAiProvider(String provider, String model) async {
     final previousPrefs = _prefs;
 
-    // Actualización optimista
     _prefs = _prefs.copyWith(aiProvider: provider, aiModel: model);
     notifyListeners();
 
     try {
       await _preferencesService.updateAiProvider(provider, model);
-      // Re-sincroniza con backend para reflejar exactamente lo persistido.
       final json = await _preferencesService.getPreferences();
       _prefs = UserPreferences.fromJson(json);
       notifyListeners();
@@ -335,6 +335,25 @@ class PreferencesProvider with ChangeNotifier {
       _prefs = previousPrefs;
       notifyListeners();
       debugPrint('Error actualizando proveedor de IA: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> setAutoResetFieldsOnSaveAndContinue(bool enabled) async {
+    final previousPrefs = _prefs;
+
+    _prefs = _prefs.copyWith(autoResetFieldsOnSaveAndContinue: enabled);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updatePreference(
+        'autoResetFieldsOnSaveAndContinue',
+        enabled,
+      );
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating auto reset fields preference: $e');
       rethrow;
     }
   }

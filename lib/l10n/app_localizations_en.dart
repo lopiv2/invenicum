@@ -986,6 +986,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveAsset => 'Save Asset';
 
   @override
+  String get saveAndContinueAsset => 'Save & Continue';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue =>
+      'Reset fields on save & continue';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Clears the form automatically after saving an item';
+
+  @override
   String get saveChanges => 'Save Changes';
 
   @override
