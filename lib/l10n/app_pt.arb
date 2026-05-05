@@ -503,6 +503,47 @@
   "saveAndContinueAsset": "Salvar e continuar",
   "autoResetFieldsOnSaveAndContinue": "Redefinir campos ao salvar",
   "autoResetFieldsOnSaveAndContinueDescription": "Limpa o formulário automaticamente após salvar um item",
+  "enableCloneBuster": "Ativar",
+  "enableCloneBusterDescription": "Garantido para evitar itens redundantes ou devolvemos o seu dinheiro! (Oferta não válida em todas as linhas temporais exceto 1993)",
+  "cloneBusterDialogTitle": "Clone-Buster-O-Matic™ Ativado",
+  "cloneBusterMessage1": "Sistema ativado. O Doutor Fred ficaria orgulhoso deste nível de eficiência! (Por favor, ignore o leve cheiro a pão torrado e o som de risos maníacos vindos do seu disco rígido).",
+  "cloneBusterMessage2": "A ativar The Clone-Buster-O-Matic™... Por favor, mantenha as mãos, os pés e quaisquer gémeos idênticos afastados do monitor durante a inicialização.",
+  "cloneBusterMessage3": "Sistema ativado. Informámos o seu 'eu do futuro' que já não precisa dessas duplicatas. Se de repente sentir um formigueiro ou deixar de existir, ignore.",
+  "cloneBusterMessage4": "Clone-Buster ativo. Quaisquer itens redundantes serão vaporizados de forma humana e transformados em estática genérica. Não se preocupe, não vão sentir nada (achamos).",
+  "cloneBusterMessage5": "Aviso: Ativar este módulo pode causar um aumento de 0,004% no uso de RAM e uma diminuição de 100% em ver a mesma coisa duas vezes. Proceda com extrema confiança!",
+  "cloneBusterMessage6": "O Clone-Buster está agora de guarda. É como ter um bibliotecário minúsculo e muito irritado dentro do seu computador que odeia ver o dobro. Clique.",
+  "cloneBusterDescription": "The Clone-Buster-O-Matic™ analisa o seu inventário com precisão quântica para detetar e prevenir entradas duplicadas. Defina como Paranoico para máxima deteção.",
+  "cloneBusterDisclaimer": "Aviso: Esta funcionalidade é tão inútil quanto uma galinha de borracha com uma roldana no meio. Ative-a por sua conta e risco (e aborrecimento)!",
+  "fontFamilyLabel": "Família de Fontes",
+  "selectFontFamily": "Selecionar a fonte da aplicação",
+  "fontDefault": "Padrão (Sistema)",
+  "fontSCUMMCredits": "SCUMM Credits",
+  "fontSCUMMSolid": "SCUMM Solid",
+  "fontDayOfTheTentacle": "Day of the Tentacle",
+  "fontEfmi": "Efmi",
+  "fontPUSAB": "PUSAB",
+  "cloneBusterDuplicateTitle": "Possível Duplicata Detetada!",
+  "cloneBusterDuplicateMessage": "Este item é {similarity}% semelhante a \"{itemName}\". Deseja continuar mesmo assim?",
+  "@cloneBusterDuplicateMessage": {
+    "placeholders": {
+      "similarity": {
+        "type": "String"
+      },
+      "itemName": {
+        "type": "String"
+      }
+    }
+  },
+  "cloneBusterContinueAnyway": "Continuar Mesmo Assim",
+  "cloneBusterReview": "Rever",
+  "cloneBusterDialogAction": "Entendido!",
+  "cloneBusterSensitivityLevel": "NÍVEL DE SENSIBILIDADE",
+  "cloneBusterSensitivityLow": "Baixo",
+  "cloneBusterSensitivityHigh": "Alto",
+  "cloneBusterSensitivityParanoid": "Paranoico",
+  "cloneBusterDialogOk": "OK",
+  "cloneBusterDialogCancel": "CANCELAR",
+  "cloneBusterDialogHelp": "?AJUDA",
   "saveChanges": "Salvar alterações",
   "saveConfiguration": "Salvar configuração",
   "saveCustomTheme": "Salvar tema personalizado",

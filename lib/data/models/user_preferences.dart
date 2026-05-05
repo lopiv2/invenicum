@@ -17,6 +17,8 @@ class UserPreferences {
   final bool useSystemTheme;
   final bool isDarkMode;
   final bool autoResetFieldsOnSaveAndContinue;
+  final bool cloneBusterEnabled;
+  final String fontFamily;
 
   UserPreferences({
     this.id,
@@ -32,6 +34,8 @@ class UserPreferences {
     this.useSystemTheme = true,
     this.isDarkMode = false,
     this.autoResetFieldsOnSaveAndContinue = true,
+    this.cloneBusterEnabled = false,
+    this.fontFamily = 'Default',
     NotificationSettings? notifications,
   }) : notifications = notifications ?? NotificationSettings();
 
@@ -62,6 +66,8 @@ class UserPreferences {
       isDarkMode: json['isDarkMode'] as bool? ?? false,
       autoResetFieldsOnSaveAndContinue:
           json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
+      cloneBusterEnabled: json['enableCloneBusterOmatic'] ?? false,
+      fontFamily: json['fontFamily'] ?? 'Default',
 
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
@@ -82,6 +88,8 @@ class UserPreferences {
       'isDarkMode': isDarkMode,
       'showAssetTypeLogo': showAssetTypeLogo,
       'autoResetFieldsOnSaveAndContinue': autoResetFieldsOnSaveAndContinue,
+      'cloneBusterEnabled': cloneBusterEnabled,
+      'fontFamily': fontFamily,
       'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
     };
@@ -108,6 +116,8 @@ class UserPreferences {
     bool? useSystemTheme,
     bool? isDarkMode,
     bool? autoResetFieldsOnSaveAndContinue,
+    bool? cloneBusterEnabled,
+    String? fontFamily,
   }) {
     return UserPreferences(
       id: id ?? this.id,
@@ -123,6 +133,8 @@ class UserPreferences {
       isDarkMode: isDarkMode ?? this.isDarkMode,
       autoResetFieldsOnSaveAndContinue:
           autoResetFieldsOnSaveAndContinue ?? this.autoResetFieldsOnSaveAndContinue,
+      cloneBusterEnabled: cloneBusterEnabled ?? this.cloneBusterEnabled,
+      fontFamily: fontFamily ?? this.fontFamily,
     );
   }
 
@@ -135,6 +147,8 @@ class UserPreferences {
       useSystemTheme: true,
       isDarkMode: false,
       autoResetFieldsOnSaveAndContinue: true,
+      cloneBusterEnabled: false,
+      fontFamily: 'Default',
       exchangeRates: {},
       notifications: NotificationSettings(),
     );

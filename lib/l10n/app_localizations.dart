@@ -1918,6 +1918,192 @@ abstract class AppLocalizations {
   /// **'Clears the form automatically after saving an item'**
   String get autoResetFieldsOnSaveAndContinueDescription;
 
+  /// No description provided for @enableCloneBuster.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get enableCloneBuster;
+
+  /// No description provided for @enableCloneBusterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Guaranteed to avoid redundant items or your money back! (Offer void in all timelines except 1993)'**
+  String get enableCloneBusterDescription;
+
+  /// No description provided for @cloneBusterDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone-Buster-O-Matic™ Activated'**
+  String get cloneBusterDialogTitle;
+
+  /// No description provided for @cloneBusterMessage1.
+  ///
+  /// In en, this message translates to:
+  /// **'System engaged. Doctor Fred would be proud of this level of efficiency! (Please ignore the faint smell of burning toast and the sound of maniacal laughter from your hard drive).'**
+  String get cloneBusterMessage1;
+
+  /// No description provided for @cloneBusterMessage2.
+  ///
+  /// In en, this message translates to:
+  /// **'Activating The Clone-Buster-O-Matic™... Please keep your hands, feet, and any identical twins away from the monitor during initialization.'**
+  String get cloneBusterMessage2;
+
+  /// No description provided for @cloneBusterMessage3.
+  ///
+  /// In en, this message translates to:
+  /// **'System enabled. We\'ve informed your \'future self\' that you no longer need those duplicates. If you suddenly feel a tingling sensation or stop existing, ignore it.'**
+  String get cloneBusterMessage3;
+
+  /// No description provided for @cloneBusterMessage4.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone-Buster active. Any redundant items will be humanely vaporized and turned into generic static. Don\'t worry, they won\'t feel a thing (we think).'**
+  String get cloneBusterMessage4;
+
+  /// No description provided for @cloneBusterMessage5.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: Enabling this module may cause a 0.004% increase in RAM usage and a 100% decrease in seeing the same thing twice. Proceed with extreme confidence!'**
+  String get cloneBusterMessage5;
+
+  /// No description provided for @cloneBusterMessage6.
+  ///
+  /// In en, this message translates to:
+  /// **'The Clone-Buster is now standing guard. It\'s like having a tiny, very angry librarian inside your computer who hates seeing double. Click.'**
+  String get cloneBusterMessage6;
+
+  /// No description provided for @cloneBusterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The Clone-Buster-O-Matic™ scans your inventory with quantum precision to detect and prevent duplicate entries. Set to Paranoid for maximum detection.'**
+  String get cloneBusterDescription;
+
+  /// No description provided for @cloneBusterDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer: This feature is as useless as a rubber chicken with a pulley in the middle. Toggle at your own risk (and boredom)!'**
+  String get cloneBusterDisclaimer;
+
+  /// No description provided for @fontFamilyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Family'**
+  String get fontFamilyLabel;
+
+  /// No description provided for @selectFontFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the application font'**
+  String get selectFontFamily;
+
+  /// No description provided for @fontDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default (System)'**
+  String get fontDefault;
+
+  /// No description provided for @fontSCUMMCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'SCUMM Credits'**
+  String get fontSCUMMCredits;
+
+  /// No description provided for @fontSCUMMSolid.
+  ///
+  /// In en, this message translates to:
+  /// **'SCUMM Solid'**
+  String get fontSCUMMSolid;
+
+  /// No description provided for @fontDayOfTheTentacle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day of the Tentacle'**
+  String get fontDayOfTheTentacle;
+
+  /// No description provided for @fontEfmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Efmi'**
+  String get fontEfmi;
+
+  /// No description provided for @fontPUSAB.
+  ///
+  /// In en, this message translates to:
+  /// **'PUSAB'**
+  String get fontPUSAB;
+
+  /// No description provided for @cloneBusterDuplicateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible Duplicate Detected!'**
+  String get cloneBusterDuplicateTitle;
+
+  /// No description provided for @cloneBusterDuplicateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This item is {similarity}% similar to \"{itemName}\". Do you want to continue anyway?'**
+  String cloneBusterDuplicateMessage(String similarity, String itemName);
+
+  /// No description provided for @cloneBusterContinueAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Anyway'**
+  String get cloneBusterContinueAnyway;
+
+  /// No description provided for @cloneBusterReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get cloneBusterReview;
+
+  /// No description provided for @cloneBusterDialogAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it!'**
+  String get cloneBusterDialogAction;
+
+  /// No description provided for @cloneBusterSensitivityLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'SENSITIVITY LEVEL'**
+  String get cloneBusterSensitivityLevel;
+
+  /// No description provided for @cloneBusterSensitivityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get cloneBusterSensitivityLow;
+
+  /// No description provided for @cloneBusterSensitivityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get cloneBusterSensitivityHigh;
+
+  /// No description provided for @cloneBusterSensitivityParanoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paranoid'**
+  String get cloneBusterSensitivityParanoid;
+
+  /// No description provided for @cloneBusterDialogOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get cloneBusterDialogOk;
+
+  /// No description provided for @cloneBusterDialogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'CANCEL'**
+  String get cloneBusterDialogCancel;
+
+  /// No description provided for @cloneBusterDialogHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'?HELP'**
+  String get cloneBusterDialogHelp;
+
   /// No description provided for @saveChanges.
   ///
   /// In en, this message translates to:

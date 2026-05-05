@@ -503,6 +503,47 @@
   "saveAndContinueAsset": "Enregistrer et continuer",
   "autoResetFieldsOnSaveAndContinue": "Réinitialiser les champs lors de l'enregistrement",
   "autoResetFieldsOnSaveAndContinueDescription": "Efface le formulaire automatiquement après l'enregistrement",
+  "enableCloneBuster": "Activer",
+  "enableCloneBusterDescription": "Garanti pour éviter les éléments redondants ou on vous rembourse ! (Offre invalide dans toutes les lignes temporelles sauf 1993)",
+  "cloneBusterDialogTitle": "Clone-Buster-O-Matic™ Activé",
+  "cloneBusterMessage1": "Système activé. Le Docteur Fred serait fier de ce niveau d'efficacité ! (Veuillez ignorer la légère odeur de pain grillé et le son de rires maniaques provenant de votre disque dur).",
+  "cloneBusterMessage2": "Activation du Clone-Buster-O-Matic™... Veuillez garder vos mains, pieds et tout jumeau identique loin de l'écran pendant l'initialisation.",
+  "cloneBusterMessage3": "Système activé. Nous avons informé votre 'vous du futur' que vous n'avez plus besoin de ces doublons. Si vous ressentez soudain un picotement ou cessez d'exister, ignorez-le.",
+  "cloneBusterMessage4": "Clone-Buster actif. Tous les éléments redondants seront vaporisés avec humanité et transformés en bruit générique. Ne vous inquiétez pas, ils ne sentiront rien (on pense).",
+  "cloneBusterMessage5": "Attention : l'activation de ce module peut entraîner une augmentation de 0,004 % de l'utilisation de la RAM et une diminution de 100 % du fait de voir la même chose deux fois. Procédez avec une confiance extrême !",
+  "cloneBusterMessage6": "Le Clone-Buster est maintenant en garde. C'est comme avoir un tout petit bibliothécaire très en colère dans votre ordinateur qui déteste voir double. Cliquez.",
+  "cloneBusterDescription": "The Clone-Buster-O-Matic™ analyse votre inventaire avec une précision quantique pour détecter et prévenir les entrées en double. Réglez sur Paranoïaque pour une détection maximale.",
+  "cloneBusterDisclaimer": "Avertissement : Cette fonctionnalité est aussi utile qu'un poulet en caoutchouc avec une poulie au milieu. Activez-la à vos risques et périls (et votre ennui) !",
+  "fontFamilyLabel": "Famille de Police",
+  "selectFontFamily": "Sélectionnez la police de l'application",
+  "fontDefault": "Par défaut (Système)",
+  "fontSCUMMCredits": "SCUMM Credits",
+  "fontSCUMMSolid": "SCUMM Solid",
+  "fontDayOfTheTentacle": "Day of the Tentacle",
+  "fontEfmi": "Efmi",
+  "fontPUSAB": "PUSAB",
+  "cloneBusterDuplicateTitle": "Possible Doublon Détecté !",
+  "cloneBusterDuplicateMessage": "Cet article est similaire à {similarity}% avec \"{itemName}\". Voulez-vous continuer quand même ?",
+  "@cloneBusterDuplicateMessage": {
+    "placeholders": {
+      "similarity": {
+        "type": "String"
+      },
+      "itemName": {
+        "type": "String"
+      }
+    }
+  },
+  "cloneBusterContinueAnyway": "Continuer Quand Même",
+  "cloneBusterReview": "Réviser",
+  "cloneBusterDialogAction": "Compris!",
+  "cloneBusterSensitivityLevel": "NIVEAU DE SENSIBILITÉ",
+  "cloneBusterSensitivityLow": "Faible",
+  "cloneBusterSensitivityHigh": "Haut",
+  "cloneBusterSensitivityParanoid": "Paranoïaque",
+  "cloneBusterDialogOk": "OK",
+  "cloneBusterDialogCancel": "ANNULER",
+  "cloneBusterDialogHelp": "?AIDE",
   "saveChanges": "Enregistrer les modifications",
   "saveConfiguration": "Enregistrer la configuration",
   "saveCustomTheme": "Enregistrer le thème personnalisé",
