@@ -33,7 +33,7 @@ class PreferencesProvider with ChangeNotifier {
   bool get autoResetFieldsOnSaveAndContinue =>
       _prefs.autoResetFieldsOnSaveAndContinue;
   bool get cloneBusterEnabled => _prefs.cloneBusterEnabled;
-  String get selectedFontFamily => _prefs.fontFamily;
+  String get selectedFontFamily => _prefs.font;
 
   PreferencesProvider(this._preferencesService);
 
@@ -383,7 +383,7 @@ class PreferencesProvider with ChangeNotifier {
   Future<void> setFontFamily(String font) async {
     final previousPrefs = _prefs;
 
-    _prefs = _prefs.copyWith(fontFamily: font);
+    _prefs = _prefs.copyWith(font: font);
     notifyListeners();
 
     try {
