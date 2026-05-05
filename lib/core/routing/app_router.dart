@@ -129,7 +129,12 @@ GoRouter createAppRouter(
       return null;
     },
     routes: [
-      // ── Public routes (outside Shell) ────────────────────────────────────
+      // ── Root redirect ───────────────────────────────────────
+      GoRoute(
+        path: '/',
+        redirect: (_, __) => '/dashboard',
+      ),
+      // ── Public routes (outside Shell) ────────────────────────────
       GoRoute(
         name: RouteNames.login,
         path: '/login',

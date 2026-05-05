@@ -1,81 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/services/theme_service.dart';
 import '../data/models/custom_theme_model.dart';
+import '../core/utils/constants.dart';
 
 class ThemeProvider with ChangeNotifier {
   final ThemeService _themeService;
 
-  // Flag para evitar múltiples cargas innecesarias desde el ProxyProvider
+  // Flag to prevent multiple unnecessary loads from ProxyProvider
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
   ThemeProvider(this._themeService);
 
-  // 1. Temas Predefinidos e Identidad de Marca
-  static final CustomTheme brandTheme = CustomTheme(
-    id: 'brand',
-    name: 'Invenicum (Marca)',
-    primaryColor: const Color(0xFF1A237E),
-    brightness: Brightness.light,
-  );
-
-  static final List<CustomTheme> predefinedThemes = [
-    CustomTheme(id: 'emerald', name: 'Esmeralda', primaryColor: Colors.teal),
-    CustomTheme(id: 'sunset', name: 'Atardecer', primaryColor: Colors.orange),
-    CustomTheme(id: 'ocean', name: 'Indian Ocean', primaryColor: Colors.blue),
-    CustomTheme(
-      id: 'lavender',
-      name: 'Lavanda Dulce',
-      primaryColor: Colors.purple.shade300,
-    ),
-    CustomTheme(
-      id: 'forest',
-      name: 'Bosque Profundo',
-      primaryColor: Colors.green.shade900,
-    ),
-    CustomTheme(id: 'cherry', name: 'Cereza', primaryColor: Colors.redAccent),
-    CustomTheme(
-      id: 'indigo',
-      name: 'Noche Eléctrica',
-      primaryColor: Colors.indigoAccent,
-    ),
-    CustomTheme(id: 'amber', name: 'Oro Ámbar', primaryColor: Colors.amber),
-    CustomTheme(
-      id: 'sakura',
-      name: 'Cherry Blossom',
-      primaryColor: Colors.pink.shade200,
-    ),
-    CustomTheme(
-      id: 'slate',
-      name: 'Pizarra Moderna',
-      primaryColor: Colors.blueGrey.shade700,
-    ),
-    CustomTheme(
-      id: 'cyberpunk',
-      name: 'Cyberpunk',
-      primaryColor: Colors.pinkAccent,
-      brightness: Brightness.dark,
-    ),
-    CustomTheme(
-      id: 'nordic',
-      name: 'Ártico Nord',
-      primaryColor: Colors.lightBlue.shade100,
-      brightness: Brightness.light,
-    ),
-    CustomTheme(
-      id: 'dark_mode',
-      name: 'Noche Profunda',
-      primaryColor: Colors.blueGrey,
-      brightness: Brightness.dark,
-    ),
-  ];
+  CustomTheme get brandTheme => AppThemes.brand;
+  List<CustomTheme> get predefinedThemes => AppThemes.predefined;
   List<CustomTheme> _userThemes = [];
   List<CustomTheme> get userThemes => _userThemes;
 
-  CustomTheme _currentTheme = brandTheme;
+  String? _fontFamily;
+
+  CustomTheme _currentTheme = AppThemes.brand;
   CustomTheme get currentTheme => _currentTheme;
 
-  // 2. Generación dinámica del ThemeData
+  void setFontFamily(String? fontFamily) {
+    _fontFamily = fontFamily == 'Default' ? null : fontFamily;
+    notifyListeners();
+  }
+
+  // 2. Dynamic ThemeData generation
   ThemeData get lightTheme {
     return _buildTheme(Brightness.light);
   }
@@ -84,13 +36,14 @@ class ThemeProvider with ChangeNotifier {
     return _buildTheme(Brightness.dark);
   }
 
-  // Método privado para no repetir código
+  // Private method to avoid code duplication
   ThemeData _buildTheme(Brightness brightness) {
     return ThemeData(
       useMaterial3: true,
       colorSchemeSeed: _currentTheme.primaryColor,
       brightness: brightness,
       appBarTheme: const AppBarTheme(centerTitle: true),
+      fontFamily: _fontFamily,
     );
   }
 
@@ -110,7 +63,7 @@ class ThemeProvider with ChangeNotifier {
   Future<void> deleteThemeFromLibrary(String themeId) async {
     try {
       await _themeService.deleteCustomTheme(themeId);
-      // Filtramos la lista local para que desaparezca de la UI inmediatamente
+      // We filter the local list so it disappears from the UI immediately
       _userThemes.removeWhere((t) => t.id == themeId);
       notifyListeners();
     } catch (e) {
@@ -118,7 +71,7 @@ class ThemeProvider with ChangeNotifier {
     }
   }
 
-  /// Inicializa el tema desde los datos del usuario (llamado por el ProxyProvider)
+  // Initialice the theme based on the user's saved configuration (called by ProxyProvider)
   void initializeTheme(String? hexColor, String? brightnessStr) async {
     if (hexColor == null || hexColor.isEmpty) {
       _isInitialized = true;
@@ -130,26 +83,26 @@ class ThemeProvider with ChangeNotifier {
         ? Brightness.dark
         : Brightness.light;
 
-    // 1. Primero cargamos los temas personalizados de la DB
+    // 1. First load custom themes from the DB
     await loadUserThemes();
 
-    // 2. Creamos una lista con TODOS los temas posibles para buscar
+    // 2. Create a list with ALL possible themes for searching
     final allPossibleThemes = [
-      brandTheme,
-      ...predefinedThemes,
-      ..._userThemes, // Temas cargados de la DB
+      AppThemes.brand,
+      ...AppThemes.predefined,
+      ..._userThemes, // Themes loaded from the DB
     ];
 
     try {
-      // 3. Buscamos si el color y brillo coinciden con alguno que tenga nombre
+      // 3. Check if color and brightness match any named theme
       _currentTheme = allPossibleThemes.firstWhere(
         (t) => t.primaryColor.toARGB32() == colorValue && t.brightness == brightness,
       );
     } catch (_) {
-      // 4. Si realmente no existe en ningún lado, queda como Personalizado
+      // 4. If it truly doesn't exist anywhere, it remains as Custom
       _currentTheme = CustomTheme(
         id: 'custom_db',
-        name: 'Personalizado',
+        name: 'Custom',
         primaryColor: Color(colorValue),
         brightness: brightness,
       );
@@ -159,15 +112,15 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Cambia el tema localmente y lo persiste en la tabla vinculada de la DB
+  /// Changes the theme locally and persists it in the linked DB table
   Future<void> setTheme(CustomTheme theme) async {
-    _currentTheme = theme; // Cambiamos el objeto en memoria
+    _currentTheme = theme; // Change the object in memory
     _isInitialized = true;
 
-    notifyListeners(); // 🚩 Esto es lo que hace que Flutter repinte la App
+    notifyListeners(); // 🚩 This is what makes Flutter repaint the App
 
     try {
-      // Esto actualiza la tabla UserThemeConfig en el backend
+      // This updates the UserThemeConfig table in the backend
       final String hexColor =
           '#${theme.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
       await _themeService.updateUserTheme(
@@ -181,11 +134,11 @@ class ThemeProvider with ChangeNotifier {
 
   Future<void> saveThemeToLibrary(CustomTheme theme) async {
     try {
-      // 1. Guardamos en la biblioteca (la tabla de temas guardados)
+      // 1. Save to the library (the table of saved themes)
       await _themeService.createCustomTheme(theme);
 
-      // 2. IMPORTANTE: También lo establecemos como tema actual
-      // Esto llamará a setTheme() que actualiza UserThemeConfig y hace el notifyListeners()
+      // 2. IMPORTANT: We also set it as the current theme
+      // This will call setTheme() which updates UserThemeConfig and triggers notifyListeners()
       Future.delayed(Duration.zero).then((_) async => await setTheme(theme));
     } catch (e) {
       debugPrint('Error en saveThemeToLibrary: $e');
@@ -199,27 +152,27 @@ class ThemeProvider with ChangeNotifier {
     Color color,
     Brightness brightness,
   ) async {
-    // 1. Cargamos los temas de la biblioteca del usuario
+    // 1. Load themes from the user's library
     await loadUserThemes();
 
-    // 2. Metemos todos los temas en una bolsa para buscar
+    // 2. Put all themes in a bag for searching
     final allPossibleThemes = [
-      brandTheme,
-      ...predefinedThemes,
-      ..._userThemes, // Estos son los que acabamos de cargar de la DB
+      AppThemes.brand,
+      ...AppThemes.predefined,
+      ..._userThemes, // These are the ones we just loaded from the DB
     ];
 
     try {
-      // 3. Buscamos el tema que coincida en color y brillo
+      // 3. Find the theme that matches color and brightness
       _currentTheme = allPossibleThemes.firstWhere(
         (t) =>
             t.primaryColor.toARGB32() == color.toARGB32() && t.brightness == brightness,
       );
     } catch (_) {
-      // 4. Si no existe, lo dejamos como personalizado
+      // 4. If it doesn't exist, leave it as Custom
       _currentTheme = CustomTheme(
         id: 'db_theme',
-        name: 'Personalizado',
+        name: 'Custom',
         primaryColor: color,
         brightness: brightness,
       );

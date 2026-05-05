@@ -2390,6 +2390,21 @@ class AppLocalizationsPt extends AppLocalizations {
   String get zoomToFit => 'Ajustar visualização';
 
   @override
+  String get currencyEur => 'Euro';
+
+  @override
+  String get currencyUsd => 'Dólar americano';
+
+  @override
+  String get currencyGbp => 'Libra esterlina';
+
+  @override
+  String get currencyJpy => 'Iene japonês';
+
+  @override
+  String get currencyMxn => 'Peso mexicano';
+
+  @override
   String get generalSettingsMenuLabel => 'Configurações gerais';
 
   @override

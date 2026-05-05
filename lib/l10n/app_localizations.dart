@@ -4390,6 +4390,36 @@ abstract class AppLocalizations {
   /// **'Zoom to Fit'**
   String get zoomToFit;
 
+  /// No description provided for @currencyEur.
+  ///
+  /// In en, this message translates to:
+  /// **'Euro'**
+  String get currencyEur;
+
+  /// No description provided for @currencyUsd.
+  ///
+  /// In en, this message translates to:
+  /// **'US Dollar'**
+  String get currencyUsd;
+
+  /// No description provided for @currencyGbp.
+  ///
+  /// In en, this message translates to:
+  /// **'British Pound'**
+  String get currencyGbp;
+
+  /// No description provided for @currencyJpy.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese Yen'**
+  String get currencyJpy;
+
+  /// No description provided for @currencyMxn.
+  ///
+  /// In en, this message translates to:
+  /// **'Mexican Peso'**
+  String get currencyMxn;
+
   /// No description provided for @generalSettingsMenuLabel.
   ///
   /// In en, this message translates to:

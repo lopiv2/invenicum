@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
 import 'package:invenicum/data/models/user_preferences.dart';
 import 'package:invenicum/data/services/preferences_service.dart';
@@ -224,42 +225,42 @@ class PreferencesProvider with ChangeNotifier {
     }
   }
 
-  /// Convierte un monto de la moneda local del usuario a la moneda base (USD)
+  /// Converts an amount from the user's local currency to the base currency (USD)
   double convertToBase(double amount) {
     final rates = _prefs.exchangeRates;
 
-    // Si la moneda actual es USD, el valor ya es la base.
-    if (selectedCurrency == 'USD' ||
+    // If the current currency is USD, the value is already the base.
+    if (selectedCurrency == AppCurrencies.usd ||
         rates == null ||
         !rates.containsKey(selectedCurrency)) {
       return amount;
     }
 
-    // Si rates['EUR'] es 0.85 (significa 1 USD = 0.85 EUR)
-    // Para pasar de 15€ a USD: 15 / 0.85 = 17.64 USD
-    // Si el resultado te dio 17.66, es porque se hizo: 15 * 1.17 (la tasa inversa)
+    // If rates['EUR'] is 0.85 (means 1 USD = 0.85 EUR)
+    // To convert 15€ to USD: 15 / 0.85 = 17.64 USD
+    // If you got 17.66, it's because you did: 15 * 1.17 (the inverse rate)
 
     final double rate = rates[selectedCurrency] ?? 1.0;
 
     if (rate == 0) return amount;
 
-    // 🔑 LA REGLA DE ORO:
-    // Para ir de BASE -> LOCAL: Multiplicar (USD * rate)
-    // Para ir de LOCAL -> BASE: Dividir (LOCAL / rate)
+    // 🔑 THE GOLDEN RULE:
+    // To go from BASE -> LOCAL: Multiply (USD * rate)
+    // To go from LOCAL -> BASE: Divide (LOCAL / rate)
     return amount / rate;
   }
 
   double convertPrice(double amount) {
     final rates = _prefs.exchangeRates;
     final target =
-        _prefs.currency; // Moneda elegida por el usuario (EUR, MXN, etc.)
+        _prefs.currency; // Currency chosen by the user (EUR, MXN, etc.)
 
-    // Si no hay tasas o el usuario ya eligió USD, devolvemos el monto original
-    if (rates == null || rates.isEmpty || target == 'USD') {
+    // If no rates or user already chose USD, return original amount
+    if (rates == null || rates.isEmpty || target == AppCurrencies.usd) {
       return amount;
     }
 
-    // Obtenemos la tasa para la moneda destino (ej: 0.92 para EUR)
+    // Get the rate for the target currency (e.g., 0.92 for EUR)
     final double rate = rates[target] ?? 1.0;
 
     return amount * rate;
@@ -387,7 +388,7 @@ class PreferencesProvider with ChangeNotifier {
 
     try {
       await _preferencesService.updatePreference(
-        'fontFamily',
+        'font',
         font,
       );
     } catch (e) {
@@ -399,44 +400,15 @@ class PreferencesProvider with ChangeNotifier {
   }
 
   String getSymbolForCurrency(String currencyCode) {
-    switch (currencyCode) {
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      case 'JPY':
-        return '¥';
-      case 'MXN':
-      case 'USD':
-      default:
-        return '\$';
-    }
+    return AppCurrencies.getSymbol(currencyCode);
   }
 
   bool usesTrailingCurrencySymbol(String currencyCode) {
-    switch (currencyCode) {
-      case 'EUR':
-        return true;
-      case 'GBP':
-      case 'JPY':
-      case 'MXN':
-      case 'USD':
-      default:
-        return false;
-    }
+    return AppCurrencies.usesTrailingSymbol(currencyCode);
   }
 
   int getDecimalDigitsForCurrency(String currencyCode) {
-    switch (currencyCode) {
-      case 'JPY':
-        return 0;
-      case 'EUR':
-      case 'GBP':
-      case 'MXN':
-      case 'USD':
-      default:
-        return 2;
-    }
+    return AppCurrencies.getDecimalDigits(currencyCode);
   }
 
   String formatPrice(double amount, {String? currencyCode}) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/achievements_model.dart';
+import 'package:invenicum/data/models/custom_theme_model.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 
 enum ItemCondition {
@@ -605,4 +606,115 @@ class AppAchievements {
       ),
     ];
   }
+}
+
+// ── Predefined Themes & Brand Identity ──────────────────────────────────────
+class AppCurrencies {
+  static const String defaultCurrency = 'USD';
+
+  static const String eur = 'EUR';
+  static const String usd = 'USD';
+  static const String gbp = 'GBP';
+  static const String jpy = 'JPY';
+  static const String mxn = 'MXN';
+
+  static const List<String> allCodes = [eur, usd, gbp, jpy, mxn];
+
+  static String getSymbol(String currencyCode) {
+    switch (currencyCode) {
+      case eur:
+        return '€';
+      case gbp:
+        return '£';
+      case jpy:
+        return '¥';
+      case mxn:
+      case usd:
+      default:
+        return '\$';
+    }
+  }
+
+  static bool usesTrailingSymbol(String currencyCode) {
+    return currencyCode == eur;
+  }
+
+  static int getDecimalDigits(String currencyCode) {
+    return currencyCode == jpy ? 0 : 2;
+  }
+
+  static Map<String, String> getLabels(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return {
+      eur: l10n.currencyEur,
+      usd: l10n.currencyUsd,
+      gbp: l10n.currencyGbp,
+      jpy: l10n.currencyJpy,
+      mxn: l10n.currencyMxn,
+    };
+  }
+
+  static String getLabel(BuildContext context, String code) {
+    return getLabels(context)[code] ?? code;
+  }
+}
+
+class AppThemes {
+  static final CustomTheme brand = CustomTheme(
+    id: 'brand',
+    name: 'Invenicum (Brand)',
+    primaryColor: const Color(0xFF1A237E),
+    brightness: Brightness.light,
+  );
+
+  static final List<CustomTheme> predefined = [
+    CustomTheme(id: 'emerald', name: 'Emerald', primaryColor: Colors.teal),
+    CustomTheme(id: 'sunset', name: 'Sunset', primaryColor: Colors.orange),
+    CustomTheme(id: 'ocean', name: 'Indian Ocean', primaryColor: Colors.blue),
+    CustomTheme(
+      id: 'lavender',
+      name: 'Sweet Lavender',
+      primaryColor: Colors.purple.shade300,
+    ),
+    CustomTheme(
+      id: 'forest',
+      name: 'Deep Forest',
+      primaryColor: Colors.green.shade900,
+    ),
+    CustomTheme(id: 'cherry', name: 'Cherry', primaryColor: Colors.redAccent),
+    CustomTheme(
+      id: 'indigo',
+      name: 'Electric Night',
+      primaryColor: Colors.indigoAccent,
+    ),
+    CustomTheme(id: 'amber', name: 'Amber Gold', primaryColor: Colors.amber),
+    CustomTheme(
+      id: 'sakura',
+      name: 'Cherry Blossom',
+      primaryColor: Colors.pink.shade200,
+    ),
+    CustomTheme(
+      id: 'slate',
+      name: 'Modern Slate',
+      primaryColor: Colors.blueGrey.shade700,
+    ),
+    CustomTheme(
+      id: 'cyberpunk',
+      name: 'Cyberpunk',
+      primaryColor: Colors.pinkAccent,
+      brightness: Brightness.dark,
+    ),
+    CustomTheme(
+      id: 'nordic',
+      name: 'Arctic Nord',
+      primaryColor: Colors.lightBlue.shade100,
+      brightness: Brightness.light,
+    ),
+    CustomTheme(
+      id: 'dark_mode',
+      name: 'Deep Night',
+      primaryColor: Colors.blueGrey,
+      brightness: Brightness.dark,
+    ),
+  ];
 }
