@@ -31,6 +31,8 @@ class PreferencesProvider with ChangeNotifier {
   bool get showAssetTypeLogo => _prefs.showAssetTypeLogo;
   bool get autoResetFieldsOnSaveAndContinue =>
       _prefs.autoResetFieldsOnSaveAndContinue;
+  bool get cloneBusterEnabled => _prefs.cloneBusterEnabled;
+  String get selectedFontFamily => _prefs.fontFamily;
 
   PreferencesProvider(this._preferencesService);
 
@@ -354,6 +356,44 @@ class PreferencesProvider with ChangeNotifier {
       _prefs = previousPrefs;
       notifyListeners();
       debugPrint('Error updating auto reset fields preference: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> setCloneBusterEnabled(bool enabled) async {
+    final previousPrefs = _prefs;
+
+    _prefs = _prefs.copyWith(cloneBusterEnabled: enabled);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updatePreference(
+        'enableCloneBusterOmatic',
+        enabled,
+      );
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating clone buster preference: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> setFontFamily(String font) async {
+    final previousPrefs = _prefs;
+
+    _prefs = _prefs.copyWith(fontFamily: font);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updatePreference(
+        'fontFamily',
+        font,
+      );
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating font family preference: $e');
       rethrow;
     }
   }

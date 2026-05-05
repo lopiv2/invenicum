@@ -1009,6 +1009,110 @@ class AppLocalizationsEs extends AppLocalizations {
       'Limpia el formulario automáticamente tras guardar un item';
 
   @override
+  String get enableCloneBuster => 'Activar';
+
+  @override
+  String get enableCloneBusterDescription =>
+      '¡Garantizado para evitar artículos redundantes o te devolvemos tu dinero! (Oferta no válida en todas las líneas temporales excepto 1993)';
+
+  @override
+  String get cloneBusterDialogTitle => 'Clone-Buster-O-Matic™ Activado';
+
+  @override
+  String get cloneBusterMessage1 =>
+      'Sistema activado. ¡El Doctor Fred estaría orgulloso de este nivel de eficiencia! (Por favor, ignora el leve olor a pan quemado y el sonido de risa maníaca que sale de tu disco duro).';
+
+  @override
+  String get cloneBusterMessage2 =>
+      'Activando The Clone-Buster-O-Matic™... Por favor, mantén las manos, los pies y cualquier gemelo idéntico alejados del monitor durante la inicialización.';
+
+  @override
+  String get cloneBusterMessage3 =>
+      'Sistema habilitado. Hemos informado a tu \'yo del futuro\' de que ya no necesitas esos duplicados. Si de repente sientes un cosquilleo o dejas de existir, ignóralo.';
+
+  @override
+  String get cloneBusterMessage4 =>
+      'Clone-Buster activo. Cualquier artículo redundante será vaporizado humanamente y convertido en estática genérica. No te preocupes, no sentirán nada (creemos).';
+
+  @override
+  String get cloneBusterMessage5 =>
+      'Advertencia: Habilitar este módulo puede causar un aumento del 0,004% en el uso de RAM y una disminución del 100% en ver lo mismo dos veces. ¡Procede con extrema confianza!';
+
+  @override
+  String get cloneBusterMessage6 =>
+      'El Clone-Buster ya está en guardia. Es como tener un bibliotecario minúsculo y muy enfadado dentro de tu ordenador que odia ver doble. Haz clic.';
+
+  @override
+  String get cloneBusterDescription =>
+      'El Clone-Buster-O-Matic™ escanea tu inventario con precisión cuántica para detectar y prevenir entradas duplicadas. Configúralo en Paranoico para máxima detección.';
+
+  @override
+  String get cloneBusterDisclaimer =>
+      'Aviso: Esta función es tan inútil como un pollo de goma con una polea en medio. ¡Actívala bajo tu propio riesgo (y aburrimiento)!';
+
+  @override
+  String get fontFamilyLabel => 'Familia de Fuente';
+
+  @override
+  String get selectFontFamily => 'Selecciona la fuente de la aplicación';
+
+  @override
+  String get fontDefault => 'Por defecto (Sistema)';
+
+  @override
+  String get fontSCUMMCredits => 'SCUMM Credits';
+
+  @override
+  String get fontSCUMMSolid => 'SCUMM Solid';
+
+  @override
+  String get fontDayOfTheTentacle => 'Day of the Tentacle';
+
+  @override
+  String get fontEfmi => 'Efmi';
+
+  @override
+  String get fontPUSAB => 'PUSAB';
+
+  @override
+  String get cloneBusterDuplicateTitle => '¡Posible Duplicado Detectado!';
+
+  @override
+  String cloneBusterDuplicateMessage(String similarity, String itemName) {
+    return 'Este artículo tiene un $similarity% de similitud con \"$itemName\". ¿Deseas continuar de todos modos?';
+  }
+
+  @override
+  String get cloneBusterContinueAnyway => 'Continuar De Todos Modos';
+
+  @override
+  String get cloneBusterReview => 'Revisar';
+
+  @override
+  String get cloneBusterDialogAction => '¡Entendido!';
+
+  @override
+  String get cloneBusterSensitivityLevel => 'NIVEL DE SENSIBILIDAD';
+
+  @override
+  String get cloneBusterSensitivityLow => 'Bajo';
+
+  @override
+  String get cloneBusterSensitivityHigh => 'Alto';
+
+  @override
+  String get cloneBusterSensitivityParanoid => 'Paranoico';
+
+  @override
+  String get cloneBusterDialogOk => 'OK';
+
+  @override
+  String get cloneBusterDialogCancel => 'CANCELAR';
+
+  @override
+  String get cloneBusterDialogHelp => '?AYUDA';
+
+  @override
   String get saveChanges => 'Guardar Cambios';
 
   @override

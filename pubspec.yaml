@@ -93,7 +93,24 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/images/
-  #   - images/a_dot_ham.jpeg
+     - assets/fonts/
+
+  fonts:
+    - family: SCUMMCredits
+      fonts:
+        - asset: assets/fonts/lucasarts-scumm-credits-alt.otf
+    - family: SCUMMSolid
+      fonts:
+        - asset: assets/fonts/lucasarts-scumm-solid.otf
+    - family: DayOfTheTentacle
+      fonts:
+        - asset: assets/fonts/Day Of The Tentacle Regular.ttf
+    - family: Efmi
+      fonts:
+        - asset: assets/fonts/efmi.TTF
+    - family: PUSAB
+      fonts:
+        - asset: assets/fonts/PUSAB.otf
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

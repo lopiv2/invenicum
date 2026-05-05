@@ -59,9 +59,20 @@ Buying from Japan? Selling to the US? Manage your costs and values in **any curr
 
 Invenicum isn't an island. It features **multiple API integrations** and notification systems (Webhooks, etc.) to keep your workflow automated and your alerts on time.
 
-### 👥 8. Multi-User & Permissions
+### 👥 8. The Multiversal Access Module
 
-Share the love (but keep control). Create accounts for family members or employees with **specific roles**. You decide who can see, edit, or manage each specific collection.
+Why keep all the fun to yourself when you can risk the integrity of your collection by involving others? Whether it's a family member who doesn't know the difference between a "Mint Condition" comic and a napkin, or an employee who looks suspiciously like a purple tentacle, you are in control!
+
+By utilizing our patented Hierarchical Access-O-Tron™, you can:
+
+Assign Roles: From "Harmless Bystander" to "Maniacal Administrator."
+
+Segment Reality: Decide who gets to see your treasures and who stays in the dark (basement).
+
+### 💾 9. Easter Eggs 
+
+Our engineers were so bored waiting for the coffee to brew that they hid several 'unauthorized features' in the code. Finding them won't give you a trophy, but it might make you feel 10% more clever than your neighbors.
+
 
 > **...and much more!** From **Achievement Unlocks** 🏆 for your cataloging progress to **Customizable Alerts**, there are plenty of features waiting for you to discover them inside the app.
 

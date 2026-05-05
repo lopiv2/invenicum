@@ -503,6 +503,47 @@
   "saveAndContinueAsset": "Salva e continua",
   "autoResetFieldsOnSaveAndContinue": "Reimposta i campi al salvataggio",
   "autoResetFieldsOnSaveAndContinueDescription": "Cancella il modulo automaticamente dopo il salvataggio",
+  "enableCloneBuster": "Attivare",
+  "enableCloneBusterDescription": "Garantito per evitare elementi ridondanti o ti rimborsiamo! (Offerta non valida in tutte le linee temporali tranne il 1993)",
+  "cloneBusterDialogTitle": "Clone-Buster-O-Matic™ Attivato",
+  "cloneBusterMessage1": "Sistema attivato. Il Dottor Fred sarebbe orgoglioso di questo livello di efficienza! (Per favore ignora il leggero odore di pane bruciato e il suono di risa maniacali provenienti dal tuo disco rigido).",
+  "cloneBusterMessage2": "Attivazione di The Clone-Buster-O-Matic™... Per favore tieni mani, piedi ed eventuali gemelli identici lontani dal monitor durante l'inizializzazione.",
+  "cloneBusterMessage3": "Sistema abilitato. Abbiamo informato il tuo 'io del futuro' che non hai più bisogno di quei duplicati. Se all'improvviso senti un formicolio o smetti di esistere, ignoralo.",
+  "cloneBusterMessage4": "Clone-Buster attivo. Tutti gli elementi ridondanti saranno vaporizzati umanamente e trasformati in staticità generica. Non preoccuparti, non sentiranno nulla (pensiamo).",
+  "cloneBusterMessage5": "Attenzione: l'attivazione di questo modulo potrebbe causare un aumento dello 0,004% dell'utilizzo della RAM e una diminuzione del 100% nel vedere la stessa cosa due volte. Procedi con estrema sicurezza!",
+  "cloneBusterMessage6": "Il Clone-Buster è ora di guardia. È come avere un minuscolo e molto arrabbiato bibliotecario nel tuo computer che odia vedere il doppio. Clicca.",
+  "cloneBusterDescription": "The Clone-Buster-O-Matic™ analizza il tuo inventario con precisione quantica per rilevare e prevenire voci duplicate. Imposta su Paranoico per il massimo rilevamento.",
+  "cloneBusterDisclaimer": "Disclaimer: Questa funzione è inutile quanto una gallina di gomma con una puleggia in mezzo. Attivala a tuo rischio e pericolo (e noia)!",
+  "fontFamilyLabel": "Famiglia di Caratteri",
+  "selectFontFamily": "Seleziona il carattere dell'app",
+  "fontDefault": "Predefinito (Sistema)",
+  "fontSCUMMCredits": "SCUMM Credits",
+  "fontSCUMMSolid": "SCUMM Solid",
+  "fontDayOfTheTentacle": "Day of the Tentacle",
+  "fontEfmi": "Efmi",
+  "fontPUSAB": "PUSAB",
+  "cloneBusterDuplicateTitle": "Possibile Duplicato Rilevato!",
+  "cloneBusterDuplicateMessage": "Questo articolo è simile al {similarity}% a \"{itemName}\". Vuoi continuare comunque?",
+  "@cloneBusterDuplicateMessage": {
+    "placeholders": {
+      "similarity": {
+        "type": "String"
+      },
+      "itemName": {
+        "type": "String"
+      }
+    }
+  },
+  "cloneBusterContinueAnyway": "Continua Comunque",
+  "cloneBusterReview": "Rivedi",
+  "cloneBusterDialogAction": "Ho capito!",
+  "cloneBusterSensitivityLevel": "LIVELLO DI SENSIBILITÀ",
+  "cloneBusterSensitivityLow": "Basso",
+  "cloneBusterSensitivityHigh": "Alto",
+  "cloneBusterSensitivityParanoid": "Paranoico",
+  "cloneBusterDialogOk": "OK",
+  "cloneBusterDialogCancel": "ANNULLA",
+  "cloneBusterDialogHelp": "?AIUTO",
   "saveChanges": "Salva modifiche",
   "saveConfiguration": "Salva impostazioni",
   "saveCustomTheme": "Salva tema personalizzato",

@@ -503,6 +503,47 @@
   "saveAndContinueAsset": "Save & Continue",
   "autoResetFieldsOnSaveAndContinue": "Reset fields on save & continue",
   "autoResetFieldsOnSaveAndContinueDescription": "Clears the form automatically after saving an item",
+  "enableCloneBuster": "Enable",
+  "enableCloneBusterDescription": "Guaranteed to avoid redundant items or your money back! (Offer void in all timelines except 1993)",
+  "cloneBusterDialogTitle": "Clone-Buster-O-Matic™ Activated",
+  "cloneBusterMessage1": "System engaged. Doctor Fred would be proud of this level of efficiency! (Please ignore the faint smell of burning toast and the sound of maniacal laughter from your hard drive).",
+  "cloneBusterMessage2": "Activating The Clone-Buster-O-Matic™... Please keep your hands, feet, and any identical twins away from the monitor during initialization.",
+  "cloneBusterMessage3": "System enabled. We've informed your 'future self' that you no longer need those duplicates. If you suddenly feel a tingling sensation or stop existing, ignore it.",
+  "cloneBusterMessage4": "Clone-Buster active. Any redundant items will be humanely vaporized and turned into generic static. Don't worry, they won't feel a thing (we think).",
+  "cloneBusterMessage5": "Warning: Enabling this module may cause a 0.004% increase in RAM usage and a 100% decrease in seeing the same thing twice. Proceed with extreme confidence!",
+  "cloneBusterMessage6": "The Clone-Buster is now standing guard. It's like having a tiny, very angry librarian inside your computer who hates seeing double. Click.",
+  "cloneBusterDescription": "The Clone-Buster-O-Matic™ scans your inventory with quantum precision to detect and prevent duplicate entries. Set to Paranoid for maximum detection.",
+  "cloneBusterDisclaimer": "Disclaimer: This feature is as useless as a rubber chicken with a pulley in the middle. Toggle at your own risk (and boredom)!",
+  "fontFamilyLabel": "Font Family",
+  "selectFontFamily": "Select the application font",
+  "fontDefault": "Default (System)",
+  "fontSCUMMCredits": "SCUMM Credits",
+  "fontSCUMMSolid": "SCUMM Solid",
+  "fontDayOfTheTentacle": "Day of the Tentacle",
+  "fontEfmi": "Efmi",
+  "fontPUSAB": "PUSAB",
+  "cloneBusterDuplicateTitle": "Possible Duplicate Detected!",
+  "cloneBusterDuplicateMessage": "This item is {similarity}% similar to \"{itemName}\". Do you want to continue anyway?",
+  "@cloneBusterDuplicateMessage": {
+    "placeholders": {
+      "similarity": {
+        "type": "String"
+      },
+      "itemName": {
+        "type": "String"
+      }
+    }
+  },
+  "cloneBusterContinueAnyway": "Continue Anyway",
+  "cloneBusterReview": "Review",
+  "cloneBusterDialogAction": "Got it!",
+  "cloneBusterSensitivityLevel": "SENSITIVITY LEVEL",
+  "cloneBusterSensitivityLow": "Low",
+  "cloneBusterSensitivityHigh": "High",
+  "cloneBusterSensitivityParanoid": "Paranoid",
+  "cloneBusterDialogOk": "OK",
+  "cloneBusterDialogCancel": "CANCEL",
+  "cloneBusterDialogHelp": "?HELP",
   "saveChanges": "Save Changes",
   "saveConfiguration": "Save Configuration",
   "saveCustomTheme": "Save Custom Theme",

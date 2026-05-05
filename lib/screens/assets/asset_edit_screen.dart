@@ -15,6 +15,7 @@ import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/ai_service.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/core/utils/asset_form_utils.dart';
+import 'package:invenicum/data/services/clone_buster_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
@@ -290,11 +291,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // IA
-  // ---------------------------------------------------------------------------
-
-  // ---------------------------------------------------------------------------
-  // Escáner de código de barras
+  // Barcode scanning and auto-suggest
   // ---------------------------------------------------------------------------
 
   Future<void> _startScan() async {
@@ -484,10 +481,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                   final idx = _assetType!.fieldDefinitions.indexWhere(
                     (f) => f.id == fieldId,
                   );
-                  if (idx != -1)
+                  if (idx != -1) {
                     _highlightedFields.add(
                       _assetType!.fieldDefinitions[idx].name,
                     );
+                  }
                 });
               });
             }
@@ -499,8 +497,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             final mappedToField = _assetType!.fieldDefinitions.any(
               (f) => f.name.toLowerCase() == key.toLowerCase(),
             );
-            if (!mappedToField && key.toLowerCase() != 'external_id')
+            if (!mappedToField && key.toLowerCase() != 'external_id') {
               leftover.add('$key: $value');
+            }
           });
           if (leftover.isNotEmpty) {
             setState(() {
@@ -879,8 +878,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     final assetItemIdInt = int.tryParse(widget.assetItemId);
 
     if (cIdInt == null || atIdInt == null || assetItemIdInt == null) {
-      if (mounted)
+      if (mounted) {
         ToastService.error(AppLocalizations.of(context)!.invalidNavigationIds);
+      }
       return;
     }
 
@@ -907,8 +907,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           );
           return;
         }
-        if (boolValue != null)
+        if (boolValue != null) {
           updatedCustomValues[fieldId.toString()] = boolValue;
+        }
       } else if (controller != null && controller.text.isNotEmpty) {
         var valueToSave = controller.text;
         if (fieldDef.type == CustomFieldType.price) {
@@ -952,6 +953,45 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       customFieldValues: updatedCustomValues,
       images: _currentImages,
     );
+
+    if (preferences.cloneBusterEnabled && mounted) {
+      final result = CloneBusterService.checkForDuplicates(
+        newItem: updatedItem,
+        existingItems: _getSameTypeItems(itemProvider),
+        excludeItemId: assetItemIdInt,
+      );
+
+      if (result.isDuplicate) {
+        final shouldContinue = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context)!.cloneBusterDuplicateTitle),
+              content: Text(
+                AppLocalizations.of(context)!.cloneBusterDuplicateMessage(
+                  result.similarityScore.toStringAsFixed(0),
+                  result.duplicateOf!.name,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(AppLocalizations.of(context)!.cloneBusterReview),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(AppLocalizations.of(context)!.cloneBusterContinueAnyway),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (shouldContinue != true) {
+          return;
+        }
+      }
+    }
 
     try {
       await itemProvider.updateAssetWithFiles(

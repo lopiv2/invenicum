@@ -1009,6 +1009,110 @@ class AppLocalizationsDe extends AppLocalizations {
       'Formular nach dem Speichern automatisch leeren';
 
   @override
+  String get enableCloneBuster => 'aktivieren';
+
+  @override
+  String get enableCloneBusterDescription =>
+      'Garantiert, um redundante Einträge zu vermeiden oder Ihr Geld zurück! (Angebot ungültig in allen Zeitlinien außer 1993)';
+
+  @override
+  String get cloneBusterDialogTitle => 'Clone-Buster-O-Matic™ Aktiviert';
+
+  @override
+  String get cloneBusterMessage1 =>
+      'System aktiviert. Doktor Fred wäre stolz auf dieses Maß an Effizienz! (Bitte ignorieren Sie den leichten Geruch von verbranntem Toast und das Geräusch manischen Lachens von Ihrer Festplatte).';
+
+  @override
+  String get cloneBusterMessage2 =>
+      'Der Clone-Buster-O-Matic™ wird aktiviert... Bitte halten Sie Hände, Füße und etwaige eineiige Zwillinge während der Initialisierung vom Monitor fern.';
+
+  @override
+  String get cloneBusterMessage3 =>
+      'System aktiviert. Wir haben Ihr \'zukünftiges Ich\' darüber informiert, dass Sie diese Duplikate nicht mehr benötigen. Wenn Sie plötzlich ein Kribbeln spüren oder aufhören zu existieren, ignorieren Sie es.';
+
+  @override
+  String get cloneBusterMessage4 =>
+      'Clone-Buster aktiv. Alle überflüssigen Einträge werden auf humane Weise verdampft und in generisches Rauschen umgewandelt. Keine Sorge, sie werden nichts spüren (denken wir).';
+
+  @override
+  String get cloneBusterMessage5 =>
+      'Warnung: Das Aktivieren dieses Moduls kann eine Erhöhung der RAM-Nutzung um 0,004 % und eine Verringerung um 100 % beim zweimaligen Sehen desselben Dings verursachen. Fahren Sie mit äußerstem Selbstvertrauen fort!';
+
+  @override
+  String get cloneBusterMessage6 =>
+      'Der Clone-Buster steht nun Wache. Es ist wie ein winziger, sehr wütender Bibliothekar in Ihrem Computer, der es hasst, Doppelgänger zu sehen. Klicken.';
+
+  @override
+  String get cloneBusterDescription =>
+      'The Clone-Buster-O-Matic™ durchsucht Ihr Inventar mit quantenpräziser Genauigkeit, um doppelte Einträge zu erkennen und zu verhindern. Stellen Sie auf Paranoisch für maximale Erkennung.';
+
+  @override
+  String get cloneBusterDisclaimer =>
+      'Haftungsausschluss: Diese Funktion ist so nutzlos wie ein Gummihuhn mit einer Rolle in der Mitte. Aktivieren auf eigene Gefahr (und Langeweile)!';
+
+  @override
+  String get fontFamilyLabel => 'Schriftfamilie';
+
+  @override
+  String get selectFontFamily => 'Schriftart der Anwendung auswählen';
+
+  @override
+  String get fontDefault => 'Standard (System)';
+
+  @override
+  String get fontSCUMMCredits => 'SCUMM Credits';
+
+  @override
+  String get fontSCUMMSolid => 'SCUMM Solid';
+
+  @override
+  String get fontDayOfTheTentacle => 'Day of the Tentacle';
+
+  @override
+  String get fontEfmi => 'Efmi';
+
+  @override
+  String get fontPUSAB => 'PUSAB';
+
+  @override
+  String get cloneBusterDuplicateTitle => 'Mögliches Duplikat Erkannt!';
+
+  @override
+  String cloneBusterDuplicateMessage(String similarity, String itemName) {
+    return 'Dieser Artikel ist zu $similarity% ähnlich wie \"$itemName\". Möchten Sie trotzdem fortfahren?';
+  }
+
+  @override
+  String get cloneBusterContinueAnyway => 'Trotzdem Fortfahren';
+
+  @override
+  String get cloneBusterReview => 'Überprüfen';
+
+  @override
+  String get cloneBusterDialogAction => 'Verstanden!';
+
+  @override
+  String get cloneBusterSensitivityLevel => 'SENSIBILITÄTSSTUFE';
+
+  @override
+  String get cloneBusterSensitivityLow => 'Niedrig';
+
+  @override
+  String get cloneBusterSensitivityHigh => 'Hoch';
+
+  @override
+  String get cloneBusterSensitivityParanoid => 'Paranoid';
+
+  @override
+  String get cloneBusterDialogOk => 'OK';
+
+  @override
+  String get cloneBusterDialogCancel => 'ABBRECHEN';
+
+  @override
+  String get cloneBusterDialogHelp => '?HILFE';
+
+  @override
   String get saveChanges => 'Änderungen speichern';
 
   @override

@@ -32,6 +32,7 @@ import 'package:invenicum/data/services/ai_service.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/core/utils/asset_form_utils.dart';
+import 'package:invenicum/data/services/clone_buster_service.dart';
 
 import 'package:invenicum/widgets/ui/magic_ai_dialog_widget.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -396,10 +397,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                 final idx = _assetType!.fieldDefinitions.indexWhere(
                   (f) => f.id == fieldId,
                 );
-                if (idx != -1)
+                if (idx != -1) {
                   _highlightedFields.add(
                     _assetType!.fieldDefinitions[idx].name,
                   );
+                }
               });
             });
           }
@@ -661,6 +663,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   Future<void> _saveAsset() async {
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
+    final prefsProvider = context.read<PreferencesProvider>();
     if (!AssetFormUtils.validateForm(_formKey) ||
         _assetType == null ||
         _selectedLocationId == null) {
@@ -671,6 +674,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       }
       return;
     }
+
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
@@ -696,22 +700,62 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         }
       }
     }
-    try {
-      final newItem = InventoryItem(
-        id: 0,
-        containerId: _containerId!,
-        assetTypeId: _assetTypeId!,
-        barcode: _barcodeController.text.trim(),
-        serialNumber: _serialController.text.trim(),
-        locationId: _selectedLocationId,
-        quantity: int.tryParse(_quantityController.text) ?? 1,
-        minStock: int.tryParse(_minStockController.text) ?? 1,
-        name: _nameController.text.trim(),
-        condition: _selectedCondition,
-        description: _descriptionController.text.trim(),
-        marketValue: _marketValue,
-        customFieldValues: customFieldValues,
+
+    final newItem = InventoryItem(
+      id: 0,
+      containerId: _containerId!,
+      assetTypeId: _assetTypeId!,
+      barcode: _barcodeController.text.trim(),
+      serialNumber: _serialController.text.trim(),
+      locationId: _selectedLocationId,
+      quantity: int.tryParse(_quantityController.text) ?? 1,
+      minStock: int.tryParse(_minStockController.text) ?? 1,
+      name: _nameController.text.trim(),
+      condition: _selectedCondition,
+      description: _descriptionController.text.trim(),
+      marketValue: _marketValue,
+      customFieldValues: customFieldValues,
+    );
+
+    if (prefsProvider.cloneBusterEnabled && mounted) {
+      final result = CloneBusterService.checkForDuplicates(
+        newItem: newItem,
+        existingItems: _getSameTypeItems(itemProvider),
       );
+
+      if (result.isDuplicate && mounted) {
+        final shouldContinue = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(l10n.cloneBusterDuplicateTitle),
+              content: Text(
+                l10n.cloneBusterDuplicateMessage(
+                  result.similarityScore.toStringAsFixed(0),
+                  result.duplicateOf!.name,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(l10n.cloneBusterReview),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(l10n.cloneBusterContinueAnyway),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (shouldContinue != true) {
+          return;
+        }
+      }
+    }
+
+    try {
       await context.read<InventoryItemProvider>().createInventoryItem(
         context,
         newItem,
@@ -743,6 +787,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   Future<void> _saveAndContinue() async {
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
+    final prefsProvider = context.read<PreferencesProvider>();
     if (!AssetFormUtils.validateForm(_formKey) ||
         _assetType == null ||
         _selectedLocationId == null) {
@@ -778,22 +823,62 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         }
       }
     }
-    try {
-      final newItem = InventoryItem(
-        id: 0,
-        containerId: _containerId!,
-        assetTypeId: _assetTypeId!,
-        barcode: _barcodeController.text.trim(),
-        serialNumber: _serialController.text.trim(),
-        locationId: _selectedLocationId,
-        quantity: int.tryParse(_quantityController.text) ?? 1,
-        minStock: int.tryParse(_minStockController.text) ?? 1,
-        name: _nameController.text.trim(),
-        condition: _selectedCondition,
-        description: _descriptionController.text.trim(),
-        marketValue: _marketValue,
-        customFieldValues: customFieldValues,
+
+    final newItem = InventoryItem(
+      id: 0,
+      containerId: _containerId!,
+      assetTypeId: _assetTypeId!,
+      barcode: _barcodeController.text.trim(),
+      serialNumber: _serialController.text.trim(),
+      locationId: _selectedLocationId,
+      quantity: int.tryParse(_quantityController.text) ?? 1,
+      minStock: int.tryParse(_minStockController.text) ?? 1,
+      name: _nameController.text.trim(),
+      condition: _selectedCondition,
+      description: _descriptionController.text.trim(),
+      marketValue: _marketValue,
+      customFieldValues: customFieldValues,
+    );
+
+    if (prefsProvider.cloneBusterEnabled && mounted) {
+      final result = CloneBusterService.checkForDuplicates(
+        newItem: newItem,
+        existingItems: _getSameTypeItems(itemProvider),
       );
+
+      if (result.isDuplicate && mounted) {
+        final shouldContinue = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(l10n.cloneBusterDuplicateTitle),
+              content: Text(
+                l10n.cloneBusterDuplicateMessage(
+                  result.similarityScore.toStringAsFixed(0),
+                  result.duplicateOf!.name,
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text(l10n.cloneBusterReview),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text(l10n.cloneBusterContinueAnyway),
+                ),
+              ],
+            );
+          },
+        );
+
+        if (shouldContinue != true) {
+          return;
+        }
+      }
+    }
+
+    try {
       await context.read<InventoryItemProvider>().createInventoryItem(
         context,
         newItem,

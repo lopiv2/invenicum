@@ -3,7 +3,9 @@ import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/screens/preferences/local_widgets/clone_buster_switch_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/currency_dropdown_widget.dart';
+import 'package:invenicum/screens/preferences/local_widgets/font_family_dropdown_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/language_dropdown_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -101,6 +103,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                 ),
               },
             ),
+            const CloneBusterSwitchWidget(),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.language),
@@ -118,6 +121,15 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                 AppLocalizations.of(context)!.selectApplicationCurrency,
               ),
               trailing: const CurrencyDropdownWidget(),
+              onTap: null,
+            ),
+            ListTile(
+              leading: const Icon(Icons.text_fields),
+              title: Text(AppLocalizations.of(context)!.fontFamilyLabel),
+              subtitle: Text(
+                AppLocalizations.of(context)!.selectFontFamily,
+              ),
+              trailing: const FontFamilyDropdownWidget(),
               onTap: null,
             ),
             if (prefsProvider.selectedCurrency != 'USD' &&
