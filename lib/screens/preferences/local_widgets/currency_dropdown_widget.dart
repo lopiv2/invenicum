@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
@@ -16,10 +17,9 @@ class CurrencyDropdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Escuchamos el provider. Al usar .watch(), el widget se reconstruye
-    // automáticamente cuando llames a notifyListeners() en el provider.
     final preferencesProvider = context.watch<PreferencesProvider>();
     final currentCurrency = preferencesProvider.selectedCurrency;
+    final currencyLabels = AppCurrencies.getLabels(context);
 
     return PopupMenuButton<String>(
       onSelected: (String currencyCode) async {
@@ -27,18 +27,19 @@ class CurrencyDropdownWidget extends StatelessWidget {
         onCurrencyChanged?.call();
       },
       itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-        _buildMenuItem(context, 'EUR', '€', 'Euro'),
-        _buildMenuItem(context, 'USD', '\$', 'Dollar'),
-        _buildMenuItem(context, 'GBP', '£', 'Pound'),
-        _buildMenuItem(context, 'JPY', '¥', 'Yen'),
-        _buildMenuItem(context, 'MXN', '\$', 'Peso Mexicano'),
+        for (final code in AppCurrencies.allCodes)
+          _buildMenuItem(
+            context,
+            code,
+            AppCurrencies.getSymbol(code),
+            currencyLabels[code] ?? code,
+          ),
       ],
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Círculo visual con el símbolo de la moneda actual
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
@@ -55,7 +56,6 @@ class CurrencyDropdownWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            // Texto del código de moneda (EUR, USD, etc.)
             Text(
               currentCurrency,
               style: const TextStyle(
@@ -98,7 +98,6 @@ class CurrencyDropdownWidget extends StatelessWidget {
   Future<void> _changeCurrency(BuildContext context, String currencyCode) async {
     AppLocalizations l10n = AppLocalizations.of(context)!;
     try {
-      // Este método en tu provider ahora actualiza _prefs y notifica al backend
       await context.read<PreferencesProvider>().setCurrency(currencyCode);
       await AppUtils.trackAndToast(context, 'CURRENCY_CHANGED');
       ToastService.success("${l10n.currency}: $currencyCode"); 

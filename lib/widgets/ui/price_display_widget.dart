@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/preferences_provider.dart';
 
@@ -20,17 +21,17 @@ class PriceDisplayWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final preferences = context.watch<PreferencesProvider>();
 
-    // 1. Convertir el valor de la DB (USD) a número
+    // 1. Convert the value from DB (USD) to a number
     final double dbValue = double.tryParse(value?.toString() ?? '0') ?? 0.0;
 
-    // 2. Convertir a moneda local según preferencias
+    // 2. Convert to local currency per preferences
     final double localPrice = preferences.convertPrice(dbValue);
 
-    // 3. Formatear el texto
+    // 3. Format the text
     final String formattedPrice = preferences.formatPrice(localPrice);
     final String originalUsdText = preferences.formatPrice(
       dbValue,
-      currencyCode: 'USD',
+      currencyCode: AppCurrencies.usd,
     );
 
     return Tooltip(

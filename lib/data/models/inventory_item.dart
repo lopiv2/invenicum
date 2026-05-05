@@ -86,7 +86,7 @@ class InventoryItem {
     this.images = const [],
     this.location,
     this.marketValue = 0.0,
-    this.currency = 'EUR',
+    this.currency = AppCurrencies.defaultCurrency,
     this.totalMarketValue = 0.0,
     this.lastPriceUpdate,
     this.priceHistory,
@@ -164,7 +164,7 @@ class InventoryItem {
           : null,
 
       marketValue: (itemData['marketValue'] ?? 0.0).toDouble(),
-      currency: itemData['currency'] as String? ?? 'EUR',
+      currency: itemData['currency'] as String? ?? AppCurrencies.defaultCurrency,
       totalMarketValue: (itemData['totalMarketValue'] ?? 0.0).toDouble(),
       lastPriceUpdate: parseDate(itemData['lastPriceUpdate']),
     );

@@ -1,5 +1,7 @@
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
 
+import 'package:invenicum/core/utils/constants.dart';
+
 class UserPreferences {
   final int? id;
   final String language;
@@ -23,7 +25,7 @@ class UserPreferences {
   UserPreferences({
     this.id,
     this.language = 'en',
-    this.currency = 'USD',
+    this.currency = AppCurrencies.defaultCurrency,
     this.showAssetTypeLogo = true,
     this.aiEnabled = true,
     this.aiProvider,
@@ -50,7 +52,7 @@ class UserPreferences {
     return UserPreferences(
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'en',
-      currency: json['currency'] as String? ?? 'USD',
+      currency: json['currency'] as String? ?? AppCurrencies.defaultCurrency,
       showAssetTypeLogo: json['showAssetTypeLogo'] ?? json['show_asset_type_logo'] ?? true,
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       aiProvider: (json['aiProvider'] ?? json['ai_provider']) as String?,
@@ -67,7 +69,7 @@ class UserPreferences {
       autoResetFieldsOnSaveAndContinue:
           json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
       cloneBusterEnabled: json['enableCloneBusterOmatic'] ?? false,
-      fontFamily: json['fontFamily'] ?? 'Default',
+      fontFamily: json['font'] ?? 'Default',
 
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
@@ -89,7 +91,7 @@ class UserPreferences {
       'showAssetTypeLogo': showAssetTypeLogo,
       'autoResetFieldsOnSaveAndContinue': autoResetFieldsOnSaveAndContinue,
       'cloneBusterEnabled': cloneBusterEnabled,
-      'fontFamily': fontFamily,
+      'font': fontFamily,
       'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
     };
@@ -141,7 +143,7 @@ class UserPreferences {
   factory UserPreferences.empty() {
     return UserPreferences(
       language: 'en',
-      currency: 'USD',
+      currency: AppCurrencies.defaultCurrency,
       showAssetTypeLogo: true,
       aiEnabled: true,
       useSystemTheme: true,

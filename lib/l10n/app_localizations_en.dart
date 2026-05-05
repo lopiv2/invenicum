@@ -2372,6 +2372,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zoomToFit => 'Zoom to Fit';
 
   @override
+  String get currencyEur => 'Euro';
+
+  @override
+  String get currencyUsd => 'US Dollar';
+
+  @override
+  String get currencyGbp => 'British Pound';
+
+  @override
+  String get currencyJpy => 'Japanese Yen';
+
+  @override
+  String get currencyMxn => 'Mexican Peso';
+
+  @override
   String get generalSettingsMenuLabel => 'General Settings';
 
   @override

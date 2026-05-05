@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/core/utils/theme_name_localizer.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/custom_theme_model.dart';
@@ -33,11 +34,11 @@ void showThemePickerModal(BuildContext context, ThemeProvider provider) {
                   Tooltip(
                     message: localizeThemeName(
                       sheetContext,
-                      ThemeProvider.brandTheme,
+                      AppThemes.brand,
                     ),
-                    child: ThemeColorDot(theme: ThemeProvider.brandTheme),
+                    child: ThemeColorDot(theme: AppThemes.brand),
                   ),
-                  ...ThemeProvider.predefinedThemes.map(
+                  ...AppThemes.predefined.map(
                     (t) => Tooltip(
                       message: localizeThemeName(sheetContext, t),
                       child: ThemeColorDot(theme: t),
