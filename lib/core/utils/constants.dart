@@ -608,6 +608,35 @@ class AppAchievements {
   }
 }
 
+//Font families available in the app, with their corresponding size deltas to adjust the UI accordingly (e.g. SCUMM fonts are smaller, so we apply a negative delta)
+class AppFonts {
+  static List<(String id, double delta, String label)> getFonts(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      ('Default',           0,  l10n.fontDefault),
+      ('SCUMMCredits',     -4,  l10n.fontSCUMMCredits),
+      ('SCUMMSolid',       -4,  l10n.fontSCUMMSolid),
+      ('DayOfTheTentacle',  4,  l10n.fontDayOfTheTentacle),
+      ('Efmi',              0,  l10n.fontEfmi),
+      ('PUSAB',             0,  l10n.fontPUSAB),
+    ];
+  }
+
+  static double getDelta(String? fontFamily) {
+    // Lista estática solo con id y delta para uso fuera del contexto
+    const deltas = <(String, double)>[
+      ('SCUMMCredits',    -4),
+      ('SCUMMSolid',      -4),
+      ('DayOfTheTentacle', 4),
+      ('Efmi',             0),
+      ('PUSAB',            0),
+    ];
+    return deltas
+        .firstWhere((f) => f.$1 == fontFamily, orElse: () => ('', 0.0))
+        .$2;
+  }
+}
+
 // ── Predefined Themes & Brand Identity ──────────────────────────────────────
 class AppCurrencies {
   static const String defaultCurrency = 'USD';

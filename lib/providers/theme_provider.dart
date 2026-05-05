@@ -18,6 +18,7 @@ class ThemeProvider with ChangeNotifier {
   List<CustomTheme> get userThemes => _userThemes;
 
   String? _fontFamily;
+  double _getDelta(String? fontFamily) => AppFonts.getDelta(fontFamily);
 
   CustomTheme _currentTheme = AppThemes.brand;
   CustomTheme get currentTheme => _currentTheme;
@@ -36,16 +37,47 @@ class ThemeProvider with ChangeNotifier {
     return _buildTheme(Brightness.dark);
   }
 
+  TextStyle? _adjustSize(
+    TextStyle? style,
+    double delta, [
+    double fallback = 14,
+  ]) {
+    return style?.copyWith(fontSize: (style.fontSize ?? fallback) + delta);
+  }
+
   // Private method to avoid code duplication
   ThemeData _buildTheme(Brightness brightness) {
-    return ThemeData(
-      useMaterial3: true,
-      colorSchemeSeed: _currentTheme.primaryColor,
-      brightness: brightness,
-      appBarTheme: const AppBarTheme(centerTitle: true),
-      fontFamily: _fontFamily,
-    );
-  }
+  final base = ThemeData(
+    useMaterial3: true,
+    colorSchemeSeed: _currentTheme.primaryColor,
+    brightness: brightness,
+    appBarTheme: const AppBarTheme(centerTitle: true),
+    fontFamily: _fontFamily,
+  );
+
+  final delta = AppFonts.getDelta(_fontFamily);
+  if (delta == 0) return base;
+
+  return base.copyWith(
+    textTheme: base.textTheme.copyWith(
+      displayLarge:  _adjustSize(base.textTheme.displayLarge,  delta, 57),
+      displayMedium: _adjustSize(base.textTheme.displayMedium, delta, 45),
+      displaySmall:  _adjustSize(base.textTheme.displaySmall,  delta, 36),
+      headlineLarge: _adjustSize(base.textTheme.headlineLarge, delta, 32),
+      headlineMedium:_adjustSize(base.textTheme.headlineMedium,delta, 28),
+      headlineSmall: _adjustSize(base.textTheme.headlineSmall, delta, 24),
+      titleLarge:    _adjustSize(base.textTheme.titleLarge,    delta, 22),
+      titleMedium:   _adjustSize(base.textTheme.titleMedium,   delta, 16),
+      titleSmall:    _adjustSize(base.textTheme.titleSmall,    delta, 14),
+      bodyLarge:     _adjustSize(base.textTheme.bodyLarge,     delta, 16),
+      bodyMedium:    _adjustSize(base.textTheme.bodyMedium,    delta, 14),
+      bodySmall:     _adjustSize(base.textTheme.bodySmall,     delta, 12),
+      labelLarge:    _adjustSize(base.textTheme.labelLarge,    delta, 14),
+      labelMedium:   _adjustSize(base.textTheme.labelMedium,   delta, 12),
+      labelSmall:    _adjustSize(base.textTheme.labelSmall,    delta, 11),
+    ),
+  );
+}
 
   void setInitializing() {
     _isInitialized = true;
@@ -96,7 +128,9 @@ class ThemeProvider with ChangeNotifier {
     try {
       // 3. Check if color and brightness match any named theme
       _currentTheme = allPossibleThemes.firstWhere(
-        (t) => t.primaryColor.toARGB32() == colorValue && t.brightness == brightness,
+        (t) =>
+            t.primaryColor.toARGB32() == colorValue &&
+            t.brightness == brightness,
       );
     } catch (_) {
       // 4. If it truly doesn't exist anywhere, it remains as Custom
@@ -166,7 +200,8 @@ class ThemeProvider with ChangeNotifier {
       // 3. Find the theme that matches color and brightness
       _currentTheme = allPossibleThemes.firstWhere(
         (t) =>
-            t.primaryColor.toARGB32() == color.toARGB32() && t.brightness == brightness,
+            t.primaryColor.toARGB32() == color.toARGB32() &&
+            t.brightness == brightness,
       );
     } catch (_) {
       // 4. If it doesn't exist, leave it as Custom

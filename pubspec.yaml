@@ -98,7 +98,7 @@ flutter:
   fonts:
     - family: SCUMMCredits
       fonts:
-        - asset: assets/fonts/lucasarts-scumm-credits-alt.otf
+        - asset: assets/fonts/LucasArtsSCUMM-CreditsAlt_mod.otf
     - family: SCUMMSolid
       fonts:
         - asset: assets/fonts/lucasarts-scumm-solid.otf

@@ -15,12 +15,11 @@ class UserPreferences {
   final Map<String, double>? exchangeRates;
   final NotificationSettings notifications;
 
-  // 🔔 NUEVOS CAMPOS
   final bool useSystemTheme;
   final bool isDarkMode;
   final bool autoResetFieldsOnSaveAndContinue;
   final bool cloneBusterEnabled;
-  final String fontFamily;
+  final String font;
 
   UserPreferences({
     this.id,
@@ -37,7 +36,7 @@ class UserPreferences {
     this.isDarkMode = false,
     this.autoResetFieldsOnSaveAndContinue = true,
     this.cloneBusterEnabled = false,
-    this.fontFamily = 'Default',
+    this.font = 'Default',
     NotificationSettings? notifications,
   }) : notifications = notifications ?? NotificationSettings();
 
@@ -69,7 +68,7 @@ class UserPreferences {
       autoResetFieldsOnSaveAndContinue:
           json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
       cloneBusterEnabled: json['enableCloneBusterOmatic'] ?? false,
-      fontFamily: json['font'] ?? 'Default',
+      font: json['font'] ?? 'Default',
 
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
@@ -91,7 +90,7 @@ class UserPreferences {
       'showAssetTypeLogo': showAssetTypeLogo,
       'autoResetFieldsOnSaveAndContinue': autoResetFieldsOnSaveAndContinue,
       'cloneBusterEnabled': cloneBusterEnabled,
-      'font': fontFamily,
+      'font': font,
       'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
     };
@@ -119,7 +118,7 @@ class UserPreferences {
     bool? isDarkMode,
     bool? autoResetFieldsOnSaveAndContinue,
     bool? cloneBusterEnabled,
-    String? fontFamily,
+    String? font,
   }) {
     return UserPreferences(
       id: id ?? this.id,
@@ -136,7 +135,7 @@ class UserPreferences {
       autoResetFieldsOnSaveAndContinue:
           autoResetFieldsOnSaveAndContinue ?? this.autoResetFieldsOnSaveAndContinue,
       cloneBusterEnabled: cloneBusterEnabled ?? this.cloneBusterEnabled,
-      fontFamily: fontFamily ?? this.fontFamily,
+      font: font ?? this.font,
     );
   }
 
@@ -150,7 +149,7 @@ class UserPreferences {
       isDarkMode: false,
       autoResetFieldsOnSaveAndContinue: true,
       cloneBusterEnabled: false,
-      fontFamily: 'Default',
+      font: 'Default',
       exchangeRates: {},
       notifications: NotificationSettings(),
     );
