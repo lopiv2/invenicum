@@ -290,6 +290,17 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         field: 'name',
         type: PlutoColumnType.text(),
         width: 200,
+        renderer: (rendererContext) {
+          final item =
+              rendererContext.row.cells['item_object']!.value as InventoryItem;
+          return Tooltip(
+            message: item.name,
+            child: Text(
+              rendererContext.cell.value.toString(),
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+        },
       ),
       PlutoColumn(
         title: l10n.currentStockLabel,
@@ -619,6 +630,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         style: PlutoGridStyleConfig(
           gridBorderColor: Colors.transparent,
           columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+          rowHeight: 45,
+          columnHeight: 45,
+          // 👇 esto añade padding interno al grid
+          defaultCellPadding: EdgeInsets.symmetric(horizontal: 8),
         ),
         scrollbar: PlutoGridScrollbarConfig(
           isAlwaysShown: true,

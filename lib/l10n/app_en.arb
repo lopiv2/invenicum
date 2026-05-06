@@ -522,6 +522,9 @@
   "fontDayOfTheTentacle": "Day of the Tentacle",
   "fontEfmi": "Efmi",
   "fontPUSAB": "PUSAB",
+  "fontActionForce": "Action Force",
+  "fontStarjedi": "Starjedi",
+  "fontTransformersMovie": "Transformers Movie",
   "cloneBusterDuplicateTitle": "Possible Duplicate Detected!",
   "cloneBusterDuplicateMessage": "This item is {similarity}% similar to \"{itemName}\". Do you want to continue anyway?",
   "@cloneBusterDuplicateMessage": {
