@@ -1073,6 +1073,15 @@ class AppLocalizationsPt extends AppLocalizations {
   String get fontPUSAB => 'PUSAB';
 
   @override
+  String get fontActionForce => 'Action Force';
+
+  @override
+  String get fontStarjedi => 'Starjedi';
+
+  @override
+  String get fontTransformersMovie => 'Transformers Movie';
+
+  @override
   String get cloneBusterDuplicateTitle => 'Possível Duplicata Detetada!';
 
   @override

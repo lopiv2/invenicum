@@ -619,6 +619,9 @@ class AppFonts {
       ('DayOfTheTentacle',  4,  l10n.fontDayOfTheTentacle),
       ('Efmi',              0,  l10n.fontEfmi),
       ('PUSAB',             0,  l10n.fontPUSAB),
+      ('ActionForce',       0,  l10n.fontActionForce),
+      ('Starjedi',          0,  l10n.fontStarjedi),
+      ('TransformersMovie', 0,  l10n.fontTransformersMovie),
     ];
   }
 
@@ -630,6 +633,9 @@ class AppFonts {
       ('DayOfTheTentacle', 4),
       ('Efmi',             0),
       ('PUSAB',            0),
+      ('ActionForce',       0),
+      ('Starjedi',          0),
+      ('TransformersMovie', 0),
     ];
     return deltas
         .firstWhere((f) => f.$1 == fontFamily, orElse: () => ('', 0.0))

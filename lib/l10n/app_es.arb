@@ -522,6 +522,9 @@
   "fontDayOfTheTentacle": "Day of the Tentacle",
   "fontEfmi": "Efmi",
   "fontPUSAB": "PUSAB",
+  "fontActionForce": "Action Force",
+  "fontStarjedi": "Starjedi",
+  "fontTransformersMovie": "Transformers Movie",
   "cloneBusterDuplicateTitle": "¡Posible Duplicado Detectado!",
   "cloneBusterDuplicateMessage": "Este artículo tiene un {similarity}% de similitud con \"{itemName}\". ¿Deseas continuar de todos modos?",
   "@cloneBusterDuplicateMessage": {

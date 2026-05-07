@@ -18,7 +18,6 @@ class ThemeProvider with ChangeNotifier {
   List<CustomTheme> get userThemes => _userThemes;
 
   String? _fontFamily;
-  double _getDelta(String? fontFamily) => AppFonts.getDelta(fontFamily);
 
   CustomTheme _currentTheme = AppThemes.brand;
   CustomTheme get currentTheme => _currentTheme;

@@ -2032,6 +2032,24 @@ abstract class AppLocalizations {
   /// **'PUSAB'**
   String get fontPUSAB;
 
+  /// No description provided for @fontActionForce.
+  ///
+  /// In en, this message translates to:
+  /// **'Action Force'**
+  String get fontActionForce;
+
+  /// No description provided for @fontStarjedi.
+  ///
+  /// In en, this message translates to:
+  /// **'Starjedi'**
+  String get fontStarjedi;
+
+  /// No description provided for @fontTransformersMovie.
+  ///
+  /// In en, this message translates to:
+  /// **'Transformers Movie'**
+  String get fontTransformersMovie;
+
   /// No description provided for @cloneBusterDuplicateTitle.
   ///
   /// In en, this message translates to:
