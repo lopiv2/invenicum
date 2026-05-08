@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/services/inventory_item_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/config/environment.dart';
@@ -580,42 +581,38 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     List<Map<String, dynamic>> candidates,
   ) {
     final l10n = AppLocalizations.of(context)!;
-    return showDialog<Map<String, dynamic>>(
+    return showAppDialog<Map<String, dynamic>>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(l10n.selectResultTitle),
-          content: SizedBox(
-            width: 520,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 420),
-              child: ListView.separated(
-                shrinkWrap: true,
-                itemCount: candidates.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
-                itemBuilder: (context, index) {
-                  final candidate = candidates[index];
-                  final subtitle = _buildCandidateSubtitle(candidate);
-                  return ListTile(
-                    leading: _buildCandidateLeading(candidate),
-                    title: Text(
-                      candidate['name']?.toString() ?? l10n.unnamedLabel,
-                    ),
-                    subtitle: subtitle.isEmpty ? null : Text(subtitle),
-                    onTap: () => Navigator.of(dialogContext).pop(candidate),
-                  );
-                },
-              ),
-            ),
+      title: l10n.selectResultTitle,
+      body: SizedBox(
+        width: 520,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 420),
+          child: ListView.separated(
+            shrinkWrap: true,
+            itemCount: candidates.length,
+            separatorBuilder: (_, _) => const Divider(height: 1),
+            itemBuilder: (context, index) {
+              final candidate = candidates[index];
+              final subtitle = _buildCandidateSubtitle(candidate);
+              return ListTile(
+                leading: _buildCandidateLeading(candidate),
+                title: Text(
+                  candidate['name']?.toString() ?? l10n.unnamedLabel,
+                ),
+                subtitle: subtitle.isEmpty ? null : Text(subtitle),
+                onTap: () => Navigator.of(context).pop(candidate),
+              );
+            },
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(l10n.cancel),
-            ),
-          ],
-        );
-      },
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+      ],
     );
   }
 
@@ -962,29 +959,25 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       );
 
       if (result.isDuplicate) {
-        final shouldContinue = await showDialog<bool>(
+        final shouldContinue = await showAppDialog<bool>(
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(AppLocalizations.of(context)!.cloneBusterDuplicateTitle),
-              content: Text(
-                AppLocalizations.of(context)!.cloneBusterDuplicateMessage(
-                  result.similarityScore.toStringAsFixed(0),
-                  result.duplicateOf!.name,
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(AppLocalizations.of(context)!.cloneBusterReview),
-                ),
-                ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(AppLocalizations.of(context)!.cloneBusterContinueAnyway),
-                ),
-              ],
-            );
-          },
+          title: AppLocalizations.of(context)!.cloneBusterDuplicateTitle,
+          body: Text(
+            AppLocalizations.of(context)!.cloneBusterDuplicateMessage(
+              result.similarityScore.toStringAsFixed(0),
+              result.duplicateOf!.name,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.cloneBusterReview),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(AppLocalizations.of(context)!.cloneBusterContinueAnyway),
+            ),
+          ],
         );
 
         if (shouldContinue != true) {

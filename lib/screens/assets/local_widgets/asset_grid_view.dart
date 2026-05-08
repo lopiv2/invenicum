@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:provider/provider.dart';
 
@@ -149,36 +150,33 @@ class _AssetGridViewState extends State<AssetGridView> {
 
   void _deleteAsset(BuildContext context, InventoryItem item) {
     final l10n = AppLocalizations.of(context)!;
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(l10n.deleteAssetTitle),
-        content: Text(l10n.confirmDeleteAssetItem(item.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.cancel),
+      title: l10n.deleteAssetTitle,
+      body: Text(l10n.confirmDeleteAssetItem(item.name)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade50,
+            foregroundColor: Colors.red,
+            elevation: 0,
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red.shade50,
-              foregroundColor: Colors.red,
-              elevation: 0,
-            ),
-            onPressed: () {
-              Navigator.of(dialogContext).pop();
-              context.read<InventoryItemProvider>().deleteInventoryItem(
-                item.id,
-                widget.containerId,
-                widget.assetTypeId,
-              );
-              ToastService.success(l10n.assetDeletedShort);
-            },
-            child: Text(l10n.delete),
-          ),
-        ],
-      ),
+          onPressed: () {
+            Navigator.of(context).pop();
+            context.read<InventoryItemProvider>().deleteInventoryItem(
+              item.id,
+              widget.containerId,
+              widget.assetTypeId,
+            );
+            ToastService.success(l10n.assetDeletedShort);
+          },
+          child: Text(l10n.delete),
+        ),
+      ],
     );
   }
 

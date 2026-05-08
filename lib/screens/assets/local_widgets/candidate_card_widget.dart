@@ -48,12 +48,12 @@ class _CandidateCardState extends State<CandidateCard> {
                   BoxShadow(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withOpacity(0.6),
+                    ).colorScheme.primary.withValues(alpha:0.6),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),
                 BoxShadow(
-                  color: Colors.black.withOpacity(isActive ? 0.25 : 0.12),
+                  color: Colors.black.withValues(alpha:isActive ? 0.25 : 0.12),
                   blurRadius: isActive ? 16 : 10,
                   offset: const Offset(0, 6),
                 ),
@@ -126,7 +126,7 @@ class _CandidateCardState extends State<CandidateCard> {
                           begin: Alignment.bottomCenter,
                           end: Alignment.center,
                           colors: [
-                            Colors.black.withOpacity(0.75),
+                            Colors.black.withValues(alpha:0.75),
                             Colors.transparent,
                           ],
                         ),
@@ -157,7 +157,7 @@ class _CandidateCardState extends State<CandidateCard> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.85),
+                              color: Colors.white.withValues(alpha:0.85),
                               fontSize: 12,
                             ),
                           ),

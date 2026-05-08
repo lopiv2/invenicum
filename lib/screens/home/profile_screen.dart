@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:web/web.dart' as web;
 import 'package:app_links/app_links.dart';
 import 'package:flutter/foundation.dart';
@@ -173,28 +174,23 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     final authProvider = context.read<AuthProvider>();
 
     // Opcional: Mostrar un diálogo de confirmación
-    final confirm = await showDialog<bool>(
+    final confirm = await showAppDialog<bool>(
       context: context,
-      builder: (context) {
-        final l10n = AppLocalizations.of(context)!;
-        return AlertDialog(
-          title: Text(l10n.unlinkGithubTitle),
-          content: Text(l10n.unlinkGithubMessage),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: Text(l10n.cancel.toUpperCase()),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: Text(
-                l10n.profileDisconnectActionUpper,
-                style: TextStyle(color: Colors.red),
-              ),
-            ),
-          ],
-        );
-      },
+      title: l10n.unlinkGithubTitle,
+      body: Text(l10n.unlinkGithubMessage),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.cancel.toUpperCase()),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(
+            l10n.profileDisconnectActionUpper,
+            style: TextStyle(color: Colors.red),
+          ),
+        ),
+      ],
     );
 
     if (confirm == true) {

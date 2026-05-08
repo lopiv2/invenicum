@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import '../../data/services/toast_service.dart';
 
@@ -11,29 +12,33 @@ Future<T> runAsyncTask<T>(
   Duration delayBeforeLoader = const Duration(milliseconds: 200),
 }) async {
   bool dialogShown = false;
+
   final l10n = AppLocalizations.of(context)!;
+
   loadingMessage = l10n.processing;
+
   // Timer to avoid flicker if the operation is fast
   final timer = Timer(delayBeforeLoader, () {
     if (!context.mounted) return;
 
     dialogShown = true;
 
-    showDialog(
+    showAppDialog(
       context: context,
       barrierDismissible: false,
       useRootNavigator: true,
-      builder: (_) => PopScope(
+
+      title: loadingMessage,
+
+      body: PopScope(
         canPop: false,
-        child: AlertDialog(
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              const SizedBox(height: 20),
-              Text(loadingMessage),
-            ],
-          ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 20),
+            Text(loadingMessage),
+          ],
         ),
       ),
     );

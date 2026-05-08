@@ -1,6 +1,7 @@
 // lib/screens/scrapers/scraper_edit_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/scraper.dart';
 import 'dart:convert';
 
@@ -109,42 +110,50 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
 
   void _editField(int index) async {
     final field = _fields[index];
+
     final nameController = TextEditingController(text: field['name']);
+
     final xpathController = TextEditingController(text: field['xpath']);
-    final result = await showDialog<bool>(
+
+    final result = await showAppDialog<bool>(
       context: context,
-      builder: (ctx) {
-        return AlertDialog(
-          title: const Text('Edit field'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Name'),
-              ),
-              TextField(
-                controller: xpathController,
-                decoration: const InputDecoration(labelText: 'XPath'),
-              ),
-            ],
+
+      title: 'Edit field',
+
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            controller: nameController,
+            decoration: const InputDecoration(labelText: 'Name'),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(ctx).pop(true),
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
+
+          TextField(
+            controller: xpathController,
+            decoration: const InputDecoration(labelText: 'XPath'),
+          ),
+        ],
+      ),
+
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+
+          child: const Text('Cancel'),
+        ),
+
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+
+          child: const Text('Save'),
+        ),
+      ],
     );
+
     if (result == true) {
       setState(() {
         _fields[index]['name'] = nameController.text.trim();
+
         _fields[index]['xpath'] = xpathController.text.trim();
       });
     }
@@ -263,90 +272,99 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
                             onPressed: () async {
                               // 1. Pedir URL de prueba
                               final testUrlController = TextEditingController();
-                              final testUrl = await showDialog<String>(
+                              final testUrl = await showAppDialog<String>(
                                 context: context,
-                                builder: (ctx) => AlertDialog(
-                                  title: const Text('Test field'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Introduce una URL que coincida con el patrón del scraper para probar el campo "${f['name']}".',
-                                        style: Theme.of(
-                                          ctx,
-                                        ).textTheme.bodySmall,
-                                      ),
-                                      const SizedBox(height: 12),
-                                      if (_patternController.text.isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 8,
-                                          ),
-                                          child: Text(
-                                            'Patrón: ${_patternController.text}',
-                                            style: Theme.of(ctx)
-                                                .textTheme
-                                                .labelSmall
-                                                ?.copyWith(
-                                                  color: Theme.of(
-                                                    ctx,
-                                                  ).colorScheme.outline,
-                                                  fontFamily: 'monospace',
-                                                ),
-                                          ),
-                                        ),
-                                      TextField(
-                                        controller: testUrlController,
-                                        autofocus: true,
-                                        decoration: const InputDecoration(
-                                          labelText: 'URL a probar',
-                                          hintText:
-                                              'https://ejemplo.com/items/123',
-                                          prefixIcon: Icon(Icons.link_outlined),
-                                        ),
-                                        keyboardType: TextInputType.url,
-                                        onSubmitted: (_) => Navigator.of(
-                                          ctx,
-                                        ).pop(testUrlController.text.trim()),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(ctx).pop(null),
-                                      child: const Text('Cancelar'),
+
+                                title: 'Test field',
+
+                                body: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Introduce una URL que coincida con el patrón del scraper para probar el campo "${f['name']}".',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodySmall,
                                     ),
-                                    FilledButton(
-                                      onPressed: () => Navigator.of(
-                                        ctx,
+
+                                    const SizedBox(height: 12),
+
+                                    if (_patternController.text.isNotEmpty)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 8,
+                                        ),
+                                        child: Text(
+                                          'Patrón: ${_patternController.text}',
+
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.outline,
+
+                                                fontFamily: 'monospace',
+                                              ),
+                                        ),
+                                      ),
+
+                                    TextField(
+                                      controller: testUrlController,
+                                      autofocus: true,
+
+                                      decoration: const InputDecoration(
+                                        labelText: 'URL a probar',
+                                        hintText:
+                                            'https://ejemplo.com/items/123',
+
+                                        prefixIcon: Icon(Icons.link_outlined),
+                                      ),
+
+                                      keyboardType: TextInputType.url,
+
+                                      onSubmitted: (_) => Navigator.of(
+                                        context,
                                       ).pop(testUrlController.text.trim()),
-                                      child: const Text('Probar'),
                                     ),
                                   ],
                                 ),
+
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(null),
+
+                                    child: const Text('Cancelar'),
+                                  ),
+
+                                  FilledButton(
+                                    onPressed: () => Navigator.of(
+                                      context,
+                                    ).pop(testUrlController.text.trim()),
+
+                                    child: const Text('Probar'),
+                                  ),
+                                ],
                               );
 
                               if (testUrl == null || testUrl.isEmpty) return;
 
                               // 2. Mostrar loading
-                              BuildContext? loadingContext;
-                              showDialog<void>(
+                              showAppDialog<void>(
                                 context: context,
                                 barrierDismissible: false,
-                                builder: (ctx) {
-                                  loadingContext = ctx;
-                                  return const AlertDialog(
-                                    content: SizedBox(
-                                      height: 80,
-                                      child: Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    ),
-                                  );
-                                },
+
+                                title: '',
+
+                                body: const SizedBox(
+                                  height: 80,
+                                  child: Center(
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ),
                               );
 
                               // 3. Ejecutar test con la URL introducida
@@ -368,34 +386,48 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
                                     },
                                   ],
                                 );
-                                if (loadingContext != null &&
-                                    Navigator.of(loadingContext!).canPop()) {
-                                  Navigator.of(loadingContext!).pop();
+                                if (mounted &&
+                                    Navigator.of(
+                                      context,
+                                      rootNavigator: true,
+                                    ).canPop()) {
+                                  Navigator.of(
+                                    context,
+                                    rootNavigator: true,
+                                  ).pop();
                                 }
                                 final pretty = const JsonEncoder.withIndent(
                                   '  ',
                                 ).convert(result);
                                 if (!mounted) return;
-                                await showDialog<void>(
+                                await showAppDialog<void>(
                                   context: context,
-                                  builder: (ctx) => AlertDialog(
-                                    title: Text(l10n.runResultTitle),
-                                    content: SingleChildScrollView(
-                                      child: SelectableText(pretty),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(ctx).pop(),
-                                        child: Text(l10n.ok),
-                                      ),
-                                    ],
+
+                                  title: l10n.runResultTitle,
+
+                                  body: SingleChildScrollView(
+                                    child: SelectableText(pretty),
                                   ),
+
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(),
+
+                                      child: Text(l10n.ok),
+                                    ),
+                                  ],
                                 );
                               } catch (e) {
-                                if (loadingContext != null &&
-                                    Navigator.of(loadingContext!).canPop()) {
-                                  Navigator.of(loadingContext!).pop();
+                                if (mounted &&
+                                    Navigator.of(
+                                      context,
+                                      rootNavigator: true,
+                                    ).canPop()) {
+                                  Navigator.of(
+                                    context,
+                                    rootNavigator: true,
+                                  ).pop();
                                 }
                                 if (!mounted) return;
                                 ToastService.error(l10n.runError(e.toString()));

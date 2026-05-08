@@ -318,6 +318,7 @@
   "configureCollectionFields": "Configura i campi della raccolta",
   "configureDeliveryVoucher": "Configura il buono di consegna",
   "configureVoucherBody": "Configura il corpo del voucher...",
+  "confirm": "Confirma",
   "confirmDeleteAlert": "Elimina avviso",
   "confirmDeleteAlertMessage": "Sei sicuro di voler eliminare questo record?",
   "confirmDeleteAssetType": "Vuoi eliminare il tipo di risorsa \"{name}\" e tutti gli elementi associati? Questa azione non può essere annullata.",

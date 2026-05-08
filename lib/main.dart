@@ -199,20 +199,29 @@ void main() async {
         >(
           create: (c) => ThemeProvider(c.read<ThemeService>()),
           update: (context, auth, prefs, prev) {
+            if (prev == null)
+              return ThemeProvider(context.read<ThemeService>());
+
+            // ── Apply theme from backend user config ──
             if (auth.isAuthenticated &&
                 auth.user?.themeConfig != null &&
-                !prev!.isInitialized) {
+                !prev.isInitialized) {
               final config = auth.user!.themeConfig!;
-              prev.setInitializing();
-              prev.initializeThemeFromConfig(
-                config.theme.primaryColor,
-                config.theme.brightness,
+
+              // Only color + brightness — paletteId is resolved internally
+              // by matching against AppThemes.all.
+              prev.initializeFromUserConfig(
+                color: config.theme.primaryColor,
+                brightness: config.theme.brightness,
               );
             }
-            if (prev != null && prefs.isInitialized) {
+
+            // ── Font update ──
+            if (prefs.isInitialized) {
               prev.setFontFamily(prefs.selectedFontFamily);
             }
-            return prev!;
+
+            return prev;
           },
         ),
         ChangeNotifierProxyProvider<AuthProvider, ContainerProvider>(
@@ -315,7 +324,7 @@ class _MyAppState extends State<MyApp> {
           ? ThemeMode.dark
           : ThemeMode.light;
     }
-
+    final isRetro = themeProvider.isRetroMode;
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       locale: preferencesProvider.locale,
@@ -328,10 +337,22 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       title: 'Invenicum',
-      theme: themeProvider.lightTheme,
-      darkTheme: themeProvider.darkTheme,
-      themeMode: currentMode,
+
+      // ───────────────────────────────
+      // 🚨 RETRO OVERRIDE FIX
+      // ───────────────────────────────
+      theme: isRetro
+          ? themeProvider.activeRetroTheme!.toThemeData()
+          : themeProvider.lightTheme,
+
+      darkTheme: isRetro
+          ? themeProvider.activeRetroTheme!.toThemeData()
+          : themeProvider.darkTheme,
+
+      themeMode: isRetro ? ThemeMode.light : currentMode,
+
       routerConfig: _router,
+
       builder: (context, child) {
         return FToastBuilder()(context, child);
       },

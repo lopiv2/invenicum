@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphview/GraphView.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/providers/location_provider.dart';
@@ -66,25 +67,23 @@ class _LocationsScreenState extends State<LocationsScreen>
     final l10n = AppLocalizations.of(context)!;
     // Capture the Scaffold context before opening the dialog.
     final scaffoldContext = context;
-    showDialog(
+    showAppDialog(
       context: scaffoldContext,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.confirmDeletion),
-        content: Text(l10n.confirmDeleteLocationMessage(locationName)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              await _performDeletion(locationId);
-            },
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      title: l10n.confirmDeletion,
+      body: Text(l10n.confirmDeleteLocationMessage(locationName)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(scaffoldContext).pop(),
+          child: Text(l10n.cancel),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.of(scaffoldContext).pop();
+            await _performDeletion(locationId);
+          },
+          child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+        ),
+      ],
     );
   }
 

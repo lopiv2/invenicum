@@ -388,6 +388,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get configureVoucherBody => 'Configurar corpo do comprovante...';
 
   @override
+  String get confirm => 'Confirmar';
+
+  @override
   String get confirmDeleteAlert => 'Excluir alerta';
 
   @override

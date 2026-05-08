@@ -22,7 +22,7 @@ class AssetTypeBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         // Nota: withValues es para Flutter 3.27+. 
-        // Si usas una versión anterior, cambia a color.withOpacity(0.15)
+        // Si usas una versión anterior, cambia a color.withValues(alpha:0.15)
         color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
