@@ -50,7 +50,7 @@ class _CloneBusterSwitchWidgetState extends State<CloneBusterSwitchWidget> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
 
-              // ── Message ──────────────────────────────────────────────
+              // ── Message ────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
                 child: CGATextBox(text: message, maxLines: 4),
