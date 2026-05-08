@@ -7,7 +7,7 @@ import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/widgets/ui/CGA_dialog.dart';
-import 'package:invenicum/widgets/ui/cga_widgets.dart';
+import 'package:invenicum/widgets/ui/CGA_widgets.dart';
 import 'package:provider/provider.dart';
 
 class CloneBusterSwitchWidget extends StatefulWidget {
