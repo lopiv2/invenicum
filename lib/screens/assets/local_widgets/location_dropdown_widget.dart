@@ -66,7 +66,7 @@ class LocationDropdownField extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
-                  value: selectedParentId,
+                  initialValue: selectedParentId,
                   decoration: InputDecoration(
                     labelText: l10n.parentLocationOptionalLabel,
                     border: const OutlineInputBorder(),
@@ -150,7 +150,7 @@ class LocationDropdownField extends StatelessWidget {
         : null;
 
     return DropdownButtonFormField<int>(
-      value: safeValue,
+      initialValue: safeValue,
       decoration: InputDecoration(
         labelText: l10n.location,
         border: const OutlineInputBorder(),

@@ -5,7 +5,9 @@ import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
+import 'package:invenicum/screens/assets/local_widgets/smart_dropdown_field.dart';
 import 'package:provider/provider.dart';
 import 'card_section_widget.dart';
 import 'common_form_field.dart';
@@ -24,6 +26,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
   final Function(int, bool?) onBooleanChanged;
   final Map<int, List<String>> autocompleteSuggestionsByField;
   final Map<int, FocusNode> autocompleteFocusNodesByField;
+  final String containerId;
 
   const CustomFieldsSectionWidget({
     super.key,
@@ -38,6 +41,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
     required this.onBooleanChanged,
     this.autocompleteSuggestionsByField = const {},
     this.autocompleteFocusNodesByField = const {},
+    required this.containerId, // Asegúrate de pasar el containerId al crear este widget
   });
 
   @override
@@ -80,7 +84,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
             }
 
             if (fieldDef.type == CustomFieldType.dropdown) {
-              return _buildDropdownField(context, fieldDef);
+              return _buildDropdownField(l10n, context, fieldDef, containerId);
             }
 
             if (fieldDef.type == CustomFieldType.date) {
@@ -191,77 +195,54 @@ class CustomFieldsSectionWidget extends StatelessWidget {
     );
   }
 
+  // Reemplaza _buildDropdownField en CustomFieldsSectionWidget
+
   Widget _buildDropdownField(
+    AppLocalizations l10n,
     BuildContext context,
     CustomFieldDefinition fieldDef,
+    String containerId,
   ) {
-    final values = listFieldValues[fieldDef.id] ?? [];
+    // ✅ Read the items from the provider based on whether it's a data list or a static list
+    final provider = context.watch<ContainerProvider>();
+    final values = fieldDef.dataListId != null
+        ? provider.getDataListItems(
+            int.parse(containerId),
+            fieldDef.dataListId!,
+          )
+        : (listFieldValues[fieldDef.id] ?? <String>[]);
+
     final selectedValue = selectedListValues[fieldDef.id];
 
-    InputDecoration _fieldDecoration({
-      required String label,
-      required IconData icon,
-      String? helper,
-    }) {
-      final colorScheme = Theme.of(context).colorScheme;
+    return AppDropdownField<String>(
+      label: fieldDef.name,
+      isRequired: fieldDef.isRequired,
+      values: values,
+      itemLabel: (v) => v,
+      selectedValue: selectedValue,
+      onChanged: (v) => onDropdownChanged(fieldDef.id!, v),
+      validator: (v) {
+        if (fieldDef.isRequired && v == null) {
+          return AppLocalizations.of(context)!.requiredFieldValidation;
+        }
+        return null;
+      },
+      addNewDialogTitle: l10n.newDataListLabel,
+      addNewHint: l10n.enterContainerName,
+      onAddNew: (name) async {
+        final provider = context.read<ContainerProvider>();
 
-      return InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, size: 20),
-        helperText: helper,
-        helperMaxLines: 2,
-        filled: true,
-        fillColor: colorScheme.onSurfaceVariant.withValues(alpha: 0.10),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 18,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: colorScheme.error, width: 1.5),
-        ),
-      );
-    }
+        await provider.addItemToDataList(
+          containerId: int.parse(containerId),
+          listId: fieldDef.dataListId!,
+          value: name,
+        );
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: DropdownButtonFormField<String>(
-        value: selectedValue,
-        isExpanded: true,
-        decoration: _fieldDecoration(
-          label: fieldDef.name,
-          icon: Icons.expand_circle_down_outlined,
-          helper: fieldDef.isRequired ? 'Obligatorio' : null,
-        ),
-        borderRadius: BorderRadius.circular(14),
-        items: values.map((value) {
-          return DropdownMenuItem<String>(value: value, child: Text(value));
-        }).toList(),
-        onChanged: (newValue) {
-          onDropdownChanged(fieldDef.id!, newValue);
-        },
-        validator: (value) {
-          if (fieldDef.isRequired && value == null) {
-            return AppLocalizations.of(context)!.requiredFieldValidation;
-          }
-          return null;
-        },
-      ),
+        // Select the newly added item immediately after adding it
+        onDropdownChanged(fieldDef.id!, name);
+
+        return name;
+      },
     );
   }
 

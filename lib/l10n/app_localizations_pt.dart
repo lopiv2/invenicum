@@ -876,6 +876,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get noNotifications => 'Sem notificações';
 
   @override
+  String get noResultsFound => 'Nenhum resultado encontrado.';
+
+  @override
   String get noThemesSaved => 'Nenhum tema salvo ainda';
 
   @override

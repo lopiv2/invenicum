@@ -877,6 +877,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noNotifications => 'Keine Benachrichtigungen';
 
   @override
+  String get noResultsFound => 'Keine Ergebnisse gefunden.';
+
+  @override
   String get noThemesSaved => 'Noch keine Designs gespeichert';
 
   @override
