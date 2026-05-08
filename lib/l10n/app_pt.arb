@@ -318,6 +318,7 @@
   "configureCollectionFields": "Configurar campos de coleção",
   "configureDeliveryVoucher": "Configurar comprovante de entrega",
   "configureVoucherBody": "Configurar corpo do comprovante...",
+  "confirm": "Confirmar",
   "confirmDeleteAlert": "Excluir alerta",
   "confirmDeleteAlertMessage": "Tem certeza de que deseja excluir este registro?",
   "confirmDeleteAssetType": "Tem certeza de que deseja excluir o tipo de ativo \"{name}\" e todos os seus itens associados? Esta ação não pode ser desfeita.",

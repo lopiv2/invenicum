@@ -318,6 +318,7 @@
   "configureCollectionFields": "Configurar Campos de Colección",
   "configureDeliveryVoucher": "Configurar Vale de Entrega",
   "configureVoucherBody": "Configura el cuerpo del vale...",
+  "confirm": "Confirmar",
   "confirmDeleteAlert": "Eliminar Alerta",
   "confirmDeleteAlertMessage": "¿Estás seguro de que deseas eliminar este registro?",
   "confirmDeleteAssetType": "¿Estás seguro de que deseas eliminar el tipo de activo \"{name}\" y todos sus elementos asociados? Esta acción no se puede deshacer.",

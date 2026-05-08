@@ -389,6 +389,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get configureVoucherBody => 'Configurer le corps du bon...';
 
   @override
+  String get confirm => 'Confirmer';
+
+  @override
   String get confirmDeleteAlert => 'Supprimer l\'alerte';
 
   @override

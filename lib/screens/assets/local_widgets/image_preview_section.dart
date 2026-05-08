@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart'; // Importación clave
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
 class ImagePreviewSection extends StatelessWidget {
@@ -69,56 +70,63 @@ class ImagePreviewSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     bool isLoading = false;
 
-    showDialog(
+    showAppDialog(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => StatefulBuilder(
+      title: l10n.addImageFromUrl,
+      body: StatefulBuilder(
         builder: (context, setState) {
-          return AlertDialog(
-            title: Text(l10n.addImageFromUrl),
-            content: isLoading
-                ? const SizedBox(
-                    height: 100,
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                : TextField(
-                    controller: urlController,
-                    decoration: InputDecoration(
-                      hintText: 'https://example.com/image.jpg',
-                      labelText: 'URL',
-                      suffixIcon: const Icon(Icons.link),
-                      border: const OutlineInputBorder(),
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              isLoading
+                  ? const SizedBox(
+                      height: 100,
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  : TextField(
+                      controller: urlController,
+                      decoration: InputDecoration(
+                        hintText: 'https://example.com/image.jpg',
+                        labelText: 'URL',
+                        suffixIcon: const Icon(Icons.link),
+                        border: const OutlineInputBorder(),
+                      ),
                     ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (!isLoading)
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text(l10n.cancel),
+                    ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: isLoading
+                        ? null
+                        : () async {
+                            final url = urlController.text.trim();
+                            if (url.isNotEmpty && onAddImageFromUrl != null) {
+                              setState(() => isLoading = true);
+                              try {
+                                await onAddImageFromUrl!(url);
+                                Navigator.of(context).pop();
+                              } catch (e) {
+                                setState(() => isLoading = false);
+                              }
+                            }
+                          },
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : Text(l10n.addLabel),
                   ),
-            actions: [
-              if (!isLoading)
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: Text(l10n.cancel),
-                ),
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () async {
-                        final url = urlController.text.trim();
-                        if (url.isNotEmpty && onAddImageFromUrl != null) {
-                          setState(() => isLoading = true);
-                          try {
-                            await onAddImageFromUrl!(url);
-                            // Cerrar SOLO el diálogo del URL
-                            Navigator.of(dialogContext).pop();
-                          } catch (e) {
-                            setState(() => isLoading = false);
-                          }
-                        }
-                      },
-                child: isLoading
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      )
-                    : Text(l10n.addLabel),
+                ],
               ),
             ],
           );

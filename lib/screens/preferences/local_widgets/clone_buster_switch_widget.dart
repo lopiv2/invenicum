@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:invenicum/core/utils/cga_constants.dart';
+import 'package:invenicum/core/utils/retro/cga_palette.dart';
+import 'package:invenicum/core/utils/retro/retro_theme_extension.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
@@ -32,6 +33,9 @@ class _CloneBusterSwitchWidgetState extends State<CloneBusterSwitchWidget> {
 
   Future<void> _showActivationDialog(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
+    final retro = Theme.of(context)
+      .extension<RetroThemeExtension>()!
+      .retro!;
     final message = _getRandomMessage(l10n);
     String currentLevel = 'Paranoid';
 
@@ -39,6 +43,7 @@ class _CloneBusterSwitchWidgetState extends State<CloneBusterSwitchWidget> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setStateDialog) => CGADialog(
+          theme: retro,
           title: l10n.cloneBusterDialogTitle,
           body: Column(
             mainAxisSize: MainAxisSize.min,

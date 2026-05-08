@@ -808,6 +808,12 @@ abstract class AppLocalizations {
   /// **'Configure voucher body...'**
   String get configureVoucherBody;
 
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
+
   /// No description provided for @confirmDeleteAlert.
   ///
   /// In en, this message translates to:

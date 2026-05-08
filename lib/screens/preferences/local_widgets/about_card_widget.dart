@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -34,8 +35,14 @@ class AboutCardWidget extends StatelessWidget {
     final aParts = aClean.split('-');
     final bParts = bClean.split('-');
 
-    final aBase = aParts[0].split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    final bBase = bParts[0].split('.').map((e) => int.tryParse(e) ?? 0).toList();
+    final aBase = aParts[0]
+        .split('.')
+        .map((e) => int.tryParse(e) ?? 0)
+        .toList();
+    final bBase = bParts[0]
+        .split('.')
+        .map((e) => int.tryParse(e) ?? 0)
+        .toList();
 
     while (aBase.length < 3) aBase.add(0);
     while (bBase.length < 3) bBase.add(0);
@@ -97,43 +104,13 @@ class AboutCardWidget extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final future = _checkLatestVersion(context);
 
-    showDialog<void>(
+    showAppDialog<void>(
       context: context,
-      builder: (context) {
-        final theme = Theme.of(context);
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-          titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-          title: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onPrimary.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.auto_awesome,
-                  color: theme.colorScheme.primary,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.aboutDialogTitle,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: SizedBox(
+      title: l10n.aboutDialogTitle,
+      body: StatefulBuilder(
+        builder: (context, setDialogState) {
+          final theme = Theme.of(context);
+          return SizedBox(
             width: 430,
             child: FutureBuilder<_VersionCheckResult>(
               future: future,
@@ -183,8 +160,9 @@ class AboutCardWidget extends StatelessWidget {
                       decoration: BoxDecoration(
                         color: (data?.hasUpdate == true)
                             ? theme.colorScheme.error.withValues(alpha: 0.12)
-                            : theme.colorScheme.onInverseSurface
-                                .withValues(alpha: 0.55),
+                            : theme.colorScheme.onInverseSurface.withValues(
+                                alpha: 0.55,
+                              ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: theme.dividerColor.withValues(alpha: 0.2),
@@ -233,20 +211,20 @@ class AboutCardWidget extends StatelessWidget {
                 );
               },
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.closeLabel),
-            ),
-            FilledButton.tonalIcon(
-              onPressed: () => _openReleases(null),
-              icon: const Icon(Icons.open_in_new),
-              label: Text(l10n.aboutOpenReleases),
-            ),
-          ],
-        );
-      },
+          );
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.closeLabel),
+        ),
+        FilledButton.tonalIcon(
+          onPressed: () => _openReleases(null),
+          icon: const Icon(Icons.open_in_new),
+          label: Text(l10n.aboutOpenReleases),
+        ),
+      ],
     );
   }
 

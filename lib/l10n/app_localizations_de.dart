@@ -390,6 +390,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get configureVoucherBody => 'Inhalt des Scheins konfigurieren...';
 
   @override
+  String get confirm => 'Bestätigen';
+
+  @override
   String get confirmDeleteAlert => 'Benachrichtigung löschen';
 
   @override

@@ -5,16 +5,33 @@ import 'package:flutter/foundation.dart';
 import '../models/custom_theme_model.dart';
 import 'api_service.dart';
 
+/// Theme persistence service.
+///
+/// The backend only knows about [hexColor] and [brightness].
+/// The [paletteId] / retro concept is purely a client-side concern:
+/// it is derived from the theme [id] when needed and never stored
+/// as a separate field in the database.
 class ThemeService {
   final ApiService _apiService;
-
-  // Access to Dio for making requests
   Dio get _dio => _apiService.dio;
 
   ThemeService(this._apiService);
 
-  /// Updates (or creates) the user's current theme preference.
-  /// This saves the color and brightness in the User or Preferences table.
+  // ─── System theme IDs (cannot be deleted) ──────────────────────────────────
+  static const Set<String> _systemIds = {
+    'brand',
+    'emerald', 'sunset', 'ocean', 'lavender', 'forest',
+    'cherry',  'indigo', 'amber', 'sakura',   'slate',
+    'cyberpunk', 'nordic', 'dark_mode',
+    'retro_cga', 'retro_ega',
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // UPDATE ACTIVE THEME
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Persists the user's active theme choice.
+  /// Only [hexColor] and [brightness] are sent — no palette/retro fields.
   Future<bool> updateUserTheme({
     required String hexColor,
     required String brightness,
@@ -22,7 +39,10 @@ class ThemeService {
     try {
       final response = await _dio.put(
         '/preferences/theme',
-        data: {'themeColor': hexColor, 'themeBrightness': brightness},
+        data: {
+          'themeColor': hexColor,
+          'themeBrightness': brightness,
+        },
       );
       return response.statusCode == 200;
     } on DioException catch (e) {
@@ -34,72 +54,69 @@ class ThemeService {
     }
   }
 
-  /// Saves a new theme into the user's "Saved Themes" list.
-  Future<void> createCustomTheme(CustomTheme theme) async {
-    final String hexColor =
-        '#${theme.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
+  // ─────────────────────────────────────────────────────────────────────────
+  // CUSTOM THEMES
+  // ─────────────────────────────────────────────────────────────────────────
 
+  /// Saves a new theme to the user's library.
+  /// Again, only color + brightness — no palette field.
+  Future<void> createCustomTheme(CustomTheme theme) async {
     try {
-      final response = await _dio.post(
+      await _dio.post(
         '/preferences/custom-themes',
         data: {
-          "name": theme.name,
-          "primaryColor": hexColor, // 👈 We send the formatted String
-          "brightness": theme.brightness == Brightness.dark ? 'dark' : 'light',
+          'name': theme.name,
+          'primaryColor': theme.hexColor,
+          'brightness': theme.brightnessStr,
         },
       );
-      return response.data;
     } catch (e) {
-      debugPrint("Service error: $e");
+      debugPrint('ThemeService.createCustomTheme error: $e');
       rethrow;
     }
   }
 
+  /// Retrieves all custom themes stored by the user.
   Future<List<CustomTheme>> getCustomThemes() async {
     try {
       final response = await _dio.get('/preferences/custom-themes');
 
       if (response.statusCode == 200) {
-        List<dynamic> data = response.data['data'];
-        return data
-            .map(
-              (json) => CustomTheme(
-                id: json['id'].toString(),
-                name: json['name'],
-                primaryColor: Color(
-                  int.parse(json['primaryColor'].replaceFirst('#', '0xFF')),
-                ),
-                brightness: json['brightness'] == 'dark'
-                    ? Brightness.dark
-                    : Brightness.light,
+        final List<dynamic> data = response.data['data'] as List<dynamic>;
+        return data.map((json) {
+          return CustomTheme(
+            id: json['id'].toString(),
+            name: json['name'] as String,
+            primaryColor: Color(
+              int.parse(
+                (json['primaryColor'] as String).replaceFirst('#', '0xFF'),
               ),
-            )
-            .toList();
+            ),
+            brightness: json['brightness'] == 'dark'
+                ? Brightness.dark
+                : Brightness.light,
+            // paletteId is never stored in the DB — user-created themes
+            // are always plain Material themes.
+          );
+        }).toList();
       }
       return [];
     } catch (e) {
-      debugPrint('Error fetching custom themes: $e');
+      debugPrint('ThemeService.getCustomThemes error: $e');
       return [];
     }
   }
 
-  /// Elimina un tema personalizado.
-  /// Deletes a custom theme.
-  /// 🛑 Protection logic against deleting default themes is validated here by ID.
+  /// Deletes a custom theme by ID.
+  /// Throws if [themeId] belongs to a system-defined theme.
   Future<void> deleteCustomTheme(String themeId) async {
-    // Protection: Do not call the API if the ID is one of the predefined themes
-    if (themeId == 'brand' ||
-        themeId == 'emerald' ||
-        themeId == 'sunset' ||
-        themeId == 'dark_mode') {
-      throw Exception(
-        'Cannot delete system default themes.',
-      );
+    if (_systemIds.contains(themeId)) {
+      throw Exception('Cannot delete system default themes.');
     }
 
     try {
-      final response = await _dio.delete('/preferences/custom-themes/$themeId');
-
+      final response =
+          await _dio.delete('/preferences/custom-themes/$themeId');
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Error deleting theme from database.');
       }

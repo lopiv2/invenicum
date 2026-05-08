@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart'; // Asegúrate de que la ruta sea correcta
 import 'package:invenicum/data/models/loan.dart';
 import 'package:invenicum/providers/loan_provider.dart';
@@ -90,43 +91,41 @@ class _LoansScreenState extends State<LoansScreen> {
   }
 
   void _deleteLoan(Loan loan) {
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(context.l10n.confirmDeletion),
-        content: Text(
-          '${context.l10n.confirmDeleteAlertMessage} (${loan.itemName})',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(context.l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              final loanProvider = context.read<LoanProvider>();
-              final containerIdInt = int.tryParse(widget.containerId);
-              if (containerIdInt == null) return;
-
-              try {
-                await loanProvider.deleteLoan(containerIdInt, loan.id);
-                if (mounted) {
-                  ToastService.success(context.l10n.alertDeleted);
-                }
-              } catch (e) {
-                if (mounted) {
-                  ToastService.error(e.toString());
-                }
-              }
-            },
-            child: Text(
-              context.l10n.delete,
-              style: const TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
+      title: context.l10n.confirmDeletion,
+      body: Text(
+        '${context.l10n.confirmDeleteAlertMessage} (${loan.itemName})',
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(context.l10n.cancel),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            final loanProvider = context.read<LoanProvider>();
+            final containerIdInt = int.tryParse(widget.containerId);
+            if (containerIdInt == null) return;
+
+            try {
+              await loanProvider.deleteLoan(containerIdInt, loan.id);
+              if (mounted) {
+                ToastService.success(context.l10n.alertDeleted);
+              }
+            } catch (e) {
+              if (mounted) {
+                ToastService.error(e.toString());
+              }
+            }
+          },
+          child: Text(
+            context.l10n.delete,
+            style: const TextStyle(color: Colors.red),
+          ),
+        ),
+      ],
     );
   }
 

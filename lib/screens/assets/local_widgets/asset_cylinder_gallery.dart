@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:ui'; // 🔑 Necesario para PointerDeviceKind
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import '../../../data/models/inventory_item.dart';
 import '../../../../config/environment.dart';
@@ -221,162 +222,213 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
   }
 
   void _showColorPicker() {
-    Color tempColor = _cardBackgroundColor;
-    
-    showDialog(
-      context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setStateDialog) => AlertDialog(
-          title: Text(AppLocalizations.of(context)!.selectColor),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Título de colores predefinidos
-                const Text(
-                  'Colores Predefinidos',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+  Color tempColor = _cardBackgroundColor;
+
+  showAppDialog(
+    context: context,
+
+    title: AppLocalizations.of(context)!.selectColor,
+
+    body: StatefulBuilder(
+      builder: (context, setStateDialog) {
+        return SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Título
+              const Text(
+                'Colores Predefinidos',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
-                const SizedBox(height: 10),
-                
-                // Selector de color predefinidos
-                Wrap(
-                  spacing: 10,
-                  runSpacing: 10,
-                  children: [
-                    Colors.white,
-                    Colors.grey.shade100,
-                    Colors.blue.shade50,
-                    Colors.amber.shade50,
-                    Colors.red.shade50,
-                    Colors.green.shade50,
-                    Colors.purple.shade50,
-                    Colors.pink.shade50,
-                  ].map((color) {
-                    final isSelected = tempColor == color;
-                    return GestureDetector(
-                      onTap: () => setStateDialog(() {
+              ),
+
+              const SizedBox(height: 10),
+
+              // Colores rápidos
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  Colors.white,
+                  Colors.grey.shade100,
+                  Colors.blue.shade50,
+                  Colors.amber.shade50,
+                  Colors.red.shade50,
+                  Colors.green.shade50,
+                  Colors.purple.shade50,
+                  Colors.pink.shade50,
+                ].map((color) {
+                  final isSelected =
+                      tempColor == color;
+
+                  return GestureDetector(
+                    onTap: () {
+                      setStateDialog(() {
                         tempColor = color;
-                      }),
-                      child: Container(
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: isSelected ? Colors.black : Colors.grey.shade300,
-                            width: isSelected ? 3 : 1,
-                          ),
+                      });
+                    },
+
+                    child: Container(
+                      width: 50,
+                      height: 50,
+
+                      decoration: BoxDecoration(
+                        color: color,
+
+                        borderRadius:
+                            BorderRadius.circular(10),
+
+                        border: Border.all(
+                          color: isSelected
+                              ? Colors.black
+                              : Colors.grey.shade300,
+
+                          width: isSelected ? 3 : 1,
                         ),
                       ),
-                    );
-                  }).toList(),
-                ),
-                
-                const SizedBox(height: 24),
-                
-                // Divisor
-                Divider(color: Colors.grey.shade300),
-                
-                const SizedBox(height: 16),
-                
-                // Título de color personalizado
-                const Text(
-                  'Color Personalizado',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 12),
-                
-                // Preview del color seleccionado
-                Container(
-                  width: double.infinity,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: tempColor,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.grey.shade300,
-                      width: 2,
                     ),
+                  );
+                }).toList(),
+              ),
+
+              const SizedBox(height: 24),
+
+              Divider(
+                color: Colors.grey.shade300,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Título custom
+              const Text(
+                'Color Personalizado',
+
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Preview
+              Container(
+                width: double.infinity,
+                height: 80,
+
+                decoration: BoxDecoration(
+                  color: tempColor,
+
+                  borderRadius:
+                      BorderRadius.circular(12),
+
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                    width: 2,
                   ),
-                  child: Center(
-                    child: Text(
-                      tempColor.toARGB32().toRadixString(16).padLeft(8, '0').toUpperCase(),
-                      style: TextStyle(
-                        color: _getContrainingColor(tempColor),
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                ),
+
+                child: Center(
+                  child: Text(
+                    tempColor
+                        .toARGB32()
+                        .toRadixString(16)
+                        .padLeft(8, '0')
+                        .toUpperCase(),
+
+                    style: TextStyle(
+                      color: _getContrainingColor(
+                        tempColor,
                       ),
+
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
                     ),
                   ),
                 ),
-                
-                const SizedBox(height: 16),
-                
-                // Slider para Red
-                _buildColorSlider(
-                  label: 'Rojo',
-                  value: tempColor.red.toDouble(),
-                  onChanged: (value) => setStateDialog(() {
+              ),
+
+              const SizedBox(height: 16),
+
+              // RGB
+              _buildColorSlider(
+                label: 'Rojo',
+
+                value: tempColor.red.toDouble(),
+
+                onChanged: (value) {
+                  setStateDialog(() {
                     tempColor = Color.fromARGB(
                       tempColor.alpha,
                       value.toInt(),
                       tempColor.green,
                       tempColor.blue,
                     );
-                  }),
-                ),
-                
-                // Slider para Green
-                _buildColorSlider(
-                  label: 'Verde',
-                  value: tempColor.green.toDouble(),
-                  onChanged: (value) => setStateDialog(() {
+                  });
+                },
+              ),
+
+              _buildColorSlider(
+                label: 'Verde',
+
+                value: tempColor.green.toDouble(),
+
+                onChanged: (value) {
+                  setStateDialog(() {
                     tempColor = Color.fromARGB(
                       tempColor.alpha,
                       tempColor.red,
                       value.toInt(),
                       tempColor.blue,
                     );
-                  }),
-                ),
-                
-                // Slider para Blue
-                _buildColorSlider(
-                  label: 'Azul',
-                  value: tempColor.blue.toDouble(),
-                  onChanged: (value) => setStateDialog(() {
+                  });
+                },
+              ),
+
+              _buildColorSlider(
+                label: 'Azul',
+
+                value: tempColor.blue.toDouble(),
+
+                onChanged: (value) {
+                  setStateDialog(() {
                     tempColor = Color.fromARGB(
                       tempColor.alpha,
                       tempColor.red,
                       tempColor.green,
                       value.toInt(),
                     );
-                  }),
-                ),
-              ],
-            ),
+                  });
+                },
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _cardBackgroundColor = tempColor;
-                });
-                Navigator.pop(context);
-              },
-              child: const Text('Aceptar'),
-            ),
-          ],
-        ),
+        );
+      },
+    ),
+
+    actions: [
+      TextButton(
+        onPressed: () =>
+            Navigator.of(context).pop(),
+
+        child: const Text('Cancelar'),
       ),
-    );
-  }
+
+      ElevatedButton(
+        onPressed: () {
+          setState(() {
+            _cardBackgroundColor = tempColor;
+          });
+
+          Navigator.of(context).pop();
+        },
+
+        child: const Text('Aceptar'),
+      ),
+    ],
+  );
+}
   
   Widget _buildColorSlider({
     required String label,

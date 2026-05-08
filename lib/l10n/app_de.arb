@@ -318,6 +318,7 @@
   "configureCollectionFields": "Sammlungsfelder konfigurieren",
   "configureDeliveryVoucher": "Lieferschein konfigurieren",
   "configureVoucherBody": "Inhalt des Scheins konfigurieren...",
+  "confirm": "Bestätigen",
   "confirmDeleteAlert": "Benachrichtigung löschen",
   "confirmDeleteAlertMessage": "Bist du sicher, dass du diesen Eintrag löschen möchtest?",
   "confirmDeleteAssetType": "Bist du sicher, dass du den Aktivtyp \"{name}\" und alle zugehörigen Elemente löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden.",

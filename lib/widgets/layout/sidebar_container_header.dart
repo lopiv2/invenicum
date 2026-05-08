@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/screens/home/local_widgets/new_container_dialog.dart';
 import 'package:invenicum/widgets/ui/sidebar_shared_widgets.dart';
@@ -22,7 +23,9 @@ class SidebarContainerHeader extends StatelessWidget {
             Text(
               AppLocalizations.of(context)!.containers.toUpperCase(),
               style: theme.textTheme.labelSmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                color: theme.colorScheme.onSurfaceVariant.withValues(
+                  alpha: 0.6,
+                ),
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.1,
               ),
@@ -47,14 +50,16 @@ class SidebarContainerHeader extends StatelessWidget {
 
   // Mueve aquí la lógica del diálogo para que el componente sea autónomo
   Future<void> _showNewContainerDialog(BuildContext context) async {
-    final result = await showDialog<Map<String, dynamic>>(
+    final l10n = AppLocalizations.of(context)!;
+    final provider = context.read<ContainerProvider>();
+
+    final result = await showAppDialog<Map<String, dynamic>>(
       context: context,
-      builder: (context) =>
-          const NewContainerDialog(), // Usamos el nuevo widget
+      title: l10n.newContainer,
+      body: const NewContainerDialog(),
     );
 
     if (result != null) {
-      final provider = context.read<ContainerProvider>();
       try {
         await provider.createNewContainer(
           result['name'],

@@ -389,6 +389,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get configureVoucherBody => 'Configura el cuerpo del vale...';
 
   @override
+  String get confirm => 'Confirmar';
+
+  @override
   String get confirmDeleteAlert => 'Eliminar Alerta';
 
   @override

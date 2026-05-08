@@ -1,6 +1,8 @@
 // lib/utils/constants.dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:invenicum/core/utils/retro/cga_palette.dart';
+import 'package:invenicum/core/utils/retro/ega_palette.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/data/models/custom_theme_model.dart';
@@ -610,31 +612,33 @@ class AppAchievements {
 
 //Font families available in the app, with their corresponding size deltas to adjust the UI accordingly (e.g. SCUMM fonts are smaller, so we apply a negative delta)
 class AppFonts {
-  static List<(String id, double delta, String label)> getFonts(BuildContext context) {
+  static List<(String id, double delta, String label)> getFonts(
+    BuildContext context,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     return [
-      ('Default',           0,  l10n.fontDefault),
-      ('SCUMMCredits',     -4,  l10n.fontSCUMMCredits),
-      ('SCUMMSolid',       -4,  l10n.fontSCUMMSolid),
-      ('DayOfTheTentacle',  4,  l10n.fontDayOfTheTentacle),
-      ('Efmi',              0,  l10n.fontEfmi),
-      ('PUSAB',             0,  l10n.fontPUSAB),
-      ('ActionForce',       0,  l10n.fontActionForce),
-      ('Starjedi',          0,  l10n.fontStarjedi),
-      ('TransformersMovie', 0,  l10n.fontTransformersMovie),
+      ('Default', 0, l10n.fontDefault),
+      ('SCUMMCredits', -4, l10n.fontSCUMMCredits),
+      ('SCUMMSolid', -4, l10n.fontSCUMMSolid),
+      ('DayOfTheTentacle', 4, l10n.fontDayOfTheTentacle),
+      ('Efmi', 0, l10n.fontEfmi),
+      ('PUSAB', 0, l10n.fontPUSAB),
+      ('ActionForce', 0, l10n.fontActionForce),
+      ('Starjedi', 0, l10n.fontStarjedi),
+      ('TransformersMovie', 0, l10n.fontTransformersMovie),
     ];
   }
 
   static double getDelta(String? fontFamily) {
     // Lista estática solo con id y delta para uso fuera del contexto
     const deltas = <(String, double)>[
-      ('SCUMMCredits',    -4),
-      ('SCUMMSolid',      -4),
+      ('SCUMMCredits', -4),
+      ('SCUMMSolid', -4),
       ('DayOfTheTentacle', 4),
-      ('Efmi',             0),
-      ('PUSAB',            0),
-      ('ActionForce',       0),
-      ('Starjedi',          0),
+      ('Efmi', 0),
+      ('PUSAB', 0),
+      ('ActionForce', 0),
+      ('Starjedi', 0),
       ('TransformersMovie', 0),
     ];
     return deltas
@@ -694,45 +698,36 @@ class AppCurrencies {
   }
 }
 
+// ── Predefined Themes & Brand Identity ──────────────────────────────────────
+//
+// Retro themes live in the same [predefined] list as any other theme.
+// They are distinguished only by their [paletteId] field.
+// [AppThemes.retro] is a convenience getter for UI sections that want
+// to display them separately (e.g. the theme-picker modal).
+ 
 class AppThemes {
+  AppThemes._();
+ 
   static final CustomTheme brand = CustomTheme(
     id: 'brand',
-    name: 'Invenicum (Brand)',
+    name: 'Invenicum',
     primaryColor: const Color(0xFF1A237E),
     brightness: Brightness.light,
   );
-
+ 
+  // ── Standard + Retro themes in one flat list ─────────────────────────────
   static final List<CustomTheme> predefined = [
-    CustomTheme(id: 'emerald', name: 'Emerald', primaryColor: Colors.teal),
-    CustomTheme(id: 'sunset', name: 'Sunset', primaryColor: Colors.orange),
-    CustomTheme(id: 'ocean', name: 'Indian Ocean', primaryColor: Colors.blue),
-    CustomTheme(
-      id: 'lavender',
-      name: 'Sweet Lavender',
-      primaryColor: Colors.purple.shade300,
-    ),
-    CustomTheme(
-      id: 'forest',
-      name: 'Deep Forest',
-      primaryColor: Colors.green.shade900,
-    ),
-    CustomTheme(id: 'cherry', name: 'Cherry', primaryColor: Colors.redAccent),
-    CustomTheme(
-      id: 'indigo',
-      name: 'Electric Night',
-      primaryColor: Colors.indigoAccent,
-    ),
-    CustomTheme(id: 'amber', name: 'Amber Gold', primaryColor: Colors.amber),
-    CustomTheme(
-      id: 'sakura',
-      name: 'Cherry Blossom',
-      primaryColor: Colors.pink.shade200,
-    ),
-    CustomTheme(
-      id: 'slate',
-      name: 'Modern Slate',
-      primaryColor: Colors.blueGrey.shade700,
-    ),
+    // Standard
+    CustomTheme(id: 'emerald',   name: 'Esmeralda',       primaryColor: Colors.teal),
+    CustomTheme(id: 'sunset',    name: 'Atardecer',        primaryColor: Colors.orange),
+    CustomTheme(id: 'ocean',     name: 'Indian Ocean',     primaryColor: Colors.blue),
+    CustomTheme(id: 'lavender',  name: 'Lavanda Dulce',    primaryColor: Colors.purple.shade300),
+    CustomTheme(id: 'forest',    name: 'Bosque Profundo',  primaryColor: Colors.green.shade900),
+    CustomTheme(id: 'cherry',    name: 'Cereza',           primaryColor: Colors.redAccent),
+    CustomTheme(id: 'indigo',    name: 'Noche Eléctrica',  primaryColor: Colors.indigoAccent),
+    CustomTheme(id: 'amber',     name: 'Oro Ámbar',        primaryColor: Colors.amber),
+    CustomTheme(id: 'sakura',    name: 'Cherry Blossom',   primaryColor: Colors.pink.shade200),
+    CustomTheme(id: 'slate',     name: 'Pizarra Moderna',  primaryColor: Colors.blueGrey.shade700),
     CustomTheme(
       id: 'cyberpunk',
       name: 'Cyberpunk',
@@ -741,15 +736,57 @@ class AppThemes {
     ),
     CustomTheme(
       id: 'nordic',
-      name: 'Arctic Nord',
+      name: 'Ártico Nord',
       primaryColor: Colors.lightBlue.shade100,
-      brightness: Brightness.light,
     ),
     CustomTheme(
       id: 'dark_mode',
-      name: 'Deep Night',
+      name: 'Noche Profunda',
       primaryColor: Colors.blueGrey,
       brightness: Brightness.dark,
     ),
+ 
+    // ── Retro themes — same list, same model, just paletteId set ──────────
+    CustomTheme(
+      id: 'retro_cga',
+      name: 'CGA (1981)',
+      primaryColor: CGA.brightCyan,
+      brightness: Brightness.dark,
+      paletteId: 'cga',
+    ),
+    CustomTheme(
+      id: 'retro_ega',
+      name: 'EGA (1984)',
+      primaryColor: EGA.magenta,
+      brightness: Brightness.dark,
+      paletteId: 'ega',
+    ),
   ];
+ 
+  /// All themes including brand, for lookup/matching.
+  static List<CustomTheme> get all => [brand, ...predefined];
+ 
+  /// Convenience: only retro themes, for special UI sections.
+  static List<CustomTheme> get retro =>
+      predefined.where((t) => t.isRetro).toList();
+ 
+  /// Convenience: only non-retro predefined themes.
+  static List<CustomTheme> get standard =>
+      predefined.where((t) => !t.isRetro).toList();
+ 
+  // ─── Lookup helpers ────────────────────────────────────────────────────────
+ 
+  /// Find a predefined theme by [id], returns null if not found.
+  static CustomTheme? findById(String id) {
+    try {
+      return all.firstWhere((t) => t.id == id);
+    } catch (_) {
+      return null;
+    }
+  }
+ 
+  /// Resolve the [paletteId] that should be used for a given theme [id].
+  /// Returns null for normal Material themes.
+  static String? paletteIdForThemeId(String id) =>
+      findById(id)?.paletteId;
 }

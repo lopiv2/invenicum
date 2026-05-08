@@ -318,6 +318,7 @@
   "configureCollectionFields": "Configure Collection Fields",
   "configureDeliveryVoucher": "Configure Delivery Voucher",
   "configureVoucherBody": "Configure voucher body...",
+  "confirm": "Confirm",
   "confirmDeleteAlert": "Delete Alert",
   "confirmDeleteAlertMessage": "Are you sure you want to delete this record?",
   "confirmDeleteAssetType": "Are you sure you want to delete asset type \"{name}\" and all associated items? This action cannot be undone.",

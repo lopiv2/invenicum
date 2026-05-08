@@ -318,6 +318,7 @@
   "configureCollectionFields": "Configurer les champs de collection",
   "configureDeliveryVoucher": "Configurer le bon de livraison",
   "configureVoucherBody": "Configurer le corps du bon...",
+  "confirm": "Confirmer",
   "confirmDeleteAlert": "Supprimer l'alerte",
   "confirmDeleteAlertMessage": "Êtes-vous sûr de vouloir supprimer cet enregistrement?",
   "confirmDeleteAssetType": "Êtes-vous sûr de vouloir supprimer le type de ressource \"{name}\" et tous les éléments associés? Cette action ne peut pas être annulée.",

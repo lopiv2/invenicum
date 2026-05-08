@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/core/utils/cga_constants.dart';
+import 'package:invenicum/core/utils/retro/cga_palette.dart';
 
 /// Paints a double-line IBM PC box-drawing border (╔═╗ / ╚═╝ style).
 class CGADoubleBorderPainter extends CustomPainter {

@@ -382,6 +382,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get configureVoucherBody => 'Configure voucher body...';
 
   @override
+  String get confirm => 'Confirm';
+
+  @override
   String get confirmDeleteAlert => 'Delete Alert';
 
   @override

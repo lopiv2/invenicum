@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/list_data.dart';
@@ -44,30 +45,26 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
     ListData dataList,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(l10n.confirmDeletion),
-          content: Text(
-            l10n.confirmDeleteDataList(dataList.name),
+      title: l10n.confirmDeletion,
+      body: Text(
+        l10n.confirmDeleteDataList(dataList.name),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(context).pop(true),
+          style: FilledButton.styleFrom(backgroundColor: Colors.red),
+          child: Text(
+            l10n.delete,
+            style: TextStyle(color: Colors.white),
           ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              style: FilledButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(
-                l10n.delete,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
-          ],
-        );
-      },
+        ),
+      ],
     );
 
     if (confirmed == true && context.mounted) {

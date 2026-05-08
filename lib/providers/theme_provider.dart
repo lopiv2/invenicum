@@ -1,218 +1,225 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_theme.dart';
 import 'package:invenicum/data/services/theme_service.dart';
-import '../data/models/custom_theme_model.dart';
-import '../core/utils/constants.dart';
+import 'package:invenicum/data/models/custom_theme_model.dart';
+import 'package:invenicum/core/utils/constants.dart';
 
 class ThemeProvider with ChangeNotifier {
   final ThemeService _themeService;
 
-  // Flag to prevent multiple unnecessary loads from ProxyProvider
+  ThemeProvider(this._themeService);
+
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
-  ThemeProvider(this._themeService);
+  CustomTheme _currentTheme = AppThemes.brand;
+  CustomTheme get currentTheme => _currentTheme;
 
-  CustomTheme get brandTheme => AppThemes.brand;
-  List<CustomTheme> get predefinedThemes => AppThemes.predefined;
   List<CustomTheme> _userThemes = [];
   List<CustomTheme> get userThemes => _userThemes;
 
   String? _fontFamily;
 
-  CustomTheme _currentTheme = AppThemes.brand;
-  CustomTheme get currentTheme => _currentTheme;
+  // ─────────────────────────────────────────────
+  // RETRO
+  //
+  // A theme is "retro" if its paletteId maps to a known RetroTheme.
+  // No separate enum needed — the paletteId string IS the discriminator.
+  // ─────────────────────────────────────────────
+
+  /// Returns the [RetroTheme] for the active theme, or null for normal themes.
+  RetroTheme? get activeRetroTheme => _retroThemeForPaletteId(
+        _currentTheme.paletteId,
+      );
+
+  bool get isRetroMode => activeRetroTheme != null;
+
+  /// Central mapping from paletteId → RetroTheme.
+  /// Add future palettes (vga, amiga…) here only.
+  static RetroTheme? _retroThemeForPaletteId(String? paletteId) =>
+      switch (paletteId) {
+        'cga' => RetroTheme.cga,
+        'ega' => RetroTheme.ega,
+        _     => null,
+      };
+
+  // ─────────────────────────────────────────────
+  // FONT
+  // ─────────────────────────────────────────────
 
   void setFontFamily(String? fontFamily) {
     _fontFamily = fontFamily == 'Default' ? null : fontFamily;
     notifyListeners();
   }
 
-  // 2. Dynamic ThemeData generation
-  ThemeData get lightTheme {
-    return _buildTheme(Brightness.light);
-  }
+  // ─────────────────────────────────────────────
+  // THEMES
+  // ─────────────────────────────────────────────
 
-  ThemeData get darkTheme {
-    return _buildTheme(Brightness.dark);
-  }
+  ThemeData get lightTheme => isRetroMode
+      ? activeRetroTheme!.toThemeData()
+      : _buildTheme(Brightness.light);
 
-  TextStyle? _adjustSize(
-    TextStyle? style,
-    double delta, [
-    double fallback = 14,
-  ]) {
-    return style?.copyWith(fontSize: (style.fontSize ?? fallback) + delta);
-  }
+  ThemeData get darkTheme => isRetroMode
+      ? activeRetroTheme!.toThemeData()
+      : _buildTheme(Brightness.dark);
 
-  // Private method to avoid code duplication
   ThemeData _buildTheme(Brightness brightness) {
-  final base = ThemeData(
-    useMaterial3: true,
-    colorSchemeSeed: _currentTheme.primaryColor,
-    brightness: brightness,
-    appBarTheme: const AppBarTheme(centerTitle: true),
-    fontFamily: _fontFamily,
-  );
+    final base = ThemeData(
+      useMaterial3: true,
+      colorSchemeSeed: _currentTheme.primaryColor,
+      brightness: brightness,
+      appBarTheme: const AppBarTheme(centerTitle: true),
+      fontFamily: _fontFamily,
+    );
 
-  final delta = AppFonts.getDelta(_fontFamily);
-  if (delta == 0) return base;
+    final delta = AppFonts.getDelta(_fontFamily);
+    if (delta == 0) return base;
 
-  return base.copyWith(
-    textTheme: base.textTheme.copyWith(
-      displayLarge:  _adjustSize(base.textTheme.displayLarge,  delta, 57),
-      displayMedium: _adjustSize(base.textTheme.displayMedium, delta, 45),
-      displaySmall:  _adjustSize(base.textTheme.displaySmall,  delta, 36),
-      headlineLarge: _adjustSize(base.textTheme.headlineLarge, delta, 32),
-      headlineMedium:_adjustSize(base.textTheme.headlineMedium,delta, 28),
-      headlineSmall: _adjustSize(base.textTheme.headlineSmall, delta, 24),
-      titleLarge:    _adjustSize(base.textTheme.titleLarge,    delta, 22),
-      titleMedium:   _adjustSize(base.textTheme.titleMedium,   delta, 16),
-      titleSmall:    _adjustSize(base.textTheme.titleSmall,    delta, 14),
-      bodyLarge:     _adjustSize(base.textTheme.bodyLarge,     delta, 16),
-      bodyMedium:    _adjustSize(base.textTheme.bodyMedium,    delta, 14),
-      bodySmall:     _adjustSize(base.textTheme.bodySmall,     delta, 12),
-      labelLarge:    _adjustSize(base.textTheme.labelLarge,    delta, 14),
-      labelMedium:   _adjustSize(base.textTheme.labelMedium,   delta, 12),
-      labelSmall:    _adjustSize(base.textTheme.labelSmall,    delta, 11),
-    ),
-  );
-}
+    TextStyle? adjust(TextStyle? style, double fallback) {
+      if (style == null) return null;
+      return style.copyWith(fontSize: (style.fontSize ?? fallback) + delta);
+    }
 
-  void setInitializing() {
-    _isInitialized = true;
+    return base.copyWith(
+      textTheme: base.textTheme.copyWith(
+        displayLarge:  adjust(base.textTheme.displayLarge,  57),
+        displayMedium: adjust(base.textTheme.displayMedium, 45),
+        displaySmall:  adjust(base.textTheme.displaySmall,  36),
+        headlineLarge: adjust(base.textTheme.headlineLarge, 32),
+        headlineMedium:adjust(base.textTheme.headlineMedium,28),
+        headlineSmall: adjust(base.textTheme.headlineSmall, 24),
+        titleLarge:    adjust(base.textTheme.titleLarge,    22),
+        titleMedium:   adjust(base.textTheme.titleMedium,   16),
+        titleSmall:    adjust(base.textTheme.titleSmall,    14),
+        bodyLarge:     adjust(base.textTheme.bodyLarge,     16),
+        bodyMedium:    adjust(base.textTheme.bodyMedium,    14),
+        bodySmall:     adjust(base.textTheme.bodySmall,     12),
+        labelLarge:    adjust(base.textTheme.labelLarge,    14),
+        labelMedium:   adjust(base.textTheme.labelMedium,   12),
+        labelSmall:    adjust(base.textTheme.labelSmall,    11),
+      ),
+    );
   }
+
+  // ─────────────────────────────────────────────
+  // LOAD USER THEMES
+  // ─────────────────────────────────────────────
 
   Future<void> loadUserThemes() async {
     try {
       _userThemes = await _themeService.getCustomThemes();
       notifyListeners();
     } catch (e) {
-      debugPrint('Error cargando temas: $e');
+      debugPrint('Error loading themes: $e');
     }
   }
 
-  Future<void> deleteThemeFromLibrary(String themeId) async {
-    try {
-      await _themeService.deleteCustomTheme(themeId);
-      // We filter the local list so it disappears from the UI immediately
-      _userThemes.removeWhere((t) => t.id == themeId);
-      notifyListeners();
-    } catch (e) {
-      debugPrint('Error al eliminar tema: $e');
-    }
-  }
+  // ─────────────────────────────────────────────
+  // INITIALIZE FROM BACKEND USER CONFIG
+  //
+  // The backend only stores hexColor + brightness.
+  // We match against the predefined list first; if no match is found
+  // we create an anonymous CustomTheme.
+  // Retro themes ARE in the predefined list and will be matched by color,
+  // so their paletteId will be restored correctly.
+  // ─────────────────────────────────────────────
 
-  // Initialice the theme based on the user's saved configuration (called by ProxyProvider)
-  void initializeTheme(String? hexColor, String? brightnessStr) async {
+  Future<void> initializeTheme(
+    String? hexColor,
+    String? brightnessStr,
+  ) async {
     if (hexColor == null || hexColor.isEmpty) {
       _isInitialized = true;
       return;
     }
 
-    final colorValue = int.parse(hexColor.replaceFirst('#', '0xFF'));
-    final brightness = brightnessStr == 'dark'
-        ? Brightness.dark
-        : Brightness.light;
+    final color = Color(int.parse(hexColor.replaceFirst('#', '0xFF')));
+    final brightness =
+        brightnessStr == 'dark' ? Brightness.dark : Brightness.light;
 
-    // 1. First load custom themes from the DB
-    await loadUserThemes();
-
-    // 2. Create a list with ALL possible themes for searching
-    final allPossibleThemes = [
-      AppThemes.brand,
-      ...AppThemes.predefined,
-      ..._userThemes, // Themes loaded from the DB
-    ];
-
-    try {
-      // 3. Check if color and brightness match any named theme
-      _currentTheme = allPossibleThemes.firstWhere(
-        (t) =>
-            t.primaryColor.toARGB32() == colorValue &&
-            t.brightness == brightness,
-      );
-    } catch (_) {
-      // 4. If it truly doesn't exist anywhere, it remains as Custom
-      _currentTheme = CustomTheme(
-        id: 'custom_db',
-        name: 'Custom',
-        primaryColor: Color(colorValue),
-        brightness: brightness,
-      );
-    }
+    await _resolveAndApply(color: color, brightness: brightness);
 
     _isInitialized = true;
     notifyListeners();
   }
 
-  /// Changes the theme locally and persists it in the linked DB table
-  Future<void> setTheme(CustomTheme theme) async {
-    _currentTheme = theme; // Change the object in memory
+  void initializeFromUserConfig({
+    required Color color,
+    required Brightness brightness,
+  }) async {
+    await _resolveAndApply(color: color, brightness: brightness);
     _isInitialized = true;
-
-    notifyListeners(); // 🚩 This is what makes Flutter repaint the App
-
-    try {
-      // This updates the UserThemeConfig table in the backend
-      final String hexColor =
-          '#${theme.primaryColor.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase()}';
-      await _themeService.updateUserTheme(
-        hexColor: hexColor,
-        brightness: theme.brightness == Brightness.dark ? 'dark' : 'light',
-      );
-    } catch (e) {
-      debugPrint('Error persistiendo preferencia: $e');
-    }
+    notifyListeners();
   }
 
-  Future<void> saveThemeToLibrary(CustomTheme theme) async {
-    try {
-      // 1. Save to the library (the table of saved themes)
-      await _themeService.createCustomTheme(theme);
-
-      // 2. IMPORTANT: We also set it as the current theme
-      // This will call setTheme() which updates UserThemeConfig and triggers notifyListeners()
-      Future.delayed(Duration.zero).then((_) async => await setTheme(theme));
-    } catch (e) {
-      debugPrint('Error en saveThemeToLibrary: $e');
-      rethrow;
-    }
-  }
-
-  // lib/providers/theme_provider.dart
-
-  Future<void> initializeThemeFromConfig(
-    Color color,
-    Brightness brightness,
-  ) async {
-    // 1. Load themes from the user's library
+  /// Matches [color]+[brightness] against all known themes (predefined + user).
+  /// Falls back to an anonymous CustomTheme if no match is found.
+  Future<void> _resolveAndApply({
+    required Color color,
+    required Brightness brightness,
+  }) async {
     await loadUserThemes();
 
-    // 2. Put all themes in a bag for searching
-    final allPossibleThemes = [
-      AppThemes.brand,
-      ...AppThemes.predefined,
-      ..._userThemes, // These are the ones we just loaded from the DB
-    ];
+    final candidates = [...AppThemes.all, ..._userThemes];
 
     try {
-      // 3. Find the theme that matches color and brightness
-      _currentTheme = allPossibleThemes.firstWhere(
+      _currentTheme = candidates.firstWhere(
         (t) =>
             t.primaryColor.toARGB32() == color.toARGB32() &&
             t.brightness == brightness,
       );
     } catch (_) {
-      // 4. If it doesn't exist, leave it as Custom
+      // No predefined match — anonymous Material theme, no paletteId.
       _currentTheme = CustomTheme(
-        id: 'db_theme',
+        id: 'custom',
         name: 'Custom',
         primaryColor: color,
         brightness: brightness,
       );
     }
+  }
 
+  // ─────────────────────────────────────────────
+  // SET THEME
+  // ─────────────────────────────────────────────
+
+  Future<void> setTheme(CustomTheme theme) async {
+    _currentTheme = theme;
     _isInitialized = true;
     notifyListeners();
+
+    try {
+      await _themeService.updateUserTheme(
+        hexColor: theme.hexColor,
+        brightness: theme.brightnessStr,
+      );
+    } catch (e) {
+      debugPrint('Error persisting theme: $e');
+    }
+  }
+
+  Future<void> saveThemeToLibrary(CustomTheme theme) async {
+    try {
+      await _themeService.createCustomTheme(theme);
+      await setTheme(theme);
+    } catch (e) {
+      debugPrint('Error in saveThemeToLibrary: $e');
+      rethrow;
+    }
+  }
+
+  // ─────────────────────────────────────────────
+  // DELETE
+  // ─────────────────────────────────────────────
+
+  Future<void> deleteThemeFromLibrary(String themeId) async {
+    try {
+      await _themeService.deleteCustomTheme(themeId);
+      _userThemes.removeWhere((t) => t.id == themeId);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting theme: $e');
+    }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/custom_footer_pagination.dart';
@@ -198,30 +199,28 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
 
   void _deleteAsset(InventoryItem item) {
     final l10n = AppLocalizations.of(context)!;
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.confirmDeletion),
-        content: Text(l10n.deleteItemMessage(item.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await context.read<InventoryItemProvider>().deleteInventoryItem(
-                item.id,
-                widget.containerId,
-                widget.assetTypeId,
-              );
-              ToastService.success(l10n.elementDeletedSuccess);
-            },
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      title: l10n.confirmDeletion,
+      body: Text(l10n.deleteItemMessage(item.name)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await context.read<InventoryItemProvider>().deleteInventoryItem(
+              item.id,
+              widget.containerId,
+              widget.assetTypeId,
+            );
+            ToastService.success(l10n.elementDeletedSuccess);
+          },
+          child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+        ),
+      ],
     );
   }
 
