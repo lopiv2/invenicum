@@ -1660,6 +1660,12 @@ abstract class AppLocalizations {
   /// **'No notifications'**
   String get noNotifications;
 
+  /// No description provided for @noResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found.'**
+  String get noResultsFound;
+
   /// No description provided for @noThemesSaved.
   ///
   /// In en, this message translates to:

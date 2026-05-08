@@ -880,6 +880,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get noNotifications => 'Nessuna notifica';
 
   @override
+  String get noResultsFound => 'Nessun risultato trovato.';
+
+  @override
   String get noThemesSaved => 'Non ci sono ancora brani salvati';
 
   @override

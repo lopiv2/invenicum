@@ -1173,6 +1173,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                               title: l10n.specificationsTitle,
                               icon: Icons.list_alt,
                               child: CustomFieldsSectionWidget(
+                                containerId: _containerId.toString(),
                                 fieldDefinitions: _assetType!.fieldDefinitions,
                                 customControllers: _customControllers,
                                 listFieldValues: _listFieldValues,

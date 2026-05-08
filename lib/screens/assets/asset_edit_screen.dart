@@ -597,9 +597,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               final subtitle = _buildCandidateSubtitle(candidate);
               return ListTile(
                 leading: _buildCandidateLeading(candidate),
-                title: Text(
-                  candidate['name']?.toString() ?? l10n.unnamedLabel,
-                ),
+                title: Text(candidate['name']?.toString() ?? l10n.unnamedLabel),
                 subtitle: subtitle.isEmpty ? null : Text(subtitle),
                 onTap: () => Navigator.of(context).pop(candidate),
               );
@@ -975,7 +973,9 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             ),
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(AppLocalizations.of(context)!.cloneBusterContinueAnyway),
+              child: Text(
+                AppLocalizations.of(context)!.cloneBusterContinueAnyway,
+              ),
             ),
           ],
         );
@@ -1113,15 +1113,15 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                           )
                         : null,
                     // ── Row 1a: Scraper ──
-                      scraperBento: CollapsibleBentoBoxWidget(
-                        collapsible: true,
-                        title: 'Scraper Import',
-                        icon: Icons.travel_explore,
-                        child: ScraperImportWidget(
-                          containerId: int.parse(widget.containerId),
-                          onResults: _handleScraperResults,
-                        ),
+                    scraperBento: CollapsibleBentoBoxWidget(
+                      collapsible: true,
+                      title: 'Scraper Import',
+                      icon: Icons.travel_explore,
+                      child: ScraperImportWidget(
+                        containerId: int.parse(widget.containerId),
+                        onResults: _handleScraperResults,
                       ),
+                    ),
                     // ── Importar desde fuente externa ──
                     importBento: aiEnabled
                         ? CollapsibleBentoBoxWidget(
@@ -1201,6 +1201,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                             title: l10n.specificationsTitle,
                             icon: Icons.list_alt,
                             child: CustomFieldsSectionWidget(
+                              containerId: widget.containerId.toString(),
                               fieldDefinitions: _assetType!.fieldDefinitions,
                               customControllers: _dynamicControllers,
                               listFieldValues: _listFieldValues,

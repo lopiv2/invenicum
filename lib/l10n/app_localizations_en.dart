@@ -865,6 +865,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNotifications => 'No notifications';
 
   @override
+  String get noResultsFound => 'No results found.';
+
+  @override
   String get noThemesSaved => 'No themes saved yet';
 
   @override

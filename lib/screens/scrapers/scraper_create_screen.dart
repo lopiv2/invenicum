@@ -214,7 +214,7 @@ class _ScraperCreateScreenState extends State<ScraperCreateScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: _fields.length,
-                  onReorderItem: (oldIndex, newIndex) {
+                  onReorder: (oldIndex, newIndex) {
                     setState(() {
                       if (newIndex > oldIndex) newIndex -= 1;
                       final item = _fields.removeAt(oldIndex);
