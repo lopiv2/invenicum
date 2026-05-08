@@ -94,7 +94,6 @@ class CurrencyDropdownWidget extends StatelessWidget {
     );
   }
 
-
   Future<void> _changeCurrency(BuildContext context, String currencyCode) async {
     AppLocalizations l10n = AppLocalizations.of(context)!;
     try {

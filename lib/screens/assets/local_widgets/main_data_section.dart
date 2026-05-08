@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/location_provider.dart';
-import 'package:invenicum/screens/assets/local_widgets/location_dropdown_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/smart_dropdown_field.dart';
 import 'package:provider/provider.dart';
 import 'common_form_field.dart';

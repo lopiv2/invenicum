@@ -124,7 +124,7 @@ class InventoryItemProvider with ChangeNotifier {
   // ----------------------------------------------------------------------
 
   /// Todos los items del contexto actual, sin paginación ni filtrado.
-  /// PlutoGrid se encarga de filtrar, ordenar y paginar.
+  /// TrinaGrid se encarga de filtrar, ordenar y paginar.
   List<InventoryItem> get allInventoryItems {
     final key = _getCacheKey(_currentContainerId, _currentAssetTypeId);
     final response = _itemsCache[key];

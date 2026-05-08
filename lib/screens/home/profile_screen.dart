@@ -423,7 +423,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     );
   }
 
-
   Widget _buildSaveButton(AuthProvider authProvider) {
     final l10n = AppLocalizations.of(context)!;
     return SizedBox(
@@ -458,7 +457,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   Widget _buildAvatarPreview(AuthProvider authProvider) {
     final user = authProvider.user;
     final String seed = user?.name ?? AppLocalizations.of(context)!.guest;
-
 
     final String? avatarUrl =
         user?.avatarUrl ?? authProvider.validatedAvatarUrl;

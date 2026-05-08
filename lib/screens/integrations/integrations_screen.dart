@@ -158,6 +158,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
     final accent = colorScheme.primary;
 
     return Container(
+      height: MediaQuery.of(context).size.height / 3,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),
