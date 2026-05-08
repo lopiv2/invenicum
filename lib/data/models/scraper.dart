@@ -1,6 +1,5 @@
 // lib/data/models/scraper.dart
 
-
 class ScraperField {
   final int id;
   final String name;

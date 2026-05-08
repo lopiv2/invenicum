@@ -14,7 +14,7 @@ import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/data/services/voucher_service.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:pluto_grid/pluto_grid.dart';
+import 'package:trina_grid/trina_grid.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
@@ -323,9 +323,9 @@ class _LoansScreenState extends State<LoansScreen> {
                       width: double.infinity,
                       child: Card(
                         margin: EdgeInsets.zero,
-                        child: PlutoGrid(
-                          columns: _buildPlutoColumns(l10n),
-                          rows: _buildPlutoRows(loans),
+                        child: TrinaGrid(
+                          columns: _buildTrinaColumns(l10n),
+                          rows: _buildTrinaRows(loans),
                           rowColorCallback: (rowColorContext) {
                             final loan =
                                 rowColorContext.row.cells['loan_object']!.value
@@ -338,8 +338,8 @@ class _LoansScreenState extends State<LoansScreen> {
                             }
                             return Colors.transparent;
                           },
-                          configuration: PlutoGridConfiguration(
-                            style: PlutoGridStyleConfig(
+                          configuration: TrinaGridConfiguration(
+                            style: TrinaGridStyleConfig(
                               rowHeight: 80,
                               cellTextStyle: const TextStyle(fontSize: 13),
                             ),
@@ -357,66 +357,66 @@ class _LoansScreenState extends State<LoansScreen> {
     );
   }
 
-  List<PlutoColumn> _buildPlutoColumns(AppLocalizations l10n) {
+  List<TrinaColumn> _buildTrinaColumns(AppLocalizations l10n) {
     return [
-      PlutoColumn(
+      TrinaColumn(
         title: 'loan_object',
         field: 'loan_object',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         hide: true,
         enableFilterMenuItem: false,
         enableSorting: false,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.loanObject,
         field: 'itemName',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 180,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.borrowerName,
         field: 'borrowerName',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 170,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.alertInfo,
         field: 'contact',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 210,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.quantity,
         field: 'quantity',
-        type: PlutoColumnType.number(),
+        type: TrinaColumnType.number(),
         width: 90,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.loanDate,
         field: 'loanDate',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 120,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.dueDate,
         field: 'dueDate',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 120,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.status,
         field: 'status',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 130,
         renderer: (ctx) {
           final loan = ctx.row.cells['loan_object']!.value as Loan;
           return Center(child: _buildStatusBadge(loan, l10n));
         },
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.apply,
         field: 'actions',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 150,
         enableSorting: false,
         enableFilterMenuItem: false,
@@ -428,24 +428,24 @@ class _LoansScreenState extends State<LoansScreen> {
     ];
   }
 
-  List<PlutoRow> _buildPlutoRows(List<Loan> loans) {
+  List<TrinaRow> _buildTrinaRows(List<Loan> loans) {
     return loans.map((loan) {
       final String contact = loan.borrowerEmail ?? loan.borrowerPhone ?? '-';
       final String dueDateText = loan.expectedReturnDate != null
           ? DateFormat.yMd().format(loan.expectedReturnDate!)
           : '-';
 
-      return PlutoRow(
+      return TrinaRow(
         cells: {
-          'loan_object': PlutoCell(value: loan),
-          'itemName': PlutoCell(value: loan.itemName),
-          'borrowerName': PlutoCell(value: loan.borrowerName ?? '-'),
-          'contact': PlutoCell(value: contact),
-          'quantity': PlutoCell(value: loan.quantity),
-          'loanDate': PlutoCell(value: DateFormat.yMd().format(loan.loanDate)),
-          'dueDate': PlutoCell(value: dueDateText),
-          'status': PlutoCell(value: loan.status),
-          'actions': PlutoCell(value: ''),
+          'loan_object': TrinaCell(value: loan),
+          'itemName': TrinaCell(value: loan.itemName),
+          'borrowerName': TrinaCell(value: loan.borrowerName ?? '-'),
+          'contact': TrinaCell(value: contact),
+          'quantity': TrinaCell(value: loan.quantity),
+          'loanDate': TrinaCell(value: DateFormat.yMd().format(loan.loanDate)),
+          'dueDate': TrinaCell(value: dueDateText),
+          'status': TrinaCell(value: loan.status),
+          'actions': TrinaCell(value: ''),
         },
       );
     }).toList();

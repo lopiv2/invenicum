@@ -28,17 +28,20 @@ class HeroOrbitalArt extends StatelessWidget {
             ),
             child: const Icon(Icons.hub_rounded, color: Colors.white, size: 56),
           ),
-          const Positioned(
-            top: 22,
+          Positioned(
+            top: MediaQuery.of(context).size.height / 60,
             child: OrbitBadge(icon: Icons.auto_awesome_rounded),
           ),
-          const Positioned(right: 18, child: OrbitBadge(icon: Icons.telegram)),
-          const Positioned(
-            bottom: 20,
+          Positioned(
+            right: MediaQuery.of(context).size.width / 11,
+            child: OrbitBadge(icon: Icons.telegram),
+          ),
+          Positioned(
+            bottom: MediaQuery.of(context).size.height / 60,
             child: OrbitBadge(icon: Icons.qr_code_2_rounded),
           ),
-          const Positioned(
-            left: 16,
+          Positioned(
+            left: MediaQuery.of(context).size.width / 11,
             child: OrbitBadge(icon: Icons.bar_chart_rounded),
           ),
         ],

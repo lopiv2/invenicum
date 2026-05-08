@@ -443,7 +443,7 @@ class _AssetListScreenState extends State<AssetListScreen>
         }
 
         // Items filtrados localmente para los widgets de estadísticas
-        // (contadores, barra de posesión, galería). No afectan a PlutoGrid.
+        // (contadores, barra de posesión, galería). No afectan a TrinaGrid.
         final statsItems = _filterForStats(data.items);
         final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
         final colorScheme = Theme.of(context).colorScheme;
@@ -668,7 +668,7 @@ class _AssetListScreenState extends State<AssetListScreen>
   }
 
   /// Filtra la lista solo para los widgets de estadísticas (contadores,
-  /// barra de posesión). No tiene nada que ver con el filtrado de PlutoGrid.
+  /// barra de posesión). No tiene nada que ver con el filtrado de TrinaGrid.
   List<InventoryItem> _filterForStats(List<InventoryItem> items) {
     if (_selectedCountFieldId == null || _selectedCountValue == null) {
       return items;
