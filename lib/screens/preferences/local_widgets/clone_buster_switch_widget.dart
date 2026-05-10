@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/retro/cga_palette.dart';
+import 'package:invenicum/core/utils/retro/retro_theme.dart';
 import 'package:invenicum/core/utils/retro/retro_theme_extension.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
@@ -33,104 +34,115 @@ class _CloneBusterSwitchWidgetState extends State<CloneBusterSwitchWidget> {
 
   Future<void> _showActivationDialog(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    final retro = Theme.of(context)
-      .extension<RetroThemeExtension>()!
-      .retro!;
     final message = _getRandomMessage(l10n);
     String currentLevel = 'Paranoid';
 
+    // We read the theme BEFORE opening the dialog (parent widget context, safe).
+    // If the extension isn't registered, we fallback to CGA as a guaranteed fallback.
+    final retro =
+        Theme.of(context).extension<RetroThemeExtension>()?.retro ??
+        RetroTheme.cga;
+
+    final parentTheme = Theme.of(
+      context,
+    ).copyWith(extensions: [RetroThemeExtension(retro)]);
+
     final bool? confirmed = await showCGADialog<bool>(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setStateDialog) => CGADialog(
-          theme: retro,
-          title: l10n.cloneBusterDialogTitle,
-          body: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-
-              // ── Message ────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
-                child: CGATextBox(text: message, maxLines: 4),
-              ),
-
-              const CGADivider(color: CGA.darkGray, padding: EdgeInsets.symmetric(horizontal: 12)),
-
-              // ── Sensitivity level ─────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
-                child: Column(
-                  children: [
-                    CGASectionLabel(label: l10n.cloneBusterSensitivityLevel),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        CGARadio<String>(
-                          label: l10n.cloneBusterSensitivityLow,
-                          value: 'Low',
-                          groupValue: currentLevel,
-                          onChanged: (v) => setStateDialog(() => currentLevel = v),
-                        ),
-                        CGARadio<String>(
-                          label: l10n.cloneBusterSensitivityHigh,
-                          value: 'High',
-                          groupValue: currentLevel,
-                          onChanged: (v) => setStateDialog(() => currentLevel = v),
-                        ),
-                        CGARadio<String>(
-                          label: l10n.cloneBusterSensitivityParanoid,
-                          value: 'Paranoid',
-                          groupValue: currentLevel,
-                          onChanged: (v) => setStateDialog(() => currentLevel = v),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      l10n.cloneBusterDisclaimer,
-                      style: const TextStyle(
-                        color: CGA.brightCyan,
-                        fontFamily: 'monospace',
-                        fontSize: 10,
-                        fontStyle: FontStyle.italic,
+      builder: (ctx) => Theme(
+        data: parentTheme, // ← el contexto del diálogo hereda la extensión
+        child: StatefulBuilder(
+          builder: (context, setStateDialog) => CGADialog(
+            theme: retro,
+            title: l10n.cloneBusterDialogTitle,
+            body: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
+                  child: CGATextBox(text: message, maxLines: 4),
+                ),
+                const CGADivider(
+                  color: CGA.darkGray,
+                  padding: EdgeInsets.symmetric(horizontal: 12),
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+                  child: Column(
+                    children: [
+                      CGASectionLabel(label: l10n.cloneBusterSensitivityLevel),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          CGARadio<String>(
+                            label: l10n.cloneBusterSensitivityLow,
+                            value: 'Low',
+                            groupValue: currentLevel,
+                            onChanged: (v) =>
+                                setStateDialog(() => currentLevel = v),
+                          ),
+                          CGARadio<String>(
+                            label: l10n.cloneBusterSensitivityHigh,
+                            value: 'High',
+                            groupValue: currentLevel,
+                            onChanged: (v) =>
+                                setStateDialog(() => currentLevel = v),
+                          ),
+                          CGARadio<String>(
+                            label: l10n.cloneBusterSensitivityParanoid,
+                            value: 'Paranoid',
+                            groupValue: currentLevel,
+                            onChanged: (v) =>
+                                setStateDialog(() => currentLevel = v),
+                          ),
+                        ],
                       ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.cloneBusterDisclaimer,
+                        style: const TextStyle(
+                          color: CGA.brightCyan,
+                          fontFamily: 'monospace',
+                          fontSize: 10,
+                          fontStyle: FontStyle.italic,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-              const CGADivider(),
-
-              // ── Buttons ───────────────────────────────────────────────
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CGAButton(
-                      label: l10n.cloneBusterDialogOk,
-                      fgColor: CGA.brightGreen,
-                      onPressed: () => Navigator.of(context).pop(true),
-                    ),
-                    CGAButton(
-                      label: l10n.cloneBusterDialogCancel,
-                      fgColor: CGA.brightRed,
-                      onPressed: () => Navigator.of(context).pop(false),
-                    ),
-                    CGAButton(
-                      label: l10n.cloneBusterDialogHelp,
-                      fgColor: CGA.yellow,
-                      onPressed: () => ToastService.info(l10n.cloneBusterDescription),
-                    ),
-                  ],
+                const CGADivider(),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      CGAButton(
+                        label: l10n.cloneBusterDialogOk,
+                        fgColor: CGA.brightGreen,
+                        onPressed: () => Navigator.of(context).pop(true),
+                      ),
+                      CGAButton(
+                        label: l10n.cloneBusterDialogCancel,
+                        fgColor: CGA.brightRed,
+                        onPressed: () => Navigator.of(context).pop(false),
+                      ),
+                      CGAButton(
+                        label: l10n.cloneBusterDialogHelp,
+                        fgColor: CGA.yellow,
+                        onPressed: () =>
+                            ToastService.info(l10n.cloneBusterDescription),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -148,24 +160,28 @@ class _CloneBusterSwitchWidgetState extends State<CloneBusterSwitchWidget> {
 
     return SwitchListTile(
       title: Localizations.localeOf(context).languageCode == 'de'
-          ? Text.rich(TextSpan(
-              text: 'The Clone-Buster-O-Matic™ ',
-              children: [
-                TextSpan(
-                  text: l10n.enableCloneBuster,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            ))
-          : Text.rich(TextSpan(
-              text: '${l10n.enableCloneBuster} ',
-              children: [
-                TextSpan(
-                  text: 'The Clone-Buster-O-Matic™',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ],
-            )),
+          ? Text.rich(
+              TextSpan(
+                text: 'The Clone-Buster-O-Matic™ ',
+                children: [
+                  TextSpan(
+                    text: l10n.enableCloneBuster,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            )
+          : Text.rich(
+              TextSpan(
+                text: '${l10n.enableCloneBuster} ',
+                children: [
+                  TextSpan(
+                    text: 'The Clone-Buster-O-Matic™',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+            ),
       subtitle: Text(l10n.enableCloneBusterDescription),
       secondary: const Icon(Icons.content_copy_outlined),
       value: context.watch<PreferencesProvider>().cloneBusterEnabled,
