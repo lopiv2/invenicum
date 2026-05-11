@@ -1,13 +1,9 @@
-// lib/screens/scrapers/scraper_edit_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/scraper.dart';
-import 'dart:convert';
-
-import 'package:invenicum/data/services/scraper_service.dart';
-import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/providers/scraper_provider.dart';
+import 'package:invenicum/screens/scrapers/shared/scraper_test_mixin.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
@@ -27,7 +23,8 @@ class ScraperEditScreen extends StatefulWidget {
   State<ScraperEditScreen> createState() => _ScraperEditScreenState();
 }
 
-class _ScraperEditScreenState extends State<ScraperEditScreen> {
+class _ScraperEditScreenState extends State<ScraperEditScreen>
+    with ScraperTestMixin {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
   late TextEditingController _urlController;
@@ -36,15 +33,23 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
   final _fieldXpathController = TextEditingController();
   final List<Map<String, dynamic>> _fields = [];
 
+  // ── ScraperTestMixin ──────────────────────────────────────────────────────
+  @override
+  String get scraperName => _nameController.text.trim();
+  @override
+  String get scraperUrl => _urlController.text.trim();
+  @override
+  String? get urlPattern => _patternController.text.trim().isEmpty
+      ? null
+      : _patternController.text.trim();
+
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initial.name);
     _urlController = TextEditingController(text: widget.initial.url);
-    _patternController = TextEditingController(
-      text: widget.initial.urlPattern ?? '',
-    );
-    // initialize fields from widget.initial
+    _patternController =
+        TextEditingController(text: widget.initial.urlPattern ?? '');
     for (final f in widget.initial.fields) {
       _fields.add({
         'id': f.id,
@@ -68,32 +73,26 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     try {
-      final provider = context.read<ScraperProvider>();
-      await provider.updateScraper(
-        containerId: int.parse(widget.containerId),
-        scraperId: int.parse(widget.scraperId),
-        name: _nameController.text.trim(),
-        url: _urlController.text.trim(),
-        urlPattern: _patternController.text.trim().isEmpty
-            ? null
-            : _patternController.text.trim(),
-        fields: _fields
-            .map(
-              (f) => {
-                if (f.containsKey('id')) 'id': f['id'],
-                'name': f['name'] ?? '',
-                'xpath': f['xpath'] ?? '',
-                'order': f['order'] ?? 0,
-              },
-            )
-            .toList(),
-      );
+      await context.read<ScraperProvider>().updateScraper(
+            containerId: int.parse(widget.containerId),
+            scraperId: int.parse(widget.scraperId),
+            name: _nameController.text.trim(),
+            url: _urlController.text.trim(),
+            urlPattern: urlPattern,
+            fields: _fields
+                .map((f) => {
+                      if (f.containsKey('id')) 'id': f['id'],
+                      'name': f['name'] ?? '',
+                      'xpath': f['xpath'] ?? '',
+                      'order': f['order'] ?? 0,
+                    })
+                .toList(),
+          );
       if (!mounted) return;
       context.go('/container/${widget.containerId}/scrapers');
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Error: $e')));
     }
   }
 
@@ -108,18 +107,14 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
     });
   }
 
-  void _editField(int index) async {
+  Future<void> _editField(int index) async {
     final field = _fields[index];
-
     final nameController = TextEditingController(text: field['name']);
-
     final xpathController = TextEditingController(text: field['xpath']);
 
     final result = await showAppDialog<bool>(
       context: context,
-
       title: 'Edit field',
-
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -127,24 +122,19 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
             controller: nameController,
             decoration: const InputDecoration(labelText: 'Name'),
           ),
-
           TextField(
             controller: xpathController,
             decoration: const InputDecoration(labelText: 'XPath'),
           ),
         ],
       ),
-
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-
           child: const Text('Cancel'),
         ),
-
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-
           child: const Text('Save'),
         ),
       ],
@@ -153,7 +143,6 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
     if (result == true) {
       setState(() {
         _fields[index]['name'] = nameController.text.trim();
-
         _fields[index]['xpath'] = xpathController.text.trim();
       });
     }
@@ -162,14 +151,14 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
   void _removeField(int index) {
     setState(() {
       _fields.removeAt(index);
-      for (var i = 0; i < _fields.length; i++) {
-        _fields[i]['order'] = i;
-      }
+      for (var i = 0; i < _fields.length; i++) _fields[i]['order'] = i;
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.all(24.0),
       child: Form(
@@ -177,12 +166,11 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Edit Scraper',
-              style: Theme.of(
-                context,
-              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
-            ),
+            Text('Edit Scraper',
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
@@ -193,10 +181,10 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
             const SizedBox(height: 8),
             TextFormField(
               controller: _urlController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'URL',
                 hintText: 'https://example.com/page',
-                prefixIcon: const Icon(Icons.link_outlined),
+                prefixIcon: Icon(Icons.link_outlined),
               ),
               keyboardType: TextInputType.url,
               validator: (v) =>
@@ -219,7 +207,8 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
                 Expanded(
                   child: TextField(
                     controller: _fieldNameController,
-                    decoration: const InputDecoration(labelText: 'Field name'),
+                    decoration:
+                        const InputDecoration(labelText: 'Field name'),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -257,7 +246,6 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
                   },
                   itemBuilder: (context, index) {
                     final f = _fields[index];
-                    final l10n = AppLocalizations.of(context)!;
                     return ListTile(
                       key: ValueKey('field_$index'),
                       title: Text(f['name'] ?? ''),
@@ -269,170 +257,7 @@ class _ScraperEditScreenState extends State<ScraperEditScreen> {
                           IconButton(
                             icon: const Icon(Icons.play_arrow),
                             tooltip: l10n.testScraper,
-                            onPressed: () async {
-                              // 1. Pedir URL de prueba
-                              final testUrlController = TextEditingController();
-                              final testUrl = await showAppDialog<String>(
-                                context: context,
-
-                                title: 'Test field',
-
-                                body: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Introduce una URL que coincida con el patrón del scraper para probar el campo "${f['name']}".',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodySmall,
-                                    ),
-
-                                    const SizedBox(height: 12),
-
-                                    if (_patternController.text.isNotEmpty)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 8,
-                                        ),
-                                        child: Text(
-                                          'Patrón: ${_patternController.text}',
-
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelSmall
-                                              ?.copyWith(
-                                                color: Theme.of(
-                                                  context,
-                                                ).colorScheme.outline,
-
-                                                fontFamily: 'monospace',
-                                              ),
-                                        ),
-                                      ),
-
-                                    TextField(
-                                      controller: testUrlController,
-                                      autofocus: true,
-
-                                      decoration: const InputDecoration(
-                                        labelText: 'URL a probar',
-                                        hintText:
-                                            'https://ejemplo.com/items/123',
-
-                                        prefixIcon: Icon(Icons.link_outlined),
-                                      ),
-
-                                      keyboardType: TextInputType.url,
-
-                                      onSubmitted: (_) => Navigator.of(
-                                        context,
-                                      ).pop(testUrlController.text.trim()),
-                                    ),
-                                  ],
-                                ),
-
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(null),
-
-                                    child: const Text('Cancelar'),
-                                  ),
-
-                                  FilledButton(
-                                    onPressed: () => Navigator.of(
-                                      context,
-                                    ).pop(testUrlController.text.trim()),
-
-                                    child: const Text('Probar'),
-                                  ),
-                                ],
-                              );
-
-                              if (testUrl == null || testUrl.isEmpty) return;
-
-                              // 2. Mostrar loading
-                              showAppDialog<void>(
-                                context: context,
-                                barrierDismissible: false,
-
-                                title: '',
-
-                                body: const SizedBox(
-                                  height: 80,
-                                  child: Center(
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                ),
-                              );
-
-                              // 3. Ejecutar test con la URL introducida
-                              try {
-                                final service = context.read<ScraperService>();
-                                final result = await service.runAdHoc(
-                                  name: _nameController.text,
-                                  url:
-                                      testUrl, // ← URL introducida por el usuario
-                                  urlPattern: _patternController.text.isEmpty
-                                      ? null
-                                      : _patternController.text,
-                                  fields: [
-                                    // ← Solo el campo que se está probando
-                                    {
-                                      'name': f['name'],
-                                      'xpath': f['xpath'],
-                                      'order': f['order'],
-                                    },
-                                  ],
-                                );
-                                if (mounted &&
-                                    Navigator.of(
-                                      context,
-                                      rootNavigator: true,
-                                    ).canPop()) {
-                                  Navigator.of(
-                                    context,
-                                    rootNavigator: true,
-                                  ).pop();
-                                }
-                                final pretty = const JsonEncoder.withIndent(
-                                  '  ',
-                                ).convert(result);
-                                if (!mounted) return;
-                                await showAppDialog<void>(
-                                  context: context,
-
-                                  title: l10n.runResultTitle,
-
-                                  body: SingleChildScrollView(
-                                    child: SelectableText(pretty),
-                                  ),
-
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-
-                                      child: Text(l10n.ok),
-                                    ),
-                                  ],
-                                );
-                              } catch (e) {
-                                if (mounted &&
-                                    Navigator.of(
-                                      context,
-                                      rootNavigator: true,
-                                    ).canPop()) {
-                                  Navigator.of(
-                                    context,
-                                    rootNavigator: true,
-                                  ).pop();
-                                }
-                                if (!mounted) return;
-                                ToastService.error(l10n.runError(e.toString()));
-                              }
-                            },
+                            onPressed: () => testField(context, f),
                           ),
                           IconButton(
                             icon: const Icon(Icons.edit),

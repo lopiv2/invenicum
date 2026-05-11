@@ -1,4 +1,3 @@
-// lib/data/services/scraper_service.dart
 import 'package:dio/dio.dart';
 import 'package:invenicum/data/models/scraper.dart';
 import 'package:invenicum/data/services/api_service.dart';
@@ -8,6 +7,7 @@ class ScraperService {
   Dio get _dio => _apiService.dio;
 
   ScraperService(this._apiService);
+
   Future<List<Scraper>> getScrapers([int? containerId]) async {
     try {
       final response = await _dio.get(
@@ -96,7 +96,6 @@ class ScraperService {
       }
       throw Exception('Error updating scraper: ${response.statusCode}');
     } on DioException catch (e) {
-      // Surface backend error message when available
       final msg = e.response?.data is Map
           ? (e.response?.data['error'] ?? e.response?.data['message'])
           : e.message;
@@ -109,7 +108,6 @@ class ScraperService {
   Future<void> deleteScraper(int scraperId) async {
     try {
       final response = await _dio.delete('/scrapers/$scraperId');
-      // Accept 200 or 204 as successful delete responses to be tolerant with backend implementations
       if (response.statusCode != 204 && response.statusCode != 200) {
         throw Exception('Error deleting scraper: ${response.statusCode}');
       }
@@ -141,10 +139,12 @@ class ScraperService {
     }
   }
 
-  /// Run a scraper ad-hoc without creating it on backend.
-  /// Expects backend endpoint POST `/scrapers/run-ad-hoc` that accepts
-  /// `{ name?, url, urlPattern?, fields: [{name,xpath,order}] }` and returns
-  /// the same results shape as `runScrape`.
+  // ─────────────────────────────────────────────────────────────────────────
+  // RUN AD-HOC
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Runs a scraper ad-hoc (without saving) against the given URL.
+  /// POST `/scrapers/run-ad-hoc` — { name?, url, urlPattern?, fields }
   Future<Map<String, dynamic>> runAdHoc({
     String? name,
     required String url,
@@ -161,7 +161,6 @@ class ScraperService {
       final response = await _dio.post('/scrapers/run-ad-hoc', data: payload);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data;
-        print(data); // Debug log to inspect response structure
         if (data is Map<String, dynamic> && data.containsKey('data'))
           return data['data'] as Map<String, dynamic>;
         if (data is Map<String, dynamic>) return data;
@@ -171,5 +170,39 @@ class ScraperService {
     } catch (e) {
       rethrow;
     }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // TEST SINGLE FIELD
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Convenience wrapper: test a single field against a URL.
+  ///
+  /// Extracts the one-field payload boilerplate so both
+  /// [ScraperCreateScreen] and [ScraperEditScreen] share the same call
+  /// instead of duplicating the fields list construction.
+  ///
+  /// The widget is still responsible for the UI (dialogs, loading state),
+  /// this method only handles the network call.
+  Future<Map<String, dynamic>> testField({
+    String? scraperName,
+    required String testUrl,
+    String? urlPattern,
+    required String fieldName,
+    required String fieldXpath,
+    required int fieldOrder,
+  }) {
+    return runAdHoc(
+      name: scraperName,
+      url: testUrl,
+      urlPattern: urlPattern,
+      fields: [
+        {
+          'name': fieldName,
+          'xpath': fieldXpath,
+          'order': fieldOrder,
+        },
+      ],
+    );
   }
 }
