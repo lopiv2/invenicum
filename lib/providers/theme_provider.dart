@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/themes/app_themes_registry.dart';
+import 'package:invenicum/core/utils/retro/retro_effects.dart';
 import 'package:invenicum/core/utils/retro/retro_theme.dart';
 import 'package:invenicum/data/services/theme_service.dart';
 import 'package:invenicum/data/models/custom_theme_model.dart';
@@ -12,7 +14,7 @@ class ThemeProvider with ChangeNotifier {
   bool _isInitialized = false;
   bool get isInitialized => _isInitialized;
 
-  CustomTheme _currentTheme = AppThemes.brand;
+  CustomTheme _currentTheme = AppThemesRegistry.brand;
   CustomTheme get currentTheme => _currentTheme;
 
   List<CustomTheme> _userThemes = [];
@@ -28,20 +30,14 @@ class ThemeProvider with ChangeNotifier {
   // ─────────────────────────────────────────────
 
   /// Returns the [RetroTheme] for the active theme, or null for normal themes.
-  RetroTheme? get activeRetroTheme => _retroThemeForPaletteId(
-        _currentTheme.paletteId,
-      );
+  RetroTheme? get activeRetroTheme =>
+      AppThemesRegistry.retroThemeForPaletteId(_currentTheme.paletteId);
 
   bool get isRetroMode => activeRetroTheme != null;
 
-  /// Central mapping from paletteId → RetroTheme.
-  /// Add future palettes (vga, amiga…) here only.
-  static RetroTheme? _retroThemeForPaletteId(String? paletteId) =>
-      switch (paletteId) {
-        'cga' => RetroTheme.cga,
-        'ega' => RetroTheme.ega,
-        _     => null,
-      };
+  /// Returns the [RetroEffects] for the active theme, or none for standard themes.
+  RetroEffects get activeEffects =>
+      AppThemesRegistry.effectsForPaletteId(_currentTheme.paletteId);
 
   // ─────────────────────────────────────────────
   // FONT
@@ -83,21 +79,21 @@ class ThemeProvider with ChangeNotifier {
 
     return base.copyWith(
       textTheme: base.textTheme.copyWith(
-        displayLarge:  adjust(base.textTheme.displayLarge,  57),
+        displayLarge: adjust(base.textTheme.displayLarge, 57),
         displayMedium: adjust(base.textTheme.displayMedium, 45),
-        displaySmall:  adjust(base.textTheme.displaySmall,  36),
+        displaySmall: adjust(base.textTheme.displaySmall, 36),
         headlineLarge: adjust(base.textTheme.headlineLarge, 32),
-        headlineMedium:adjust(base.textTheme.headlineMedium,28),
+        headlineMedium: adjust(base.textTheme.headlineMedium, 28),
         headlineSmall: adjust(base.textTheme.headlineSmall, 24),
-        titleLarge:    adjust(base.textTheme.titleLarge,    22),
-        titleMedium:   adjust(base.textTheme.titleMedium,   16),
-        titleSmall:    adjust(base.textTheme.titleSmall,    14),
-        bodyLarge:     adjust(base.textTheme.bodyLarge,     16),
-        bodyMedium:    adjust(base.textTheme.bodyMedium,    14),
-        bodySmall:     adjust(base.textTheme.bodySmall,     12),
-        labelLarge:    adjust(base.textTheme.labelLarge,    14),
-        labelMedium:   adjust(base.textTheme.labelMedium,   12),
-        labelSmall:    adjust(base.textTheme.labelSmall,    11),
+        titleLarge: adjust(base.textTheme.titleLarge, 22),
+        titleMedium: adjust(base.textTheme.titleMedium, 16),
+        titleSmall: adjust(base.textTheme.titleSmall, 14),
+        bodyLarge: adjust(base.textTheme.bodyLarge, 16),
+        bodyMedium: adjust(base.textTheme.bodyMedium, 14),
+        bodySmall: adjust(base.textTheme.bodySmall, 12),
+        labelLarge: adjust(base.textTheme.labelLarge, 14),
+        labelMedium: adjust(base.textTheme.labelMedium, 12),
+        labelSmall: adjust(base.textTheme.labelSmall, 11),
       ),
     );
   }
@@ -128,6 +124,7 @@ class ThemeProvider with ChangeNotifier {
   Future<void> initializeTheme(
     String? hexColor,
     String? brightnessStr,
+    String? paletteId, // ← nuevo
   ) async {
     if (hexColor == null || hexColor.isEmpty) {
       _isInitialized = true;
@@ -135,42 +132,55 @@ class ThemeProvider with ChangeNotifier {
     }
 
     final color = Color(int.parse(hexColor.replaceFirst('#', '0xFF')));
-    final brightness =
-        brightnessStr == 'dark' ? Brightness.dark : Brightness.light;
+    final brightness = brightnessStr == 'dark'
+        ? Brightness.dark
+        : Brightness.light;
 
-    await _resolveAndApply(color: color, brightness: brightness);
+    await _resolveAndApply(
+      color: color,
+      brightness: brightness,
+      paletteId: paletteId,
+    );
 
     _isInitialized = true;
     notifyListeners();
   }
 
-  void initializeFromUserConfig({
+  /*void initializeFromUserConfig({
     required Color color,
     required Brightness brightness,
   }) async {
     await _resolveAndApply(color: color, brightness: brightness);
     _isInitialized = true;
     notifyListeners();
-  }
+  }*/
 
   /// Matches [color]+[brightness] against all known themes (predefined + user).
   /// Falls back to an anonymous CustomTheme if no match is found.
   Future<void> _resolveAndApply({
     required Color color,
     required Brightness brightness,
+    String? paletteId,
   }) async {
     await loadUserThemes();
 
-    final candidates = [...AppThemes.all, ..._userThemes];
+    final candidates = [...AppThemesRegistry.all, ..._userThemes];
 
     try {
-      _currentTheme = candidates.firstWhere(
-        (t) =>
-            t.primaryColor.toARGB32() == color.toARGB32() &&
-            t.brightness == brightness,
-      );
+      _currentTheme = candidates.firstWhere((t) {
+        final colorMatch = t.primaryColor.toARGB32() == color.toARGB32();
+        final brightnessMatch = t.brightness == brightness;
+
+        // Con paletteId del backend: match exacto (resuelve ambigüedad cga/scumm_crt)
+        if (paletteId != null && paletteId.isNotEmpty) {
+          return colorMatch && brightnessMatch && t.paletteId == paletteId;
+        }
+
+        // Sin paletteId (usuarios con datos anteriores a la migración):
+        // match por color+brightness como antes — retrocompatible
+        return colorMatch && brightnessMatch;
+      });
     } catch (_) {
-      // No predefined match — anonymous Material theme, no paletteId.
       _currentTheme = CustomTheme(
         id: 'custom',
         name: 'Custom',
@@ -193,6 +203,7 @@ class ThemeProvider with ChangeNotifier {
       await _themeService.updateUserTheme(
         hexColor: theme.hexColor,
         brightness: theme.brightnessStr,
+        paletteId: theme.paletteId,
       );
     } catch (e) {
       debugPrint('Error persisting theme: $e');

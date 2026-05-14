@@ -139,18 +139,18 @@ class PreferencesProvider with ChangeNotifier {
     }
   }
 
-  /// Carga las preferencias completas y actualiza el estado
   Future<void> loadPreferences() async {
     try {
       final json = await _preferencesService.getPreferences();
       _prefs = UserPreferences.fromJson(json);
 
-      // 🚩 SINCRONIZACIÓN CRÍTICA
       _useSystemTheme = _prefs.useSystemTheme;
       _isDarkMode = _prefs.isDarkMode;
 
       _isInitialized = true;
-      notifyListeners();
+      notifyListeners(); // ← esto dispara el ProxyProvider2 en main.dart,
+      //   que llama a prev.initializeTheme() con los
+      //   3 campos que ya están en _prefs
     } catch (e) {
       debugPrint('Error cargando preferencias: $e');
       _isInitialized = true;
@@ -387,10 +387,7 @@ class PreferencesProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      await _preferencesService.updatePreference(
-        'font',
-        font,
-      );
+      await _preferencesService.updatePreference('font', font);
     } catch (e) {
       _prefs = previousPrefs;
       notifyListeners();

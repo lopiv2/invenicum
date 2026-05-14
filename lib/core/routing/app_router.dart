@@ -62,6 +62,9 @@ import 'package:stac/stac.dart';
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
+/// Helper to wrap protected screens with the app layout (sidebar, header, etc.).
+Widget _layout(Widget child) => MainLayout(child: child);
+
 /// Also receives [firstRunProvider] so the router can
 /// listen to it and react when the check finishes.
 GoRouter createAppRouter(
@@ -148,333 +151,328 @@ GoRouter createAppRouter(
         builder: (context, state) => const FirstRunSetupScreen(),
       ),
 
-      // ── Protected routes inside MainLayout ────────────────────────────────
-      ShellRoute(
-        builder: (context, state, child) => MainLayout(child: child),
+      // ── Protected routes (each wrapped with MainLayout) ────────────────────
+      GoRoute(
+        name: RouteNames.myProfile,
+        path: '/myprofile',
+        builder: (context, state) {
+          String? code = state.uri.queryParameters['code'];
+          if (code == null) {
+            final Uri uri = Uri.parse(html.window.location.href);
+            code = uri.queryParameters['code'];
+          }
+
+          if (code != null) {
+            WidgetsBinding.instance.addPostFrameCallback((_) async {
+              final authProvider = context.read<AuthProvider>();
+              final success = await authProvider.linkGitHubAccount(code!);
+              if (success) {
+                html.window.history.replaceState(null, '', '/#/myprofile');
+                ToastService.success("GitHub vinculado correctamente");
+              }
+            });
+          }
+
+          return _layout(const UserProfileScreen());
+        },
+      ),
+      GoRoute(
+        name: RouteNames.dashboard,
+        path: '/dashboard',
+        builder: (context, state) => _layout(DashboardScreen(
+          dashboardService: context.read<DashboardService>(),
+        )),
+      ),
+      GoRoute(
+        name: RouteNames.alerts,
+        path: '/alerts',
+        builder: (context, state) => _layout(const AlertsScreen()),
+      ),
+      GoRoute(
+        name: RouteNames.preferences,
+        path: '/preferences',
+        builder: (context, state) => _layout(const PreferencesScreen()),
+      ),
+      GoRoute(
+        name: RouteNames.reports,
+        path: '/reports',
+        builder: (context, state) => _layout(const ReportsScreen()),
+      ),
+      GoRoute(
+        name: RouteNames.voucherEditor,
+        path: '/delivery-voucher-editor',
+        builder: (context, state) => _layout(const DeliveryVoucherEditorScreen()),
+      ),
+
+      // --- CONTAINERS / ASSET TYPES ---
+      GoRoute(
+        name: RouteNames.assetTypes,
+        path: '/container/:containerId/asset-types',
+        builder: (context, state) {
+          final containerId = state.pathParameters['containerId']!;
+          return _layout(AssetTypeGridScreen(containerId: containerId));
+        },
         routes: [
           GoRoute(
-            name: RouteNames.myProfile,
-            path: '/myprofile',
-            builder: (context, state) {
-              String? code = state.uri.queryParameters['code'];
-              if (code == null) {
-                final Uri uri = Uri.parse(html.window.location.href);
-                code = uri.queryParameters['code'];
-              }
-
-              if (code != null) {
-                WidgetsBinding.instance.addPostFrameCallback((_) async {
-                  final authProvider = context.read<AuthProvider>();
-                  final success = await authProvider.linkGitHubAccount(code!);
-                  if (success) {
-                    html.window.history.replaceState(null, '', '/#/myprofile');
-                    ToastService.success("GitHub vinculado correctamente");
-                  }
-                });
-              }
-
-              return const UserProfileScreen();
-            },
+            name: RouteNames.assetTypeCreate,
+            path: 'new',
+            builder: (context, state) => _layout(AssetTypeCreateScreen(
+              containerId: state.pathParameters['containerId']!,
+            )),
           ),
           GoRoute(
-            name: RouteNames.dashboard,
-            path: '/dashboard',
-            builder: (context, state) => DashboardScreen(
-              dashboardService: context.read<DashboardService>(),
-            ),
-          ),
-          GoRoute(
-            name: RouteNames.alerts,
-            path: '/alerts',
-            builder: (context, state) => const AlertsScreen(),
-          ),
-          GoRoute(
-            name: RouteNames.preferences,
-            path: '/preferences',
-            builder: (context, state) => const PreferencesScreen(),
-          ),
-          GoRoute(
-            name: RouteNames.reports,
-            path: '/reports',
-            builder: (context, state) => const ReportsScreen(),
-          ),
-          GoRoute(
-            name: RouteNames.voucherEditor,
-            path: '/delivery-voucher-editor',
-            builder: (context, state) => const DeliveryVoucherEditorScreen(),
-          ),
-
-          // --- CONTAINERS / ASSET TYPES ---
-          GoRoute(
-            name: RouteNames.assetTypes,
-            path: '/container/:containerId/asset-types',
-            builder: (context, state) {
-              final containerId = state.pathParameters['containerId']!;
-              return AssetTypeGridScreen(containerId: containerId);
-            },
-            routes: [
-              GoRoute(
-                name: RouteNames.assetTypeCreate,
-                path: 'new',
-                builder: (context, state) => AssetTypeCreateScreen(
-                  containerId: state.pathParameters['containerId']!,
-                ),
-              ),
-              GoRoute(
-                name: RouteNames.assetTypeEdit,
-                path: ':assetTypeId/edit',
-                builder: (context, state) => AssetTypeEditScreen(
-                  containerId: state.pathParameters['containerId']!,
-                  assetTypeId: state.pathParameters['assetTypeId']!,
-                ),
-              ),
-            ],
-          ),
-          GoRoute(
-            name: RouteNames.achievements,
-            path: '/achievements',
-            builder: (context, state) => const Scaffold(
-              body: SingleChildScrollView(
-                padding: EdgeInsets.all(40.0),
-                child: AchievementsCardWidget(),
-              ),
-            ),
-          ),
-          GoRoute(
-            name: RouteNames.integrations,
-            path: '/integrations',
-            builder: (context, state) => IntegrationsScreen(),
-          ),
-          GoRoute(
-            name: RouteNames.templates,
-            path: '/templates',
-            builder: (context, state) => const AssetTemplatesMarketScreen(),
-            routes: [
-              GoRoute(
-                name: RouteNames.templateCreate,
-                path: 'create',
-                builder: (context, state) {
-                  final Object? extra = state.extra;
-                  AssetTemplate? draft;
-                  if (extra is AssetTemplate) {
-                    draft = extra;
-                  }
-                  return AssetTemplateEditorScreen(initialDraft: draft);
-                },
-              ),
-              GoRoute(
-                name: RouteNames.templateDetail,
-                path: 'details/:templateId',
-                builder: (context, state) {
-                  final AssetTemplate? templateFromExtra =
-                      state.extra as AssetTemplate?;
-                  final String templateId = state.pathParameters['templateId']!;
-                  return AssetTemplateDetailScreen(
-                    templateId: templateId,
-                    initialTemplate: templateFromExtra,
-                  );
-                },
-              ),
-            ],
-          ),
-          GoRoute(
-            name: RouteNames.plugins,
-            path: '/plugins-admin',
-            builder: (context, state) => const PluginAdminScreen(),
-          ),
-          GoRoute(
-            name: RouteNames.pluginDetail,
-            path: '/plugins/:pluginId',
-            builder: (context, state) {
-              final pluginId = state.pathParameters['pluginId']!;
-              final provider = context.watch<PluginProvider>();
-              final plugin = provider.installed.firstWhere(
-                (p) => p.id == pluginId,
-                orElse: () => StorePlugin(
-                  id: '',
-                  name: '',
-                  author: '',
-                  version: '',
-                  description: '',
-                  slot: '',
-                ),
-              );
-              final processedUi = provider.getProcessedUi(plugin.ui!);
-              final l10n = AppLocalizations.of(context)!;
-              return Scaffold(
-                appBar: AppBar(title: Text(plugin.name)),
-                body:
-                    Stac.fromJson(processedUi, context) ??
-                    Center(child: Text(l10n.pluginLoadError)),
-              );
-            },
-          ),
-
-          // --- ASSETS (ITEMS) ---
-          GoRoute(
-            name: RouteNames.assetList,
-            path: '/container/:containerId/asset-types/:assetTypeId/assets',
-            builder: (context, state) => AssetListScreen(
+            name: RouteNames.assetTypeEdit,
+            path: ':assetTypeId/edit',
+            builder: (context, state) => _layout(AssetTypeEditScreen(
               containerId: state.pathParameters['containerId']!,
               assetTypeId: state.pathParameters['assetTypeId']!,
-            ),
-            routes: [
-              GoRoute(
-                name: RouteNames.assetCreate,
-                path: 'new',
-                builder: (context, state) => AssetCreateScreen(
-                  containerId: state.pathParameters['containerId']!,
-                  assetTypeId: state.pathParameters['assetTypeId']!,
-                ),
-              ),
-              GoRoute(
-                name: RouteNames.assetImport,
-                path: 'import-csv',
-                builder: (context, state) => AssetImportScreen(
-                  containerId: state.pathParameters['containerId']!,
-                  assetTypeId: state.pathParameters['assetTypeId']!,
-                ),
-              ),
-              GoRoute(
-                name: RouteNames.assetDetail,
-                path: ':assetId',
-                builder: (context, state) => AssetDetailScreen(
-                  containerId: state.pathParameters['containerId']!,
-                  assetTypeId: state.pathParameters['assetTypeId']!,
-                  itemId: state.pathParameters['assetId']!,
-                ),
-              ),
-              GoRoute(
-                name: RouteNames.assetEdit,
-                path: ':assetId/edit',
-                builder: (context, state) {
-                  final item = state.extra as InventoryItem?;
-                  return AssetEditScreen(
-                    containerId: state.pathParameters['containerId']!,
-                    assetTypeId: state.pathParameters['assetTypeId']!,
-                    assetItemId: state.pathParameters['assetId']!,
-                    initialItem: item,
-                  );
-                },
-              ),
-            ],
+            )),
           ),
+        ],
+      ),
+      GoRoute(
+        name: RouteNames.achievements,
+        path: '/achievements',
+        builder: (context, state) => _layout(const Scaffold(
+          body: SingleChildScrollView(
+            padding: EdgeInsets.all(40.0),
+            child: AchievementsCardWidget(),
+          ),
+        )),
+      ),
+      GoRoute(
+        name: RouteNames.integrations,
+        path: '/integrations',
+        builder: (context, state) => _layout(IntegrationsScreen()),
+      ),
+      GoRoute(
+        name: RouteNames.templates,
+        path: '/templates',
+        builder: (context, state) => _layout(const AssetTemplatesMarketScreen()),
+        routes: [
+          GoRoute(
+            name: RouteNames.templateCreate,
+            path: 'create',
+            builder: (context, state) {
+              final Object? extra = state.extra;
+              AssetTemplate? draft;
+              if (extra is AssetTemplate) {
+                draft = extra;
+              }
+              return _layout(AssetTemplateEditorScreen(initialDraft: draft));
+            },
+          ),
+          GoRoute(
+            name: RouteNames.templateDetail,
+            path: 'details/:templateId',
+            builder: (context, state) {
+              final AssetTemplate? templateFromExtra =
+                  state.extra as AssetTemplate?;
+              final String templateId = state.pathParameters['templateId']!;
+              return _layout(AssetTemplateDetailScreen(
+                templateId: templateId,
+                initialTemplate: templateFromExtra,
+              ));
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        name: RouteNames.plugins,
+        path: '/plugins-admin',
+        builder: (context, state) => _layout(const PluginAdminScreen()),
+      ),
+      GoRoute(
+        name: RouteNames.pluginDetail,
+        path: '/plugins/:pluginId',
+        builder: (context, state) {
+          final pluginId = state.pathParameters['pluginId']!;
+          final provider = context.watch<PluginProvider>();
+          final plugin = provider.installed.firstWhere(
+            (p) => p.id == pluginId,
+            orElse: () => StorePlugin(
+              id: '',
+              name: '',
+              author: '',
+              version: '',
+              description: '',
+              slot: '',
+            ),
+          );
+          final processedUi = provider.getProcessedUi(plugin.ui!);
+          final l10n = AppLocalizations.of(context)!;
+          return _layout(Scaffold(
+            appBar: AppBar(title: Text(plugin.name)),
+            body:
+                Stac.fromJson(processedUi, context) ??
+                Center(child: Text(l10n.pluginLoadError)),
+          ));
+        },
+      ),
 
-          // --- DATALISTS ---
+      // --- ASSETS (ITEMS) ---
+      GoRoute(
+        name: RouteNames.assetList,
+        path: '/container/:containerId/asset-types/:assetTypeId/assets',
+        builder: (context, state) => _layout(AssetListScreen(
+          containerId: state.pathParameters['containerId']!,
+          assetTypeId: state.pathParameters['assetTypeId']!,
+        )),
+        routes: [
           GoRoute(
-            name: RouteNames.dataLists,
-            path: '/container/:containerId/datalists',
-            builder: (context, state) => DataListGridScreen(
+            name: RouteNames.assetCreate,
+            path: 'new',
+            builder: (context, state) => _layout(AssetCreateScreen(
               containerId: state.pathParameters['containerId']!,
-            ),
-            routes: [
-              GoRoute(
-                name: RouteNames.dataListCreate,
-                path: 'new',
-                builder: (context, state) => DataListCreateScreen(
-                  containerId: state.pathParameters['containerId']!,
-                ),
-              ),
-              GoRoute(
-                name: RouteNames.dataListEdit,
-                path: ':dataListId/edit',
-                builder: (context, state) {
-                  final listData = state.extra as ListData?;
-                  return DataListEditScreen(
-                    containerId: state.pathParameters['containerId']!,
-                    dataListId: state.pathParameters['dataListId']!,
-                    initialData: listData!,
-                  );
-                },
-              ),
-            ],
+              assetTypeId: state.pathParameters['assetTypeId']!,
+            )),
           ),
-          // --- SCRAPERS ---
           GoRoute(
-            name: RouteNames.scrapers,
-            path: '/container/:containerId/scrapers',
-            builder: (context, state) => ScraperGridScreen(
+            name: RouteNames.assetImport,
+            path: 'import-csv',
+            builder: (context, state) => _layout(AssetImportScreen(
               containerId: state.pathParameters['containerId']!,
-            ),
-            routes: [
-              GoRoute(
-                name: RouteNames.scraperCreate,
-                path: 'new',
-                builder: (context, state) => ScraperCreateScreen(
-                  containerId: state.pathParameters['containerId']!,
-                ),
-              ),
-              GoRoute(
-                name: RouteNames.scraperEdit,
-                path: ':scraperId/edit',
-                builder: (context, state) {
-                  final scraper = state.extra as dynamic;
-                  return ScraperEditScreen(
-                    containerId: state.pathParameters['containerId']!,
-                    scraperId: state.pathParameters['scraperId']!,
-                    initial: scraper!,
-                  );
-                },
-              ),
-            ],
+              assetTypeId: state.pathParameters['assetTypeId']!,
+            )),
           ),
+          GoRoute(
+            name: RouteNames.assetDetail,
+            path: ':assetId',
+            builder: (context, state) => _layout(AssetDetailScreen(
+              containerId: state.pathParameters['containerId']!,
+              assetTypeId: state.pathParameters['assetTypeId']!,
+              itemId: state.pathParameters['assetId']!,
+            )),
+          ),
+          GoRoute(
+            name: RouteNames.assetEdit,
+            path: ':assetId/edit',
+            builder: (context, state) {
+              final item = state.extra as InventoryItem?;
+              return _layout(AssetEditScreen(
+                containerId: state.pathParameters['containerId']!,
+                assetTypeId: state.pathParameters['assetTypeId']!,
+                assetItemId: state.pathParameters['assetId']!,
+                initialItem: item,
+              ));
+            },
+          ),
+        ],
+      ),
 
-          // --- LOCATIONS ---
+      // --- DATALISTS ---
+      GoRoute(
+        name: RouteNames.dataLists,
+        path: '/container/:containerId/datalists',
+        builder: (context, state) => _layout(DataListGridScreen(
+          containerId: state.pathParameters['containerId']!,
+        )),
+        routes: [
           GoRoute(
-            name: RouteNames.locations,
-            path: '/container/:containerId/locations',
-            builder: (context, state) => LocationsScreen(
+            name: RouteNames.dataListCreate,
+            path: 'new',
+            builder: (context, state) => _layout(DataListCreateScreen(
               containerId: state.pathParameters['containerId']!,
-            ),
-            routes: [
-              GoRoute(
-                name: RouteNames.locationCreate,
-                path: 'new',
-                builder: (context, state) => LocationCreateScreen(
-                  containerId: state.pathParameters['containerId']!,
-                ),
-              ),
-              GoRoute(
-                name: RouteNames.locationEdit,
-                path: ':locationId/edit',
-                builder: (context, state) {
-                  final containerId = state.pathParameters['containerId']!;
-                  final locationId = int.tryParse(
-                    state.pathParameters['locationId'] ?? '',
-                  );
-                  Location? location = state.extra as Location?;
-                  if (location == null && locationId != null) {
-                    final provider = context.read<LocationProvider>();
-                    try {
-                      location = provider.locations.firstWhere(
-                        (l) => l.id == locationId,
-                      );
-                    } catch (_) {}
-                  }
-                  return LocationEditScreen(
-                    containerId: containerId,
-                    location: location!,
-                  );
-                },
-              ),
-            ],
+            )),
           ),
-
-          // --- LOANS ---
           GoRoute(
-            name: RouteNames.loans,
-            path: '/container/:containerId/loans',
-            builder: (context, state) =>
-                LoansScreen(containerId: state.pathParameters['containerId']!),
-            routes: [
-              GoRoute(
-                name: RouteNames.loanCreate,
-                path: 'new',
-                builder: (context, state) => LoanCreateScreen(
-                  containerId: state.pathParameters['containerId']!,
-                ),
-              ),
-            ],
+            name: RouteNames.dataListEdit,
+            path: ':dataListId/edit',
+            builder: (context, state) {
+              final listData = state.extra as ListData?;
+              return _layout(DataListEditScreen(
+                containerId: state.pathParameters['containerId']!,
+                dataListId: state.pathParameters['dataListId']!,
+                initialData: listData!,
+              ));
+            },
+          ),
+        ],
+      ),
+      // --- SCRAPERS ---
+      GoRoute(
+        name: RouteNames.scrapers,
+        path: '/container/:containerId/scrapers',
+        builder: (context, state) => _layout(ScraperGridScreen(
+          containerId: state.pathParameters['containerId']!,
+        )),
+        routes: [
+          GoRoute(
+            name: RouteNames.scraperCreate,
+            path: 'new',
+            builder: (context, state) => _layout(ScraperCreateScreen(
+              containerId: state.pathParameters['containerId']!,
+            )),
+          ),
+          GoRoute(
+            name: RouteNames.scraperEdit,
+            path: ':scraperId/edit',
+            builder: (context, state) {
+              final scraper = state.extra as dynamic;
+              return _layout(ScraperEditScreen(
+                containerId: state.pathParameters['containerId']!,
+                scraperId: state.pathParameters['scraperId']!,
+                initial: scraper!,
+              ));
+            },
+          ),
+        ],
+      ),
+
+      // --- LOCATIONS ---
+      GoRoute(
+        name: RouteNames.locations,
+        path: '/container/:containerId/locations',
+        builder: (context, state) => _layout(LocationsScreen(
+          containerId: state.pathParameters['containerId']!,
+        )),
+        routes: [
+          GoRoute(
+            name: RouteNames.locationCreate,
+            path: 'new',
+            builder: (context, state) => _layout(LocationCreateScreen(
+              containerId: state.pathParameters['containerId']!,
+            )),
+          ),
+          GoRoute(
+            name: RouteNames.locationEdit,
+            path: ':locationId/edit',
+            builder: (context, state) {
+              final containerId = state.pathParameters['containerId']!;
+              final locationId = int.tryParse(
+                state.pathParameters['locationId'] ?? '',
+              );
+              Location? location = state.extra as Location?;
+              if (location == null && locationId != null) {
+                final provider = context.read<LocationProvider>();
+                try {
+                  location = provider.locations.firstWhere(
+                    (l) => l.id == locationId,
+                  );
+                } catch (_) {}
+              }
+              return _layout(LocationEditScreen(
+                containerId: containerId,
+                location: location!,
+              ));
+            },
+          ),
+        ],
+      ),
+
+      // --- LOANS ---
+      GoRoute(
+        name: RouteNames.loans,
+        path: '/container/:containerId/loans',
+        builder: (context, state) =>
+            _layout(LoansScreen(containerId: state.pathParameters['containerId']!)),
+        routes: [
+          GoRoute(
+            name: RouteNames.loanCreate,
+            path: 'new',
+            builder: (context, state) => _layout(LoanCreateScreen(
+              containerId: state.pathParameters['containerId']!,
+            )),
           ),
         ],
       ),

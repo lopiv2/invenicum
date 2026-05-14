@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/utils/effects_wrapper.dart';
 import 'package:invenicum/data/services/asset_print_service.dart';
 import 'package:invenicum/data/services/scraper_service.dart';
 import 'package:invenicum/providers/achievement_provider.dart';
@@ -202,21 +202,27 @@ void main() async {
             if (prev == null)
               return ThemeProvider(context.read<ThemeService>());
 
-            // ── Apply theme from backend user config ──
+            // ── 1. Tema desde PreferencesProvider (fuente de verdad con paletteId) ──
+            //
+            // PreferencesProvider.loadPreferences() ya obtiene themeColor,
+            // themeBrightness y paletteId del backend en un solo GET /preferences.
+            // Cuando prefs.isInitialized cambia a true, inicializamos el tema aquí.
             if (auth.isAuthenticated &&
-                auth.user?.themeConfig != null &&
+                auth.token != null &&
+                prefs.isInitialized &&
                 !prev.isInitialized) {
-              final config = auth.user!.themeConfig!;
-
-              // Only color + brightness — paletteId is resolved internally
-              // by matching against AppThemes.all.
-              prev.initializeFromUserConfig(
-                color: config.theme.primaryColor,
-                brightness: config.theme.brightness,
+              Future.microtask(
+                () => prev.initializeTheme(
+                  prefs
+                      .prefs
+                      .themeColor, // String? — viene del JSON del backend
+                  prefs.prefs.themeBrightness, // String? — 'light' | 'dark'
+                  prefs.prefs.paletteId, // String? — 'cga' | 'ega' | null
+                ),
               );
             }
 
-            // ── Font update ──
+            // ── 2. Font — sin cambios ──
             if (prefs.isInitialized) {
               prev.setFontFamily(prefs.selectedFontFamily);
             }
@@ -353,9 +359,9 @@ class _MyAppState extends State<MyApp> {
 
       routerConfig: _router,
 
-      builder: (context, child) {
-        return FToastBuilder()(context, child);
-      },
+      builder: (context, child) => EffectsWrapper(child: child!),
     );
   }
 }
+
+

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:invenicum/core/utils/retro/cga_palette.dart';
-import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/themes/app_themes_registry.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/core/utils/theme_name_localizer.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -35,12 +34,12 @@ void showThemePickerModal(BuildContext context, ThemeProvider provider) {
                 spacing: 15,
                 children: [
                   Tooltip(
-                    message: localizeThemeName(sheetContext, AppThemes.brand),
-                    child: ThemeColorDot(theme: AppThemes.brand),
+                    message: localizeThemeName(sheetContext, AppThemesRegistry.brand, includeNotes: true),
+                    child: ThemeColorDot(theme: AppThemesRegistry.brand),
                   ),
-                  ...AppThemes.standard.map(
+                  ...AppThemesRegistry.standard.map(
                     (t) => Tooltip(
-                      message: localizeThemeName(sheetContext, t),
+                      message: localizeThemeName(sheetContext, t, includeNotes: true),
                       child: ThemeColorDot(theme: t),
                     ),
                   ),
@@ -72,7 +71,7 @@ void showThemePickerModal(BuildContext context, ThemeProvider provider) {
                 spacing: 15,
                 // Retro themes are plain CustomThemes — just display them
                 // using their paletteId for the dot appearance.
-                children: AppThemes.retro.map((t) {
+                children: AppThemesRegistry.retro.map((t) {
                   final bool isActive = themeProvider.currentTheme.id == t.id;
                   return Tooltip(
                     message: t.name,
@@ -163,9 +162,9 @@ class _RetroThemeDot extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isCga = theme.paletteId == 'cga';
-    final Color accentColor = isCga ? CGA.brightCyan : const Color(0xFFFF55FF);
-    final String label = isCga ? 'CGA' : 'EGA';
+    final retro = AppThemesRegistry.retroThemeForPaletteId(theme.paletteId);
+    final accentColor = retro?.border ?? Colors.white;
+    final label = (theme.paletteId ?? 'RETRO').toUpperCase();
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),

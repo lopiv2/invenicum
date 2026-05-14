@@ -12,7 +12,7 @@ import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
-import 'package:invenicum/screens/assets/local_widgets/candidate_card_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/candidate_selection_body.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_save_button_bar.dart';
 import 'package:invenicum/screens/assets/local_widgets/scraper_import_widget.dart';
@@ -280,12 +280,19 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         final candidates = _normalizeCandidates(enrichedData['candidates']);
         if (candidates.isEmpty) {
           throw Exception(
-            'La búsqueda devolvió múltiples resultados sin candidatos.',
+            ' Query returned multiple results but no candidates to select from.',
           );
         }
 
         final selectedCandidate = await _showCandidateSelectionDialog(
-          candidates,
+          candidates: candidates,
+          source: enrichedData['source']?.toString() ?? _selectedSource!,
+          query: query,
+          locale: locale,
+          page: enrichedData['page'] as int? ?? 1,
+          pageSize: enrichedData['pageSize'] as int? ?? 30,
+          hasMore: enrichedData['hasMore'] as bool? ?? false,
+          dropdownContext: dropdownContext,
         );
         if (selectedCandidate == null) {
           ToastService.error(l10n.importCancelled);
@@ -297,10 +304,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           throw Exception('El candidato seleccionado no tiene un ID válido.');
         }
 
-        final selectedSource =
-            enrichedData['source']?.toString() ?? _selectedSource!;
         enrichedData = await _integrationService.enrichSelectedItem(
-          source: selectedSource,
+          source: enrichedData['source']?.toString() ?? _selectedSource!,
           itemId: selectedId,
           locale: locale,
         );
@@ -466,43 +471,33 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     return parts.join(' • ');
   }
 
-  Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
-    List<Map<String, dynamic>> candidates,
-  ) {
+  Future<Map<String, dynamic>?> _showCandidateSelectionDialog({
+    required List<Map<String, dynamic>> candidates,
+    required String source,
+    required String query,
+    required String locale,
+    required int page,
+    required int pageSize,
+    required bool hasMore,
+    Map<String, List<String>>? dropdownContext,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     return showAppDialog<Map<String, dynamic>>(
       context: context,
       title: l10n.selectResultTitle,
       body: SizedBox(
         width: 520,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 420),
-          child: GridView.builder(
-            shrinkWrap: true,
-            itemCount: candidates.length,
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 3,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 0.7,
-            ),
-            itemBuilder: (context, index) {
-              final candidate = candidates[index];
-              final subtitle = _buildCandidateSubtitle(candidate);
-
-              return CandidateCard(
-                candidate: candidate,
-                subtitle: subtitle,
-                isSelected: selectedId == candidate['id'],
-                onTap: () {
-                  setState(() {
-                    selectedId = candidate['id'];
-                  });
-                  Navigator.of(context).pop(candidate);
-                },
-              );
-            },
-          ),
+        child: CandidateSelectionBody(
+          initialCandidates: candidates,
+          source: source,
+          query: query,
+          locale: locale,
+          initialPage: page,
+          pageSize: pageSize,
+          initialHasMore: hasMore,
+          dropdownContext: dropdownContext,
+          integrationService: _integrationService,
+          buildCandidateSubtitle: _buildCandidateSubtitle,
         ),
       ),
       actions: [

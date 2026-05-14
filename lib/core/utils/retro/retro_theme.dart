@@ -97,6 +97,41 @@ class RetroTheme {
     radioSelected: EGA.lime,
   );
 
+  static const scummCrt = RetroTheme(
+    border: CGA.brightCyan,
+    titleBar: CGA.blue,
+    titleText: CGA.yellow,
+    messageBox: CGA.black,
+    messageText: CGA.white,
+    divider: CGA.darkGray,
+    buttonOk: CGA.brightGreen,
+    buttonCancel: CGA.brightRed,
+    buttonHelp: CGA.yellow,
+    radioSelected: CGA.brightGreen,
+  );
+
+  // ==========================================================================
+  // PIP-BOY 3000 THEME
+  // ==========================================================================
+
+  static const _pipboyGreen = Color(0xFF00FF41);
+  static const _pipboyAmber = Color(0xFFFF8800);
+  static const _pipboyLime = Color(0xFF88FF00);
+  static const _pipboyBrightGreen = Color(0xFF33FF66);
+
+  static const pipboy3000 = RetroTheme(
+    border: _pipboyGreen,
+    titleBar: Color(0xFF003300),
+    titleText: _pipboyGreen,
+    messageBox: Color(0xFF001800),
+    messageText: _pipboyBrightGreen,
+    divider: Color(0xFF004400),
+    buttonOk: _pipboyGreen,
+    buttonCancel: _pipboyAmber,
+    buttonHelp: _pipboyLime,
+    radioSelected: _pipboyGreen,
+  );
+
   // ==========================================================================
   // THEME DATA
   // ==========================================================================
@@ -116,13 +151,9 @@ class RetroTheme {
       useMaterial3: true,
 
       // ───────────────── EXTENSIONS ─────────────────
-
-      extensions: [
-        RetroThemeExtension(this),
-      ],
+      extensions: [RetroThemeExtension(this)],
 
       // ───────────────── CORE ─────────────────
-
       brightness: Brightness.dark,
 
       fontFamily: 'IBMPlexMono',
@@ -133,16 +164,15 @@ class RetroTheme {
 
       canvasColor: Colors.black,
 
-      splashColor: border.withValues(alpha:0.15),
+      splashColor: border.withValues(alpha: 0.15),
 
-      highlightColor: border.withValues(alpha:0.08),
+      highlightColor: border.withValues(alpha: 0.08),
 
-      hoverColor: border.withValues(alpha:0.08),
+      hoverColor: border.withValues(alpha: 0.08),
 
       disabledColor: divider,
 
       // ───────────────── APP BAR ─────────────────
-
       appBarTheme: AppBarTheme(
         backgroundColor: titleBar,
         foregroundColor: titleText,
@@ -157,37 +187,27 @@ class RetroTheme {
           letterSpacing: 2,
         ),
 
-        iconTheme: IconThemeData(
-          color: titleText,
-        ),
+        iconTheme: IconThemeData(color: titleText),
       ),
 
       // ───────────────── CARD ─────────────────
-
       cardTheme: CardThemeData(
         color: messageBox,
         elevation: 0,
         margin: const EdgeInsets.all(4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
-          side: BorderSide(
-            color: border,
-            width: 1,
-          ),
+          side: BorderSide(color: border, width: 1),
         ),
       ),
 
       // ───────────────── DIALOG ─────────────────
-
       dialogTheme: DialogThemeData(
         backgroundColor: messageBox,
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
-          side: BorderSide(
-            color: border,
-            width: 1,
-          ),
+          side: BorderSide(color: border, width: 1),
         ),
 
         titleTextStyle: TextStyle(
@@ -205,88 +225,56 @@ class RetroTheme {
       ),
 
       // ───────────────── DIVIDER ─────────────────
-
-      dividerTheme: DividerThemeData(
-        color: divider,
-        thickness: 1,
-        space: 1,
-      ),
+      dividerTheme: DividerThemeData(color: divider, thickness: 1, space: 1),
 
       // ───────────────── LIST TILE ─────────────────
-
       listTileTheme: ListTileThemeData(
         textColor: messageText,
         iconColor: border,
         tileColor: Colors.transparent,
-        selectedTileColor: border.withValues(alpha:0.08),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 12,
-          vertical: 4,
-        ),
+        selectedTileColor: border.withValues(alpha: 0.08),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       ),
 
       // ───────────────── ICONS ─────────────────
-
-      iconTheme: IconThemeData(
-        color: border,
-        size: 20,
-      ),
+      iconTheme: IconThemeData(color: border, size: 20),
 
       // ───────────────── SWITCH ─────────────────
-
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith(
-          (states) {
-            return states.contains(WidgetState.selected)
-                ? buttonOk
-                : divider;
-          },
-        ),
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected) ? buttonOk : divider;
+        }),
 
-        trackColor: WidgetStateProperty.resolveWith(
-          (states) {
-            return states.contains(WidgetState.selected)
-                ? buttonOk.withValues(alpha:0.35)
-                : Colors.black;
-          },
-        ),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? buttonOk.withValues(alpha: 0.35)
+              : Colors.black;
+        }),
 
         trackOutlineColor: WidgetStateProperty.all(border),
       ),
 
       // ───────────────── CHECKBOX ─────────────────
-
       checkboxTheme: CheckboxThemeData(
-        fillColor: WidgetStateProperty.resolveWith(
-          (states) {
-            return states.contains(WidgetState.selected)
-                ? buttonOk
-                : Colors.black;
-          },
-        ),
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.selected)
+              ? buttonOk
+              : Colors.black;
+        }),
 
         checkColor: WidgetStateProperty.all(Colors.black),
 
-        side: BorderSide(
-          color: border,
-          width: 1,
-        ),
+        side: BorderSide(color: border, width: 1),
 
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.zero,
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       ),
 
       // ───────────────── RADIO ─────────────────
-
       radioTheme: RadioThemeData(
-        fillColor: WidgetStateProperty.all(
-          radioSelected,
-        ),
+        fillColor: WidgetStateProperty.all(radioSelected),
       ),
 
       // ───────────────── BUTTONS ─────────────────
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -299,10 +287,7 @@ class RetroTheme {
 
           disabledForegroundColor: divider,
 
-          padding: const EdgeInsets.symmetric(
-            horizontal: 14,
-            vertical: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
 
           textStyle: const TextStyle(
             fontFamily: 'monospace',
@@ -312,10 +297,7 @@ class RetroTheme {
 
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.zero,
-            side: BorderSide(
-              color: border,
-              width: 1,
-            ),
+            side: BorderSide(color: border, width: 1),
           ),
         ),
       ),
@@ -331,7 +313,6 @@ class RetroTheme {
       ),
 
       // ───────────────── INPUTS ─────────────────
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
 
@@ -342,15 +323,9 @@ class RetroTheme {
           vertical: 10,
         ),
 
-        hintStyle: TextStyle(
-          color: divider,
-          fontFamily: 'monospace',
-        ),
+        hintStyle: TextStyle(color: divider, fontFamily: 'monospace'),
 
-        labelStyle: TextStyle(
-          color: titleText,
-          fontFamily: 'monospace',
-        ),
+        labelStyle: TextStyle(color: titleText, fontFamily: 'monospace'),
 
         border: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
@@ -364,15 +339,11 @@ class RetroTheme {
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.zero,
-          borderSide: BorderSide(
-            color: titleText,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: titleText, width: 2),
         ),
       ),
 
       // ───────────────── SNACKBAR ─────────────────
-
       snackBarTheme: SnackBarThemeData(
         backgroundColor: Colors.black,
 
@@ -391,7 +362,6 @@ class RetroTheme {
       ),
 
       // ───────────────── BOTTOM SHEET ─────────────────
-
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: messageBox,
 
@@ -406,16 +376,12 @@ class RetroTheme {
       ),
 
       // ───────────────── POPUP MENU ─────────────────
-
       popupMenuTheme: PopupMenuThemeData(
         color: messageBox,
 
         elevation: 0,
 
-        textStyle: TextStyle(
-          color: messageText,
-          fontFamily: 'monospace',
-        ),
+        textStyle: TextStyle(color: messageText, fontFamily: 'monospace'),
 
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.zero,
@@ -424,15 +390,13 @@ class RetroTheme {
       ),
 
       // ───────────────── TEXT SELECTION ─────────────────
-
       textSelectionTheme: TextSelectionThemeData(
         cursorColor: titleText,
-        selectionColor: border.withValues(alpha:0.35),
+        selectionColor: border.withValues(alpha: 0.35),
         selectionHandleColor: titleText,
       ),
 
       // ───────────────── TEXT ─────────────────
-
       textTheme: TextTheme(
         bodyLarge: TextStyle(
           color: messageText,

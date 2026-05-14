@@ -38,7 +38,8 @@ class CustomTheme {
   bool get hasCustomPalette => paletteId != null && paletteId!.isNotEmpty;
 
   /// Convenience: true when the palette is one of the known retro renderers.
-  bool get isRetro => paletteId == 'cga' || paletteId == 'ega';
+  /// Any non-empty paletteId identifies a retro theme — no hardcoded list.
+  bool get isRetro => paletteId != null && paletteId!.isNotEmpty;
 
   CustomTheme copyWith({
     String? id,

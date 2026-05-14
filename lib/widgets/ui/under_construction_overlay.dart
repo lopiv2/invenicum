@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
 import 'package:invenicum/l10n/app_localizations.dart';
 
 /// Overlay widget that displays an "Under Construction" screen with a glass effect
@@ -23,16 +22,12 @@ class UnderConstructionOverlay extends StatelessWidget {
   /// Icon color
   final Color? iconColor;
   
-  /// Blur sigma for the blur effect
-  final double blurSigma;
-
   const UnderConstructionOverlay({
     super.key,
     this.title,
     this.subtitle,
     this.icon = Icons.construction_rounded,
     this.iconColor,
-    this.blurSigma = 5.0,
   });
 
   @override
@@ -45,13 +40,8 @@ class UnderConstructionOverlay extends StatelessWidget {
 
     return Stack(
       children: [
-        // Background with blur (BackdropFilter)
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-          child: Container(
-            color: Colors.black.withValues(alpha: 0.1),
-          ),
-        ),
+        // Background overlay
+        Container(color: Colors.black.withValues(alpha: 0.15)),
         
         // Centered translucent glass panel
         Center(
@@ -60,10 +50,8 @@ class UnderConstructionOverlay extends StatelessWidget {
               padding: const EdgeInsets.all(24),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(28),
-                child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                  child: Container(
-                    decoration: BoxDecoration(
+                child: Container(
+                  decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -157,7 +145,6 @@ class UnderConstructionOverlay extends StatelessWidget {
                 ),
               ),
             ),
-          ),
         ),
       ],
     );
