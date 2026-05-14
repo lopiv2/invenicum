@@ -1,5 +1,4 @@
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
-
 import 'package:invenicum/core/utils/constants.dart';
 
 class UserPreferences {
@@ -14,12 +13,16 @@ class UserPreferences {
   final DateTime? updatedAt;
   final Map<String, double>? exchangeRates;
   final NotificationSettings notifications;
-
   final bool useSystemTheme;
   final bool isDarkMode;
   final bool autoResetFieldsOnSaveAndContinue;
   final bool cloneBusterEnabled;
   final String font;
+
+  // ── Tema ────────────────────────────────────────────────────────────────────
+  final String? themeColor;      // e.g. '#55FFFF'
+  final String? themeBrightness; // 'light' | 'dark'
+  final String? paletteId;       // 'cga' | 'ega' | 'scumm_crt' | null
 
   UserPreferences({
     this.id,
@@ -38,6 +41,9 @@ class UserPreferences {
     this.cloneBusterEnabled = false,
     this.font = 'Default',
     NotificationSettings? notifications,
+    this.themeColor,
+    this.themeBrightness,
+    this.paletteId,
   }) : notifications = notifications ?? NotificationSettings();
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) {
@@ -61,18 +67,19 @@ class UserPreferences {
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       exchangeRates: parsedRates,
-      
-      // 🔔 MAPEO DE NUEVOS CAMPOS (Vienen del DTO de Node)
       useSystemTheme: json['useSystemTheme'] as bool? ?? true,
       isDarkMode: json['isDarkMode'] as bool? ?? false,
       autoResetFieldsOnSaveAndContinue:
           json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
       cloneBusterEnabled: json['enableCloneBusterOmatic'] ?? false,
       font: json['font'] ?? 'Default',
-
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
           : NotificationSettings(),
+      // ── Tema ────────────────────────────────────────────────────────────────
+      themeColor: json['themeColor'] as String?,
+      themeBrightness: json['themeBrightness'] as String?,
+      paletteId: json['paletteId'] as String?,
     );
   }
 
@@ -93,10 +100,12 @@ class UserPreferences {
       'font': font,
       'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
+      'themeColor': themeColor,
+      'themeBrightness': themeBrightness,
+      'paletteId': paletteId,
     };
   }
 
-  /// Útil para el PATCH /visual-settings que creamos
   Map<String, dynamic> toVisualSettingsJson() {
     return {
       'useSystemTheme': useSystemTheme,
@@ -119,6 +128,9 @@ class UserPreferences {
     bool? autoResetFieldsOnSaveAndContinue,
     bool? cloneBusterEnabled,
     String? font,
+    String? themeColor,
+    String? themeBrightness,
+    String? paletteId,
   }) {
     return UserPreferences(
       id: id ?? this.id,
@@ -136,6 +148,9 @@ class UserPreferences {
           autoResetFieldsOnSaveAndContinue ?? this.autoResetFieldsOnSaveAndContinue,
       cloneBusterEnabled: cloneBusterEnabled ?? this.cloneBusterEnabled,
       font: font ?? this.font,
+      themeColor: themeColor ?? this.themeColor,
+      themeBrightness: themeBrightness ?? this.themeBrightness,
+      paletteId: paletteId ?? this.paletteId,
     );
   }
 
@@ -152,6 +167,9 @@ class UserPreferences {
       font: 'Default',
       exchangeRates: {},
       notifications: NotificationSettings(),
+      themeColor: null,
+      themeBrightness: null,
+      paletteId: null,
     );
   }
 }

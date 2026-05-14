@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:invenicum/core/themes/app_themes_registry.dart';
 import '../models/custom_theme_model.dart';
 import 'api_service.dart';
 
@@ -18,13 +19,7 @@ class ThemeService {
   ThemeService(this._apiService);
 
   // ─── System theme IDs (cannot be deleted) ──────────────────────────────────
-  static const Set<String> _systemIds = {
-    'brand',
-    'emerald', 'sunset', 'ocean', 'lavender', 'forest',
-    'cherry',  'indigo', 'amber', 'sakura',   'slate',
-    'cyberpunk', 'nordic', 'dark_mode',
-    'retro_cga', 'retro_ega',
-  };
+  // Single source of truth: AppThemesRegistry.systemIds
 
   // ─────────────────────────────────────────────────────────────────────────
   // UPDATE ACTIVE THEME
@@ -35,6 +30,7 @@ class ThemeService {
   Future<bool> updateUserTheme({
     required String hexColor,
     required String brightness,
+    String? paletteId,
   }) async {
     try {
       final response = await _dio.put(
@@ -42,14 +38,12 @@ class ThemeService {
         data: {
           'themeColor': hexColor,
           'themeBrightness': brightness,
+          if (paletteId != null && paletteId.isNotEmpty) 'paletteId': paletteId,
         },
       );
       return response.statusCode == 200;
     } on DioException catch (e) {
       debugPrint('Dio error updating theme: ${e.message}');
-      return false;
-    } catch (e) {
-      debugPrint('Unexpected error updating theme: $e');
       return false;
     }
   }
@@ -110,13 +104,12 @@ class ThemeService {
   /// Deletes a custom theme by ID.
   /// Throws if [themeId] belongs to a system-defined theme.
   Future<void> deleteCustomTheme(String themeId) async {
-    if (_systemIds.contains(themeId)) {
+    if (AppThemesRegistry.systemIds.contains(themeId)) {
       throw Exception('Cannot delete system default themes.');
     }
 
     try {
-      final response =
-          await _dio.delete('/preferences/custom-themes/$themeId');
+      final response = await _dio.delete('/preferences/custom-themes/$themeId');
       if (response.statusCode != 200 && response.statusCode != 204) {
         throw Exception('Error deleting theme from database.');
       }

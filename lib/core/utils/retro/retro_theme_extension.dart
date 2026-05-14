@@ -35,13 +35,8 @@ class RetroThemeExtension extends ThemeExtension<RetroThemeExtension> {
   const RetroThemeExtension(this.retro);
 
   @override
-  RetroThemeExtension copyWith({
-    RetroTheme? retro,
-  }) {
-    return RetroThemeExtension(
-      retro ?? this.retro,
-    );
-  }
+  RetroThemeExtension copyWith({RetroTheme? retro}) =>
+      RetroThemeExtension(retro ?? this.retro);
 
   @override
   RetroThemeExtension lerp(

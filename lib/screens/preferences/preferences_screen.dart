@@ -196,23 +196,26 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: ListTile(
-        onTap: () => setState(() => _selectedCategory = category),
-        leading: Icon(icon, color: color),
-        title: Text(
-          categoryTitle,
-          style: TextStyle(
-            color: isSelected
-                ? Theme.of(context).textTheme.bodyLarge?.color
-                : color,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          onTap: () => setState(() => _selectedCategory = category),
+          leading: Icon(icon, color: color),
+          title: Text(
+            categoryTitle,
+            style: TextStyle(
+              color: isSelected
+                  ? Theme.of(context).textTheme.bodyLarge?.color
+                  : color,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
+          selected: isSelected,
+          selectedTileColor: Theme.of(
+            context,
+          ).primaryColor.withValues(alpha: 0.1),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        selected: isSelected,
-        selectedTileColor: Theme.of(
-          context,
-        ).primaryColor.withValues(alpha: 0.1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }

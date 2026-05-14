@@ -21,6 +21,7 @@ import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/candidate_selection_body.dart';
 import 'package:invenicum/screens/assets/local_widgets/custom_fields_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/images_section.dart';
@@ -377,7 +378,13 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         }
 
         final selectedCandidate = await _showCandidateSelectionDialog(
-          candidates,
+          candidates: candidates,
+          source: enrichedData['source']?.toString() ?? _selectedSource!,
+          query: query,
+          locale: locale,
+          page: enrichedData['page'] as int? ?? 1,
+          pageSize: enrichedData['pageSize'] as int? ?? 30,
+          hasMore: enrichedData['hasMore'] as bool? ?? false,
         );
         if (selectedCandidate == null) {
           ToastService.error(l10n.importCancelled);
@@ -389,10 +396,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           throw Exception('El candidato seleccionado no tiene un ID válido.');
         }
 
-        final selectedSource =
-            enrichedData['source']?.toString() ?? _selectedSource!;
         enrichedData = await _integrationService.enrichSelectedItem(
-          source: selectedSource,
+          source: enrichedData['source']?.toString() ?? _selectedSource!,
           itemId: selectedId,
           locale: locale,
         );
@@ -553,56 +558,32 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     return parts.join(' • ');
   }
 
-  Widget? _buildCandidateLeading(Map<String, dynamic> candidate) {
-    final image = candidate['image']?.toString();
-    if (image == null || image.isEmpty) {
-      return null;
-    }
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.network(
-        image,
-        width: 48,
-        height: 48,
-        fit: BoxFit.cover,
-        errorBuilder: (_, _, _) => Container(
-          width: 48,
-          height: 48,
-          color: Colors.grey.shade200,
-          alignment: Alignment.center,
-          child: Icon(Icons.image_not_supported, color: Colors.grey.shade500),
-        ),
-      ),
-    );
-  }
-
-  Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
-    List<Map<String, dynamic>> candidates,
-  ) {
+  Future<Map<String, dynamic>?> _showCandidateSelectionDialog({
+    required List<Map<String, dynamic>> candidates,
+    required String source,
+    required String query,
+    required String locale,
+    required int page,
+    required int pageSize,
+    required bool hasMore,
+  }) {
     final l10n = AppLocalizations.of(context)!;
     return showAppDialog<Map<String, dynamic>>(
       context: context,
       title: l10n.selectResultTitle,
       body: SizedBox(
         width: 520,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxHeight: 420),
-          child: ListView.separated(
-            shrinkWrap: true,
-            itemCount: candidates.length,
-            separatorBuilder: (_, _) => const Divider(height: 1),
-            itemBuilder: (context, index) {
-              final candidate = candidates[index];
-              final subtitle = _buildCandidateSubtitle(candidate);
-              return ListTile(
-                leading: _buildCandidateLeading(candidate),
-                title: Text(candidate['name']?.toString() ?? l10n.unnamedLabel),
-                subtitle: subtitle.isEmpty ? null : Text(subtitle),
-                onTap: () => Navigator.of(context).pop(candidate),
-              );
-            },
-          ),
+        child: CandidateSelectionBody(
+          initialCandidates: candidates,
+          source: source,
+          query: query,
+          locale: locale,
+          initialPage: page,
+          pageSize: pageSize,
+          initialHasMore: hasMore,
+          dropdownContext: null,
+          integrationService: _integrationService,
+          buildCandidateSubtitle: _buildCandidateSubtitle,
         ),
       ),
       actions: [
