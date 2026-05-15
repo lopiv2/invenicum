@@ -74,7 +74,7 @@ void showThemePickerModal(BuildContext context, ThemeProvider provider) {
                 children: AppThemesRegistry.retro.map((t) {
                   final bool isActive = themeProvider.currentTheme.id == t.id;
                   return Tooltip(
-                    message: t.name,
+                    message: localizeThemeName(sheetContext, t, includeNotes: true),
                     child: GestureDetector(
                       onTap: () {
                         themeProvider.setTheme(t);

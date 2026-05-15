@@ -8,11 +8,14 @@ String localizeThemeName(
   CustomTheme theme, {
   bool includeNotes = false,
 }) {
-  final key = AppThemesRegistry.nameKeyForId(theme.id);
-  if (key == null) return theme.name;
-
+  final nameKey = AppThemesRegistry.nameKeyForId(theme.id);
   final l10n = AppLocalizations.of(context)!;
-  final name = switch (key) {
+
+  final notes = includeNotes
+      ? _resolveNotes(l10n, AppThemesRegistry.notesKeyForId(theme.id))
+      : null;
+
+  final name = switch (nameKey) {
     'themeBrand'         => l10n.themeBrand,
     'themeEmerald'       => l10n.themeEmerald,
     'themeSunset'        => l10n.themeSunset,
@@ -30,19 +33,14 @@ String localizeThemeName(
     _                    => theme.name,
   };
 
-  if (includeNotes) {
-    final notesKey = AppThemesRegistry.notesKeyForId(theme.id);
-    if (notesKey != null) {
-      final notes = _localizeNotes(l10n, notesKey);
-      if (notes.isNotEmpty) return '$name\n$notes';
-    }
-  }
-
+  if (notes != null) return '$name\n$notes';
   return name;
 }
 
-String _localizeNotes(AppLocalizations l10n, String notesKey) {
+String? _resolveNotes(AppLocalizations l10n, String? notesKey) {
+  if (notesKey == null) return null;
   return switch (notesKey) {
-    _ => '',
+    'themePipboy3000Notes' => l10n.themePipboy3000Notes,
+    _ => null,
   };
 }

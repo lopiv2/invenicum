@@ -14,23 +14,12 @@ class PhosphorGlowLayer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        child,
-        Positioned.fill(
-          child: IgnorePointer(
-            child: ClipRect(
-              child: BackdropFilter(
-                filter: ColorFilter.mode(
-                  (color ?? Colors.cyan).withValues(alpha: 0.15),
-                  BlendMode.srcATop,
-                ),
-                child: Container(color: Colors.transparent),
-              ),
-            ),
-          ),
-        ),
-      ],
+    return ColorFiltered(
+      colorFilter: ColorFilter.mode(
+        (color ?? Colors.cyan).withValues(alpha: 0.15),
+        BlendMode.srcATop,
+      ),
+      child: child,
     );
   }
 }

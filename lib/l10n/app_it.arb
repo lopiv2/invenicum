@@ -1692,6 +1692,7 @@
   "firstRunSuccessSubtitle": "Il tuo account amministratore è pronto.\\nPuoi ora accedere.",
   "firstRunAccountCreatedLabel": "ACCOUNT CREATO",
   "firstRunCopyright": "Invenicum ©",
+  "themePipboy3000Notes": "Attenzione: questo tema potrebbe far sudare pixel al tuo 3dfx Voodoo2.",
   "addImageFromUrl": "Aggiungi immagine da URL",
   "imageDownloadedSuccessfully": "Immagine scaricata con successo",
   "errorDownloadingImage": "Errore durante il download dell'immagine: {error}",

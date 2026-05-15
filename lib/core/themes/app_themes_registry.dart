@@ -59,7 +59,7 @@ class _ThemeEntry {
     this.notesKey,
   }) : assert(
           (retroTheme == null) == (paletteId == null),
-          'retroTheme y paletteId deben definirse juntos o ninguno',
+          'retroTheme and paletteId must both be set or both be null',
         );
 
   bool get isRetro => paletteId != null;
@@ -132,6 +132,7 @@ class AppThemesRegistry {
     _ThemeEntry(
       id: 'retro_pipboy3000',
       name: 'Pip-Boy 3000',
+      notesKey: 'themePipboy3000Notes',
       paletteId: 'pipboy3000',
       primaryColor: Color(0xFF00FF41),
       brightness: Brightness.dark,
