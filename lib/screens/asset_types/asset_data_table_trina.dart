@@ -273,10 +273,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                       ),
                     )
                   : Container(
-                      color: Colors.grey[200],
-                      child: const Icon(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: Icon(
                         Icons.image,
-                        color: Colors.grey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         size: 20,
                       ),
                     ),
@@ -349,8 +349,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                 child: PriceDisplayWidget(
                   value: item.marketValue,
                   fontSize: 14,
-                  color: Colors
-                      .black87, // Color más neutro para la tabla si se prefiere
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
@@ -394,7 +393,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                   isChecked ? Icons.check_box : Icons.check_box_outline_blank,
                   color: isChecked
                       ? Theme.of(context).primaryColor
-                      : Colors.grey.withValues(alpha: 0.5),
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                 );
               }
             : field.type == CustomFieldType.price
@@ -410,7 +409,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                       child: PriceDisplayWidget(
                         value: numVal,
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -579,10 +578,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                 errorBuilder: (context, error, stackTrace) => Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.broken_image,
                       size: 60,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -607,7 +606,9 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.sizeOf(context).width < 700;
     final scrollbarThickness = isMobile ? 14.0 : 12.0;
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final scrollbarColor = scheme.primary.withValues(alpha: 0.95);
     final scrollbarTrackColor = scheme.outline.withValues(alpha: 0.5);
 
@@ -625,14 +626,21 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         _openAssetDetail(item);
       },
       configuration: TrinaGridConfiguration(
-        style: TrinaGridStyleConfig(
-          gridBorderColor: Colors.transparent,
-          columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-          rowHeight: 45,
-          columnHeight: 45,
-          // 👇 esto añade padding interno al grid
-          defaultCellPadding: EdgeInsets.symmetric(horizontal: 8),
-        ),
+        style: isDark
+            ? TrinaGridStyleConfig.dark(
+                gridBorderColor: Colors.transparent,
+                columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                rowHeight: 45,
+                columnHeight: 45,
+                defaultCellPadding: const EdgeInsets.symmetric(horizontal: 8),
+              )
+            : TrinaGridStyleConfig(
+                gridBorderColor: Colors.transparent,
+                columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                rowHeight: 45,
+                columnHeight: 45,
+                defaultCellPadding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
         scrollbar: TrinaGridScrollbarConfig(
           isAlwaysShown: true,
           isDraggable: true,

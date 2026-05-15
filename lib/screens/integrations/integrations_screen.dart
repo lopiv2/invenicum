@@ -119,7 +119,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
     ].where((section) => section.integrations.isNotEmpty).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5EFE6),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: Text(l10n.integrationsAndConnectionsTitle),
         elevation: 0,

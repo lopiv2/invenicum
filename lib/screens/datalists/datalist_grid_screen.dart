@@ -48,9 +48,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
     final confirmed = await showAppDialog<bool>(
       context: context,
       title: l10n.confirmDeletion,
-      body: Text(
-        l10n.confirmDeleteDataList(dataList.name),
-      ),
+      body: Text(l10n.confirmDeleteDataList(dataList.name)),
       actions: <Widget>[
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
@@ -59,10 +57,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
           style: FilledButton.styleFrom(backgroundColor: Colors.red),
-          child: Text(
-            l10n.delete,
-            style: TextStyle(color: Colors.white),
-          ),
+          child: Text(l10n.delete, style: TextStyle(color: Colors.white)),
         ),
       ],
     );
@@ -138,7 +133,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // --- GRID DE LISTAS ---
+                // --- LIST GRID ---
                 if (container.dataLists.isEmpty)
                   Center(
                     child: Text(
@@ -150,11 +145,9 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                   Expanded(
                     child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent:
-                            400, // Un poco más ancho para que en móvil ocupe casi todo
+                        maxCrossAxisExtent: 400,
                         mainAxisSpacing: 16,
                         crossAxisSpacing: 16,
-                        // Ajustamos la altura de la tarjeta según el dispositivo
                         childAspectRatio:
                             MediaQuery.of(context).size.width < 600 ? 2 : 2.5,
                       ),
@@ -170,9 +163,9 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
     );
   }
 
-  // Extraemos la tarjeta a un método para limpiar el build
   Widget _buildDataListCard(BuildContext context, ListData dataList) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Card(
       elevation: 2,
       child: InkWell(
@@ -182,7 +175,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
             pathParameters: {
               'containerId': widget.containerId,
               'dataListId': dataList.id
-                  .toString(), // GoRouter siempre espera Strings en los parámetros de ruta
+                  .toString(),
             },
             extra: dataList,
           );
@@ -194,7 +187,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.list_alt, color: Theme.of(context).primaryColor),
+                  Icon(Icons.list_alt, color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -207,17 +200,16 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  // Agrupamos botones para que no se amontonen en tarjetas pequeñas
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
                         constraints:
-                            const BoxConstraints(), // Quita padding extra
+                            const BoxConstraints(),
                         padding: const EdgeInsets.all(4),
                         icon: Icon(
                           Icons.edit_outlined,
-                          color: Theme.of(context).primaryColor,
+                          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                           size: 20,
                         ),
                         onPressed: () => context.goNamed(
@@ -250,7 +242,10 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                   dataList.description ?? l10n.noDescriptionAvailable,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
                 ),
               ),
               Row(
@@ -262,7 +257,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -270,7 +265,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
                       style: TextStyle(
                         fontSize: 11,
                         fontWeight: FontWeight.bold,
-                        color: Theme.of(context).primaryColor,
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       ),
                     ),
                   ),

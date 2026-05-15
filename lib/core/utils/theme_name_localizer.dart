@@ -30,6 +30,10 @@ String localizeThemeName(
     'themeCyberpunk'     => l10n.themeCyberpunk,
     'themeNordicArctic'  => l10n.themeNordicArctic,
     'themeDeepNight'     => l10n.themeDeepNight,
+    'themeSnowy'         => l10n.themeSnowy,
+    'themeFiesta'        => l10n.themeFiesta,
+    'themeMatrix'        => l10n.themeMatrix,
+    'themeVolcano'       => l10n.themeVolcano,
     _                    => theme.name,
   };
 

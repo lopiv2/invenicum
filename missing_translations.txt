@@ -10,7 +10,11 @@
     "testScraper",
     "runResultTitle",
     "runError",
-    "ok"
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
   ],
 
   "fr": [
@@ -24,7 +28,11 @@
     "testScraper",
     "runResultTitle",
     "runError",
-    "ok"
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
   ],
 
   "it": [
@@ -38,7 +46,11 @@
     "testScraper",
     "runResultTitle",
     "runError",
-    "ok"
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
   ],
 
   "pt": [
@@ -52,6 +64,10 @@
     "testScraper",
     "runResultTitle",
     "runError",
-    "ok"
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
   ]
 }

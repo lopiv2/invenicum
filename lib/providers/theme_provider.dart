@@ -37,7 +37,7 @@ class ThemeProvider with ChangeNotifier {
 
   /// Returns the [RetroEffects] for the active theme, or none for standard themes.
   RetroEffects get activeEffects =>
-      AppThemesRegistry.effectsForPaletteId(_currentTheme.paletteId);
+      AppThemesRegistry.effectsForId(_currentTheme.id);
 
   // ─────────────────────────────────────────────
   // FONT

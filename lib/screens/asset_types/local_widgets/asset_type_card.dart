@@ -225,7 +225,7 @@ class AssetTypeCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Material(
-          color: theme.cardColor,
+          color: theme.colorScheme.surfaceContainerHigh,
           child: InkWell(
             onTap: onTap,
             child: SizedBox(
@@ -343,7 +343,7 @@ class AssetTypeCard extends StatelessWidget {
         style: TextStyle(
           fontSize: isMobile ? 11.0 : 12.0,
           fontWeight: FontWeight.bold,
-          color: theme.primaryColor,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -374,7 +374,7 @@ class AssetTypeCard extends StatelessWidget {
         const SizedBox(width: 4),
         _CircleIconButton(
           icon: Icons.edit_rounded,
-          color: theme.primaryColor,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           size: buttonSize,
           iconSize: iconSize,
           onPressed: onEdit,
@@ -411,10 +411,11 @@ class AssetTypeCard extends StatelessWidget {
     required List<CustomFieldDefinition> fields,
     required Function(String?) onChanged,
   }) {
+    final dropdownTheme = Theme.of(context);
     if (fields.isEmpty) {
       return Text(
         AppLocalizations.of(context)!.noBooleanFields,
-        style: const TextStyle(color: Colors.grey, fontSize: 13),
+        style: TextStyle(color: dropdownTheme.colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 13),
       );
     }
     return DropdownButtonFormField<String?>(
@@ -423,7 +424,7 @@ class AssetTypeCard extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: dropdownTheme.colorScheme.surfaceContainerHighest,
       ),
       hint: Text(AppLocalizations.of(context)!.selectField),
       items: [

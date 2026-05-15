@@ -3024,6 +3024,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDeepNight => 'Deep Night';
 
   @override
+  String get themeSnowy => 'Snowy';
+
+  @override
+  String get themeFiesta => 'Party!';
+
+  @override
+  String get themeMatrix => 'Matrix';
+
+  @override
+  String get themeVolcano => 'Volcano';
+
+  @override
   String get themePipboy3000Notes =>
       'Warning: this theme may cause your 3dfx Voodoo2 to start sweating pixels.';
 

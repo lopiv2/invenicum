@@ -3062,6 +3062,18 @@ class AppLocalizationsDe extends AppLocalizations {
   String get themeDeepNight => 'Tiefe Nacht';
 
   @override
+  String get themeSnowy => 'Snowy';
+
+  @override
+  String get themeFiesta => 'Party!';
+
+  @override
+  String get themeMatrix => 'Matrix';
+
+  @override
+  String get themeVolcano => 'Volcano';
+
+  @override
   String get themePipboy3000Notes =>
       'Warnung: Dieses Design könnte Ihren 3dfx Voodoo2 ins Schwitzen bringen.';
 

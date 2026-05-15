@@ -331,6 +331,7 @@ class _MyAppState extends State<MyApp> {
           : ThemeMode.light;
     }
     final isRetro = themeProvider.isRetroMode;
+    final isDarkTheme = themeProvider.currentTheme.brightness == Brightness.dark;
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       locale: preferencesProvider.locale,
@@ -355,7 +356,11 @@ class _MyAppState extends State<MyApp> {
           ? themeProvider.activeRetroTheme!.toThemeData()
           : themeProvider.darkTheme,
 
-      themeMode: isRetro ? ThemeMode.light : currentMode,
+      themeMode: isRetro
+          ? ThemeMode.light
+          : isDarkTheme
+              ? ThemeMode.dark
+              : currentMode,
 
       routerConfig: _router,
 

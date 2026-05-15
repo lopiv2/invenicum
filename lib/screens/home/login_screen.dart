@@ -151,18 +151,18 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: Center(
-                          child: Image.asset(
-                            'assets/images/invenicum_logo.png',
-                            width: 80,
-                            height: 80,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(
-                                Icons.inventory_2_outlined,
-                                size: 50,
-                                color: Colors.white,
-                              );
-                            },
-                          ),
+                        child: Image.asset(
+                          'assets/images/invenicum_logo.png',
+                          width: 80,
+                          height: 80,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Icon(
+                              Icons.inventory_2_outlined,
+                              size: 50,
+                              color: Colors.white,
+                            );
+                          },
+                        ),
                         ),
                       ),
                       const SizedBox(height: 32),
