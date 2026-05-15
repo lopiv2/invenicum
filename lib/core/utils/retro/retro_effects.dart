@@ -19,6 +19,7 @@ import 'effects/vhs_jitter_layer.dart';
 import 'effects/pixel_grid_layer.dart';
 import 'effects/noise_layer.dart';
 import 'effects/dithering_layer.dart';
+import 'shaders/retro_shader_effect.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // MODEL
@@ -123,6 +124,10 @@ class RetroEffects {
   /// Size of each dither cell in logical pixels.
   final double ditheringPatternSize;
 
+  /// When true, [RetroEffectsLayer] replaces all individual
+  /// [CustomPainter] layers with a single GPU [FragmentShader] pass.
+  final bool useShader;
+
   const RetroEffects({
     this.scanlines = false,
     this.scanlineOpacity = 0.18,
@@ -152,6 +157,7 @@ class RetroEffects {
     this.dithering = false,
     this.ditheringStrength = 0.2,
     this.ditheringPatternSize = 4.0,
+    this.useShader = false,
   });
 
   /// No effects — plain retro palette, no post-processing.
@@ -230,6 +236,7 @@ class RetroEffects {
   );
 
   /// Pip-Boy 3000 (Fallout): green monochrome CRT with soft glow.
+  /// Uses a single GPU [FragmentShader] instead of multiple [CustomPainter]s.
   static const pipboy3000 = RetroEffects(
     scanlines: true,
     scanlineOpacity: 0.15,
@@ -238,38 +245,10 @@ class RetroEffects {
     glowRadius: 6.0,
     glowColor: Color(0xFF00FF41),
     curvature: true,
-    curvatureStrength: 0.25,
+    curvatureStrength: 0.02,
     flicker: true,
     flickerIntensity: 0.02,
-    bloom: true,
-    bloomIntensity: 0.35,
-    bloomRadius: 4.0,
-    bloomColor: Color(0xFF00FF41),
-    dithering: true,
-    ditheringStrength: 0.08,
-    ditheringPatternSize: 3.0,
-  );
-
-  /// Full retro: CGA + bloom + dithering + noise (the whole package).
-  static const fullRetro = RetroEffects(
-    scanlines: true,
-    scanlineOpacity: 0.20,
-    scanlineSpacing: 3.0,
-    curvature: true,
-    curvatureStrength: 0.30,
-    flicker: true,
-    flickerIntensity: 0.03,
-    bloom: true,
-    bloomIntensity: 0.4,
-    bloomRadius: 5.0,
-    dithering: true,
-    ditheringStrength: 0.12,
-    pixelGrid: true,
-    pixelGridSize: 8.0,
-    pixelGridOpacity: 0.04,
-    noise: true,
-    noiseOpacity: 0.05,
-    noiseDensity: 50,
+    useShader: true,
   );
 }
 
@@ -353,6 +332,14 @@ class _RetroEffectsLayerState extends State<RetroEffectsLayer>
 
   @override
   Widget build(BuildContext context) {
+    // ── GPU shader path (replaces ALL individual CustomPainters) ──────────
+    if (widget.effects.useShader) {
+      return RetroShaderEffect(
+        effects: widget.effects,
+        child: widget.child,
+      );
+    }
+
     Widget result = widget.child;
 
     // 1. Phosphor glow (BackdropFilter blur — cheap approximation)

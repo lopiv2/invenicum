@@ -3024,6 +3024,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get themeDeepNight => 'Deep Night';
 
   @override
+  String get themePipboy3000Notes =>
+      'Warning: this theme may cause your 3dfx Voodoo2 to start sweating pixels.';
+
+  @override
   String get loginSuccess => 'Login successful';
 
   @override

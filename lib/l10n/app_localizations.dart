@@ -5560,6 +5560,12 @@ abstract class AppLocalizations {
   /// **'Deep Night'**
   String get themeDeepNight;
 
+  /// No description provided for @themePipboy3000Notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: this theme may cause your 3dfx Voodoo2 to start sweating pixels.'**
+  String get themePipboy3000Notes;
+
   /// No description provided for @loginSuccess.
   ///
   /// In en, this message translates to:

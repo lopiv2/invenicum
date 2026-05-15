@@ -1577,6 +1577,7 @@
   "themeCyberpunk": "Cyberpunk",
   "themeNordicArctic": "Nordic Arctic",
   "themeDeepNight": "Deep Night",
+  "themePipboy3000Notes": "Warning: this theme may cause your 3dfx Voodoo2 to start sweating pixels.",
   "@loginSuccess": {},
   "loginSuccess": "Login successful",
   "reloadListError": "Failed to reload the list",

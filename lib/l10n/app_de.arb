@@ -1692,6 +1692,7 @@
   "firstRunSuccessSubtitle": "Ihr Admin-Konto ist bereit.\\nSie können sich jetzt anmelden.",
   "firstRunAccountCreatedLabel": "KONTO ERSTELLT",
   "firstRunCopyright": "Invenicum ©",
+  "themePipboy3000Notes": "Warnung: Dieses Design könnte Ihren 3dfx Voodoo2 ins Schwitzen bringen.",
   "addImageFromUrl": "Bild von URL hinzufügen",
   "imageDownloadedSuccessfully": "Bild erfolgreich heruntergeladen",
   "errorDownloadingImage": "Fehler beim Herunterladen des Bildes: {error}",

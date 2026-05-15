@@ -3058,6 +3058,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get themeDeepNight => 'Noche Profunda';
 
   @override
+  String get themePipboy3000Notes =>
+      'Avertissement : ce thème pourrait faire transpirer des pixels à votre 3dfx Voodoo2.';
+
+  @override
   String get loginSuccess => 'Inicio de sesión exitoso';
 
   @override

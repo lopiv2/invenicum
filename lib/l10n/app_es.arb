@@ -1577,6 +1577,7 @@
   "themeCyberpunk": "Cyberpunk",
   "themeNordicArctic": "Ártico Nord",
   "themeDeepNight": "Noche Profunda",
+  "themePipboy3000Notes": "Advertencia: este tema puede hacer que tu 3dfx Voodoo2 empiece a sudar píxeles.",
   "@loginSuccess": {},
   "loginSuccess": "Inicio de sesión exitoso",
   "reloadListError": "No se pudo recargar la lista",
