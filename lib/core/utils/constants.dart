@@ -1,6 +1,7 @@
 // lib/utils/constants.dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
@@ -695,3 +696,113 @@ class AppCurrencies {
   }
 }
 
+// ── Overlay Floating Images ─────────────────────────────────────────────────
+
+/// Vertical zone of the screen where the overlay image appears.
+enum OverlayZone {
+  /// Near the top edge.
+  top,
+  /// Central area of the screen.
+  middle,
+  /// Near the bottom edge.
+  bottom,
+  /// Any random vertical position.
+  random,
+}
+
+/// Which direction the sprite faces in the asset file.
+///
+/// The animation moves the sprite left-to-right (for [leftToRight]) or
+/// right-to-left (for [rightToLeft]). When the movement direction does not
+/// match the facing direction the image is flipped horizontally.
+enum AnimationDirection {
+  /// Sprite faces right. Animation moves left-to-right, no flip.
+  leftToRight,
+  /// Sprite faces left. Animation moves right-to-left, no flip.
+  rightToLeft,
+  /// Sprite faces right by convention. Movement direction is random;
+  /// the image is flipped when moving left.
+  alternate,
+}
+
+/// Whether and how the sprite can randomly turn around mid-animation.
+enum TurnMode {
+  /// Sprite always turns at random intervals within [turnMinDelay, turnMaxDelay].
+  on,
+  /// Sprite never turns mid-animation.
+  off,
+  /// Each turn opportunity is decided randomly (≈ 50 % chance), with a
+  /// fully random delay. [turnMinDelay] and [turnMaxDelay] are ignored.
+  random,
+}
+
+class AppOverlayImages {
+  static const List<OverlayImageConfig> defaultImages = [
+    // Add your WEBP asset paths here, e.g.:
+    OverlayImageConfig(
+      imagePath: 'images/collectibles/greenTentacle.webp',
+      direction: AnimationDirection.alternate,
+      zone: OverlayZone.random,
+      speed: Duration(seconds: 30),
+      frequency: Duration(seconds: 10),
+      imageSize: 150,
+      animationFps: 30,
+      turnMode: TurnMode.on,
+      turnMinDelay: 5,
+      turnMaxDelay: 8,
+      maxTurns: 1,
+    ),
+    OverlayImageConfig(
+      imagePath: 'images/collectibles/purpleTentacle.webp',
+      direction: AnimationDirection.alternate,
+      zone: OverlayZone.random,
+      speed: Duration(seconds: 50), //50 optimal for long images like the tentacles, 30 for smaller ones
+      frequency: Duration(seconds: 10),
+      imageSize: 220,
+      animationFps: 30,
+      turnMode: TurnMode.off,
+      turnMinDelay: 5,
+      turnMaxDelay: 8,
+      maxTurns: 1,
+    ),
+    OverlayImageConfig(
+      imagePath: 'images/collectibles/mario.webp',
+      direction: AnimationDirection.alternate,
+      zone: OverlayZone.random,
+      speed: Duration(seconds: 8),
+      frequency: Duration(seconds: 10),
+      imageSize: 150,
+      animationFps: 30,
+      turnMode: TurnMode.off,
+      turnMinDelay: 5,
+      turnMaxDelay: 8,
+      maxTurns: 1,
+    ),
+    OverlayImageConfig(
+      imagePath: 'images/collectibles/heman.webp',
+      direction: AnimationDirection.alternate,
+      zone: OverlayZone.random,
+      speed: Duration(seconds: 8),
+      frequency: Duration(seconds: 10),
+      imageSize: 200,
+      animationFps: 30,
+      turnMode: TurnMode.off,
+      turnMinDelay: 5,
+      turnMaxDelay: 8,
+      maxTurns: 1,
+    ),
+    OverlayImageConfig(
+      imagePath: 'images/collectibles/luigi.webp',
+      direction: AnimationDirection.alternate,
+      zone: OverlayZone.random,
+      speed: Duration(seconds: 8),
+      frequency: Duration(seconds: 10),
+      imageSize: 150,
+      animationFps: 30,
+      turnMode: TurnMode.off,
+      turnMinDelay: 5,
+      turnMaxDelay: 8,
+      maxTurns: 1,
+    ),
+  ];
+}

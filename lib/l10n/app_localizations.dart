@@ -5560,6 +5560,30 @@ abstract class AppLocalizations {
   /// **'Deep Night'**
   String get themeDeepNight;
 
+  /// No description provided for @themeSnowy.
+  ///
+  /// In en, this message translates to:
+  /// **'Snowy'**
+  String get themeSnowy;
+
+  /// No description provided for @themeFiesta.
+  ///
+  /// In en, this message translates to:
+  /// **'Party!'**
+  String get themeFiesta;
+
+  /// No description provided for @themeMatrix.
+  ///
+  /// In en, this message translates to:
+  /// **'Matrix'**
+  String get themeMatrix;
+
+  /// No description provided for @themeVolcano.
+  ///
+  /// In en, this message translates to:
+  /// **'Volcano'**
+  String get themeVolcano;
+
   /// No description provided for @themePipboy3000Notes.
   ///
   /// In en, this message translates to:

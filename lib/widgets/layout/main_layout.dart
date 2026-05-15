@@ -4,22 +4,18 @@ import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/providers/alert_provider.dart';
-import 'package:invenicum/providers/auth_provider.dart';
-import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
+import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/utils/retro/retro_theme_extension.dart';
 import 'package:invenicum/screens/home/local_widgets/chatbot_veni_widget.dart';
-import 'package:invenicum/screens/home/local_widgets/pulsing_avatar_widget.dart';
-import 'package:invenicum/screens/home/local_widgets/ringing_bell_widget.dart';
-import 'package:invenicum/screens/home/local_widgets/search_bar_widget.dart';
 import 'package:invenicum/widgets/layout/sidebar_layout.dart';
-import 'package:invenicum/widgets/ui/stac_slot.dart';
+import 'package:invenicum/widgets/layout/main_header.dart';
+import 'package:invenicum/widgets/layout/floating_overlay_image.dart';
 import 'package:provider/provider.dart';
-import 'package:random_avatar/random_avatar.dart';
 
 class MainLayout extends StatefulWidget {
   final Widget child;
@@ -128,6 +124,7 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
     final colorScheme = Theme.of(context).colorScheme;
+    final retroTheme = Theme.of(context).extension<RetroThemeExtension>()?.retro;
     final size = MediaQuery.of(context).size;
 
     final showFAB = aiEnabled && !_isChatOpen;
@@ -135,8 +132,15 @@ class _MainLayoutState extends State<MainLayout> {
 
     return Scaffold(
       body: Stack(
+        clipBehavior: Clip.none,
         children: [
           _buildBaseApp(context),
+
+          // Overlay image (collectibles) that floats across the screen randomly
+          // Add entries to AppOverlayImages.defaultImages in constants.dart
+          FloatingOverlayImage(
+            configs: AppOverlayImages.defaultImages,
+          ),
 
           // Use a single Positioned for the "Veni" container
           // Important: Do not give fixed width/height here so it doesn't block the screen
@@ -205,8 +209,8 @@ class _MainLayoutState extends State<MainLayout> {
                         onPressed: () => setState(() => _isChatOpen = true),
                         label: const Text('Veni'),
                         icon: const Icon(Icons.auto_awesome_rounded),
-                        backgroundColor: colorScheme.primary,
-                        foregroundColor: colorScheme.onPrimary,
+                        backgroundColor: retroTheme?.buttonOk ?? colorScheme.primary,
+                        foregroundColor: retroTheme != null ? Colors.black : colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -227,7 +231,7 @@ class _MainLayoutState extends State<MainLayout> {
 
     return Column(
       children: [
-        _Header(
+        MainHeader(
           isSidebarVisible: _isSidebarVisible,
           onToggleSidebar: () => setState(() => _handleToggleSidebar()),
         ),
@@ -262,251 +266,6 @@ class _MainLayoutState extends State<MainLayout> {
           ),
         ),
       ],
-    );
-  }
-}
-
-class _Header extends StatefulWidget {
-  final bool isSidebarVisible;
-  final VoidCallback onToggleSidebar;
-  const _Header({
-    required this.isSidebarVisible,
-    required this.onToggleSidebar,
-  });
-
-  @override
-  State<_Header> createState() => _HeaderState();
-}
-
-class _HeaderState extends State<_Header> {
-  late TextEditingController _searchController;
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController = TextEditingController();
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
-    final user = authProvider.user;
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
-    final l10n = AppLocalizations.of(context);
-    final isDarkMode = theme.brightness == Brightness.dark;
-    final String avatarSeed = user?.name ?? l10n?.guest ?? 'Guest';
-
-    return Container(
-      height: 64, // Slightly slimmer for a more professional look
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          bottom: BorderSide(
-            color: colorScheme.outlineVariant.withValues(alpha: 0.5),
-            width: 1,
-          ),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Row(
-        children: [
-          IconButton(
-            onPressed: widget.onToggleSidebar,
-            icon: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              child: Icon(
-                widget.isSidebarVisible
-                    ? Icons.menu_open_rounded
-                    : Icons.menu_rounded,
-                key: ValueKey(widget.isSidebarVisible),
-                color: colorScheme.primary,
-              ),
-            ),
-            tooltip: 'Menu',
-          ),
-          _buildLogo(colorScheme, isDarkMode),
-
-          SizedBox(width: MediaQuery.of(context).size.width * 0.025),
-
-          // Search Bar with Autocomplete
-          const Expanded(flex: 3, child: InvenicumSearchBar()),
-          const Spacer(),
-          const StacSlot(slotName: 'inventory_header'),
-          const Spacer(),
-
-          // User Profile
-          Consumer<AlertProvider>(
-            // 🚩 We listen to the AlertProvider
-            builder: (context, alertProvider, child) {
-              final int unread = alertProvider.unreadCount;
-              return PulsingAvatar(
-                isActive: unread > 0,
-                child: Badge.count(
-                  count: unread,
-                  isLabelVisible: unread > 0,
-                  offset: const Offset(
-                    -35,
-                    0,
-                  ), // Adjust the position over the avatar
-                  backgroundColor: Colors.redAccent,
-                  child: PopupMenuButton<String>(
-                    offset: const Offset(0, 48),
-                    borderRadius: BorderRadius.circular(16),
-                    elevation: 8,
-                    onSelected: (value) async {
-                      if (value == 'alerts') {
-                        context.goNamed(RouteNames.alerts);
-                      }
-                      if (value == 'logout') {
-                        // Cleanup states before logging out
-                        context.read<InventoryItemProvider>().resetState();
-                        await context.read<AuthProvider>().logout();
-
-                        if (context.mounted) {
-                          context.goNamed(RouteNames.login);
-                        }
-                      } else if (value == 'settings') {
-                        context.goNamed(RouteNames.preferences);
-                      } else if (value == 'profile') {
-                        context.goNamed(RouteNames.myProfile);
-                      }
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: colorScheme.primary.withValues(alpha: 0.2),
-                          width: 2,
-                        ),
-                      ),
-                      child: ClipOval(
-                        child:
-                            user?.avatarUrl != null &&
-                                user!.avatarUrl!.isNotEmpty
-                            ? Image.network(
-                                user.avatarUrl!,
-                                width: 38,
-                                height: 38,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    RandomAvatar(
-                                      avatarSeed,
-                                      width: 38,
-                                      height: 38,
-                                    ),
-                              )
-                            : RandomAvatar(avatarSeed, width: 38, height: 38),
-                      ),
-                    ),
-                    itemBuilder: (context) => [
-                      if (unread > 0) ...[
-                        _buildPopupItem(
-                          'alerts',
-                          // Instead of passing only an IconData, we customize the icon with animation
-                          Icons.notifications_active_outlined,
-                          '${l10n?.alerts ?? 'Alertas'} ($unread)',
-                          isHighlight: true,
-                          leadingWidget: RingingBell(isActive: unread > 0),
-                        ),
-                        const PopupMenuDivider(),
-                      ],
-                      _buildPopupItem(
-                        'profile',
-                        Icons.person_outline_rounded,
-                        l10n?.myProfile ?? 'Profile',
-                      ),
-                      _buildPopupItem(
-                        'settings',
-                        Icons.settings_outlined,
-                        l10n?.settings ?? 'Settings',
-                      ),
-                      const PopupMenuDivider(),
-                      _buildPopupItem(
-                        'logout',
-                        Icons.logout_rounded,
-                        l10n?.logout ?? 'Logout',
-                        isDestructive: true,
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLogo(ColorScheme colorScheme, bool isDarkMode) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Container(
-          width: 190,
-          height: 80,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-          child: Image.asset(
-            'assets/images/invenicum_logo.png',
-            fit: BoxFit.contain,
-            scale: 1.8,
-            alignment: Alignment.center,
-            errorBuilder: (context, error, stackTrace) {
-              return Center(
-                child: Text(
-                  'Invenicum',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
-                    fontSize: 14,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  PopupMenuItem<String> _buildPopupItem(
-    String value,
-    IconData icon,
-    String text, {
-    bool isDestructive = false,
-    bool isHighlight = false,
-    Widget? leadingWidget,
-  }) {
-    return PopupMenuItem<String>(
-      value: value,
-      child: Row(
-        children: [
-          leadingWidget ??
-              Icon(
-                icon,
-                size: 20,
-                color: isDestructive
-                    ? Colors.redAccent
-                    : (isHighlight ? Colors.orange.shade700 : null),
-              ),
-          const SizedBox(width: 12),
-          Text(
-            text,
-            style: TextStyle(color: isDestructive ? Colors.redAccent : null),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -13,12 +13,19 @@ class IntegrationVisual extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final visAccent = isDark
+        ? HSLColor.fromColor(accent).lightness < 0.5
+            ? HSLColor.fromColor(accent).withLightness(0.5).toColor()
+            : accent
+        : accent;
+
     return Container(
       width: 64,
       height: 64,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: accent.withValues(alpha: 0.10),
+        color: visAccent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(18),
       ),
       child: FittedBox(fit: BoxFit.contain, child: icon),

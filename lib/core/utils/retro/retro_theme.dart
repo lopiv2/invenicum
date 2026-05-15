@@ -312,6 +312,17 @@ class RetroTheme {
         ),
       ),
 
+      // ───────────────── FLOATING ACTION BUTTON ─────────────────
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: buttonOk,
+        foregroundColor: Colors.black,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: border, width: 1),
+        ),
+      ),
+
       // ───────────────── INPUTS ─────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,

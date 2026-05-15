@@ -58,19 +58,19 @@ class _ThemeEntry {
     this.effects = RetroEffects.none,
     this.notesKey,
   }) : assert(
-          (retroTheme == null) == (paletteId == null),
-          'retroTheme and paletteId must both be set or both be null',
-        );
+         (retroTheme == null) == (paletteId == null),
+         'retroTheme and paletteId must both be set or both be null',
+       );
 
   bool get isRetro => paletteId != null;
 
   CustomTheme toCustomTheme() => CustomTheme(
-        id: id,
-        name: name,
-        primaryColor: primaryColor,
-        brightness: brightness,
-        paletteId: paletteId,
-      );
+    id: id,
+    name: name,
+    primaryColor: primaryColor,
+    brightness: brightness,
+    paletteId: paletteId,
+  );
 }
 
 // ─── Registro central ─────────────────────────────────────────────────────────
@@ -84,20 +84,124 @@ class AppThemesRegistry {
 
   static const _definitions = <_ThemeEntry>[
     // ── Standard ──────────────────────────────────────────────────────────
-    _ThemeEntry(id: 'brand',      name: 'Invenicum',       nameKey: 'themeBrand',      primaryColor: Color(0xFF1A237E)),
-    _ThemeEntry(id: 'emerald',    name: 'Esmeralda',       nameKey: 'themeEmerald',    primaryColor: Colors.teal),
-    _ThemeEntry(id: 'sunset',     name: 'Atardecer',       nameKey: 'themeSunset',     primaryColor: Colors.orange),
-    _ThemeEntry(id: 'ocean',      name: 'Indian Ocean',    nameKey: 'oceanTheme',      primaryColor: Colors.blue),
-    _ThemeEntry(id: 'lavender',   name: 'Lavanda Dulce',   nameKey: 'themeLavender',   primaryColor: Color(0xFFCE93D8)),
-    _ThemeEntry(id: 'forest',     name: 'Bosque Profundo', nameKey: 'themeForest',     primaryColor: Color(0xFF1B5E20)),
-    _ThemeEntry(id: 'cherry',     name: 'Cereza',          nameKey: 'themeCherry',     primaryColor: Colors.redAccent),
-    _ThemeEntry(id: 'indigo',     name: 'Noche Eléctrica', nameKey: 'themeElectricNight', primaryColor: Colors.indigoAccent),
-    _ThemeEntry(id: 'amber',      name: 'Oro Ámbar',       nameKey: 'themeAmberGold',  primaryColor: Colors.amber),
-    _ThemeEntry(id: 'sakura',     name: 'Cherry Blossom',  nameKey: 'cherryBlossomTheme', primaryColor: Color(0xFFF48FB1)),
-    _ThemeEntry(id: 'slate',      name: 'Pizarra Moderna', nameKey: 'themeModernSlate', primaryColor: Color(0xFF546E7A)),
-    _ThemeEntry(id: 'cyberpunk',  name: 'Cyberpunk',       nameKey: 'themeCyberpunk',  primaryColor: Colors.pinkAccent,      brightness: Brightness.dark),
-    _ThemeEntry(id: 'nordic',     name: 'Ártico Nord',     nameKey: 'themeNordicArctic', primaryColor: Color(0xFFB3E5FC)),
-    _ThemeEntry(id: 'dark_mode',  name: 'Noche Profunda',  nameKey: 'themeDeepNight',  primaryColor: Colors.blueGrey,        brightness: Brightness.dark),
+    _ThemeEntry(
+      id: 'brand',
+      name: 'Invenicum',
+      nameKey: 'themeBrand',
+      primaryColor: Color(0xFF1A237E),
+    ),
+    _ThemeEntry(
+      id: 'emerald',
+      name: 'Esmeralda',
+      nameKey: 'themeEmerald',
+      primaryColor: Colors.teal,
+    ),
+    _ThemeEntry(
+      id: 'sunset',
+      name: 'Atardecer',
+      nameKey: 'themeSunset',
+      primaryColor: Color.fromARGB(255, 185, 130, 47),
+    ),
+    _ThemeEntry(
+      id: 'ocean',
+      name: 'Indian Ocean',
+      nameKey: 'oceanTheme',
+      primaryColor: Colors.blue,
+    ),
+    _ThemeEntry(
+      id: 'lavender',
+      name: 'Lavanda Dulce',
+      nameKey: 'themeLavender',
+      primaryColor: Color(0xFFCE93D8),
+    ),
+    _ThemeEntry(
+      id: 'forest',
+      name: 'Bosque Profundo',
+      nameKey: 'themeForest',
+      primaryColor: Color(0xFF1B5E20),
+    ),
+    _ThemeEntry(
+      id: 'cherry',
+      name: 'Cereza',
+      nameKey: 'themeCherry',
+      primaryColor: Colors.redAccent,
+    ),
+    _ThemeEntry(
+      id: 'indigo',
+      name: 'Noche Eléctrica',
+      nameKey: 'themeElectricNight',
+      primaryColor: Colors.indigoAccent,
+    ),
+    _ThemeEntry(
+      id: 'amber',
+      name: 'Oro Ámbar',
+      nameKey: 'themeAmberGold',
+      primaryColor: Colors.amber,
+    ),
+    _ThemeEntry(
+      id: 'sakura',
+      name: 'Cherry Blossom',
+      nameKey: 'cherryBlossomTheme',
+      primaryColor: Color(0xFFF48FB1),
+    ),
+    _ThemeEntry(
+      id: 'slate',
+      name: 'Pizarra Moderna',
+      nameKey: 'themeModernSlate',
+      primaryColor: Color(0xFF546E7A),
+    ),
+    _ThemeEntry(
+      id: 'cyberpunk',
+      name: 'Cyberpunk',
+      nameKey: 'themeCyberpunk',
+      primaryColor: Colors.pinkAccent,
+      brightness: Brightness.dark,
+    ),
+    _ThemeEntry(
+      id: 'nordic',
+      name: 'Ártico Nord',
+      nameKey: 'themeNordicArctic',
+      primaryColor: Color(0xFFB3E5FC),
+    ),
+    _ThemeEntry(
+      id: 'dark_mode',
+      name: 'Noche Profunda',
+      nameKey: 'themeDeepNight',
+      primaryColor: Colors.blueGrey,
+      brightness: Brightness.dark,
+    ),
+    _ThemeEntry(
+      id: 'snowy',
+      name: 'Snowy',
+      nameKey: 'themeSnowy',
+      primaryColor: Color(0xFFB0D4F1),
+      effects: RetroEffects.snowy,
+      brightness: Brightness.dark,
+    ),
+    _ThemeEntry(
+      id: 'fiesta',
+      name: 'Fiesta',
+      nameKey: 'themeFiesta',
+      primaryColor: Color(0xFFE91E63),
+      effects: RetroEffects.fiesta,
+      brightness: Brightness.dark,
+    ),
+    _ThemeEntry(
+      id: 'matrix',
+      name: 'Matrix',
+      nameKey: 'themeMatrix',
+      primaryColor: Color(0xFF00FF41),
+      effects: RetroEffects.matrix,
+      brightness: Brightness.dark,
+    ),
+    _ThemeEntry(
+      id: 'volcano',
+      name: 'Volcano',
+      nameKey: 'themeVolcano',
+      primaryColor: Color(0xFFFF4400),
+      effects: RetroEffects.volcano,
+      brightness: Brightness.dark,
+    ),
 
     // ── Retro ──────────────────────────────────────────────────────────────
     // Para añadir un retro nuevo: copiar una entrada, cambiar id/name/paletteId,
@@ -166,8 +270,7 @@ class AppThemesRegistry {
       _definitions.first.toCustomTheme(); // 'brand' es siempre el primero
 
   /// IDs de temas del sistema (no se pueden borrar).
-  static Set<String> get systemIds =>
-      _definitions.map((e) => e.id).toSet();
+  static Set<String> get systemIds => _definitions.map((e) => e.id).toSet();
 
   /// Resuelve un paletteId a su RetroTheme. Devuelve null para temas normales.
   static RetroTheme? retroThemeForPaletteId(String? paletteId) {
@@ -182,17 +285,19 @@ class AppThemesRegistry {
   static RetroEffects effectsForPaletteId(String? paletteId) {
     if (paletteId == null) return RetroEffects.none;
     return _definitions
-        .where((e) => e.paletteId == paletteId)
-        .map((e) => e.effects)
-        .firstOrNull ?? RetroEffects.none;
+            .where((e) => e.paletteId == paletteId)
+            .map((e) => e.effects)
+            .firstOrNull ??
+        RetroEffects.none;
   }
 
   /// Resuelve efectos por ID de tema.
   static RetroEffects effectsForId(String id) {
     return _definitions
-        .where((e) => e.id == id)
-        .map((e) => e.effects)
-        .firstOrNull ?? RetroEffects.none;
+            .where((e) => e.id == id)
+            .map((e) => e.effects)
+            .firstOrNull ??
+        RetroEffects.none;
   }
 
   /// ARB localization key para un theme ID, o null si no tiene.

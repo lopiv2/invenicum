@@ -27,7 +27,7 @@ class _TagPalette {
 
 String _normalizeTagValue(String tag) => tag.trim().toLowerCase();
 
-_TagPalette _buildTagPalette(String tag) {
+_TagPalette _buildTagPalette(String tag, {bool isDark = false}) {
   final normalized = _normalizeTagValue(tag);
   final hash = normalized.hashCode.abs();
   final hue = (hash % 360).toDouble();
@@ -38,10 +38,14 @@ _TagPalette _buildTagPalette(String tag) {
   return _TagPalette(
     background: baseColor.withValues(alpha: 0.12),
     border: baseColor.withValues(alpha: 0.34),
-    text: baseHsl.withLightness(0.28).toColor(),
+    text: isDark
+        ? baseHsl.withLightness(0.7).toColor()
+        : baseHsl.withLightness(0.28).toColor(),
     selectedBackground: baseColor.withValues(alpha: 0.24),
     selectedBorder: baseColor.withValues(alpha: 0.60),
-    selectedText: baseHsl.withLightness(0.22).toColor(),
+    selectedText: isDark
+        ? baseHsl.withLightness(0.85).toColor()
+        : baseHsl.withLightness(0.22).toColor(),
   );
 }
 
@@ -147,7 +151,7 @@ class _AssetTemplatesMarketScreenState
                                     const SizedBox(height: 6),
                                 itemBuilder: (context, index) {
                                   final tag = filteredTags[index];
-                                  final palette = _buildTagPalette(tag);
+                                  final palette = _buildTagPalette(tag, isDark: Theme.of(sheetContext).brightness == Brightness.dark);
 
                                   return Material(
                                     color: Colors.transparent,
@@ -211,7 +215,11 @@ class _AssetTemplatesMarketScreenState
     final l10n = AppLocalizations.of(context)!;
 
     return IconButton(
-      icon: const Icon(Icons.style_rounded, color: Colors.indigo, size: 22),
+      icon: Icon(
+        Icons.style_rounded,
+        size: 22,
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+      ),
       tooltip: l10n.filterByTagTooltip,
       onPressed: () => _openTagSearchSheet(availableTags),
     );
@@ -282,6 +290,16 @@ class _AssetTemplatesMarketScreenState
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    Color lightenForDark(Color c) {
+      if (!isDark) return c;
+      final hsl = HSLColor.fromColor(c);
+      return hsl.lightness < 0.5 ? hsl.withLightness(0.55).toColor() : c;
+    }
+
+    final marketAccent = lightenForDark(Colors.indigo);
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isMobile = screenWidth < 700;
     final isTablet = screenWidth >= 700 && screenWidth < 1100;
@@ -298,6 +316,8 @@ class _AssetTemplatesMarketScreenState
             templates,
             isMobile: isMobile,
             isTablet: isTablet,
+            marketAccent: marketAccent,
+            isDark: isDark,
           ),
           Expanded(
             child: _buildBody(
@@ -310,7 +330,7 @@ class _AssetTemplatesMarketScreenState
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.goNamed(RouteNames.templateCreate),
-        icon: const Icon(Icons.add_to_photos),
+        icon: Icon(Icons.add_to_photos, color: marketAccent),
         label: Text(l10n.publishTemplateLabel),
       ),
     );
@@ -381,10 +401,12 @@ class _AssetTemplatesMarketScreenState
 
   Widget _buildMarketHeader(
     BuildContext context,
-    TemplateProvider provider, // Añadimos el provider para el refresh
+    TemplateProvider provider,
     List<AssetTemplate> templates, {
     required bool isMobile,
     required bool isTablet,
+    required Color marketAccent,
+    required bool isDark,
   }) {
     final l10n = AppLocalizations.of(context)!;
     final availableTags = _getAvailableTags(templates);
@@ -420,14 +442,14 @@ class _AssetTemplatesMarketScreenState
                   alignment: Alignment.centerRight,
                   child: IconButton(
                     onPressed: () => provider.fetchMarketTemplates(),
-                    icon: const Icon(
+                    icon: Icon(
                       Icons.refresh_rounded,
-                      color: Colors.indigo,
+                      color: marketAccent,
                     ),
                     tooltip: l10n.refreshMarketTooltip,
                   ),
                 ),
-                const Icon(Icons.hub_rounded, size: 34, color: Colors.indigo),
+                Icon(Icons.hub_rounded, size: 34, color: marketAccent),
                 const SizedBox(height: 8),
                 Text(
                   l10n.invenicumCommunity,
@@ -435,7 +457,7 @@ class _AssetTemplatesMarketScreenState
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.3,
-                    color: Colors.indigo.shade900,
+                    color: marketAccent,
                   ),
                 ),
               ],
@@ -450,10 +472,10 @@ class _AssetTemplatesMarketScreenState
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.hub_rounded,
                         size: 40,
-                        color: Colors.indigo,
+                        color: marketAccent,
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -462,7 +484,7 @@ class _AssetTemplatesMarketScreenState
                             ?.copyWith(
                               fontWeight: FontWeight.w900,
                               letterSpacing: -0.5,
-                              color: Colors.indigo.shade900,
+                              color: marketAccent,
                             ),
                       ),
                     ],
@@ -472,9 +494,9 @@ class _AssetTemplatesMarketScreenState
                     top: 0,
                     child: IconButton(
                       onPressed: () => provider.fetchMarketTemplates(),
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.refresh_rounded,
-                        color: Colors.indigo,
+                        color: marketAccent,
                       ),
                       tooltip: l10n.refreshMarketTooltip,
                     ),
@@ -487,18 +509,26 @@ class _AssetTemplatesMarketScreenState
           Text(
             l10n.exploreCommunityConfigurations,
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.blueGrey, fontSize: 14),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 14,
+            ),
           ),
 
           const SizedBox(height: 24),
 
           // --- BUSCADOR HÍBRIDO (Nombre + Tags) ---
-          _buildModernSearchBar(availableTags, isMobile: isMobile),
+          _buildModernSearchBar(
+            availableTags,
+            isMobile: isMobile,
+            marketAccent: marketAccent,
+            isDark: isDark,
+          ),
 
           const SizedBox(height: 16),
 
           // --- CHIPS CENTRADOS ---
-          _buildActiveFiltersChips(),
+          _buildActiveFiltersChips(isDark: isDark),
         ],
       ),
     );
@@ -507,17 +537,20 @@ class _AssetTemplatesMarketScreenState
   Widget _buildModernSearchBar(
     List<String> availableTags, {
     required bool isMobile,
+    required Color marketAccent,
+    required bool isDark,
   }) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Container(
       constraints: BoxConstraints(minHeight: isMobile ? 90 : 54),
       padding: EdgeInsets.symmetric(horizontal: isMobile ? 10 : 0),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(27), // Forma de cápsula completa
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(27),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: theme.shadowColor.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 8),
           ),
@@ -530,9 +563,9 @@ class _AssetTemplatesMarketScreenState
                 Row(
                   children: [
                     const SizedBox(width: 8),
-                    const Icon(
+                    Icon(
                       Icons.search_rounded,
-                      color: Colors.indigo,
+                      color: marketAccent,
                       size: 22,
                     ),
                     const SizedBox(width: 10),
@@ -541,12 +574,12 @@ class _AssetTemplatesMarketScreenState
                         controller: _searchController,
                         onChanged: (value) =>
                             setState(() => searchQuery = value),
-                        style: const TextStyle(fontSize: 15),
+                        style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
                         decoration: InputDecoration(
                           hintText: l10n.searchByTemplateName,
                           border: InputBorder.none,
-                          hintStyle: const TextStyle(
-                            color: Colors.blueGrey,
+                          hintStyle: TextStyle(
+                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                             fontSize: 14,
                           ),
                           isDense: true,
@@ -586,9 +619,9 @@ class _AssetTemplatesMarketScreenState
           : Row(
               children: [
                 const SizedBox(width: 18),
-                const Icon(
+                Icon(
                   Icons.search_rounded,
-                  color: Colors.indigo,
+                  color: marketAccent,
                   size: 22,
                 ),
                 const SizedBox(width: 12),
@@ -597,12 +630,12 @@ class _AssetTemplatesMarketScreenState
                   child: TextField(
                     controller: _searchController,
                     onChanged: (value) => setState(() => searchQuery = value),
-                    style: const TextStyle(fontSize: 15),
+                    style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: l10n.searchByTemplateName,
                       border: InputBorder.none,
-                      hintStyle: const TextStyle(
-                        color: Colors.blueGrey,
+                      hintStyle: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
                         fontSize: 14,
                       ),
                       isDense: true,
@@ -613,7 +646,7 @@ class _AssetTemplatesMarketScreenState
                 Container(
                   height: 24,
                   width: 1,
-                  color: Colors.grey.withValues(alpha: 0.2),
+                  color: theme.colorScheme.outlineVariant,
                 ),
 
                 _buildTagSelectorButton(availableTags),
@@ -643,7 +676,7 @@ class _AssetTemplatesMarketScreenState
     );
   }
 
-  Widget _buildActiveFiltersChips() {
+  Widget _buildActiveFiltersChips({bool isDark = false}) {
     final showLogicToggle = _selectedTags.length > 1;
 
     return AnimatedSwitcher(
@@ -689,7 +722,7 @@ class _AssetTemplatesMarketScreenState
                     runSpacing: 8, // Espacio vertical si saltan de línea
                     alignment: WrapAlignment.center,
                     children: _selectedTags.map((tag) {
-                      final palette = _buildTagPalette(tag);
+                      final palette = _buildTagPalette(tag, isDark: isDark);
                       return RawChip(
                         label: Text(
                           tag,
@@ -751,19 +784,31 @@ class _TemplateCard extends StatelessWidget {
   }
 
   // Helper para no repetir código
-  Widget _buildInitial() {
+  Widget _buildInitial(ThemeData theme) {
     return Text(
       template.author.isNotEmpty ? template.author[0].toUpperCase() : '?',
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 14,
         fontWeight: FontWeight.bold,
-        color: Colors.indigo,
+        color: theme.colorScheme.primary,
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    Color lightenForDark(Color c) {
+      if (!isDark) return c;
+      final hsl = HSLColor.fromColor(c);
+      return hsl.lightness < 0.5 ? hsl.withLightness(0.55).toColor() : c;
+    }
+
+    final indigo = lightenForDark(Colors.indigo);
+    final teal = lightenForDark(Colors.teal);
+
     return Card(
       clipBehavior: Clip.antiAlias,
       elevation: 2,
@@ -784,8 +829,8 @@ class _TemplateCard extends StatelessWidget {
                   Container(
                     width: double.infinity,
                     color: template.isOfficial
-                        ? Colors.indigo.withValues(alpha: 0.1)
-                        : Colors.teal.withValues(alpha: 0.1),
+                        ? indigo.withValues(alpha: 0.1)
+                        : teal.withValues(alpha: 0.1),
                     child: Center(
                       child: Icon(
                         template.isOfficial
@@ -793,8 +838,8 @@ class _TemplateCard extends StatelessWidget {
                             : Icons.copy_all,
                         size: 40,
                         color: template.isOfficial
-                            ? Colors.indigo
-                            : Colors.teal,
+                            ? indigo
+                            : teal,
                       ),
                     ),
                   ),
@@ -808,22 +853,22 @@ class _TemplateCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.file_download_outlined,
-                            color: Colors.white,
+                            color: theme.colorScheme.surface,
                             size: 14,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             '${template.downloadCount}',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: theme.colorScheme.surface,
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -845,16 +890,19 @@ class _TemplateCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           template.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onSurface,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       if (template.isOfficial)
-                        const Icon(
+                        Icon(
                           Icons.verified,
                           size: 16,
-                          color: Colors.blue,
+                          color: theme.colorScheme.primary,
                         ),
                     ],
                   ),
@@ -863,7 +911,7 @@ class _TemplateCard extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 20,
-                        backgroundColor: Colors.indigo.shade100,
+                        backgroundColor: theme.colorScheme.primaryContainer,
                         child: ClipOval(
                           child:
                               template.authorAvatarUrl != null &&
@@ -881,7 +929,7 @@ class _TemplateCard extends StatelessWidget {
                                       "Avatar load error ${template.id}: $error",
                                     );
                                     }
-                                    return _buildInitial();
+                                    return _buildInitial(theme);
                                   },
                                   loadingBuilder:
                                       (context, child, loadingProgress) {
@@ -899,16 +947,16 @@ class _TemplateCard extends StatelessWidget {
                                         );
                                       },
                                 )
-                              : _buildInitial(), // 🚩 Si la URL es nula o vacía
+                              : _buildInitial(theme), // 🚩 Si la URL es nula o vacía
                         ),
                       ),
                       const SizedBox(width: 6),
                       Expanded(
                         child: Text(
                           '@${template.author}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Colors.blueGrey,
+                            color: theme.colorScheme.onSurfaceVariant,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -926,6 +974,7 @@ class _TemplateCard extends StatelessWidget {
                               tag,
                               isSelected: _isSelected(tag),
                               onTap: () => onTagTap(tag),
+                              isDark: isDark,
                             ),
                           )
                           .toList(),
@@ -943,8 +992,9 @@ class _TemplateCard extends StatelessWidget {
     String text, {
     required bool isSelected,
     required VoidCallback onTap,
+    bool isDark = false,
   }) {
-    final palette = _buildTagPalette(text);
+    final palette = _buildTagPalette(text, isDark: isDark);
 
     return Material(
       color: Colors.transparent,

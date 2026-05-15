@@ -19,6 +19,10 @@ import 'effects/vhs_jitter_layer.dart';
 import 'effects/pixel_grid_layer.dart';
 import 'effects/noise_layer.dart';
 import 'effects/dithering_layer.dart';
+import 'effects/snow_layer.dart';
+import 'effects/confetti_layer.dart';
+import 'effects/matrix_rain_layer.dart';
+import 'effects/volcano_layer.dart';
 import 'shaders/retro_shader_effect.dart';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -124,6 +128,67 @@ class RetroEffects {
   /// Size of each dither cell in logical pixels.
   final double ditheringPatternSize;
 
+  // ── Confetti ────────────────────────────────────────────────────────────────
+  /// Falling confetti particles overlay.
+  final bool confetti;
+
+  /// Opacity of confetti particles (0.0 – 1.0).
+  final double confettiOpacity;
+
+  /// Number of confetti particles on screen.
+  final int confettiParticleCount;
+
+  /// Falling speed multiplier.
+  final double confettiSpeed;
+
+  // ── Matrix rain ─────────────────────────────────────────────────────────────
+  /// Digital rain overlay (Matrix style).
+  final bool matrixRain;
+
+  /// Opacity of the rain.
+  final double matrixRainOpacity;
+
+  /// Number of character columns.
+  final int matrixRainColumns;
+
+  /// Falling speed multiplier.
+  final double matrixRainSpeed;
+
+  /// Character font size in logical pixels (null = auto).
+  final double? matrixRainFontSize;
+
+  /// Tick interval in ms (null = 80 / speed).
+  final int? matrixRainRefreshMs;
+
+  // ── Volcano ────────────────────────────────────────────────────────────────
+  /// Lava eruption particles from bottom-center.
+  final bool lava;
+
+  /// Opacity of lava particles (0.0 – 1.0).
+  final double lavaOpacity;
+
+  /// Number of lava particles.
+  final int lavaParticleCount;
+
+  /// Eruption speed multiplier.
+  final double lavaSpeed;
+
+  /// Upward launch power.
+  final double lavaPower;
+
+  // ── Snow ───────────────────────────────────────────────────────────────────
+  /// Falling snowflakes overlay.
+  final bool snow;
+
+  /// Opacity of snowflakes (0.0 – 1.0).
+  final double snowOpacity;
+
+  /// Number of snowflakes on screen.
+  final int snowFlakeCount;
+
+  /// Falling speed multiplier.
+  final double snowSpeed;
+
   /// When true, [RetroEffectsLayer] replaces all individual
   /// [CustomPainter] layers with a single GPU [FragmentShader] pass.
   final bool useShader;
@@ -157,6 +222,25 @@ class RetroEffects {
     this.dithering = false,
     this.ditheringStrength = 0.2,
     this.ditheringPatternSize = 4.0,
+    this.confetti = false,
+    this.confettiOpacity = 0.8,
+    this.confettiParticleCount = 40,
+    this.confettiSpeed = 1.0,
+    this.matrixRain = false,
+    this.matrixRainOpacity = 0.5,
+    this.matrixRainColumns = 24,
+    this.matrixRainSpeed = 1.0,
+    this.matrixRainFontSize = null,
+    this.matrixRainRefreshMs = null,
+    this.lava = false,
+    this.lavaOpacity = 0.7,
+    this.lavaParticleCount = 50,
+    this.lavaSpeed = 1.0,
+    this.lavaPower = 8.0,
+    this.snow = false,
+    this.snowOpacity = 0.6,
+    this.snowFlakeCount = 60,
+    this.snowSpeed = 1.0,
     this.useShader = false,
   });
 
@@ -235,9 +319,53 @@ class RetroEffects {
     ditheringPatternSize: 4.0,
   );
 
+  /// Snowy: gentle falling snowflakes overlay.
+  static const snowy = RetroEffects(
+    snow: true,
+    snowOpacity: 0.7,
+    snowFlakeCount: 300,
+    snowSpeed: 0.2,
+  );
+
+  /// Confetti: colorful falling confetti particles.
+  static const fiesta = RetroEffects(
+    confetti: true,
+    confettiOpacity: 0.8,
+    confettiParticleCount: 300,
+    confettiSpeed: 0.3,
+  );
+
+  /// Matrix: green digital rain (Matrix style).
+  static const matrix = RetroEffects(
+    matrixRain: true,
+    matrixRainOpacity: 0.5,
+    matrixRainColumns: 80,
+    matrixRainSpeed: 1.0,
+    matrixRainFontSize: 20,
+    matrixRainRefreshMs: 30,
+    phosphorGlow: true,
+    glowRadius: 1.0,
+    glowColor: Colors.green
+  );
+
+  /// Volcano: lava eruption particles from bottom-center.
+  static const volcano = RetroEffects(
+    lava: true,
+    lavaOpacity: 0.8,
+    lavaParticleCount: 100,
+    lavaSpeed: 1.0,
+    lavaPower: 12,
+    phosphorGlow: true,
+    glowRadius: 2.0,
+    glowColor: Color.fromARGB(255, 236, 85, 39),
+  );
+
   /// Pip-Boy 3000 (Fallout): green monochrome CRT with soft glow.
   /// Uses a single GPU [FragmentShader] instead of multiple [CustomPainter]s.
   static const pipboy3000 = RetroEffects(
+    vhsJitter: true,
+    jitterIntensity: 2.5,
+    jitterIntervalMs: 500,
     scanlines: true,
     scanlineOpacity: 0.15,
     scanlineSpacing: 2.5,
@@ -248,7 +376,7 @@ class RetroEffects {
     curvatureStrength: 0.02,
     flicker: true,
     flickerIntensity: 0.02,
-    useShader: true,
+    useShader: false, //Standby because the shader version is very expensive and needs optimization before enabling
   );
 }
 
@@ -418,7 +546,50 @@ class _RetroEffectsLayerState extends State<RetroEffectsLayer>
       result = Opacity(opacity: _flickerAlpha, child: result);
     }
 
-    // 10. VHS jitter (screen displacement — last to move everything)
+    // 10. Matrix rain overlay (digital rain)
+    if (widget.effects.matrixRain) {
+      result = MatrixRainLayer(
+        opacity: widget.effects.matrixRainOpacity,
+        columnCount: widget.effects.matrixRainColumns,
+        speed: widget.effects.matrixRainSpeed,
+        fontSize: widget.effects.matrixRainFontSize,
+        refreshMs: widget.effects.matrixRainRefreshMs,
+        child: result,
+      );
+    }
+
+    // 11. Volcano overlay (lava eruption)
+    if (widget.effects.lava) {
+      result = VolcanoLayer(
+        opacity: widget.effects.lavaOpacity,
+        particleCount: widget.effects.lavaParticleCount,
+        speed: widget.effects.lavaSpeed,
+        power: widget.effects.lavaPower,
+        child: result,
+      );
+    }
+
+    // 12. Confetti overlay (animated falling confetti)
+    if (widget.effects.confetti) {
+      result = ConfettiLayer(
+        opacity: widget.effects.confettiOpacity,
+        particleCount: widget.effects.confettiParticleCount,
+        speed: widget.effects.confettiSpeed,
+        child: result,
+      );
+    }
+
+    // 13. Snow overlay (animated falling snowflakes)
+    if (widget.effects.snow) {
+      result = SnowLayer(
+        opacity: widget.effects.snowOpacity,
+        flakeCount: widget.effects.snowFlakeCount,
+        speed: widget.effects.snowSpeed,
+        child: result,
+      );
+    }
+
+    // 14. VHS jitter (screen displacement — last to move everything)
     if (widget.effects.vhsJitter) {
       result = VhsJitterLayer(
         intensity: widget.effects.jitterIntensity,

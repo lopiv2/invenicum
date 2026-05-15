@@ -16,13 +16,22 @@ class IntegrationSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    Color lightenForDark(Color c) {
+      if (!isDark) return c;
+      final hsl = HSLColor.fromColor(c);
+      return hsl.lightness < 0.5 ? hsl.withLightness(0.5).toColor() : c;
+    }
+
+    final visAccent = lightenForDark(section.accent);
 
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface.withValues(alpha: 0.88),
         borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: section.accent.withValues(alpha: 0.18)),
+        border: Border.all(color: visAccent.withValues(alpha: 0.18)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.035),
@@ -40,10 +49,10 @@ class IntegrationSection extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: section.accent.withValues(alpha: 0.12),
+                  color: visAccent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(section.icon, color: section.accent, size: 22),
+                child: Icon(section.icon, color: visAccent, size: 22),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -98,7 +107,7 @@ class IntegrationSection extends StatelessWidget {
                   final integration = section.integrations[index];
                   return IntegrationTile(
                     integration: integration,
-                    accent: section.accent,
+                    accent: visAccent,
                     isLinked: isLinked(integration.id),
                     onTap: () => onTap(integration.id),
                   );
