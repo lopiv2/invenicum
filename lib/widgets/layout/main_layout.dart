@@ -136,10 +136,9 @@ class _MainLayoutState extends State<MainLayout> {
         children: [
           _buildBaseApp(context),
 
-          // Overlay image (collectibles) that floats across the screen randomly
-          // Add entries to AppOverlayImages.defaultImages in constants.dart
+          // CrossToons that float across the screen - fetched from the server
           FloatingOverlayImage(
-            configs: AppOverlayImages.defaultImages,
+            configs: context.watch<PreferencesProvider>().crossToonConfigs,
           ),
 
           // Use a single Positioned for the "Veni" container

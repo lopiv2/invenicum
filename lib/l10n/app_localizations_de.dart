@@ -2445,6 +2445,72 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aboutMenuLabel => 'Info';
 
   @override
+  String get crossToonsMenuLabel => 'CrossToons™';
+
+  @override
+  String get crossToonsTitle => 'CrossToons™';
+
+  @override
+  String get crossToonsDescription =>
+      'Verwalte deine schwebenden Overlay-Bilder, die über den Bildschirm wandern. Alle Bilder müssen im webp-Format sein und nach rechts schauen, außer es ist Michael Jackson, du weißt schon...';
+
+  @override
+  String get crossToonsAddNew => 'Neues CrossToon hinzufügen';
+
+  @override
+  String get crossToonsUploadImage => 'Bild hochladen';
+
+  @override
+  String get crossToonsConfigure => 'Konfigurieren';
+
+  @override
+  String get crossToonsDeleteConfirm => 'Dieses CrossToon löschen?';
+
+  @override
+  String get crossToonsDirectionLabel => 'Richtung';
+
+  @override
+  String get crossToonsZoneLabel => 'Zone';
+
+  @override
+  String get crossToonsSpeedLabel => 'Geschwindigkeit (Sekunden)';
+
+  @override
+  String get crossToonsFrequencyLabel => 'Häufigkeit (Sekunden)';
+
+  @override
+  String get crossToonsImageSizeLabel => 'Größe (px)';
+
+  @override
+  String get crossToonsFpsLabel => 'Animations-FPS';
+
+  @override
+  String get crossToonsTurnModeLabel => 'Wendemodus';
+
+  @override
+  String get crossToonsImageLabel => 'Bild';
+
+  @override
+  String get crossToonsImageHint => 'Bild auswählen';
+
+  @override
+  String get crossToonsTurnMinDelayLabel =>
+      'Minimale Wendeverzögerung (Sekunden)';
+
+  @override
+  String get crossToonsTurnMaxDelayLabel =>
+      'Maximale Wendeverzögerung (Sekunden)';
+
+  @override
+  String get crossToonsMaxTurnsLabel => 'Maximale Wendungen';
+
+  @override
+  String get crossToonsPreviewLabel => 'Vorschau';
+
+  @override
+  String get disable => 'Deaktivieren';
+
+  @override
   String get automaticDarkModeLabel => 'Automatischer Dunkelmodus';
 
   @override

@@ -2442,6 +2442,70 @@ class AppLocalizationsEs extends AppLocalizations {
   String get aboutMenuLabel => 'Información';
 
   @override
+  String get crossToonsMenuLabel => 'CrossToons™';
+
+  @override
+  String get crossToonsTitle => 'CrossToons™';
+
+  @override
+  String get crossToonsDescription =>
+      'Gestiona tus imágenes flotantes que cruzan la pantalla. Es necesario que todas las imágenes, en formato webp, estén mirando hacia la derecha, salvo que sea Michael Jackson, ya me entiendes...';
+
+  @override
+  String get crossToonsAddNew => 'Añadir CrossToon';
+
+  @override
+  String get crossToonsUploadImage => 'Subir Imagen';
+
+  @override
+  String get crossToonsConfigure => 'Configurar';
+
+  @override
+  String get crossToonsDeleteConfirm => '¿Eliminar este CrossToon?';
+
+  @override
+  String get crossToonsDirectionLabel => 'Dirección';
+
+  @override
+  String get crossToonsZoneLabel => 'Zona';
+
+  @override
+  String get crossToonsSpeedLabel => 'Velocidad (segundos)';
+
+  @override
+  String get crossToonsFrequencyLabel => 'Frecuencia (segundos)';
+
+  @override
+  String get crossToonsImageSizeLabel => 'Tamaño (px)';
+
+  @override
+  String get crossToonsFpsLabel => 'FPS Animación';
+
+  @override
+  String get crossToonsTurnModeLabel => 'Modo Giro';
+
+  @override
+  String get crossToonsImageLabel => 'Imagen';
+
+  @override
+  String get crossToonsImageHint => 'Selecciona una imagen';
+
+  @override
+  String get crossToonsTurnMinDelayLabel => 'Retardo mínimo de giro (segundos)';
+
+  @override
+  String get crossToonsTurnMaxDelayLabel => 'Retardo máximo de giro (segundos)';
+
+  @override
+  String get crossToonsMaxTurnsLabel => 'Giros máximos';
+
+  @override
+  String get crossToonsPreviewLabel => 'Vista previa';
+
+  @override
+  String get disable => 'Desactivar';
+
+  @override
   String get automaticDarkModeLabel => 'Modo oscuro automático';
 
   @override

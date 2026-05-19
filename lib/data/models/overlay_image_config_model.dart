@@ -5,6 +5,15 @@ import 'package:invenicum/core/utils/constants.dart';
 /// Each config controls the image asset, animation speed, facing direction,
 /// appearance frequency, screen zone, rendered size, and random turning.
 class OverlayImageConfig {
+  /// Server-side ID (null for local-only entries).
+  final int? id;
+
+  /// Whether this is a system default (non-editable, non-deletable).
+  final bool isDefault;
+
+  /// Whether this cross-toon is currently enabled and may appear on screen.
+  final bool enabled;
+
   /// Path to the WEBP asset (e.g. `assets/images/mascot.webp`).
   final String imagePath;
 
@@ -61,6 +70,9 @@ class OverlayImageConfig {
   final int animationFps;
 
   const OverlayImageConfig({
+    this.id,
+    this.isDefault = false,
+    this.enabled = true,
     required this.imagePath,
     this.speed = const Duration(seconds: 8),
     this.direction = AnimationDirection.alternate,
@@ -73,4 +85,83 @@ class OverlayImageConfig {
     this.maxTurns = 3,
     this.animationFps = 60,
   });
+
+  factory OverlayImageConfig.fromJson(Map<String, dynamic> json) {
+    return OverlayImageConfig(
+      id: json['id'] as int?,
+      isDefault: json['isDefault'] as bool? ?? false,
+      enabled: json['enabled'] as bool? ?? true,
+      imagePath: json['imagePath'] as String,
+      speed: Duration(seconds: json['speed'] as int? ?? 8),
+      direction: AnimationDirection.values.firstWhere(
+        (e) => e.name == json['direction'],
+        orElse: () => AnimationDirection.alternate,
+      ),
+      frequency: Duration(seconds: json['frequency'] as int? ?? 600),
+      zone: OverlayZone.values.firstWhere(
+        (e) => e.name == json['zone'],
+        orElse: () => OverlayZone.bottom,
+      ),
+      imageSize: (json['imageSize'] as num?)?.toDouble() ?? 80,
+      turnMode: TurnMode.values.firstWhere(
+        (e) => e.name == json['turnMode'],
+        orElse: () => TurnMode.on,
+      ),
+      turnMinDelay: json['turnMinDelay'] as int? ?? 2,
+      turnMaxDelay: json['turnMaxDelay'] as int? ?? 6,
+      maxTurns: json['maxTurns'] as int? ?? 3,
+      animationFps: json['animationFps'] as int? ?? 60,
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    if (id != null) 'id': id,
+    'isDefault': isDefault,
+    'enabled': enabled,
+    'imagePath': imagePath,
+    'speed': speed.inSeconds,
+    'direction': direction.name,
+    'frequency': frequency.inSeconds,
+    'zone': zone.name,
+    'imageSize': imageSize,
+    'turnMode': turnMode.name,
+    'turnMinDelay': turnMinDelay,
+    'turnMaxDelay': turnMaxDelay,
+    'maxTurns': maxTurns,
+    'animationFps': animationFps,
+  };
+
+  OverlayImageConfig copyWith({
+    int? id,
+    bool? isDefault,
+    bool? enabled,
+    String? imagePath,
+    Duration? speed,
+    AnimationDirection? direction,
+    Duration? frequency,
+    OverlayZone? zone,
+    double? imageSize,
+    TurnMode? turnMode,
+    int? turnMinDelay,
+    int? turnMaxDelay,
+    int? maxTurns,
+    int? animationFps,
+  }) {
+    return OverlayImageConfig(
+      id: id ?? this.id,
+      isDefault: isDefault ?? this.isDefault,
+      enabled: enabled ?? this.enabled,
+      imagePath: imagePath ?? this.imagePath,
+      speed: speed ?? this.speed,
+      direction: direction ?? this.direction,
+      frequency: frequency ?? this.frequency,
+      zone: zone ?? this.zone,
+      imageSize: imageSize ?? this.imageSize,
+      turnMode: turnMode ?? this.turnMode,
+      turnMinDelay: turnMinDelay ?? this.turnMinDelay,
+      turnMaxDelay: turnMaxDelay ?? this.turnMaxDelay,
+      maxTurns: maxTurns ?? this.maxTurns,
+      animationFps: animationFps ?? this.animationFps,
+    );
+  }
 }

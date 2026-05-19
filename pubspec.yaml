@@ -98,7 +98,7 @@ flutter:
   # ── Shaders ────────────────────────────────────────────────────────────────
   # Flutter compila estos .frag a formato Impeller en build time.
   shaders:
-    - assets/shaders/pipboy_effect.frag
+    # - assets/shaders/pipboy_effect.frag
 
   fonts:
     - family: SCUMMCredits

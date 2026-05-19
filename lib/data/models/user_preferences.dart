@@ -1,4 +1,5 @@
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
+import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/core/utils/constants.dart';
 
 class UserPreferences {
@@ -18,6 +19,7 @@ class UserPreferences {
   final bool autoResetFieldsOnSaveAndContinue;
   final bool cloneBusterEnabled;
   final String font;
+  final List<OverlayImageConfig> crossToonConfigs;
 
   // ── Tema ────────────────────────────────────────────────────────────────────
   final String? themeColor;      // e.g. '#55FFFF'
@@ -40,6 +42,7 @@ class UserPreferences {
     this.autoResetFieldsOnSaveAndContinue = true,
     this.cloneBusterEnabled = false,
     this.font = 'Default',
+    this.crossToonConfigs = const [],
     NotificationSettings? notifications,
     this.themeColor,
     this.themeBrightness,
@@ -73,6 +76,12 @@ class UserPreferences {
           json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
       cloneBusterEnabled: json['enableCloneBusterOmatic'] ?? false,
       font: json['font'] ?? 'Default',
+      crossToonConfigs: json['crossToonConfigs'] != null
+          ? (json['crossToonConfigs'] as List<dynamic>)
+              .map((e) =>
+                  OverlayImageConfig.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
           : NotificationSettings(),
@@ -98,6 +107,7 @@ class UserPreferences {
       'autoResetFieldsOnSaveAndContinue': autoResetFieldsOnSaveAndContinue,
       'cloneBusterEnabled': cloneBusterEnabled,
       'font': font,
+      'crossToonConfigs': crossToonConfigs.map((e) => e.toJson()).toList(),
       'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
       'themeColor': themeColor,
@@ -128,6 +138,7 @@ class UserPreferences {
     bool? autoResetFieldsOnSaveAndContinue,
     bool? cloneBusterEnabled,
     String? font,
+    List<OverlayImageConfig>? crossToonConfigs,
     String? themeColor,
     String? themeBrightness,
     String? paletteId,
@@ -148,6 +159,7 @@ class UserPreferences {
           autoResetFieldsOnSaveAndContinue ?? this.autoResetFieldsOnSaveAndContinue,
       cloneBusterEnabled: cloneBusterEnabled ?? this.cloneBusterEnabled,
       font: font ?? this.font,
+      crossToonConfigs: crossToonConfigs ?? this.crossToonConfigs,
       themeColor: themeColor ?? this.themeColor,
       themeBrightness: themeBrightness ?? this.themeBrightness,
       paletteId: paletteId ?? this.paletteId,
@@ -165,6 +177,7 @@ class UserPreferences {
       autoResetFieldsOnSaveAndContinue: true,
       cloneBusterEnabled: false,
       font: 'Default',
+      crossToonConfigs: const [],
       exchangeRates: {},
       notifications: NotificationSettings(),
       themeColor: null,

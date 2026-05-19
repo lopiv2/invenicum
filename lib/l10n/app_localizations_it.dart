@@ -2447,6 +2447,70 @@ class AppLocalizationsIt extends AppLocalizations {
   String get aboutMenuLabel => 'Informazioni';
 
   @override
+  String get crossToonsMenuLabel => 'CrossToons™';
+
+  @override
+  String get crossToonsTitle => 'CrossToons™';
+
+  @override
+  String get crossToonsDescription =>
+      'Gestisci le tue immagini fluttuanti che attraversano lo schermo. Tutte le immagini devono essere in formato webp e guardare verso destra, a meno che non sia Michael Jackson, capisci cosa intendo...';
+
+  @override
+  String get crossToonsAddNew => 'Aggiungi CrossToon';
+
+  @override
+  String get crossToonsUploadImage => 'Carica immagine';
+
+  @override
+  String get crossToonsConfigure => 'Configura';
+
+  @override
+  String get crossToonsDeleteConfirm => 'Eliminare questo CrossToon?';
+
+  @override
+  String get crossToonsDirectionLabel => 'Direzione';
+
+  @override
+  String get crossToonsZoneLabel => 'Zona';
+
+  @override
+  String get crossToonsSpeedLabel => 'Velocità (secondi)';
+
+  @override
+  String get crossToonsFrequencyLabel => 'Frequenza (secondi)';
+
+  @override
+  String get crossToonsImageSizeLabel => 'Dimensione (px)';
+
+  @override
+  String get crossToonsFpsLabel => 'FPS animazione';
+
+  @override
+  String get crossToonsTurnModeLabel => 'Modalità svolta';
+
+  @override
+  String get crossToonsImageLabel => 'Immagine';
+
+  @override
+  String get crossToonsImageHint => 'Seleziona un\'immagine';
+
+  @override
+  String get crossToonsTurnMinDelayLabel => 'Ritardo minimo svolta (secondi)';
+
+  @override
+  String get crossToonsTurnMaxDelayLabel => 'Ritardo massimo svolta (secondi)';
+
+  @override
+  String get crossToonsMaxTurnsLabel => 'Svolte massime';
+
+  @override
+  String get crossToonsPreviewLabel => 'Anteprima';
+
+  @override
+  String get disable => 'Disattivare';
+
+  @override
   String get automaticDarkModeLabel => 'Modalità oscura automatica';
 
   @override
