@@ -4480,6 +4480,132 @@ abstract class AppLocalizations {
   /// **'About'**
   String get aboutMenuLabel;
 
+  /// No description provided for @crossToonsMenuLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CrossToons™'**
+  String get crossToonsMenuLabel;
+
+  /// No description provided for @crossToonsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CrossToons™'**
+  String get crossToonsTitle;
+
+  /// No description provided for @crossToonsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your floating overlay images that roam across the screen. All images must be in webp format and facing to the right, unless it\'s Michael Jackson, you know what I mean...'**
+  String get crossToonsDescription;
+
+  /// No description provided for @crossToonsAddNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New CrossToon'**
+  String get crossToonsAddNew;
+
+  /// No description provided for @crossToonsUploadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Image'**
+  String get crossToonsUploadImage;
+
+  /// No description provided for @crossToonsConfigure.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure'**
+  String get crossToonsConfigure;
+
+  /// No description provided for @crossToonsDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this CrossToon?'**
+  String get crossToonsDeleteConfirm;
+
+  /// No description provided for @crossToonsDirectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Direction'**
+  String get crossToonsDirectionLabel;
+
+  /// No description provided for @crossToonsZoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Zone'**
+  String get crossToonsZoneLabel;
+
+  /// No description provided for @crossToonsSpeedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed (seconds)'**
+  String get crossToonsSpeedLabel;
+
+  /// No description provided for @crossToonsFrequencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency (seconds)'**
+  String get crossToonsFrequencyLabel;
+
+  /// No description provided for @crossToonsImageSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Size (px)'**
+  String get crossToonsImageSizeLabel;
+
+  /// No description provided for @crossToonsFpsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Animation FPS'**
+  String get crossToonsFpsLabel;
+
+  /// No description provided for @crossToonsTurnModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Mode'**
+  String get crossToonsTurnModeLabel;
+
+  /// No description provided for @crossToonsImageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get crossToonsImageLabel;
+
+  /// No description provided for @crossToonsImageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an image'**
+  String get crossToonsImageHint;
+
+  /// No description provided for @crossToonsTurnMinDelayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Min Delay (seconds)'**
+  String get crossToonsTurnMinDelayLabel;
+
+  /// No description provided for @crossToonsTurnMaxDelayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Max Delay (seconds)'**
+  String get crossToonsTurnMaxDelayLabel;
+
+  /// No description provided for @crossToonsMaxTurnsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Turns'**
+  String get crossToonsMaxTurnsLabel;
+
+  /// No description provided for @crossToonsPreviewLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get crossToonsPreviewLabel;
+
+  /// No description provided for @disable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get disable;
+
   /// No description provided for @automaticDarkModeLabel.
   ///
   /// In en, this message translates to:

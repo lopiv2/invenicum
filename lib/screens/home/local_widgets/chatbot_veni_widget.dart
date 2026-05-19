@@ -11,7 +11,7 @@ import 'package:provider/provider.dart';
 
 class VeniChatbot extends StatefulWidget {
   final String? initialPath;
-  final VoidCallback? onClose; // Callback para cerrar desde el Stack
+  final VoidCallback? onClose; // Callback to close from the Stack
   final Function(Offset)? onDrag;
 
   const VeniChatbot({super.key, this.initialPath, this.onClose, this.onDrag});
@@ -32,30 +32,31 @@ class _VeniChatbotState extends State<VeniChatbot> {
   }
 
   Future<void> _initializeChat() async {
-    // 1. Obtenemos el service
+    // 1. Get the service
     final chatService = Provider.of<ChatService>(context, listen: false);
 
-    // 2. Cargamos el historial de la base de datos
+    // 2. Load history from database
     await chatService.loadRemoteHistory();
 
-    // 3. Verificamos si realmente está vacío
+    // 3. Check if it's actually empty
     if (chatService.messages.isEmpty && mounted) {
-      // Pequeño delay de seguridad para asegurar que la UI está lista
+      // Small safety delay to ensure UI is ready
       await Future.delayed(const Duration(milliseconds: 500));
 
+      if (!mounted) return;
       final String currentLocale = Localizations.localeOf(context).languageCode;
 
-      if (mounted) setState(() => _isLoading = true);
+      setState(() => _isLoading = true);
 
       try {
         await chatService.sendMessageToVeni(
           message:
-              "SAY_HELLO_INITIAL", // 👈 Este comando dispara la lógica en el back
+              "SAY_HELLO_INITIAL", // 👈 This command triggers the logic on the back
           locale: currentLocale,
           contextData: {'currentPath': widget.initialPath ?? '/dashboard'},
         );
       } catch (e) {
-        debugPrint("Error en saludo inicial: $e");
+        debugPrint("Error in initial greeting: $e");
       } finally {
         if (mounted) setState(() => _isLoading = false);
       }
@@ -109,11 +110,11 @@ class _VeniChatbotState extends State<VeniChatbot> {
 
     if (action == 'CREATE_TEMPLATE') {
       try {
-        debugPrint("🧠 CREATE_TEMPLATE data bruta: $data");
+        debugPrint("🧠 CREATE_TEMPLATE raw data: $data");
 
-        // El backend puede anidar los datos de la plantilla de distintas maneras:
-        // 1. data = { name, fields, ... }              → directo
-        // 2. data = { data: { name, fields, ... } }    → un nivel anidado
+        // The backend can nest template data in different ways:
+        // 1. data = { name, fields, ... }              → direct
+        // 2. data = { data: { name, fields, ... } }    → one level nested
         Map<String, dynamic> templateData = data;
 
         if (!data.containsKey('name') && !data.containsKey('fields')) {
@@ -125,47 +126,47 @@ class _VeniChatbotState extends State<VeniChatbot> {
         }
 
         debugPrint(
-          "🧠 templateData resuelto: name=${templateData['name']} fields=${templateData['fields']?.length ?? 0}",
+          "🧠 templateData resolved: name=${templateData['name']} fields=${templateData['fields']?.length ?? 0}",
         );
 
         final draft = _mapAiDataToTemplate(templateData);
-        debugPrint("✅ Draft: ${draft.name} — ${draft.fields.length} campos");
+        debugPrint("✅ Draft: ${draft.name} — ${draft.fields.length} fields");
 
-        // Delay para que Veni muestre su mensaje antes de navegar
+        // Delay so Veni shows its message before navigating
         Future.delayed(const Duration(milliseconds: 600), () {
           if (!mounted) return;
           context.goNamed(RouteNames.templateCreate, extra: draft);
           if (widget.onClose != null) widget.onClose!();
         });
       } catch (e, stack) {
-        debugPrint("❌ Error en CREATE_TEMPLATE: $e$stack");
+        debugPrint("❌ Error in CREATE_TEMPLATE: $e$stack");
       }
     }
   }
 
   AssetTemplate _mapAiDataToTemplate(Map<String, dynamic> data) {
-    // 1. Extraemos la lista de campos que viene de la IA
+    // 1. Extract the field list from the AI
     final List<dynamic> rawFields = data['fields'] ?? [];
 
     return AssetTemplate(
-      id: 'draft_${DateTime.now().millisecondsSinceEpoch}', // ID temporal para el UI
+      id: 'draft_${DateTime.now().millisecondsSinceEpoch}', // Temporary ID for the UI
       name: data['name'] ?? 'Nueva Colección',
       description: data['description'] ?? '',
       category: data['category'] ?? 'General',
       author: 'Veni AI',
       tags: List<String>.from(data['tags'] ?? []),
-      // 2. Mapeamos a tu lista de fields con el modelo CustomFieldDefinition
+      // 2. Map to your field list using the CustomFieldDefinition model
       fields: rawFields.map((f) {
         final map = Map<String, dynamic>.from(f);
 
         return CustomFieldDefinition(
-          id: null, // Los campos nuevos no tienen ID de base de datos aún
+          id: null, // New fields don't have a database ID yet
           name: map['name'] ?? 'Campo',
-          // 3. Convertimos el string de la IA al Enum CustomFieldType
+          // 3. Convert the AI string to the CustomFieldType enum
           type: _parseAiFieldType(map['type']),
-          // Soportamos 'isRequired' o 'required' por si la IA varía el nombre
+          // Support 'isRequired' or 'required' in case the AI varies the name
           isRequired: map['isRequired'] ?? map['required'] ?? false,
-          // Aprovechamos tus nuevos campos de sumatorios y moneda
+          // Leverage your new sum and currency fields
           isSummable: map['isSummable'] ?? map['is_summable'] ?? false,
           isCountable: map['isCountable'] ?? map['is_countable'] ?? false,
           isMonetary: map['isMonetary'] ?? map['is_monetary'] ?? false,
@@ -239,13 +240,13 @@ class _VeniChatbotState extends State<VeniChatbot> {
             child: GestureDetector(
               onPanUpdate: (details) {
                 if (widget.onDrag != null) {
-                  widget.onDrag!(details.delta); // Llama a la función del padre
+                  widget.onDrag!(details.delta); // Calls the parent function
                 }
               },
               child: AppBar(
                 backgroundColor: theme.primaryColor,
                 automaticallyImplyLeading:
-                    false, // Quita flecha de atrás automática
+                    false, // Remove automatic back arrow
                 title: Row(
                   children: [
                     const Icon(
@@ -352,7 +353,7 @@ class _ChatBubble extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.only(
           top: 4,
-          bottom: 14, // espacio para el piquito que sobresale abajo
+          bottom: 14, // space for the protruding tail at the bottom
           left: isUser ? 40 : 4,
           right: isUser ? 4 : 40,
         ),
@@ -382,10 +383,10 @@ class _BubbleShapePainter extends CustomPainter {
 
   const _BubbleShapePainter({required this.isUser, required this.color});
 
-  // Medidas del piquito y radio de esquinas
-  static const double _r = 14; // radio esquinas
-  static const double _tw = 9; // ancho base piquito
-  static const double _th = 9; // alto piquito
+  // Tail measurements and corner radius
+  static const double _r = 14; // corner radius
+  static const double _tw = 9; // tail base width
+  static const double _th = 9; // tail height
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -394,86 +395,86 @@ class _BubbleShapePainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final w = size.width;
-    final h = size.height - _th; // altura del rectángulo sin el piquito
+    final h = size.height - _th; // rectangle height without the tail
     final path = Path();
 
     if (isUser) {
-      // Empezamos arriba-izquierda, sentido horario
-      // Esquina superior-izquierda
+      // Start top-left, clockwise
+      // Top-left corner
       path.moveTo(_r, 0);
-      // Borde superior
+      // Top edge
       path.lineTo(w - _r, 0);
-      // Esquina superior-derecha
+      // Top-right corner
       path.arcToPoint(
         Offset(w, _r),
         radius: const Radius.circular(_r),
         clockwise: true,
       );
-      // Borde derecho
+      // Right edge
       path.lineTo(w, h - _r);
-      // Esquina inferior-derecha → piquito sale aquí
+      // Bottom-right corner → tail comes out here
       path.arcToPoint(
         Offset(w - _r, h),
         radius: const Radius.circular(_r),
         clockwise: true,
       );
-      // Piquito abajo-derecha: base → punta → regreso
+      // Bottom-right tail: base → tip → return
       path.lineTo(w - _r, h);
       path.lineTo(w - _r + _tw * 0.4, h + _th * 0.4);
-      path.lineTo(w - _r + _tw, h + _th); // punta del piquito
-      path.lineTo(w - _r - _tw * 0.8, h); // regreso a la base
-      // Borde inferior hacia la izquierda
+      path.lineTo(w - _r + _tw, h + _th); // tail tip
+      path.lineTo(w - _r - _tw * 0.8, h); // return to base
+      // Bottom edge towards left
       path.lineTo(_r, h);
-      // Esquina inferior-izquierda
+      // Bottom-left corner
       path.arcToPoint(
         Offset(0, h - _r),
         radius: const Radius.circular(_r),
         clockwise: true,
       );
-      // Borde izquierdo
+      // Left edge
       path.lineTo(0, _r);
-      // Esquina superior-izquierda (cierre)
+      // Top-left corner (close)
       path.arcToPoint(
         Offset(_r, 0),
         radius: const Radius.circular(_r),
         clockwise: true,
       );
     } else {
-      // Empezamos arriba-izquierda, sentido horario
-      // Esquina superior-izquierda
+      // Start top-left, clockwise
+      // Top-left corner
       path.moveTo(_r, 0);
-      // Borde superior
+      // Top edge
       path.lineTo(w - _r, 0);
-      // Esquina superior-derecha
+      // Top-right corner
       path.arcToPoint(
         Offset(w, _r),
         radius: const Radius.circular(_r),
         clockwise: true,
       );
-      // Borde derecho
+      // Right edge
       path.lineTo(w, h - _r);
-      // Esquina inferior-derecha
+      // Bottom-right corner
       path.arcToPoint(
         Offset(w - _r, h),
         radius: const Radius.circular(_r),
         clockwise: true,
       );
-      // Borde inferior hacia la izquierda
+      // Bottom edge towards left
       path.lineTo(_r + _tw * 0.2, h);
-      // Piquito abajo-izquierda: base → punta → regreso
+      // Bottom-left tail: base → tip → return
       path.lineTo(_r - _tw + _tw * 0.8, h + _th * 0.4);
-      path.lineTo(_r - _tw, h + _th); // punta del piquito
-      path.lineTo(_r - _tw * 0.4, h); // regreso a la base
+      path.lineTo(_r - _tw, h + _th); // tail tip
+      path.lineTo(_r - _tw * 0.4, h); // return to base
       path.lineTo(_r, h);
-      // Esquina inferior-izquierda
+      // Bottom-left corner
       path.arcToPoint(
         Offset(0, h - _r),
         radius: const Radius.circular(_r),
         clockwise: true,
       );
-      // Borde izquierdo
+      // Left edge
       path.lineTo(0, _r);
-      // Esquina superior-izquierda (cierre)
+      // Top-left corner (close)
       path.arcToPoint(
         Offset(_r, 0),
         radius: const Radius.circular(_r),

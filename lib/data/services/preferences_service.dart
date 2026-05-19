@@ -1,5 +1,7 @@
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
+import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/data/models/user_preferences.dart';
 import 'package:invenicum/data/services/api_service.dart';
 
@@ -103,6 +105,100 @@ class PreferencesService {
       );
     } catch (e) {
       rethrow;
+    }
+  }
+
+  // ── CrossToons ────────────────────────────────────────────────────────────
+
+  /// Creates a new cross-toon config with an uploaded image.
+  Future<OverlayImageConfig> createCrossToon({
+    required Uint8List imageBytes,
+    required String imageName,
+    required OverlayImageConfig config,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'speed': config.speed.inSeconds,
+        'direction': config.direction.name,
+        'frequency': config.frequency.inSeconds,
+        'zone': config.zone.name,
+        'imageSize': config.imageSize,
+        'turnMode': config.turnMode.name,
+        'turnMinDelay': config.turnMinDelay,
+        'turnMaxDelay': config.turnMaxDelay,
+        'maxTurns': config.maxTurns,
+        'animationFps': config.animationFps,
+        'enabled': config.enabled,
+        'image': MultipartFile.fromBytes(
+          imageBytes,
+          filename: imageName,
+          contentType: DioMediaType('image', imageName.split('.').last),
+        ),
+      });
+
+      final response = await _dio.post('/preferences/cross-toons', data: formData);
+      final json = response.data is Map<String, dynamic> && response.data['data'] != null
+          ? response.data['data'] as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
+      return OverlayImageConfig.fromJson(json);
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map
+          ? (e.response?.data['error'] ?? e.response?.data['message'])
+          : e.message;
+      throw Exception('Error creating cross-toon: $msg');
+    }
+  }
+
+  /// Updates an existing cross-toon config (with optional new image).
+  Future<OverlayImageConfig> updateCrossToon({
+    required int id,
+    Uint8List? imageBytes,
+    String? imageName,
+    required OverlayImageConfig config,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        'speed': config.speed.inSeconds,
+        'direction': config.direction.name,
+        'frequency': config.frequency.inSeconds,
+        'zone': config.zone.name,
+        'imageSize': config.imageSize,
+        'turnMode': config.turnMode.name,
+        'turnMinDelay': config.turnMinDelay,
+        'turnMaxDelay': config.turnMaxDelay,
+        'maxTurns': config.maxTurns,
+        'animationFps': config.animationFps,
+        'enabled': config.enabled,
+        if (imageBytes != null && imageName != null)
+          'image': MultipartFile.fromBytes(
+            imageBytes,
+            filename: imageName,
+            contentType: DioMediaType('image', imageName.split('.').last),
+          ),
+      });
+
+      final response = await _dio.patch('/preferences/cross-toons/$id', data: formData);
+      final json = response.data is Map<String, dynamic> && response.data['data'] != null
+          ? response.data['data'] as Map<String, dynamic>
+          : response.data as Map<String, dynamic>;
+      return OverlayImageConfig.fromJson(json);
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map
+          ? (e.response?.data['error'] ?? e.response?.data['message'])
+          : e.message;
+      throw Exception('Error updating cross-toon: $msg');
+    }
+  }
+
+  /// Deletes a cross-toon config from the server.
+  Future<void> deleteCrossToon(int id) async {
+    try {
+      await _dio.delete('/preferences/cross-toons/$id');
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map
+          ? (e.response?.data['error'] ?? e.response?.data['message'])
+          : e.message;
+      throw Exception('Error deleting cross-toon: $msg');
     }
   }
 }

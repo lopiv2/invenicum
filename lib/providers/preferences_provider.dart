@@ -1,9 +1,11 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
+import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/data/models/user_preferences.dart';
 import 'package:invenicum/data/services/preferences_service.dart';
 
@@ -34,6 +36,7 @@ class PreferencesProvider with ChangeNotifier {
       _prefs.autoResetFieldsOnSaveAndContinue;
   bool get cloneBusterEnabled => _prefs.cloneBusterEnabled;
   String get selectedFontFamily => _prefs.font;
+  List<OverlayImageConfig> get crossToonConfigs => _prefs.crossToonConfigs;
 
   PreferencesProvider(this._preferencesService);
 
@@ -393,6 +396,93 @@ class PreferencesProvider with ChangeNotifier {
       notifyListeners();
       debugPrint('Error updating font family preference: $e');
       rethrow;
+    }
+  }
+
+  Future<void> addCrossToonConfig({
+    required Uint8List imageBytes,
+    required String imageName,
+    required OverlayImageConfig config,
+  }) async {
+    try {
+      final saved = await _preferencesService.createCrossToon(
+        imageBytes: imageBytes,
+        imageName: imageName,
+        config: config,
+      );
+      final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs)
+        ..add(saved);
+      _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error adding cross-toon config: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateCrossToonConfig({
+    required int index,
+    required OverlayImageConfig config,
+    Uint8List? imageBytes,
+    String? imageName,
+  }) async {
+    final previousPrefs = _prefs;
+    final existing = _prefs.crossToonConfigs[index];
+    if (existing.id == null) return;
+    try {
+      final saved = await _preferencesService.updateCrossToon(
+        id: existing.id!,
+        imageBytes: imageBytes,
+        imageName: imageName,
+        config: config,
+      );
+      final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs);
+      updatedList[index] = saved;
+      _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+      notifyListeners();
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating cross-toon config: $e');
+    }
+  }
+
+  Future<void> removeCrossToonConfig(int index) async {
+    final previousPrefs = _prefs;
+    final config = _prefs.crossToonConfigs[index];
+    final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs)
+      ..removeAt(index);
+    _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+    notifyListeners();
+    try {
+      if (config.id != null) {
+        await _preferencesService.deleteCrossToon(config.id!);
+      }
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error removing cross-toon config: $e');
+    }
+  }
+
+  Future<void> toggleCrossToonEnabled(int index, bool enabled) async {
+    final previousPrefs = _prefs;
+    final config = _prefs.crossToonConfigs[index];
+    final updated = config.copyWith(enabled: enabled);
+    final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs)
+      ..[index] = updated;
+    _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+    notifyListeners();
+    if (config.id == null) return;
+    try {
+      await _preferencesService.updateCrossToon(
+        id: config.id!,
+        config: updated,
+      );
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error toggling cross-toon enabled: $e');
     }
   }
 

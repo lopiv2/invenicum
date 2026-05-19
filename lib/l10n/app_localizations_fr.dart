@@ -2443,6 +2443,70 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aboutMenuLabel => 'À propos';
 
   @override
+  String get crossToonsMenuLabel => 'CrossToons™';
+
+  @override
+  String get crossToonsTitle => 'CrossToons™';
+
+  @override
+  String get crossToonsDescription =>
+      'Gérez vos images flottantes qui traversent l\'écran. Toutes les images doivent être au format webp et orientées vers la droite, sauf s\'il s\'agit de Michael Jackson, vous voyez ce que je veux dire...';
+
+  @override
+  String get crossToonsAddNew => 'Ajouter un CrossToon';
+
+  @override
+  String get crossToonsUploadImage => 'Télécharger une image';
+
+  @override
+  String get crossToonsConfigure => 'Configurer';
+
+  @override
+  String get crossToonsDeleteConfirm => 'Supprimer ce CrossToon ?';
+
+  @override
+  String get crossToonsDirectionLabel => 'Direction';
+
+  @override
+  String get crossToonsZoneLabel => 'Zone';
+
+  @override
+  String get crossToonsSpeedLabel => 'Vitesse (secondes)';
+
+  @override
+  String get crossToonsFrequencyLabel => 'Fréquence (secondes)';
+
+  @override
+  String get crossToonsImageSizeLabel => 'Taille (px)';
+
+  @override
+  String get crossToonsFpsLabel => 'FPS Animation';
+
+  @override
+  String get crossToonsTurnModeLabel => 'Mode virage';
+
+  @override
+  String get crossToonsImageLabel => 'Image';
+
+  @override
+  String get crossToonsImageHint => 'Sélectionner une image';
+
+  @override
+  String get crossToonsTurnMinDelayLabel => 'Délai min. de virage (secondes)';
+
+  @override
+  String get crossToonsTurnMaxDelayLabel => 'Délai max. de virage (secondes)';
+
+  @override
+  String get crossToonsMaxTurnsLabel => 'Virages maximum';
+
+  @override
+  String get crossToonsPreviewLabel => 'Aperçu';
+
+  @override
+  String get disable => 'Désactiver';
+
+  @override
   String get automaticDarkModeLabel => 'Mode sombre automatique';
 
   @override

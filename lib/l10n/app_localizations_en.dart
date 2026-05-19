@@ -2417,6 +2417,70 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutMenuLabel => 'About';
 
   @override
+  String get crossToonsMenuLabel => 'CrossToons™';
+
+  @override
+  String get crossToonsTitle => 'CrossToons™';
+
+  @override
+  String get crossToonsDescription =>
+      'Manage your floating overlay images that roam across the screen. All images must be in webp format and facing to the right, unless it\'s Michael Jackson, you know what I mean...';
+
+  @override
+  String get crossToonsAddNew => 'Add New CrossToon';
+
+  @override
+  String get crossToonsUploadImage => 'Upload Image';
+
+  @override
+  String get crossToonsConfigure => 'Configure';
+
+  @override
+  String get crossToonsDeleteConfirm => 'Delete this CrossToon?';
+
+  @override
+  String get crossToonsDirectionLabel => 'Direction';
+
+  @override
+  String get crossToonsZoneLabel => 'Zone';
+
+  @override
+  String get crossToonsSpeedLabel => 'Speed (seconds)';
+
+  @override
+  String get crossToonsFrequencyLabel => 'Frequency (seconds)';
+
+  @override
+  String get crossToonsImageSizeLabel => 'Size (px)';
+
+  @override
+  String get crossToonsFpsLabel => 'Animation FPS';
+
+  @override
+  String get crossToonsTurnModeLabel => 'Turn Mode';
+
+  @override
+  String get crossToonsImageLabel => 'Image';
+
+  @override
+  String get crossToonsImageHint => 'Select an image';
+
+  @override
+  String get crossToonsTurnMinDelayLabel => 'Turn Min Delay (seconds)';
+
+  @override
+  String get crossToonsTurnMaxDelayLabel => 'Turn Max Delay (seconds)';
+
+  @override
+  String get crossToonsMaxTurnsLabel => 'Max Turns';
+
+  @override
+  String get crossToonsPreviewLabel => 'Preview';
+
+  @override
+  String get disable => 'Disable';
+
+  @override
   String get automaticDarkModeLabel => 'Automatic dark mode';
 
   @override

@@ -21,7 +21,8 @@ class RetroShaderEffect extends StatefulWidget {
     super.key,
     required this.effects,
     required this.child,
-    this.shaderAsset = 'assets/shaders/pipboy_effect.frag',
+    this.shaderAsset = '',
+    //this.shaderAsset = 'assets/shaders/pipboy_effect.frag',
   });
 
   @override
