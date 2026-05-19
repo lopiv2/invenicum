@@ -97,7 +97,7 @@ flutter:
 
   # ── Shaders ────────────────────────────────────────────────────────────────
   # Flutter compila estos .frag a formato Impeller en build time.
-  shaders:
+  # shaders:
     # - assets/shaders/pipboy_effect.frag
 
   fonts:

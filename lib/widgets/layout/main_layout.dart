@@ -9,7 +9,6 @@ import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
-import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/core/utils/retro/retro_theme_extension.dart';
 import 'package:invenicum/screens/home/local_widgets/chatbot_veni_widget.dart';
 import 'package:invenicum/widgets/layout/sidebar_layout.dart';
