@@ -1432,6 +1432,27 @@ class AppLocalizationsEn extends AppLocalizations {
       'Query cards and sets from collectible card games to enrich your inventory automatically.';
 
   @override
+  String get integrationPokemonPriceTrackerDesc =>
+      'Connect your PokemonPriceTracker account to sync your collection automatically.';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyLabel => 'API Key';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyHint =>
+      'Enter your PokemonPriceTracker API key';
+
+  @override
+  String get integrationRawgDesc =>
+      'Query video games from the RAWG database to enrich your inventory automatically.';
+
+  @override
+  String get integrationRawgApiKeyLabel => 'API Key';
+
+  @override
+  String get integrationRawgApiKeyHint => 'Enter your RAWG API key';
+
+  @override
   String get integrationQrGeneratorName => 'QR Generator';
 
   @override
@@ -2437,6 +2458,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get crossToonsDeleteConfirm => 'Delete this CrossToon?';
+
+  @override
+  String crossToonsDeleteConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?';
+  }
 
   @override
   String get crossToonsDirectionLabel => 'Direction';

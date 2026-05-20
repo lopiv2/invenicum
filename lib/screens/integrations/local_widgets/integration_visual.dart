@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 
 class IntegrationVisual extends StatelessWidget {
   const IntegrationVisual({
-    required this.icon,
+    this.icon,
     required this.image,
     required this.accent,
   });
 
-  final Widget icon;
+  final Widget? icon;
   final Image? image;
   final Color accent;
 
@@ -28,7 +28,11 @@ class IntegrationVisual extends StatelessWidget {
         color: visAccent.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(18),
       ),
-      child: FittedBox(fit: BoxFit.contain, child: icon),
+      child: icon != null
+          ? FittedBox(fit: BoxFit.contain, child: icon!)
+          : (image != null
+              ? image!
+              : const SizedBox.shrink()),
     );
   }
 }

@@ -40,7 +40,7 @@ class ExternalImportWidget extends StatelessWidget {
                   value: source.id,
                   child: Row(
                     children: [
-                      SizedBox(width: 20, child: source.icon),
+                      SizedBox(width: 20, child: source.icon ?? source.image ?? const SizedBox.shrink()),
                       SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                       Flexible(
                         child: Text(

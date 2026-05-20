@@ -1,7 +1,6 @@
 // lib/utils/constants.dart
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
@@ -98,6 +97,8 @@ class AppIntegrations {
   static const String bgg = 'bgg';
   static const String pokemon = 'pokemon';
   static const String tcgdex = 'tcgdex';
+  static const String pokemonPriceTracker = 'pokemon_price_tracker';
+  static const String rawg = 'rawg';
 
   /// Returns the complete list of models for the UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {
@@ -244,6 +245,42 @@ class AppIntegrations {
         icon: const Icon(Icons.style_outlined, color: Colors.deepOrange),
         description: l10n.integrationTcgdexDesc,
         fields: [],
+      ),
+      IntegrationModel(
+        id: pokemonPriceTracker,
+        name: 'PokemonPriceTracker',
+        isDataSource: true,
+        image: Image.asset(
+          'assets/images/pokemonpricetracker_logo.png',
+          height: 35,
+        ),
+        description: l10n.integrationPokemonPriceTrackerDesc,
+        fields: [
+          IntegrationField(
+            id: 'apiKey',
+            label: l10n.integrationPokemonPriceTrackerApiKeyLabel,
+            type: IntegrationFieldType.password,
+            helperText: l10n.integrationPokemonPriceTrackerApiKeyHint,
+          ),
+        ],
+      ),
+      IntegrationModel(
+        id: rawg,
+        name: 'RAWG',
+        isDataSource: true,
+        image: Image.asset(
+          'assets/images/RAWG_logo.png',
+          height: 35,
+        ),
+        description: l10n.integrationRawgDesc,
+        fields: [
+          IntegrationField(
+            id: 'apiKey',
+            label: l10n.integrationRawgApiKeyLabel,
+            type: IntegrationFieldType.password,
+            helperText: l10n.integrationRawgApiKeyHint,
+          ),
+        ],
       ),
 
       // --- TOOLS ---
