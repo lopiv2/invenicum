@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/utils/retro/retro_confirm_dialog.dart';
 import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
@@ -68,7 +69,20 @@ class CrossToonsCardWidget extends StatelessWidget {
                               ),
                       onDelete: entry.value.isDefault
                           ? null
-                          : () => prefsProv.removeCrossToonConfig(entry.key),
+                          : () async {
+                              final confirmed = await showAppConfirmDialog(
+                                context: context,
+                                title: l10n.crossToonsDeleteConfirm,
+                                message: l10n.crossToonsDeleteConfirmMessage(
+                                  entry.value.imagePath.split('/').last,
+                                ),
+                                confirmLabel: l10n.delete,
+                                destructive: true,
+                              );
+                              if (confirmed && context.mounted) {
+                                prefsProv.removeCrossToonConfig(entry.key);
+                              }
+                            },
                       onToggle: entry.value.isDefault
                           ? null
                           : (v) => prefsProv.toggleCrossToonEnabled(entry.key, v ?? false),
@@ -730,7 +744,7 @@ class _CrossToonTile extends StatelessWidget {
           color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: ListTile(
+        child: Material(type: MaterialType.transparency, child: ListTile(
           dense: true,
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(4),
@@ -772,6 +786,7 @@ class _CrossToonTile extends StatelessWidget {
                     ),
                   ],
                 ),
+        ),
         ),
       ),
     );

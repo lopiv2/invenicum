@@ -2716,6 +2716,42 @@ abstract class AppLocalizations {
   /// **'Query cards and sets from collectible card games to enrich your inventory automatically.'**
   String get integrationTcgdexDesc;
 
+  /// No description provided for @integrationPokemonPriceTrackerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your PokemonPriceTracker account to sync your collection automatically.'**
+  String get integrationPokemonPriceTrackerDesc;
+
+  /// No description provided for @integrationPokemonPriceTrackerApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get integrationPokemonPriceTrackerApiKeyLabel;
+
+  /// No description provided for @integrationPokemonPriceTrackerApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your PokemonPriceTracker API key'**
+  String get integrationPokemonPriceTrackerApiKeyHint;
+
+  /// No description provided for @integrationRawgDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Query video games from the RAWG database to enrich your inventory automatically.'**
+  String get integrationRawgDesc;
+
+  /// No description provided for @integrationRawgApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get integrationRawgApiKeyLabel;
+
+  /// No description provided for @integrationRawgApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your RAWG API key'**
+  String get integrationRawgApiKeyHint;
+
   /// No description provided for @integrationQrGeneratorName.
   ///
   /// In en, this message translates to:
@@ -4521,6 +4557,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete this CrossToon?'**
   String get crossToonsDeleteConfirm;
+
+  /// No description provided for @crossToonsDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {name}?'**
+  String crossToonsDeleteConfirmMessage(String name);
 
   /// No description provided for @crossToonsDirectionLabel.
   ///

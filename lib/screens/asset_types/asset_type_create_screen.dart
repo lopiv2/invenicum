@@ -152,19 +152,15 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
     super.dispose();
   }
 
-  // --- DISEÑO MODERNO 2026 ---
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      // Fondo sutilmente coloreado para dar profundidad
       backgroundColor: theme.colorScheme.surfaceContainerLowest,
       body: Center(
         child: Container(
-          // Restringimos el ancho para que en Web no se vea estirado
           constraints: const BoxConstraints(maxWidth: 900),
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
@@ -183,7 +179,6 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                     runSpacing: 24,
                     alignment: WrapAlignment.center,
                     children: [
-                      // Tarjeta de Imagen (Arriba y prominente)
                       _buildBentoBox(
                         width: 350,
                         child: AssetTypeImageSection(
@@ -192,8 +187,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                           onRemoveImage: _removeImage,
                         ),
                       ),
-
-                      // Tarjeta de Configuración Principal
+                
                       _buildBentoBox(
                         width: 480,
                         child: Column(
@@ -251,10 +245,8 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                           ],
                         ),
                       ),
-
-                      // Tarjeta de Campos Dinámicos (Ocupa el ancho total disponible)
                       _buildBentoBox(
-                        width: 854, // Casi el ancho máximo del contenedor
+                        width: 854,
                         child: AssetTypeCustomFieldsSection(
                           fieldDefinitions: _fieldDefinitions,
                           availableDataLists: _availableDataLists,
@@ -273,7 +265,6 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
 
                   const SizedBox(height: 48),
 
-                  // 3. Botones de Acción (Flotantes o fijos al final)
                   AssetTypeActionButtons(
                     onSave: _saveAssetType,
                   saveLabel: l10n.createAssetTypeButton,
@@ -287,7 +278,6 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
     );
   }
 
-  // Widget auxiliar para crear las "Cajas Bento"
   Widget _buildBentoBox({required double width, required Widget child}) {
     final theme = Theme.of(context);
     return Container(
@@ -297,7 +287,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(
           28,
-        ), // Bordes muy redondeados (2026 style)
+        ),
         border: Border.all(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),

@@ -453,7 +453,7 @@ class ModernPluginCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
                 ),
-                child: CheckboxListTile(
+                child: Material(type: MaterialType.transparency, child: CheckboxListTile(
                   title: Text(
                     l10n.deleteFromGithubLabel,
                     style: TextStyle(
@@ -472,6 +472,7 @@ class ModernPluginCard extends StatelessWidget {
                   activeColor: Colors.red,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
+              ),
               ),
             ],
           ],

@@ -171,7 +171,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
             color: colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
-        child: CheckboxListTile(
+        child: Material(type: MaterialType.transparency, child: CheckboxListTile(
           title: Text(
             fieldDef.name,
             style: const TextStyle(fontWeight: FontWeight.w500),
@@ -190,6 +190,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
+        ),
         ),
       ),
     );

@@ -105,7 +105,11 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
           // --- Cabecera ---
           Row(
             children: [
-              SizedBox(width: 32, height: 32, child: widget.integration.icon),
+              SizedBox(
+                width: 32,
+                height: 32,
+                child: widget.integration.icon ?? widget.integration.image ?? Container(),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -113,10 +117,11 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
               ),
-              InkWell(
-                onTap: () => AppUtils.launchUrlWeb('https://boardgamegeek.com'),
-                child: widget.integration.image ?? Container(),
-              ),
+              if (widget.integration.icon != null && widget.integration.image != null)
+                InkWell(
+                  onTap: () => AppUtils.launchUrlWeb('https://boardgamegeek.com'),
+                  child: widget.integration.image,
+                ),
               if (_isIdLoading)
                 const SizedBox(
                   width: 20,

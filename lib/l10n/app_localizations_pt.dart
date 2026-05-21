@@ -1444,6 +1444,27 @@ class AppLocalizationsPt extends AppLocalizations {
       'Consulte cartas e expansões de jogos de cartas colecionáveis para enriquecer seu inventário automaticamente.';
 
   @override
+  String get integrationPokemonPriceTrackerDesc =>
+      'Conecte sua conta PokemonPriceTracker para sincronizar sua coleção automaticamente.';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyLabel => 'Chave API';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyHint =>
+      'Insira sua chave de API do PokemonPriceTracker';
+
+  @override
+  String get integrationRawgDesc =>
+      'Consulte videogames do banco de dados RAWG para enriquecer seu inventário automaticamente.';
+
+  @override
+  String get integrationRawgApiKeyLabel => 'Chave API';
+
+  @override
+  String get integrationRawgApiKeyHint => 'Insira sua chave de API do RAWG';
+
+  @override
   String get integrationQrGeneratorName => 'Gerador de QR';
 
   @override
@@ -2455,6 +2476,11 @@ class AppLocalizationsPt extends AppLocalizations {
 
   @override
   String get crossToonsDeleteConfirm => 'Excluir este CrossToon?';
+
+  @override
+  String crossToonsDeleteConfirmMessage(String name) {
+    return 'Tem certeza de que deseja excluir $name?';
+  }
 
   @override
   String get crossToonsDirectionLabel => 'Direção';

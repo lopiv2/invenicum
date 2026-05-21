@@ -90,7 +90,9 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
               (integration) =>
                   integration.id == AppIntegrations.bgg ||
                   integration.id == AppIntegrations.pokemon ||
-                  integration.id == AppIntegrations.tcgdex,
+                  integration.id == AppIntegrations.tcgdex ||
+                  integration.id == AppIntegrations.pokemonPriceTracker ||
+                  integration.id == AppIntegrations.rawg,
             )
             .toList(),
       ),

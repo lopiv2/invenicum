@@ -40,7 +40,7 @@ class NotificationSettingsCardWidget extends StatelessWidget {
                 color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: ReorderableListView.builder(
+              child: Material(type: MaterialType.transparency, child: ReorderableListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: channels.length,
@@ -66,6 +66,7 @@ class NotificationSettingsCardWidget extends StatelessWidget {
                   );
                 },
               ),
+            ),
             ),
 
             const Padding(

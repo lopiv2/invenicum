@@ -660,6 +660,12 @@
   "integrationBggDesc": "Conecta tu cuenta de BGG para sincronizar tu colección y enriquecer tus datos automáticamente.",
   "integrationPokemonDesc": "Conéctate a la API de Pokemon para sincronizar tu colección y enriquecer tus datos automáticamente.",
   "integrationTcgdexDesc": "Consulta cartas y expansiones de juegos de cartas coleccionables para enriquecer tu inventario automáticamente.",
+  "integrationPokemonPriceTrackerDesc": "Conecta tu cuenta de PokemonPriceTracker para sincronizar tu colección automáticamente.",
+  "integrationPokemonPriceTrackerApiKeyLabel": "Clave API",
+  "integrationPokemonPriceTrackerApiKeyHint": "Introduce tu clave de API de PokemonPriceTracker",
+  "integrationRawgDesc": "Consulta videojuegos de la base de datos RAWG para enriquecer tu inventario automáticamente.",
+  "integrationRawgApiKeyLabel": "Clave API",
+  "integrationRawgApiKeyHint": "Introduce tu clave de API de RAWG",
   "integrationQrGeneratorName": "Generador QR",
   "integrationQrLabelsDesc": "Configura el formato de tus etiquetas imprimibles.",
   "integrationQrPageSizeLabel": "Tamaño de página (A4, Carta)",
@@ -1206,6 +1212,14 @@
   "crossToonsUploadImage": "Subir Imagen",
   "crossToonsConfigure": "Configurar",
   "crossToonsDeleteConfirm": "¿Eliminar este CrossToon?",
+  "crossToonsDeleteConfirmMessage": "¿Estás seguro de que quieres eliminar {name}?",
+  "@crossToonsDeleteConfirmMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "crossToonsDirectionLabel": "Dirección",
   "crossToonsZoneLabel": "Zona",
   "crossToonsSpeedLabel": "Velocidad (segundos)",
