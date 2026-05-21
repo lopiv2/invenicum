@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/services/inventory_item_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -9,10 +10,12 @@ import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
+import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
 import 'package:invenicum/screens/assets/local_widgets/barcode_scanner_widget.dart';
-import 'package:invenicum/screens/assets/local_widgets/candidate_card_widget.dart';
+import 'package:invenicum/screens/assets/local_widgets/candidate_selection_body.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
-import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
+import 'package:invenicum/screens/assets/local_widgets/asset_save_button_bar.dart';
+import 'package:invenicum/screens/assets/local_widgets/scraper_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/status_section_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -30,6 +33,7 @@ import 'package:invenicum/data/services/ai_service.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/core/utils/asset_form_utils.dart';
+import 'package:invenicum/data/services/clone_buster_service.dart';
 
 import 'package:invenicum/widgets/ui/magic_ai_dialog_widget.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -276,12 +280,19 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         final candidates = _normalizeCandidates(enrichedData['candidates']);
         if (candidates.isEmpty) {
           throw Exception(
-            'La búsqueda devolvió múltiples resultados sin candidatos.',
+            ' Query returned multiple results but no candidates to select from.',
           );
         }
 
         final selectedCandidate = await _showCandidateSelectionDialog(
-          candidates,
+          candidates: candidates,
+          source: enrichedData['source']?.toString() ?? _selectedSource!,
+          query: query,
+          locale: locale,
+          page: enrichedData['page'] as int? ?? 1,
+          pageSize: enrichedData['pageSize'] as int? ?? 30,
+          hasMore: enrichedData['hasMore'] as bool? ?? false,
+          dropdownContext: dropdownContext,
         );
         if (selectedCandidate == null) {
           ToastService.error(l10n.importCancelled);
@@ -293,10 +304,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           throw Exception('El candidato seleccionado no tiene un ID válido.');
         }
 
-        final selectedSource =
-            enrichedData['source']?.toString() ?? _selectedSource!;
         enrichedData = await _integrationService.enrichSelectedItem(
-          source: selectedSource,
+          source: enrichedData['source']?.toString() ?? _selectedSource!,
           itemId: selectedId,
           locale: locale,
         );
@@ -394,10 +403,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                 final idx = _assetType!.fieldDefinitions.indexWhere(
                   (f) => f.id == fieldId,
                 );
-                if (idx != -1)
+                if (idx != -1) {
                   _highlightedFields.add(
                     _assetType!.fieldDefinitions[idx].name,
                   );
+                }
               });
             });
           }
@@ -461,55 +471,41 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     return parts.join(' • ');
   }
 
-  Future<Map<String, dynamic>?> _showCandidateSelectionDialog(
-    List<Map<String, dynamic>> candidates,
-  ) {
+  Future<Map<String, dynamic>?> _showCandidateSelectionDialog({
+    required List<Map<String, dynamic>> candidates,
+    required String source,
+    required String query,
+    required String locale,
+    required int page,
+    required int pageSize,
+    required bool hasMore,
+    Map<String, List<String>>? dropdownContext,
+  }) {
     final l10n = AppLocalizations.of(context)!;
-    return showDialog<Map<String, dynamic>>(
+    return showAppDialog<Map<String, dynamic>>(
       context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(l10n.selectResultTitle),
-          content: SizedBox(
-            width: 520,
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxHeight: 420),
-              child: GridView.builder(
-                shrinkWrap: true,
-                itemCount: candidates.length,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // 3 columns
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: 0.7,
-                ),
-                itemBuilder: (context, index) {
-                  final candidate = candidates[index];
-                  final subtitle = _buildCandidateSubtitle(candidate);
-
-                  return CandidateCard(
-                    candidate: candidate,
-                    subtitle: subtitle,
-                    isSelected: selectedId == candidate['id'],
-                    onTap: () {
-                      setState(() {
-                        selectedId = candidate['id'];
-                      });
-                      Navigator.of(dialogContext).pop(candidate);
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: Text(l10n.cancel),
-            ),
-          ],
-        );
-      },
+      title: l10n.selectResultTitle,
+      body: SizedBox(
+        width: 520,
+        child: CandidateSelectionBody(
+          initialCandidates: candidates,
+          source: source,
+          query: query,
+          locale: locale,
+          initialPage: page,
+          pageSize: pageSize,
+          initialHasMore: hasMore,
+          dropdownContext: dropdownContext,
+          integrationService: _integrationService,
+          buildCandidateSubtitle: _buildCandidateSubtitle,
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+      ],
     );
   }
 
@@ -659,6 +655,127 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   Future<void> _saveAsset() async {
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
+    final prefsProvider = context.read<PreferencesProvider>();
+    if (!AssetFormUtils.validateForm(_formKey) ||
+        _assetType == null ||
+        _selectedLocationId == null) {
+      if (_selectedLocationId == null) {
+        ToastService.error(l10n.selectLocationRequired);
+      } else {
+        ToastService.error(l10n.completeRequiredFields);
+      }
+      return;
+    }
+
+    final Map<String, dynamic> customFieldValues = {};
+    for (var fieldDef in _assetType!.fieldDefinitions) {
+      if (fieldDef.type == CustomFieldType.dropdown) {
+        if (_selectedListValues[fieldDef.id] != null) {
+          customFieldValues[fieldDef.id.toString()] =
+              _selectedListValues[fieldDef.id];
+        }
+      } else if (fieldDef.type == CustomFieldType.boolean) {
+        customFieldValues[fieldDef.id.toString()] =
+            _booleanFieldValues[fieldDef.id] ?? false;
+      } else {
+        final controller = _customControllers[fieldDef.id];
+        if (controller != null && controller.text.isNotEmpty) {
+          String val = controller.text;
+          if (fieldDef.type == CustomFieldType.price) {
+            double localVal = double.tryParse(val.replaceAll(',', '.')) ?? 0.0;
+            val = context
+                .read<PreferencesProvider>()
+                .convertToBase(localVal)
+                .toStringAsFixed(2);
+          }
+          customFieldValues[fieldDef.id.toString()] = val;
+        }
+      }
+    }
+
+    final newItem = InventoryItem(
+      id: 0,
+      containerId: _containerId!,
+      assetTypeId: _assetTypeId!,
+      barcode: _barcodeController.text.trim(),
+      serialNumber: _serialController.text.trim(),
+      locationId: _selectedLocationId,
+      quantity: int.tryParse(_quantityController.text) ?? 1,
+      minStock: int.tryParse(_minStockController.text) ?? 1,
+      name: _nameController.text.trim(),
+      condition: _selectedCondition,
+      description: _descriptionController.text.trim(),
+      marketValue: _marketValue,
+      customFieldValues: customFieldValues,
+    );
+
+    if (prefsProvider.cloneBusterEnabled && mounted) {
+      final result = CloneBusterService.checkForDuplicates(
+        newItem: newItem,
+        existingItems: _getSameTypeItems(itemProvider),
+      );
+
+      if (result.isDuplicate && mounted) {
+        final shouldContinue = await showAppDialog<bool>(
+          context: context,
+          title: l10n.cloneBusterDuplicateTitle,
+          body: Text(
+            l10n.cloneBusterDuplicateMessage(
+              result.similarityScore.toStringAsFixed(0),
+              result.duplicateOf!.name,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cloneBusterReview),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.cloneBusterContinueAnyway),
+            ),
+          ],
+        );
+
+        if (shouldContinue != true) {
+          return;
+        }
+      }
+    }
+
+    try {
+      await context.read<InventoryItemProvider>().createInventoryItem(
+        context,
+        newItem,
+        filesData: AssetFormUtils.processImages(_imagePreviewUrls),
+      );
+      if (mounted) {
+        ToastService.success(l10n.assetCreatedSuccess);
+        await itemProvider.loadInventoryItems(
+          containerId: _containerId!,
+          assetTypeId: _assetTypeId!,
+        );
+        if (context.canPop()) {
+          context.pop(true);
+        } else {
+          context.goNamed(
+            RouteNames.assetList,
+            pathParameters: {
+              'containerId': widget.containerId,
+              'assetTypeId': widget.assetTypeId.toString(),
+            },
+          );
+        }
+      }
+    } catch (e) {
+      ToastService.error(l10n.errorCreatingAsset(e.toString()));
+    }
+  }
+
+  Future<void> _saveAndContinue() async {
+    final l10n = AppLocalizations.of(context)!;
+    final itemProvider = context.read<InventoryItemProvider>();
+    final prefsProvider = context.read<PreferencesProvider>();
     if (!AssetFormUtils.validateForm(_formKey) ||
         _assetType == null ||
         _selectedLocationId == null) {
@@ -694,23 +811,60 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         }
       }
     }
-    try {
-      final newItem = InventoryItem(
-        id: 0,
-        containerId: _containerId!,
-        assetTypeId: _assetTypeId!,
-        barcode: _barcodeController.text.trim(),
-        serialNumber: _serialController.text.trim(),
-        locationId: _selectedLocationId,
-        quantity: int.tryParse(_quantityController.text) ?? 1,
-        minStock: int.tryParse(_minStockController.text) ?? 1,
-        name: _nameController.text.trim(),
-        condition: _selectedCondition,
-        description: _descriptionController.text.trim(),
-        marketValue: _marketValue,
-        customFieldValues: customFieldValues,
+
+    final newItem = InventoryItem(
+      id: 0,
+      containerId: _containerId!,
+      assetTypeId: _assetTypeId!,
+      barcode: _barcodeController.text.trim(),
+      serialNumber: _serialController.text.trim(),
+      locationId: _selectedLocationId,
+      quantity: int.tryParse(_quantityController.text) ?? 1,
+      minStock: int.tryParse(_minStockController.text) ?? 1,
+      name: _nameController.text.trim(),
+      condition: _selectedCondition,
+      description: _descriptionController.text.trim(),
+      marketValue: _marketValue,
+      customFieldValues: customFieldValues,
+    );
+
+    if (prefsProvider.cloneBusterEnabled && mounted) {
+      final result = CloneBusterService.checkForDuplicates(
+        newItem: newItem,
+        existingItems: _getSameTypeItems(itemProvider),
       );
+
+      if (result.isDuplicate && mounted) {
+        final shouldContinue = await showAppDialog<bool>(
+          context: context,
+          title: l10n.cloneBusterDuplicateTitle,
+          body: Text(
+            l10n.cloneBusterDuplicateMessage(
+              result.similarityScore.toStringAsFixed(0),
+              result.duplicateOf!.name,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cloneBusterReview),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(l10n.cloneBusterContinueAnyway),
+            ),
+          ],
+        );
+
+        if (shouldContinue != true) {
+          return;
+        }
+      }
+    }
+
+    try {
       await context.read<InventoryItemProvider>().createInventoryItem(
+        context,
         newItem,
         filesData: AssetFormUtils.processImages(_imagePreviewUrls),
       );
@@ -720,16 +874,32 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           containerId: _containerId!,
           assetTypeId: _assetTypeId!,
         );
-        if (context.canPop()) {
-          context.pop(true);
-        } else {
-          context.goNamed(
-            RouteNames.assetList,
-            pathParameters: {
-              'containerId': widget.containerId,
-              'assetTypeId': widget.assetTypeId.toString(),
-            },
+        _imagePreviewUrls.clear();
+        final shouldReset = context
+            .read<PreferencesProvider>()
+            .autoResetFieldsOnSaveAndContinue;
+        if (shouldReset) {
+          _nameController.clear();
+          _descriptionController.clear();
+          _barcodeController.clear();
+          _serialController.clear();
+          _quantityController.text = '1';
+          _minStockController.text = '1';
+          _selectedCondition = ItemCondition.loose;
+          _marketValue = 0.0;
+          for (var entry in _customControllers.entries) {
+            entry.value.clear();
+          }
+          _selectedListValues.clear();
+          _booleanFieldValues.clear();
+          _scrollController.animateTo(
+            0,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOut,
           );
+        }
+        if (mounted) {
+          setState(() {});
         }
       }
     } catch (e) {
@@ -776,6 +946,56 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         ToastService.error(l10n.errorDownloadingImage(e.toString()));
       }
     }
+  }
+
+  void _handleScraperResults(Map<String, dynamic> results) {
+    setState(() {
+      // Nombre
+      if (results['name'] != null) {
+        _nameController.text = results['name'].toString();
+        _highlightedFields.add('name');
+      }
+      // Descripción
+      if (results['description'] != null) {
+        _descriptionController.text = results['description'].toString();
+        _highlightedFields.add('description');
+      }
+      // Imagen: si viene URL absoluta la añade directamente
+      final imageVal =
+          results['image'] ?? results['imageUrl'] ?? results['imagen'];
+      if (imageVal != null) {
+        _addImageFromUrl(imageVal.toString());
+      }
+      // Campos custom: busca por nombre de campo
+      for (final fieldDef in _assetType?.fieldDefinitions ?? []) {
+        final key = fieldDef.name.toLowerCase();
+        final match = results.entries.firstWhere(
+          (e) => e.key.toLowerCase() == key,
+          orElse: () => const MapEntry('', null),
+        );
+        if (match.value == null) continue;
+        _highlightedFields.add(fieldDef.name);
+        if (fieldDef.type == CustomFieldType.boolean) {
+          _booleanFieldValues[fieldDef.id!] =
+              match.value.toString().toLowerCase() == 'true';
+        } else if (fieldDef.type == CustomFieldType.dropdown) {
+          final options = _listFieldValues[fieldDef.id!] ?? [];
+          final opt = options.firstWhere(
+            (o) =>
+                o.toLowerCase().contains(match.value.toString().toLowerCase()),
+            orElse: () => '',
+          );
+          if (opt.isNotEmpty) _selectedListValues[fieldDef.id!] = opt;
+        } else {
+          _customControllers[fieldDef.id!]?.text = match.value.toString();
+        }
+      }
+    });
+
+    ToastService.success('Data extracted successfully');
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) setState(() => _highlightedFields.clear());
+    });
   }
 
   void _showMagicDialog() async {
@@ -853,7 +1073,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                   padding: const EdgeInsets.fromLTRB(24, 20, 24, 120),
                   child: Form(
                     key: _formKey,
-                    child: _AssetFormLayout(
+                    child: AssetFormLayout(
                       // ── Fila 0: Banner IA (URL mágica) ──
                       aiBanner: aiEnabled
                           ? AiMagicBannerWidget(
@@ -861,9 +1081,17 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                               onPressed: _showMagicDialog,
                             )
                           : null,
-
-                      // ── Fila 1: Importar desde fuente externa ──
-                      importBento: BentoBoxWidget(
+                      // ── Row 1a: Scraper ──
+                      scraperBento: CollapsibleBentoBoxWidget(
+                        title: 'Scraper Import',
+                        icon: Icons.travel_explore,
+                        child: ScraperImportWidget(
+                          containerId: _containerId!,
+                          onResults: _handleScraperResults,
+                        ),
+                      ),
+                      // ── Row 1b: Import from external source ──
+                      importBento: CollapsibleBentoBoxWidget(
                         title: l10n.externalImportTitle,
                         icon: Icons.auto_awesome,
                         child: ExternalImportWidget(
@@ -878,7 +1106,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       ),
 
                       // ── Fila 2a: Datos principales ──
-                      mainDataBento: BentoBoxWidget(
+                      mainDataBento: CollapsibleBentoBoxWidget(
+                        collapsible: false,
                         title: l10n.mainDataTitle,
                         icon: Icons.info_outline,
                         child: MainDataSectionWidget(
@@ -896,7 +1125,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       ),
 
                       // ── Fila 2b: Galería ──
-                      galleryBento: BentoBoxWidget(
+                      galleryBento: CollapsibleBentoBoxWidget(
+                        collapsible: false,
                         title: l10n.galleryTitle,
                         icon: Icons.camera_alt_outlined,
                         child: ImagesSectionWidget(
@@ -916,7 +1146,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                       ),
 
                       // ── Fila 3b: Stock y Codificación ──
-                      stockBento: BentoBoxWidget(
+                      stockBento: CollapsibleBentoBoxWidget(
+                        collapsible: false,
                         title: l10n.stockAndCodingTitle,
                         icon: Icons.qr_code_scanner,
                         child: InventorySectionWidget(
@@ -932,10 +1163,12 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
                       // ── Fila 4: Especificaciones (full width si hay campos) ──
                       specsBento: _assetType!.fieldDefinitions.isNotEmpty
-                          ? BentoBoxWidget(
+                          ? CollapsibleBentoBoxWidget(
+                              collapsible: false,
                               title: l10n.specificationsTitle,
                               icon: Icons.list_alt,
                               child: CustomFieldsSectionWidget(
+                                containerId: _containerId.toString(),
                                 fieldDefinitions: _assetType!.fieldDefinitions,
                                 customControllers: _customControllers,
                                 listFieldValues: _listFieldValues,
@@ -960,7 +1193,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                 ),
               ),
             ),
-            SaveAssetFloatingButton(onPressed: _saveAsset),
+            AssetSaveButtonBar(
+              onSaveAsset: _saveAsset,
+              onSaveAndContinue: _saveAndContinue,
+            ),
           ],
         ),
       ),
@@ -971,93 +1207,3 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 // ---------------------------------------------------------------------------
 // Layout compartido — usado tanto en Create como en Edit
 // ---------------------------------------------------------------------------
-
-class _AssetFormLayout extends StatelessWidget {
-  final Widget? aiBanner;
-  final Widget? importBento; // Solo en Create
-  final Widget mainDataBento;
-  final Widget galleryBento;
-  final Widget statusWidget;
-  final Widget stockBento;
-  final Widget? specsBento;
-
-  const _AssetFormLayout({
-    this.aiBanner,
-    this.importBento,
-    required this.mainDataBento,
-    required this.galleryBento,
-    required this.statusWidget,
-    required this.stockBento,
-    this.specsBento,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        // ── Banner IA ──────────────────────────────────────────────────────
-        if (aiBanner != null) ...[aiBanner!, const SizedBox(height: 24)],
-
-        // ── Importar (solo create) ─────────────────────────────────────────
-        if (importBento != null) ...[importBento!, const SizedBox(height: 24)],
-
-        // ── Fila: Datos Principales (2/3) + Galería (1/3) ─────────────────
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final w = constraints.maxWidth;
-            // En pantallas anchas: side-by-side. En estrechas: apiladas.
-            if (w >= 700) {
-              final galleryWidth = (w * 0.35).clamp(260.0, 380.0);
-              final mainWidth = w - galleryWidth - 24;
-              return Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(width: mainWidth, child: mainDataBento),
-                  const SizedBox(width: 24),
-                  SizedBox(width: galleryWidth, child: galleryBento),
-                ],
-              );
-            }
-            return Column(
-              children: [
-                mainDataBento,
-                const SizedBox(height: 16),
-                galleryBento,
-              ],
-            );
-          },
-        ),
-
-        const SizedBox(height: 24),
-
-        // ── Fila: Estado (auto) + Stock (flex) ────────────────────────────
-        LayoutBuilder(
-          builder: (context, constraints) {
-            final w = constraints.maxWidth;
-            if (w >= 600) {
-              return IntrinsicHeight(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // StatusSectionWidget tiene su propio BentoBox internamente;
-                    // lo envolvemos en Flexible para que tome el espacio justo.
-                    Flexible(flex: 2, child: statusWidget),
-                    const SizedBox(width: 24),
-                    Flexible(flex: 3, child: stockBento),
-                  ],
-                ),
-              );
-            }
-            return Column(
-              children: [statusWidget, const SizedBox(height: 16), stockBento],
-            );
-          },
-        ),
-
-        // ── Especificaciones (full width, solo si hay campos) ─────────────
-        if (specsBento != null) ...[const SizedBox(height: 24), specsBento!],
-      ],
-    );
-  }
-}

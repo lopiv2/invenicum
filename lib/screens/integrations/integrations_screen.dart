@@ -90,7 +90,9 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
               (integration) =>
                   integration.id == AppIntegrations.bgg ||
                   integration.id == AppIntegrations.pokemon ||
-                  integration.id == AppIntegrations.tcgdex,
+                  integration.id == AppIntegrations.tcgdex ||
+                  integration.id == AppIntegrations.pokemonPriceTracker ||
+                  integration.id == AppIntegrations.rawg,
             )
             .toList(),
       ),
@@ -119,7 +121,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
     ].where((section) => section.integrations.isNotEmpty).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5EFE6),
+      backgroundColor: Theme.of(context).colorScheme.surface,
       appBar: AppBar(
         title: Text(l10n.integrationsAndConnectionsTitle),
         elevation: 0,
@@ -158,6 +160,7 @@ class _IntegrationsScreenState extends State<IntegrationsScreen> {
     final accent = colorScheme.primary;
 
     return Container(
+      height: MediaQuery.of(context).size.height / 3,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32),

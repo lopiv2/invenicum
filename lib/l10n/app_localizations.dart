@@ -178,6 +178,246 @@ abstract class AppLocalizations {
   /// **'View releases'**
   String get aboutOpenReleases;
 
+  /// No description provided for @achievementFirstItemTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to the Mansion'**
+  String get achievementFirstItemTitle;
+
+  /// No description provided for @achievementFirstItemDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first item to the inventory'**
+  String get achievementFirstItemDesc;
+
+  /// No description provided for @achievementCatalogerSmallTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Small Warehouse'**
+  String get achievementCatalogerSmallTitle;
+
+  /// No description provided for @achievementCatalogerSmallDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register 10 items in your collection'**
+  String get achievementCatalogerSmallDesc;
+
+  /// No description provided for @achievementCatalogerMediumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Museum Curator'**
+  String get achievementCatalogerMediumTitle;
+
+  /// No description provided for @achievementCatalogerMediumDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register 50 items in your collection'**
+  String get achievementCatalogerMediumDesc;
+
+  /// No description provided for @achievementCatalogerLargeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner of an Empire'**
+  String get achievementCatalogerLargeTitle;
+
+  /// No description provided for @achievementCatalogerLargeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register 200 items (Legendary Level)'**
+  String get achievementCatalogerLargeDesc;
+
+  /// No description provided for @achievementOrderMasterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Absolute Order'**
+  String get achievementOrderMasterTitle;
+
+  /// No description provided for @achievementOrderMasterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign a physical location to 20 items'**
+  String get achievementOrderMasterDesc;
+
+  /// No description provided for @achievementEyeForValueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Eye for Value'**
+  String get achievementEyeForValueTitle;
+
+  /// No description provided for @achievementEyeForValueDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register the purchase price of 5 items'**
+  String get achievementEyeForValueDesc;
+
+  /// No description provided for @achievementFirstGrailTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'First Grail'**
+  String get achievementFirstGrailTitle;
+
+  /// No description provided for @achievementFirstGrailDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an item worth more than 100€'**
+  String get achievementFirstGrailDesc;
+
+  /// No description provided for @achievementMuseumPieceTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Museum Piece'**
+  String get achievementMuseumPieceTitle;
+
+  /// No description provided for @achievementMuseumPieceDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an item worth more than 500€'**
+  String get achievementMuseumPieceDesc;
+
+  /// No description provided for @achievementGrowingWealthTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Growing Wealth'**
+  String get achievementGrowingWealthTitle;
+
+  /// No description provided for @achievementGrowingWealthDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your total inventory exceeds 1,000€'**
+  String get achievementGrowingWealthDesc;
+
+  /// No description provided for @achievementWallStreetWolfTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wall Street Wolf'**
+  String get achievementWallStreetWolfTitle;
+
+  /// No description provided for @achievementWallStreetWolfDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your total inventory exceeds 10,000€'**
+  String get achievementWallStreetWolfDesc;
+
+  /// No description provided for @achievementBargainHunterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Bargain Hunter'**
+  String get achievementBargainHunterTitle;
+
+  /// No description provided for @achievementBargainHunterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Register an item worth double what you paid'**
+  String get achievementBargainHunterDesc;
+
+  /// No description provided for @achievementBlindTrustTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Blind Trust'**
+  String get achievementBlindTrustTitle;
+
+  /// No description provided for @achievementBlindTrustDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Make your first loan to a contact'**
+  String get achievementBlindTrustDesc;
+
+  /// No description provided for @achievementLibrarianTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Librarian'**
+  String get achievementLibrarianTitle;
+
+  /// No description provided for @achievementLibrarianDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage 3 active loans simultaneously'**
+  String get achievementLibrarianDesc;
+
+  /// No description provided for @achievementAllInOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All in Order'**
+  String get achievementAllInOrderTitle;
+
+  /// No description provided for @achievementAllInOrderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Retrieve and mark a loaned item as returned'**
+  String get achievementAllInOrderDesc;
+
+  /// No description provided for @achievementLegendaryLenderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Legendary Lender'**
+  String get achievementLegendaryLenderTitle;
+
+  /// No description provided for @achievementLegendaryLenderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete 20 loans successfully'**
+  String get achievementLegendaryLenderDesc;
+
+  /// No description provided for @achievementCyberCollectorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cyber Collector'**
+  String get achievementCyberCollectorTitle;
+
+  /// No description provided for @achievementCyberCollectorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Identify an item using AI for the first time'**
+  String get achievementCyberCollectorDesc;
+
+  /// No description provided for @achievementHawkEyeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Hawk Eye'**
+  String get achievementHawkEyeTitle;
+
+  /// No description provided for @achievementHawkEyeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Use AI to identify 15 items'**
+  String get achievementHawkEyeDesc;
+
+  /// No description provided for @achievementPolyglotTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Polyglot'**
+  String get achievementPolyglotTitle;
+
+  /// No description provided for @achievementPolyglotDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the global currency of the app'**
+  String get achievementPolyglotDesc;
+
+  /// No description provided for @achievementForecasterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecaster'**
+  String get achievementForecasterTitle;
+
+  /// No description provided for @achievementForecasterDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Activate 3 different maintenance alerts'**
+  String get achievementForecasterDesc;
+
+  /// No description provided for @achievementMasterUserTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Master User'**
+  String get achievementMasterUserTitle;
+
+  /// No description provided for @achievementMasterUserDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Customize the order of your notifications'**
+  String get achievementMasterUserDesc;
+
   /// No description provided for @active.
   ///
   /// In en, this message translates to:
@@ -496,6 +736,18 @@ abstract class AppLocalizations {
   /// **'Collection fields configured.'**
   String get collectionFieldsConfigured;
 
+  /// No description provided for @collectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection'**
+  String get collectionLabel;
+
+  /// No description provided for @collectionsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Collections'**
+  String get collectionsLabel;
+
   /// No description provided for @condition.
   ///
   /// In en, this message translates to:
@@ -555,6 +807,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Configure voucher body...'**
   String get configureVoucherBody;
+
+  /// No description provided for @confirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirm;
 
   /// No description provided for @confirmDeleteAlert.
   ///
@@ -1078,6 +1336,12 @@ abstract class AppLocalizations {
   /// **'Inventory'**
   String get inventoryLabel;
 
+  /// No description provided for @inventoriesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventories'**
+  String get inventoriesLabel;
+
   /// No description provided for @january.
   ///
   /// In en, this message translates to:
@@ -1396,6 +1660,12 @@ abstract class AppLocalizations {
   /// **'No notifications'**
   String get noNotifications;
 
+  /// No description provided for @noResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found.'**
+  String get noResultsFound;
+
   /// No description provided for @noThemesSaved.
   ///
   /// In en, this message translates to:
@@ -1503,6 +1773,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Preferences'**
   String get preferences;
+
+  /// No description provided for @preferencesUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Preferences updated'**
+  String get preferencesUpdated;
 
   /// No description provided for @previewPDF.
   ///
@@ -1636,6 +1912,228 @@ abstract class AppLocalizations {
   /// **'Save Asset'**
   String get saveAsset;
 
+  /// No description provided for @saveAndContinueAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Save & Continue'**
+  String get saveAndContinueAsset;
+
+  /// No description provided for @autoResetFieldsOnSaveAndContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset fields on save & continue'**
+  String get autoResetFieldsOnSaveAndContinue;
+
+  /// No description provided for @autoResetFieldsOnSaveAndContinueDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Clears the form automatically after saving an item'**
+  String get autoResetFieldsOnSaveAndContinueDescription;
+
+  /// No description provided for @enableCloneBuster.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable'**
+  String get enableCloneBuster;
+
+  /// No description provided for @enableCloneBusterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Guaranteed to avoid redundant items or your money back! (Offer void in all timelines except 1993)'**
+  String get enableCloneBusterDescription;
+
+  /// No description provided for @cloneBusterDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone-Buster-O-Matic™ Activated'**
+  String get cloneBusterDialogTitle;
+
+  /// No description provided for @cloneBusterMessage1.
+  ///
+  /// In en, this message translates to:
+  /// **'System engaged. Doctor Fred would be proud of this level of efficiency! (Please ignore the faint smell of burning toast and the sound of maniacal laughter from your hard drive).'**
+  String get cloneBusterMessage1;
+
+  /// No description provided for @cloneBusterMessage2.
+  ///
+  /// In en, this message translates to:
+  /// **'Activating The Clone-Buster-O-Matic™... Please keep your hands, feet, and any identical twins away from the monitor during initialization.'**
+  String get cloneBusterMessage2;
+
+  /// No description provided for @cloneBusterMessage3.
+  ///
+  /// In en, this message translates to:
+  /// **'System enabled. We\'ve informed your \'future self\' that you no longer need those duplicates. If you suddenly feel a tingling sensation or stop existing, ignore it.'**
+  String get cloneBusterMessage3;
+
+  /// No description provided for @cloneBusterMessage4.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone-Buster active. Any redundant items will be humanely vaporized and turned into generic static. Don\'t worry, they won\'t feel a thing (we think).'**
+  String get cloneBusterMessage4;
+
+  /// No description provided for @cloneBusterMessage5.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: Enabling this module may cause a 0.004% increase in RAM usage and a 100% decrease in seeing the same thing twice. Proceed with extreme confidence!'**
+  String get cloneBusterMessage5;
+
+  /// No description provided for @cloneBusterMessage6.
+  ///
+  /// In en, this message translates to:
+  /// **'The Clone-Buster is now standing guard. It\'s like having a tiny, very angry librarian inside your computer who hates seeing double. Click.'**
+  String get cloneBusterMessage6;
+
+  /// No description provided for @cloneBusterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The Clone-Buster-O-Matic™ scans your inventory with quantum precision to detect and prevent duplicate entries. Set to Paranoid for maximum detection.'**
+  String get cloneBusterDescription;
+
+  /// No description provided for @cloneBusterDisclaimer.
+  ///
+  /// In en, this message translates to:
+  /// **'Disclaimer: This feature is as useless as a rubber chicken with a pulley in the middle. Toggle at your own risk (and boredom)!'**
+  String get cloneBusterDisclaimer;
+
+  /// No description provided for @fontFamilyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Family'**
+  String get fontFamilyLabel;
+
+  /// No description provided for @selectFontFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the application font'**
+  String get selectFontFamily;
+
+  /// No description provided for @fontDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default (System)'**
+  String get fontDefault;
+
+  /// No description provided for @fontSCUMMCredits.
+  ///
+  /// In en, this message translates to:
+  /// **'SCUMM Credits'**
+  String get fontSCUMMCredits;
+
+  /// No description provided for @fontSCUMMSolid.
+  ///
+  /// In en, this message translates to:
+  /// **'SCUMM Solid'**
+  String get fontSCUMMSolid;
+
+  /// No description provided for @fontDayOfTheTentacle.
+  ///
+  /// In en, this message translates to:
+  /// **'Day of the Tentacle'**
+  String get fontDayOfTheTentacle;
+
+  /// No description provided for @fontEfmi.
+  ///
+  /// In en, this message translates to:
+  /// **'Efmi'**
+  String get fontEfmi;
+
+  /// No description provided for @fontPUSAB.
+  ///
+  /// In en, this message translates to:
+  /// **'PUSAB'**
+  String get fontPUSAB;
+
+  /// No description provided for @fontActionForce.
+  ///
+  /// In en, this message translates to:
+  /// **'Action Force'**
+  String get fontActionForce;
+
+  /// No description provided for @fontStarjedi.
+  ///
+  /// In en, this message translates to:
+  /// **'Starjedi'**
+  String get fontStarjedi;
+
+  /// No description provided for @fontTransformersMovie.
+  ///
+  /// In en, this message translates to:
+  /// **'Transformers Movie'**
+  String get fontTransformersMovie;
+
+  /// No description provided for @cloneBusterDuplicateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible Duplicate Detected!'**
+  String get cloneBusterDuplicateTitle;
+
+  /// No description provided for @cloneBusterDuplicateMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This item is {similarity}% similar to \"{itemName}\". Do you want to continue anyway?'**
+  String cloneBusterDuplicateMessage(String similarity, String itemName);
+
+  /// No description provided for @cloneBusterContinueAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Anyway'**
+  String get cloneBusterContinueAnyway;
+
+  /// No description provided for @cloneBusterReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get cloneBusterReview;
+
+  /// No description provided for @cloneBusterDialogAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it!'**
+  String get cloneBusterDialogAction;
+
+  /// No description provided for @cloneBusterSensitivityLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'SENSITIVITY LEVEL'**
+  String get cloneBusterSensitivityLevel;
+
+  /// No description provided for @cloneBusterSensitivityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get cloneBusterSensitivityLow;
+
+  /// No description provided for @cloneBusterSensitivityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get cloneBusterSensitivityHigh;
+
+  /// No description provided for @cloneBusterSensitivityParanoid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paranoid'**
+  String get cloneBusterSensitivityParanoid;
+
+  /// No description provided for @cloneBusterDialogOk.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get cloneBusterDialogOk;
+
+  /// No description provided for @cloneBusterDialogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'CANCEL'**
+  String get cloneBusterDialogCancel;
+
+  /// No description provided for @cloneBusterDialogHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'?HELP'**
+  String get cloneBusterDialogHelp;
+
   /// No description provided for @saveChanges.
   ///
   /// In en, this message translates to:
@@ -1653,6 +2151,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Custom Theme'**
   String get saveCustomTheme;
+
+  /// No description provided for @searchByName.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by name...'**
+  String get searchByName;
 
   /// No description provided for @searchInAllColumns.
   ///
@@ -1749,6 +2253,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show as List'**
   String get showAsList;
+
+  /// No description provided for @showAssetTypeLogo.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Asset Type Logo'**
+  String get showAssetTypeLogo;
+
+  /// No description provided for @showAssetTypeLogoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'If the asset type has an image, display it as a logo in the list view.'**
+  String get showAssetTypeLogoDescription;
 
   /// No description provided for @sortAsc.
   ///
@@ -2199,6 +2715,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Query cards and sets from collectible card games to enrich your inventory automatically.'**
   String get integrationTcgdexDesc;
+
+  /// No description provided for @integrationPokemonPriceTrackerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect your PokemonPriceTracker account to sync your collection automatically.'**
+  String get integrationPokemonPriceTrackerDesc;
+
+  /// No description provided for @integrationPokemonPriceTrackerApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get integrationPokemonPriceTrackerApiKeyLabel;
+
+  /// No description provided for @integrationPokemonPriceTrackerApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your PokemonPriceTracker API key'**
+  String get integrationPokemonPriceTrackerApiKeyHint;
+
+  /// No description provided for @integrationRawgDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Query video games from the RAWG database to enrich your inventory automatically.'**
+  String get integrationRawgDesc;
+
+  /// No description provided for @integrationRawgApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get integrationRawgApiKeyLabel;
+
+  /// No description provided for @integrationRawgApiKeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your RAWG API key'**
+  String get integrationRawgApiKeyHint;
 
   /// No description provided for @integrationQrGeneratorName.
   ///
@@ -3904,6 +4456,36 @@ abstract class AppLocalizations {
   /// **'Zoom to Fit'**
   String get zoomToFit;
 
+  /// No description provided for @currencyEur.
+  ///
+  /// In en, this message translates to:
+  /// **'Euro'**
+  String get currencyEur;
+
+  /// No description provided for @currencyUsd.
+  ///
+  /// In en, this message translates to:
+  /// **'US Dollar'**
+  String get currencyUsd;
+
+  /// No description provided for @currencyGbp.
+  ///
+  /// In en, this message translates to:
+  /// **'British Pound'**
+  String get currencyGbp;
+
+  /// No description provided for @currencyJpy.
+  ///
+  /// In en, this message translates to:
+  /// **'Japanese Yen'**
+  String get currencyJpy;
+
+  /// No description provided for @currencyMxn.
+  ///
+  /// In en, this message translates to:
+  /// **'Mexican Peso'**
+  String get currencyMxn;
+
   /// No description provided for @generalSettingsMenuLabel.
   ///
   /// In en, this message translates to:
@@ -3933,6 +4515,138 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'About'**
   String get aboutMenuLabel;
+
+  /// No description provided for @crossToonsMenuLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'CrossToons™'**
+  String get crossToonsMenuLabel;
+
+  /// No description provided for @crossToonsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CrossToons™'**
+  String get crossToonsTitle;
+
+  /// No description provided for @crossToonsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your floating overlay images that roam across the screen. All images must be in webp format and facing to the right, unless it\'s Michael Jackson, you know what I mean...'**
+  String get crossToonsDescription;
+
+  /// No description provided for @crossToonsAddNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Add New CrossToon'**
+  String get crossToonsAddNew;
+
+  /// No description provided for @crossToonsUploadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Image'**
+  String get crossToonsUploadImage;
+
+  /// No description provided for @crossToonsConfigure.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure'**
+  String get crossToonsConfigure;
+
+  /// No description provided for @crossToonsDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this CrossToon?'**
+  String get crossToonsDeleteConfirm;
+
+  /// No description provided for @crossToonsDeleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {name}?'**
+  String crossToonsDeleteConfirmMessage(String name);
+
+  /// No description provided for @crossToonsDirectionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Direction'**
+  String get crossToonsDirectionLabel;
+
+  /// No description provided for @crossToonsZoneLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Zone'**
+  String get crossToonsZoneLabel;
+
+  /// No description provided for @crossToonsSpeedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Speed (seconds)'**
+  String get crossToonsSpeedLabel;
+
+  /// No description provided for @crossToonsFrequencyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency (seconds)'**
+  String get crossToonsFrequencyLabel;
+
+  /// No description provided for @crossToonsImageSizeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Size (px)'**
+  String get crossToonsImageSizeLabel;
+
+  /// No description provided for @crossToonsFpsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Animation FPS'**
+  String get crossToonsFpsLabel;
+
+  /// No description provided for @crossToonsTurnModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Mode'**
+  String get crossToonsTurnModeLabel;
+
+  /// No description provided for @crossToonsImageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Image'**
+  String get crossToonsImageLabel;
+
+  /// No description provided for @crossToonsImageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an image'**
+  String get crossToonsImageHint;
+
+  /// No description provided for @crossToonsTurnMinDelayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Min Delay (seconds)'**
+  String get crossToonsTurnMinDelayLabel;
+
+  /// No description provided for @crossToonsTurnMaxDelayLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn Max Delay (seconds)'**
+  String get crossToonsTurnMaxDelayLabel;
+
+  /// No description provided for @crossToonsMaxTurnsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Max Turns'**
+  String get crossToonsMaxTurnsLabel;
+
+  /// No description provided for @crossToonsPreviewLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get crossToonsPreviewLabel;
+
+  /// No description provided for @disable.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable'**
+  String get disable;
 
   /// No description provided for @automaticDarkModeLabel.
   ///
@@ -4612,6 +5326,72 @@ abstract class AppLocalizations {
   /// **'Element deleted successfully'**
   String get elementDeletedSuccess;
 
+  /// No description provided for @scrapers.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrapers'**
+  String get scrapers;
+
+  /// No description provided for @newScraperLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New scraper'**
+  String get newScraperLabel;
+
+  /// No description provided for @noScrapers.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no scrapers. Create a new one.'**
+  String get noScrapers;
+
+  /// No description provided for @confirmDeleteScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Scraper'**
+  String get confirmDeleteScraper;
+
+  /// No description provided for @confirmDeleteScraperMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete scraper \"{name}\"? This action cannot be undone.'**
+  String confirmDeleteScraperMessage(String name);
+
+  /// No description provided for @scraperDeletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Scraper deleted successfully.'**
+  String get scraperDeletedSuccess;
+
+  /// No description provided for @errorDeletingScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting scraper: {error}'**
+  String errorDeletingScraper(String error);
+
+  /// No description provided for @testScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Test'**
+  String get testScraper;
+
+  /// No description provided for @runResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Test result'**
+  String get runResultTitle;
+
+  /// No description provided for @runError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error running test: {error}'**
+  String runError(String error);
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
   /// No description provided for @enterYourNameValidation.
   ///
   /// In en, this message translates to:
@@ -4947,6 +5727,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Deep Night'**
   String get themeDeepNight;
+
+  /// No description provided for @themeSnowy.
+  ///
+  /// In en, this message translates to:
+  /// **'Snowy'**
+  String get themeSnowy;
+
+  /// No description provided for @themeFiesta.
+  ///
+  /// In en, this message translates to:
+  /// **'Party!'**
+  String get themeFiesta;
+
+  /// No description provided for @themeMatrix.
+  ///
+  /// In en, this message translates to:
+  /// **'Matrix'**
+  String get themeMatrix;
+
+  /// No description provided for @themeVolcano.
+  ///
+  /// In en, this message translates to:
+  /// **'Volcano'**
+  String get themeVolcano;
+
+  /// No description provided for @themePipboy3000Notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: this theme may cause your 3dfx Voodoo2 to start sweating pixels.'**
+  String get themePipboy3000Notes;
 
   /// No description provided for @loginSuccess.
   ///

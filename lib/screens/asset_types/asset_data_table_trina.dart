@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/custom_footer_pagination.dart';
 import 'package:invenicum/widgets/ui/price_display_widget.dart';
-import 'package:pluto_grid/pluto_grid.dart';
+import 'package:trina_grid/trina_grid.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -41,9 +42,9 @@ class AssetPlutoTable extends StatefulWidget {
 }
 
 class _AssetPlutoTableState extends State<AssetPlutoTable> {
-  PlutoGridStateManager? stateManager;
-  late List<PlutoColumn> columns;
-  late List<PlutoRow> _initialRows;
+  TrinaGridStateManager? stateManager;
+  late List<TrinaColumn> columns;
+  late List<TrinaRow> _initialRows;
   bool _goToLastPage = false;
 
   @override
@@ -105,7 +106,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     if (itemsChanged && stateManager != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || stateManager == null) return;
-        stateManager!.setShowLoading(true, level: PlutoGridLoadingLevel.rows);
+        stateManager!.setShowLoading(true, level: TrinaGridLoadingLevel.rows);
         final newRows = _buildRows(widget.items);
         stateManager!.removeAllRows();
         stateManager!.appendRows(newRows);
@@ -198,34 +199,32 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
 
   void _deleteAsset(InventoryItem item) {
     final l10n = AppLocalizations.of(context)!;
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.confirmDeletion),
-        content: Text(l10n.deleteItemMessage(item.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.cancel),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              await context.read<InventoryItemProvider>().deleteInventoryItem(
-                item.id,
-                widget.containerId,
-                widget.assetTypeId,
-              );
-              ToastService.success(l10n.elementDeletedSuccess);
-            },
-            child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      title: l10n.confirmDeletion,
+      body: Text(l10n.deleteItemMessage(item.name)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.cancel),
+        ),
+        TextButton(
+          onPressed: () async {
+            Navigator.of(context).pop();
+            await context.read<InventoryItemProvider>().deleteInventoryItem(
+              item.id,
+              widget.containerId,
+              widget.assetTypeId,
+            );
+            ToastService.success(l10n.elementDeletedSuccess);
+          },
+          child: Text(l10n.delete, style: const TextStyle(color: Colors.red)),
+        ),
+      ],
     );
   }
 
-  List<PlutoColumn> _buildColumns() {
+  List<TrinaColumn> _buildColumns() {
     // Obtenemos los labels localizados para el select de condición.
     // Los valores del select DEBEN coincidir exactamente con los que
     // guardamos en las celdas en _buildRows (condition.getLocalizedString).
@@ -234,19 +233,19 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         .map((e) => e.getLocalizedString(context))
         .toList();
 
-    final List<PlutoColumn> baseColumns = [
-      PlutoColumn(
+    final List<TrinaColumn> baseColumns = [
+      TrinaColumn(
         title: 'ID Obj',
         field: 'item_object',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         hide: true,
         enableSorting: false,
         enableFilterMenuItem: false,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.imageColumnLabel,
         field: 'image',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         enableSorting: false,
         enableFilterMenuItem: false,
         width: 80,
@@ -274,10 +273,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                       ),
                     )
                   : Container(
-                      color: Colors.grey[200],
-                      child: const Icon(
+                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      child: Icon(
                         Icons.image,
-                        color: Colors.grey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         size: 20,
                       ),
                     ),
@@ -285,47 +284,58 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
           );
         },
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.assetName,
         field: 'name',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 200,
+        renderer: (rendererContext) {
+          final item =
+              rendererContext.row.cells['item_object']!.value as InventoryItem;
+          return Tooltip(
+            message: item.name,
+            child: Text(
+              rendererContext.cell.value.toString(),
+              overflow: TextOverflow.ellipsis,
+            ),
+          );
+        },
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.currentStockLabel,
         field: 'quantity',
-        type: PlutoColumnType.number(),
+        type: TrinaColumnType.number(),
         width: 100,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.minimumStockLabel,
         field: 'minStock',
-        type: PlutoColumnType.number(),
+        type: TrinaColumnType.number(),
         width: 100,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.locationColumnLabel,
         field: 'location',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 150,
       ),
       if (widget.assetType.isSerialized)
-        PlutoColumn(
+        TrinaColumn(
           title: l10n.serialNumberColumnLabel,
           field: 'serialNumber',
-          type: PlutoColumnType.text(),
+          type: TrinaColumnType.text(),
           width: 100,
         ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.barCode,
         field: 'barcode',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 150,
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.marketPriceLabel,
         field: 'marketValue',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         width: 150,
         renderer: (rendererContext) {
           // Usamos item_object para tener el enum real y mostrar el badge.
@@ -339,20 +349,19 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                 child: PriceDisplayWidget(
                   value: item.marketValue,
                   fontSize: 14,
-                  color: Colors
-                      .black87, // Color más neutro para la tabla si se prefiere
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
             ),
           );
         },
       ),
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.conditionColumnLabel,
         field: 'condition',
-        // select con los strings localizados — PlutoGrid muestra un dropdown
+        // select con los strings localizados — TrinaGrid muestra un dropdown
         // al filtrar con exactamente estas opciones.
-        type: PlutoColumnType.select(conditionLabels),
+        type: TrinaColumnType.select(conditionLabels),
         width: 150,
         enableFilterMenuItem: true,
         renderer: (rendererContext) {
@@ -370,12 +379,12 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     ];
 
     final customColumns = widget.assetType.fieldDefinitions.map((field) {
-      return PlutoColumn(
+      return TrinaColumn(
         title: field.name,
         field: field.id.toString(),
         type: field.type == CustomFieldType.number
-            ? PlutoColumnType.number()
-            : PlutoColumnType.text(),
+            ? TrinaColumnType.number()
+            : TrinaColumnType.text(),
         width: 150,
         renderer: field.type == CustomFieldType.boolean
             ? (rendererContext) {
@@ -384,7 +393,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                   isChecked ? Icons.check_box : Icons.check_box_outline_blank,
                   color: isChecked
                       ? Theme.of(context).primaryColor
-                      : Colors.grey.withValues(alpha: 0.5),
+                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
                 );
               }
             : field.type == CustomFieldType.price
@@ -400,7 +409,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                       child: PriceDisplayWidget(
                         value: numVal,
                         fontSize: 14,
-                        color: Colors.black87,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -413,10 +422,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     return [
       ...baseColumns,
       ...customColumns,
-      PlutoColumn(
+      TrinaColumn(
         title: l10n.actionsColumnLabel,
         field: 'actions',
-        type: PlutoColumnType.text(),
+        type: TrinaColumnType.text(),
         enableSorting: false,
         enableFilterMenuItem: false,
         width: 180,
@@ -488,26 +497,26 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
     );
   }
 
-  List<PlutoRow> _buildRows(List<InventoryItem> items) {
+  List<TrinaRow> _buildRows(List<InventoryItem> items) {
     return items.map((item) {
-      final Map<String, PlutoCell> cells = {
-        'item_object': PlutoCell(value: item),
-        'image': PlutoCell(
+      final Map<String, TrinaCell> cells = {
+        'item_object': TrinaCell(value: item),
+        'image': TrinaCell(
           value: item.images.isNotEmpty ? item.images[0].url : '',
         ),
-        'name': PlutoCell(value: item.name),
-        'quantity': PlutoCell(value: item.quantity),
-        'minStock': PlutoCell(value: item.minStock),
-        'location': PlutoCell(value: item.location?.name ?? ''),
-        'serialNumber': PlutoCell(value: item.serialNumber ?? ''),
-        'barcode': PlutoCell(value: item.barcode ?? ''),
-        'marketValue': PlutoCell(value: item.marketValue.toString()),
+        'name': TrinaCell(value: item.name),
+        'quantity': TrinaCell(value: item.quantity),
+        'minStock': TrinaCell(value: item.minStock),
+        'location': TrinaCell(value: item.location?.name ?? ''),
+        'serialNumber': TrinaCell(value: item.serialNumber ?? ''),
+        'barcode': TrinaCell(value: item.barcode ?? ''),
+        'marketValue': TrinaCell(value: item.marketValue.toString()),
         // El valor de la celda DEBE ser el string localizado del select
-        // para que PlutoGrid pueda filtrar correctamente con el dropdown.
-        'condition': PlutoCell(
+        // para que TrinaGrid pueda filtrar correctamente con el dropdown.
+        'condition': TrinaCell(
           value: item.condition.getLocalizedString(context),
         ),
-        'actions': PlutoCell(value: ''),
+        'actions': TrinaCell(value: ''),
       };
 
       for (var field in widget.assetType.fieldDefinitions) {
@@ -515,12 +524,12 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         final dynamic rawValue =
             item.customFieldValues?[field.id] ??
             item.customFieldValues?[fieldKey];
-        cells[fieldKey] = PlutoCell(
+        cells[fieldKey] = TrinaCell(
           value: _parseCustomFieldValue(rawValue, field.type),
         );
       }
 
-      return PlutoRow(cells: cells);
+      return TrinaRow(cells: cells);
     }).toList();
   }
 
@@ -569,10 +578,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                 errorBuilder: (context, error, stackTrace) => Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.broken_image,
                       size: 60,
-                      color: Colors.grey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                     const SizedBox(height: 10),
                     Text(
@@ -597,12 +606,13 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.sizeOf(context).width < 700;
     final scrollbarThickness = isMobile ? 14.0 : 12.0;
-    final scrollbarThicknessWhileDragging = isMobile ? 16.0 : 14.0;
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final scrollbarColor = scheme.primary.withValues(alpha: 0.95);
     final scrollbarTrackColor = scheme.outline.withValues(alpha: 0.5);
 
-    return PlutoGrid(
+    return TrinaGrid(
       columns: columns,
       rows: _initialRows,
       onLoaded: (event) {
@@ -615,29 +625,37 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         final item = event.row.cells['item_object']!.value as InventoryItem;
         _openAssetDetail(item);
       },
-      configuration: PlutoGridConfiguration(
-        style: PlutoGridStyleConfig(
-          gridBorderColor: Colors.transparent,
-          columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        scrollbar: PlutoGridScrollbarConfig(
+      configuration: TrinaGridConfiguration(
+        style: isDark
+            ? TrinaGridStyleConfig.dark(
+                gridBorderColor: Colors.transparent,
+                columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                rowHeight: 45,
+                columnHeight: 45,
+                defaultCellPadding: const EdgeInsets.symmetric(horizontal: 8),
+              )
+            : TrinaGridStyleConfig(
+                gridBorderColor: Colors.transparent,
+                columnTextStyle: const TextStyle(fontWeight: FontWeight.bold),
+                rowHeight: 45,
+                columnHeight: 45,
+                defaultCellPadding: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+        scrollbar: TrinaGridScrollbarConfig(
           isAlwaysShown: true,
-          draggableScrollbar: true,
-          onlyDraggingThumb: false,
-          scrollbarThickness: scrollbarThickness,
-          scrollbarThicknessWhileDragging: scrollbarThicknessWhileDragging,
-          crossAxisMargin: isMobile ? 12 : 10,
-          mainAxisMargin: 6,
-          scrollBarColor: scrollbarColor,
-          scrollBarTrackColor: scrollbarTrackColor,
+          isDraggable: true,
+          thumbVisible: true,
+          thickness: scrollbarThickness,
+          thumbColor: scrollbarColor,
+          trackColor: scrollbarTrackColor,
         ),
-        columnSize: const PlutoGridColumnSizeConfig(
-          autoSizeMode: PlutoAutoSizeMode.none,
+        columnSize: const TrinaGridColumnSizeConfig(
+          autoSizeMode: TrinaAutoSizeMode.none,
         ),
       ),
       createFooter: (stateManager) {
         stateManager.setPageSize(10, notify: false);
-        return PlutoPaginationFooter(stateManager: stateManager);
+        return TrinaPaginationFooter(stateManager: stateManager);
       },
     );
   }

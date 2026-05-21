@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/asset_type_model.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
-import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
 class AssetTypeCard extends StatelessWidget {
@@ -29,39 +30,32 @@ class AssetTypeCard extends StatelessWidget {
   // --- MÉTODOS DE LÓGICA (Mantenidos igual para funcionalidad total) ---
 
   Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
-    return await showDialog<bool>(
+    return await showAppDialog<bool>(
           context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
-              ),
-              title: Text(AppLocalizations.of(context)!.confirmDeletion),
-              content: Text(
-                AppLocalizations.of(
-                  context,
-                )!.confirmDeleteAssetType(assetType.name),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text(AppLocalizations.of(context)!.cancel),
+          title: AppLocalizations.of(context)!.confirmDeletion,
+          body: Text(
+            AppLocalizations.of(
+              context,
+            )!.confirmDeleteAssetType(assetType.name),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red.shade50,
+                foregroundColor: Colors.red,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red.shade50,
-                    foregroundColor: Colors.red,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: Text(AppLocalizations.of(context)!.delete),
-                ),
-              ],
-            );
-          },
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text(AppLocalizations.of(context)!.delete),
+            ),
+          ],
         ) ??
         false;
   }
@@ -90,67 +84,62 @@ class AssetTypeCard extends StatelessWidget {
 
     if (!context.mounted) return;
 
-    final result = await showDialog<Map<String, String?>>(
+    final result = await showAppDialog<Map<String, String?>>(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24),
-          ),
-          title: Text(AppLocalizations.of(context)!.configureCollectionFields),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.selectBooleanFields,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _buildDropdownLabel(
-                  AppLocalizations.of(context)!.possessionFieldDef,
-                ),
-                _buildDropdown(
-                  context,
-                  value: possessionFieldId,
-                  fields: booleanFields,
-                  onChanged: (val) => setState(() => possessionFieldId = val),
-                ),
-                const SizedBox(height: 20),
-                _buildDropdownLabel(AppLocalizations.of(context)!.desiredField),
-                _buildDropdown(
-                  context,
-                  value: desiredFieldId,
-                  fields: booleanFields,
-                  onChanged: (val) => setState(() => desiredFieldId = val),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(AppLocalizations.of(context)!.cancel),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+      title: AppLocalizations.of(context)!.configureCollectionFields,
+      body: StatefulBuilder(
+        builder: (context, setState) => SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.selectBooleanFields,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              onPressed: () => Navigator.pop(context, {
-                'possession': possessionFieldId,
-                'desired': desiredFieldId,
-              }),
-              child: Text(AppLocalizations.of(context)!.save),
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildDropdownLabel(
+                AppLocalizations.of(context)!.possessionFieldDef,
+              ),
+              _buildDropdown(
+                context,
+                value: possessionFieldId,
+                fields: booleanFields,
+                onChanged: (val) => setState(() => possessionFieldId = val),
+              ),
+              const SizedBox(height: 20),
+              _buildDropdownLabel(AppLocalizations.of(context)!.desiredField),
+              _buildDropdown(
+                context,
+                value: desiredFieldId,
+                fields: booleanFields,
+                onChanged: (val) => setState(() => desiredFieldId = val),
+              ),
+            ],
+          ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(AppLocalizations.of(context)!.cancel),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+          onPressed: () => Navigator.pop(context, {
+            'possession': possessionFieldId,
+            'desired': desiredFieldId,
+          }),
+          child: Text(AppLocalizations.of(context)!.save),
+        ),
+      ],
     );
 
     if (result != null && context.mounted) {
@@ -193,35 +182,7 @@ class AssetTypeCard extends StatelessWidget {
 
   // --- DISEÑO ACTUALIZADO CON NOMBRE ARRIBA ---
 
-  /// Construye la URL pública completa de una imagen de forma segura.
-  ///
-  /// Maneja los tres casos posibles que pueden venir de la DB:
-  ///   1. URL ya absoluta: "http://server/images/asset-types/file.jpg" → la devuelve tal cual
-  ///   2. URL relativa con barra: "/images/asset-types/file.jpg"       → añade el host
-  ///   3. URL relativa sin barra: "asset-types/file.jpg" (registros viejos) → añade host + /images/
-  static String _buildImageUrl(String rawUrl) {
-    if (rawUrl.isEmpty) return '';
-
-    // Caso 1: ya es absoluta
-    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
-      return rawUrl;
-    }
-
-    // Host sin trailing slash
-    final host = Environment.apiUrl.endsWith('/')
-        ? Environment.apiUrl.substring(0, Environment.apiUrl.length - 1)
-        : Environment.apiUrl;
-
-    // Caso 2: relativa correcta ("/images/...")
-    if (rawUrl.startsWith('/')) {
-      return '$host$rawUrl';
-    }
-
-    // Caso 3: relativa sin barra inicial (registros guardados antes del fix)
-    // Añadimos el prefijo /images/ que debería tener
-    final staticPrefix = '/images';
-    return '$host$staticPrefix/$rawUrl';
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -234,7 +195,7 @@ class AssetTypeCard extends StatelessWidget {
         ? Colors.lightGreen
         : theme.primaryColor;
     final fullImageUrl = assetType.images.isNotEmpty
-        ? _buildImageUrl(assetType.images.first.url)
+        ? AppUtils.buildImageUrl(assetType.images.first.url)
         : '';
     
     // Dimensiones responsivas
@@ -264,7 +225,7 @@ class AssetTypeCard extends StatelessWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
         child: Material(
-          color: theme.cardColor,
+          color: theme.colorScheme.surfaceContainerHigh,
           child: InkWell(
             onTap: onTap,
             child: SizedBox(
@@ -382,7 +343,7 @@ class AssetTypeCard extends StatelessWidget {
         style: TextStyle(
           fontSize: isMobile ? 11.0 : 12.0,
           fontWeight: FontWeight.bold,
-          color: theme.primaryColor,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
         ),
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
@@ -413,7 +374,7 @@ class AssetTypeCard extends StatelessWidget {
         const SizedBox(width: 4),
         _CircleIconButton(
           icon: Icons.edit_rounded,
-          color: theme.primaryColor,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
           size: buttonSize,
           iconSize: iconSize,
           onPressed: onEdit,
@@ -450,10 +411,11 @@ class AssetTypeCard extends StatelessWidget {
     required List<CustomFieldDefinition> fields,
     required Function(String?) onChanged,
   }) {
+    final dropdownTheme = Theme.of(context);
     if (fields.isEmpty) {
       return Text(
         AppLocalizations.of(context)!.noBooleanFields,
-        style: const TextStyle(color: Colors.grey, fontSize: 13),
+        style: TextStyle(color: dropdownTheme.colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 13),
       );
     }
     return DropdownButtonFormField<String?>(
@@ -462,7 +424,7 @@ class AssetTypeCard extends StatelessWidget {
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         filled: true,
-        fillColor: Colors.grey.shade50,
+        fillColor: dropdownTheme.colorScheme.surfaceContainerHighest,
       ),
       hint: Text(AppLocalizations.of(context)!.selectField),
       items: [

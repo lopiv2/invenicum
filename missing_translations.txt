@@ -1,1 +1,73 @@
-{}
+{
+  "de": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
+  ],
+
+  "fr": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
+  ],
+
+  "it": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
+  ],
+
+  "pt": [
+    "scrapers",
+    "newScraperLabel",
+    "noScrapers",
+    "confirmDeleteScraper",
+    "confirmDeleteScraperMessage",
+    "scraperDeletedSuccess",
+    "errorDeletingScraper",
+    "testScraper",
+    "runResultTitle",
+    "runError",
+    "ok",
+    "themeSnowy",
+    "themeFiesta",
+    "themeMatrix",
+    "themeVolcano"
+  ]
+}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/services/api_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
@@ -25,31 +26,44 @@ class AboutCardWidget extends StatelessWidget {
   static const String _fallbackGithubReleasesUrl =
       'https://github.com/lopiv2/invenicum/releases';
 
+  /// Devuelve 1 si a > b, -1 si a < b, 0 si son iguales.
+  /// Entiende prereleases: 1.1.0 > 1.1.0-beta.1 > 1.0.2
   int _compareSemver(String a, String b) {
-    final aParts = a.split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    final bParts = b.split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    while (aParts.length < 3) {
-      aParts.add(0);
-    }
-    while (bParts.length < 3) {
-      bParts.add(0);
-    }
+    final aClean = a.trim().replaceFirst(RegExp(r'^v'), '');
+    final bClean = b.trim().replaceFirst(RegExp(r'^v'), '');
+
+    final aParts = aClean.split('-');
+    final bParts = bClean.split('-');
+
+    final aBase = aParts[0]
+        .split('.')
+        .map((e) => int.tryParse(e) ?? 0)
+        .toList();
+    final bBase = bParts[0]
+        .split('.')
+        .map((e) => int.tryParse(e) ?? 0)
+        .toList();
+
+    while (aBase.length < 3) aBase.add(0);
+    while (bBase.length < 3) bBase.add(0);
 
     for (int i = 0; i < 3; i++) {
-      if (aParts[i] > bParts[i]) return 1;
-      if (aParts[i] < bParts[i]) return -1;
+      if (aBase[i] > bBase[i]) return 1;
+      if (aBase[i] < bBase[i]) return -1;
     }
+
+    // Misma base: prerelease es MENOR que release estable
+    final aIsPrerelease = aParts.length > 1;
+    final bIsPrerelease = bParts.length > 1;
+
+    if (aIsPrerelease && !bIsPrerelease) return -1;
+    if (!aIsPrerelease && bIsPrerelease) return 1;
     return 0;
   }
 
   String _sanitizeVersion(String raw) {
-    final normalized = raw.trim().toLowerCase().replaceFirst(RegExp(r'^v'), '');
-    // Strip build metadata (+...) if present
-    final withoutMeta = normalized.split('+').first;
-    // Match semver-like patterns with at least one dot (major.minor[.patch]).
-    // Anchored to the start to avoid matching digits from SHAs (e.g. 'c36fb74').
-    final match = RegExp(r'^\d+\.\d+(?:\.\d+)?').firstMatch(withoutMeta);
-    return match?.group(0) ?? '0.0.0';
+    // Solo quitar la v inicial y espacios, mantener prerelease completo
+    return raw.trim().replaceFirst(RegExp(r'^v'), '');
   }
 
   Future<_VersionCheckResult> _checkLatestVersion(BuildContext context) async {
@@ -63,10 +77,7 @@ class AboutCardWidget extends StatelessWidget {
         (payload['latestVersion'] ?? payload['latest'] ?? '').toString(),
       );
       final local = _sanitizeVersion(Environment.appVersion);
-      final dynamic rawHasUpdate = payload['hasUpdate'];
-      final hasUpdate = rawHasUpdate is bool
-          ? rawHasUpdate
-          : _compareSemver(latest, local) > 0;
+      final hasUpdate = _compareSemver(latest, local) > 0;
       final releasesUrl = payload['releasesUrl']?.toString();
 
       return _VersionCheckResult(
@@ -93,52 +104,25 @@ class AboutCardWidget extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final future = _checkLatestVersion(context);
 
-    showDialog<void>(
+    showAppDialog<void>(
       context: context,
-      builder: (context) {
-        final theme = Theme.of(context);
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-          title: Row(
-            children: [
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onPrimary.withValues(alpha: 0.16),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.auto_awesome,
-                  color: theme.colorScheme.primary,
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.aboutDialogTitle,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: SizedBox(
+      title: l10n.aboutDialogTitle,
+      body: StatefulBuilder(
+        builder: (context, setDialogState) {
+          final theme = Theme.of(context);
+          return SizedBox(
             width: 430,
             child: FutureBuilder<_VersionCheckResult>(
               future: future,
               builder: (context, snapshot) {
-                final isLoading = snapshot.connectionState == ConnectionState.waiting;
+                final isLoading =
+                    snapshot.connectionState == ConnectionState.waiting;
                 final data = snapshot.data;
 
                 final latestVersionRaw = data?.latestVersion;
                 final latestVersion = latestVersionRaw != null
-                  ? 'v$latestVersionRaw'
-                  : l10n.aboutVersionUnknown;
+                    ? 'v$latestVersionRaw'
+                    : l10n.aboutVersionUnknown;
 
                 String versionStateText;
                 Color stateColor;
@@ -171,14 +155,14 @@ class AboutCardWidget extends StatelessWidget {
                       style: theme.textTheme.bodyMedium,
                     ),
                     const SizedBox(height: 16),
-                    // Use original neutral background when up-to-date,
-                    // otherwise use a translucent error (red) background.
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
                         color: (data?.hasUpdate == true)
                             ? theme.colorScheme.error.withValues(alpha: 0.12)
-                            : theme.colorScheme.onInverseSurface.withValues(alpha: 0.55),
+                            : theme.colorScheme.onInverseSurface.withValues(
+                                alpha: 0.55,
+                              ),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: theme.dividerColor.withValues(alpha: 0.2),
@@ -188,7 +172,7 @@ class AboutCardWidget extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            '${l10n.aboutCurrentVersionLabel}: ${Environment.appVersion}',
+                            '${l10n.aboutCurrentVersionLabel}: v${Environment.appVersion}',
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -227,20 +211,20 @@ class AboutCardWidget extends StatelessWidget {
                 );
               },
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(l10n.closeLabel),
-            ),
-            FilledButton.tonalIcon(
-              onPressed: () => _openReleases(null),
-              icon: const Icon(Icons.open_in_new),
-              label: Text(l10n.aboutOpenReleases),
-            ),
-          ],
-        );
-      },
+          );
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.closeLabel),
+        ),
+        FilledButton.tonalIcon(
+          onPressed: () => _openReleases(null),
+          icon: const Icon(Icons.open_in_new),
+          label: Text(l10n.aboutOpenReleases),
+        ),
+      ],
     );
   }
 

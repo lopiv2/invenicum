@@ -23,7 +23,7 @@ class IntegrationField {
 class IntegrationModel {
   final String id;
   final String name;
-  final Widget icon;
+  final Widget? icon;
   final String description;
   final List<IntegrationField> fields;
   final bool isDataSource;
@@ -32,7 +32,7 @@ class IntegrationModel {
   const IntegrationModel({
     required this.id,
     required this.name,
-    required this.icon,
+    this.icon,
     required this.description,
     required this.fields,
     this.isDataSource = false,

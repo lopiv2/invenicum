@@ -53,10 +53,11 @@ class _InvenicumSearchBarState extends State<InvenicumSearchBar> {
         _isSearching = false; // Quitamos carga
       });
 
-      if (_results.isNotEmpty)
+      if (_results.isNotEmpty) {
         _showOverlay();
-      else
+      } else {
         _hideOverlay();
+      }
     });
   }
 
@@ -151,7 +152,6 @@ class _InvenicumSearchBarState extends State<InvenicumSearchBar> {
                         },
                       )
                     : const Icon(Icons.search)),
-          prefixIcon: const Icon(Icons.search, size: 20),
           filled: true,
           fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
           border: OutlineInputBorder(

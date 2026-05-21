@@ -46,6 +46,138 @@ class AppLocalizationsEn extends AppLocalizations {
   String get aboutOpenReleases => 'View releases';
 
   @override
+  String get achievementFirstItemTitle => 'Welcome to the Mansion';
+
+  @override
+  String get achievementFirstItemDesc => 'Add your first item to the inventory';
+
+  @override
+  String get achievementCatalogerSmallTitle => 'Small Warehouse';
+
+  @override
+  String get achievementCatalogerSmallDesc =>
+      'Register 10 items in your collection';
+
+  @override
+  String get achievementCatalogerMediumTitle => 'Museum Curator';
+
+  @override
+  String get achievementCatalogerMediumDesc =>
+      'Register 50 items in your collection';
+
+  @override
+  String get achievementCatalogerLargeTitle => 'Owner of an Empire';
+
+  @override
+  String get achievementCatalogerLargeDesc =>
+      'Register 200 items (Legendary Level)';
+
+  @override
+  String get achievementOrderMasterTitle => 'Absolute Order';
+
+  @override
+  String get achievementOrderMasterDesc =>
+      'Assign a physical location to 20 items';
+
+  @override
+  String get achievementEyeForValueTitle => 'Eye for Value';
+
+  @override
+  String get achievementEyeForValueDesc =>
+      'Register the purchase price of 5 items';
+
+  @override
+  String get achievementFirstGrailTitle => 'First Grail';
+
+  @override
+  String get achievementFirstGrailDesc => 'Add an item worth more than 100€';
+
+  @override
+  String get achievementMuseumPieceTitle => 'Museum Piece';
+
+  @override
+  String get achievementMuseumPieceDesc => 'Add an item worth more than 500€';
+
+  @override
+  String get achievementGrowingWealthTitle => 'Growing Wealth';
+
+  @override
+  String get achievementGrowingWealthDesc =>
+      'Your total inventory exceeds 1,000€';
+
+  @override
+  String get achievementWallStreetWolfTitle => 'Wall Street Wolf';
+
+  @override
+  String get achievementWallStreetWolfDesc =>
+      'Your total inventory exceeds 10,000€';
+
+  @override
+  String get achievementBargainHunterTitle => 'Bargain Hunter';
+
+  @override
+  String get achievementBargainHunterDesc =>
+      'Register an item worth double what you paid';
+
+  @override
+  String get achievementBlindTrustTitle => 'Blind Trust';
+
+  @override
+  String get achievementBlindTrustDesc => 'Make your first loan to a contact';
+
+  @override
+  String get achievementLibrarianTitle => 'Librarian';
+
+  @override
+  String get achievementLibrarianDesc => 'Manage 3 active loans simultaneously';
+
+  @override
+  String get achievementAllInOrderTitle => 'All in Order';
+
+  @override
+  String get achievementAllInOrderDesc =>
+      'Retrieve and mark a loaned item as returned';
+
+  @override
+  String get achievementLegendaryLenderTitle => 'Legendary Lender';
+
+  @override
+  String get achievementLegendaryLenderDesc => 'Complete 20 loans successfully';
+
+  @override
+  String get achievementCyberCollectorTitle => 'Cyber Collector';
+
+  @override
+  String get achievementCyberCollectorDesc =>
+      'Identify an item using AI for the first time';
+
+  @override
+  String get achievementHawkEyeTitle => 'Hawk Eye';
+
+  @override
+  String get achievementHawkEyeDesc => 'Use AI to identify 15 items';
+
+  @override
+  String get achievementPolyglotTitle => 'Polyglot';
+
+  @override
+  String get achievementPolyglotDesc => 'Change the global currency of the app';
+
+  @override
+  String get achievementForecasterTitle => 'Forecaster';
+
+  @override
+  String get achievementForecasterDesc =>
+      'Activate 3 different maintenance alerts';
+
+  @override
+  String get achievementMasterUserTitle => 'Master User';
+
+  @override
+  String get achievementMasterUserDesc =>
+      'Customize the order of your notifications';
+
+  @override
   String get active => 'Active';
 
   @override
@@ -214,6 +346,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get collectionFieldsConfigured => 'Collection fields configured.';
 
   @override
+  String get collectionLabel => 'Collection';
+
+  @override
+  String get collectionsLabel => 'Collections';
+
+  @override
   String get condition => 'Condition';
 
   @override
@@ -242,6 +380,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get configureVoucherBody => 'Configure voucher body...';
+
+  @override
+  String get confirm => 'Confirm';
 
   @override
   String get confirmDeleteAlert => 'Delete Alert';
@@ -557,6 +698,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get inventoryLabel => 'Inventory';
 
   @override
+  String get inventoriesLabel => 'Inventories';
+
+  @override
   String get january => 'January';
 
   @override
@@ -721,6 +865,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noNotifications => 'No notifications';
 
   @override
+  String get noResultsFound => 'No results found.';
+
+  @override
   String get noThemesSaved => 'No themes saved yet';
 
   @override
@@ -774,6 +921,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get preferences => 'Preferences';
+
+  @override
+  String get preferencesUpdated => 'Preferences updated';
 
   @override
   String get previewPDF => 'Preview';
@@ -842,6 +992,130 @@ class AppLocalizationsEn extends AppLocalizations {
   String get saveAsset => 'Save Asset';
 
   @override
+  String get saveAndContinueAsset => 'Save & Continue';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue =>
+      'Reset fields on save & continue';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Clears the form automatically after saving an item';
+
+  @override
+  String get enableCloneBuster => 'Enable';
+
+  @override
+  String get enableCloneBusterDescription =>
+      'Guaranteed to avoid redundant items or your money back! (Offer void in all timelines except 1993)';
+
+  @override
+  String get cloneBusterDialogTitle => 'Clone-Buster-O-Matic™ Activated';
+
+  @override
+  String get cloneBusterMessage1 =>
+      'System engaged. Doctor Fred would be proud of this level of efficiency! (Please ignore the faint smell of burning toast and the sound of maniacal laughter from your hard drive).';
+
+  @override
+  String get cloneBusterMessage2 =>
+      'Activating The Clone-Buster-O-Matic™... Please keep your hands, feet, and any identical twins away from the monitor during initialization.';
+
+  @override
+  String get cloneBusterMessage3 =>
+      'System enabled. We\'ve informed your \'future self\' that you no longer need those duplicates. If you suddenly feel a tingling sensation or stop existing, ignore it.';
+
+  @override
+  String get cloneBusterMessage4 =>
+      'Clone-Buster active. Any redundant items will be humanely vaporized and turned into generic static. Don\'t worry, they won\'t feel a thing (we think).';
+
+  @override
+  String get cloneBusterMessage5 =>
+      'Warning: Enabling this module may cause a 0.004% increase in RAM usage and a 100% decrease in seeing the same thing twice. Proceed with extreme confidence!';
+
+  @override
+  String get cloneBusterMessage6 =>
+      'The Clone-Buster is now standing guard. It\'s like having a tiny, very angry librarian inside your computer who hates seeing double. Click.';
+
+  @override
+  String get cloneBusterDescription =>
+      'The Clone-Buster-O-Matic™ scans your inventory with quantum precision to detect and prevent duplicate entries. Set to Paranoid for maximum detection.';
+
+  @override
+  String get cloneBusterDisclaimer =>
+      'Disclaimer: This feature is as useless as a rubber chicken with a pulley in the middle. Toggle at your own risk (and boredom)!';
+
+  @override
+  String get fontFamilyLabel => 'Font Family';
+
+  @override
+  String get selectFontFamily => 'Select the application font';
+
+  @override
+  String get fontDefault => 'Default (System)';
+
+  @override
+  String get fontSCUMMCredits => 'SCUMM Credits';
+
+  @override
+  String get fontSCUMMSolid => 'SCUMM Solid';
+
+  @override
+  String get fontDayOfTheTentacle => 'Day of the Tentacle';
+
+  @override
+  String get fontEfmi => 'Efmi';
+
+  @override
+  String get fontPUSAB => 'PUSAB';
+
+  @override
+  String get fontActionForce => 'Action Force';
+
+  @override
+  String get fontStarjedi => 'Starjedi';
+
+  @override
+  String get fontTransformersMovie => 'Transformers Movie';
+
+  @override
+  String get cloneBusterDuplicateTitle => 'Possible Duplicate Detected!';
+
+  @override
+  String cloneBusterDuplicateMessage(String similarity, String itemName) {
+    return 'This item is $similarity% similar to \"$itemName\". Do you want to continue anyway?';
+  }
+
+  @override
+  String get cloneBusterContinueAnyway => 'Continue Anyway';
+
+  @override
+  String get cloneBusterReview => 'Review';
+
+  @override
+  String get cloneBusterDialogAction => 'Got it!';
+
+  @override
+  String get cloneBusterSensitivityLevel => 'SENSITIVITY LEVEL';
+
+  @override
+  String get cloneBusterSensitivityLow => 'Low';
+
+  @override
+  String get cloneBusterSensitivityHigh => 'High';
+
+  @override
+  String get cloneBusterSensitivityParanoid => 'Paranoid';
+
+  @override
+  String get cloneBusterDialogOk => 'OK';
+
+  @override
+  String get cloneBusterDialogCancel => 'CANCEL';
+
+  @override
+  String get cloneBusterDialogHelp => '?HELP';
+
+  @override
   String get saveChanges => 'Save Changes';
 
   @override
@@ -849,6 +1123,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get saveCustomTheme => 'Save Custom Theme';
+
+  @override
+  String get searchByName => 'Search by name...';
 
   @override
   String get searchInAllColumns => 'Search in all columns...';
@@ -901,6 +1178,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showAsList => 'Show as List';
+
+  @override
+  String get showAssetTypeLogo => 'Show Asset Type Logo';
+
+  @override
+  String get showAssetTypeLogoDescription =>
+      'If the asset type has an image, display it as a logo in the list view.';
 
   @override
   String get sortAsc => 'Ascending';
@@ -1146,6 +1430,27 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get integrationTcgdexDesc =>
       'Query cards and sets from collectible card games to enrich your inventory automatically.';
+
+  @override
+  String get integrationPokemonPriceTrackerDesc =>
+      'Connect your PokemonPriceTracker account to sync your collection automatically.';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyLabel => 'API Key';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyHint =>
+      'Enter your PokemonPriceTracker API key';
+
+  @override
+  String get integrationRawgDesc =>
+      'Query video games from the RAWG database to enrich your inventory automatically.';
+
+  @override
+  String get integrationRawgApiKeyLabel => 'API Key';
+
+  @override
+  String get integrationRawgApiKeyHint => 'Enter your RAWG API key';
 
   @override
   String get integrationQrGeneratorName => 'QR Generator';
@@ -2103,6 +2408,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get zoomToFit => 'Zoom to Fit';
 
   @override
+  String get currencyEur => 'Euro';
+
+  @override
+  String get currencyUsd => 'US Dollar';
+
+  @override
+  String get currencyGbp => 'British Pound';
+
+  @override
+  String get currencyJpy => 'Japanese Yen';
+
+  @override
+  String get currencyMxn => 'Mexican Peso';
+
+  @override
   String get generalSettingsMenuLabel => 'General Settings';
 
   @override
@@ -2116,6 +2436,75 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get aboutMenuLabel => 'About';
+
+  @override
+  String get crossToonsMenuLabel => 'CrossToons™';
+
+  @override
+  String get crossToonsTitle => 'CrossToons™';
+
+  @override
+  String get crossToonsDescription =>
+      'Manage your floating overlay images that roam across the screen. All images must be in webp format and facing to the right, unless it\'s Michael Jackson, you know what I mean...';
+
+  @override
+  String get crossToonsAddNew => 'Add New CrossToon';
+
+  @override
+  String get crossToonsUploadImage => 'Upload Image';
+
+  @override
+  String get crossToonsConfigure => 'Configure';
+
+  @override
+  String get crossToonsDeleteConfirm => 'Delete this CrossToon?';
+
+  @override
+  String crossToonsDeleteConfirmMessage(String name) {
+    return 'Are you sure you want to delete $name?';
+  }
+
+  @override
+  String get crossToonsDirectionLabel => 'Direction';
+
+  @override
+  String get crossToonsZoneLabel => 'Zone';
+
+  @override
+  String get crossToonsSpeedLabel => 'Speed (seconds)';
+
+  @override
+  String get crossToonsFrequencyLabel => 'Frequency (seconds)';
+
+  @override
+  String get crossToonsImageSizeLabel => 'Size (px)';
+
+  @override
+  String get crossToonsFpsLabel => 'Animation FPS';
+
+  @override
+  String get crossToonsTurnModeLabel => 'Turn Mode';
+
+  @override
+  String get crossToonsImageLabel => 'Image';
+
+  @override
+  String get crossToonsImageHint => 'Select an image';
+
+  @override
+  String get crossToonsTurnMinDelayLabel => 'Turn Min Delay (seconds)';
+
+  @override
+  String get crossToonsTurnMaxDelayLabel => 'Turn Max Delay (seconds)';
+
+  @override
+  String get crossToonsMaxTurnsLabel => 'Max Turns';
+
+  @override
+  String get crossToonsPreviewLabel => 'Preview';
+
+  @override
+  String get disable => 'Disable';
 
   @override
   String get automaticDarkModeLabel => 'Automatic dark mode';
@@ -2493,6 +2882,45 @@ class AppLocalizationsEn extends AppLocalizations {
   String get elementDeletedSuccess => 'Element deleted successfully';
 
   @override
+  String get scrapers => 'Scrapers';
+
+  @override
+  String get newScraperLabel => 'New scraper';
+
+  @override
+  String get noScrapers => 'There are no scrapers. Create a new one.';
+
+  @override
+  String get confirmDeleteScraper => 'Delete Scraper';
+
+  @override
+  String confirmDeleteScraperMessage(String name) {
+    return 'Are you sure you want to delete scraper \"$name\"? This action cannot be undone.';
+  }
+
+  @override
+  String get scraperDeletedSuccess => 'Scraper deleted successfully.';
+
+  @override
+  String errorDeletingScraper(String error) {
+    return 'Error deleting scraper: $error';
+  }
+
+  @override
+  String get testScraper => 'Test';
+
+  @override
+  String get runResultTitle => 'Test result';
+
+  @override
+  String runError(String error) {
+    return 'Error running test: $error';
+  }
+
+  @override
+  String get ok => 'OK';
+
+  @override
   String get enterYourNameValidation => 'Enter your name.';
 
   @override
@@ -2684,6 +3112,22 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get themeDeepNight => 'Deep Night';
+
+  @override
+  String get themeSnowy => 'Snowy';
+
+  @override
+  String get themeFiesta => 'Party!';
+
+  @override
+  String get themeMatrix => 'Matrix';
+
+  @override
+  String get themeVolcano => 'Volcano';
+
+  @override
+  String get themePipboy3000Notes =>
+      'Warning: this theme may cause your 3dfx Voodoo2 to start sweating pixels.';
 
   @override
   String get loginSuccess => 'Login successful';

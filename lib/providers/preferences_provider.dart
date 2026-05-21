@@ -1,8 +1,11 @@
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
+import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/data/models/user_preferences.dart';
 import 'package:invenicum/data/services/preferences_service.dart';
 
@@ -28,6 +31,12 @@ class PreferencesProvider with ChangeNotifier {
   String? get aiModel => _prefs.aiModel;
   // 🔑 Ahora la moneda viene de las preferencias guardadas
   String get selectedCurrency => _prefs.currency;
+  bool get showAssetTypeLogo => _prefs.showAssetTypeLogo;
+  bool get autoResetFieldsOnSaveAndContinue =>
+      _prefs.autoResetFieldsOnSaveAndContinue;
+  bool get cloneBusterEnabled => _prefs.cloneBusterEnabled;
+  String get selectedFontFamily => _prefs.font;
+  List<OverlayImageConfig> get crossToonConfigs => _prefs.crossToonConfigs;
 
   PreferencesProvider(this._preferencesService);
 
@@ -69,7 +78,7 @@ class PreferencesProvider with ChangeNotifier {
       _isDarkMode = oldDarkValue;
       _prefs = oldPrefs;
       notifyListeners();
-      debugPrint('Error al persistir tema de sistema: $e');
+      debugPrint('Error persisting visual status: $e');
       rethrow;
     }
   }
@@ -109,23 +118,42 @@ class PreferencesProvider with ChangeNotifier {
       _useSystemTheme = oldSystemValue;
       _prefs = oldPrefs;
       notifyListeners();
-      debugPrint('Error al persistir modo oscuro: $e');
+      debugPrint('Error persisting dark mode: $e');
       rethrow;
     }
   }
 
-  /// Carga las preferencias completas y actualiza el estado
+  Future<void> updatePreference(String key, dynamic value) async {
+    // Optimistic update
+    _prefs = _prefs.copyWith(
+      showAssetTypeLogo: key == 'showAssetTypeLogo'
+          ? value as bool
+          : _prefs.showAssetTypeLogo,
+    );
+    notifyListeners();
+
+    try {
+      final updated = await _preferencesService.updatePreference(key, value);
+      _prefs = updated;
+      notifyListeners();
+    } catch (e) {
+      await loadPreferences(); // rollback
+      rethrow;
+    }
+  }
+
   Future<void> loadPreferences() async {
     try {
       final json = await _preferencesService.getPreferences();
       _prefs = UserPreferences.fromJson(json);
 
-      // 🚩 SINCRONIZACIÓN CRÍTICA
       _useSystemTheme = _prefs.useSystemTheme;
       _isDarkMode = _prefs.isDarkMode;
 
       _isInitialized = true;
-      notifyListeners();
+      notifyListeners(); // ← esto dispara el ProxyProvider2 en main.dart,
+      //   que llama a prev.initializeTheme() con los
+      //   3 campos que ya están en _prefs
     } catch (e) {
       debugPrint('Error cargando preferencias: $e');
       _isInitialized = true;
@@ -200,42 +228,42 @@ class PreferencesProvider with ChangeNotifier {
     }
   }
 
-  /// Convierte un monto de la moneda local del usuario a la moneda base (USD)
+  /// Converts an amount from the user's local currency to the base currency (USD)
   double convertToBase(double amount) {
     final rates = _prefs.exchangeRates;
 
-    // Si la moneda actual es USD, el valor ya es la base.
-    if (selectedCurrency == 'USD' ||
+    // If the current currency is USD, the value is already the base.
+    if (selectedCurrency == AppCurrencies.usd ||
         rates == null ||
         !rates.containsKey(selectedCurrency)) {
       return amount;
     }
 
-    // Si rates['EUR'] es 0.85 (significa 1 USD = 0.85 EUR)
-    // Para pasar de 15€ a USD: 15 / 0.85 = 17.64 USD
-    // Si el resultado te dio 17.66, es porque se hizo: 15 * 1.17 (la tasa inversa)
+    // If rates['EUR'] is 0.85 (means 1 USD = 0.85 EUR)
+    // To convert 15€ to USD: 15 / 0.85 = 17.64 USD
+    // If you got 17.66, it's because you did: 15 * 1.17 (the inverse rate)
 
     final double rate = rates[selectedCurrency] ?? 1.0;
 
     if (rate == 0) return amount;
 
-    // 🔑 LA REGLA DE ORO:
-    // Para ir de BASE -> LOCAL: Multiplicar (USD * rate)
-    // Para ir de LOCAL -> BASE: Dividir (LOCAL / rate)
+    // 🔑 THE GOLDEN RULE:
+    // To go from BASE -> LOCAL: Multiply (USD * rate)
+    // To go from LOCAL -> BASE: Divide (LOCAL / rate)
     return amount / rate;
   }
 
   double convertPrice(double amount) {
     final rates = _prefs.exchangeRates;
     final target =
-        _prefs.currency; // Moneda elegida por el usuario (EUR, MXN, etc.)
+        _prefs.currency; // Currency chosen by the user (EUR, MXN, etc.)
 
-    // Si no hay tasas o el usuario ya eligió USD, devolvemos el monto original
-    if (rates == null || rates.isEmpty || target == 'USD') {
+    // If no rates or user already chose USD, return original amount
+    if (rates == null || rates.isEmpty || target == AppCurrencies.usd) {
       return amount;
     }
 
-    // Obtenemos la tasa para la moneda destino (ej: 0.92 para EUR)
+    // Get the rate for the target currency (e.g., 0.92 for EUR)
     final double rate = rates[target] ?? 1.0;
 
     return amount * rate;
@@ -274,7 +302,7 @@ class PreferencesProvider with ChangeNotifier {
     } catch (e) {
       _prefs = previousPrefs; // Revertimos si falla
       notifyListeners();
-      debugPrint('Error actualizando idioma: $e');
+      debugPrint('Error updating language: $e');
       rethrow;
     }
   }
@@ -301,13 +329,11 @@ class PreferencesProvider with ChangeNotifier {
   Future<void> updateAiProvider(String provider, String model) async {
     final previousPrefs = _prefs;
 
-    // Actualización optimista
     _prefs = _prefs.copyWith(aiProvider: provider, aiModel: model);
     notifyListeners();
 
     try {
       await _preferencesService.updateAiProvider(provider, model);
-      // Re-sincroniza con backend para reflejar exactamente lo persistido.
       final json = await _preferencesService.getPreferences();
       _prefs = UserPreferences.fromJson(json);
       notifyListeners();
@@ -319,45 +345,157 @@ class PreferencesProvider with ChangeNotifier {
     }
   }
 
-  String getSymbolForCurrency(String currencyCode) {
-    switch (currencyCode) {
-      case 'EUR':
-        return '€';
-      case 'GBP':
-        return '£';
-      case 'JPY':
-        return '¥';
-      case 'MXN':
-      case 'USD':
-      default:
-        return '\$';
+  Future<void> setAutoResetFieldsOnSaveAndContinue(bool enabled) async {
+    final previousPrefs = _prefs;
+
+    _prefs = _prefs.copyWith(autoResetFieldsOnSaveAndContinue: enabled);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updatePreference(
+        'autoResetFieldsOnSaveAndContinue',
+        enabled,
+      );
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating auto reset fields preference: $e');
+      rethrow;
     }
+  }
+
+  Future<void> setCloneBusterEnabled(bool enabled) async {
+    final previousPrefs = _prefs;
+
+    _prefs = _prefs.copyWith(cloneBusterEnabled: enabled);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updatePreference(
+        'enableCloneBusterOmatic',
+        enabled,
+      );
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating clone buster preference: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> setFontFamily(String font) async {
+    final previousPrefs = _prefs;
+
+    _prefs = _prefs.copyWith(font: font);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updatePreference('font', font);
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating font family preference: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> addCrossToonConfig({
+    required Uint8List imageBytes,
+    required String imageName,
+    required OverlayImageConfig config,
+  }) async {
+    try {
+      final saved = await _preferencesService.createCrossToon(
+        imageBytes: imageBytes,
+        imageName: imageName,
+        config: config,
+      );
+      final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs)
+        ..add(saved);
+      _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error adding cross-toon config: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> updateCrossToonConfig({
+    required int index,
+    required OverlayImageConfig config,
+    Uint8List? imageBytes,
+    String? imageName,
+  }) async {
+    final previousPrefs = _prefs;
+    final existing = _prefs.crossToonConfigs[index];
+    if (existing.id == null) return;
+    try {
+      final saved = await _preferencesService.updateCrossToon(
+        id: existing.id!,
+        imageBytes: imageBytes,
+        imageName: imageName,
+        config: config,
+      );
+      final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs);
+      updatedList[index] = saved;
+      _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+      notifyListeners();
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating cross-toon config: $e');
+    }
+  }
+
+  Future<void> removeCrossToonConfig(int index) async {
+    final previousPrefs = _prefs;
+    final config = _prefs.crossToonConfigs[index];
+    final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs)
+      ..removeAt(index);
+    _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+    notifyListeners();
+    try {
+      if (config.id != null) {
+        await _preferencesService.deleteCrossToon(config.id!);
+      }
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error removing cross-toon config: $e');
+    }
+  }
+
+  Future<void> toggleCrossToonEnabled(int index, bool enabled) async {
+    final previousPrefs = _prefs;
+    final config = _prefs.crossToonConfigs[index];
+    final updated = config.copyWith(enabled: enabled);
+    final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs)
+      ..[index] = updated;
+    _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
+    notifyListeners();
+    if (config.id == null) return;
+    try {
+      await _preferencesService.updateCrossToon(
+        id: config.id!,
+        config: updated,
+      );
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error toggling cross-toon enabled: $e');
+    }
+  }
+
+  String getSymbolForCurrency(String currencyCode) {
+    return AppCurrencies.getSymbol(currencyCode);
   }
 
   bool usesTrailingCurrencySymbol(String currencyCode) {
-    switch (currencyCode) {
-      case 'EUR':
-        return true;
-      case 'GBP':
-      case 'JPY':
-      case 'MXN':
-      case 'USD':
-      default:
-        return false;
-    }
+    return AppCurrencies.usesTrailingSymbol(currencyCode);
   }
 
   int getDecimalDigitsForCurrency(String currencyCode) {
-    switch (currencyCode) {
-      case 'JPY':
-        return 0;
-      case 'EUR':
-      case 'GBP':
-      case 'MXN':
-      case 'USD':
-      default:
-        return 2;
-    }
+    return AppCurrencies.getDecimalDigits(currencyCode);
   }
 
   String formatPrice(double amount, {String? currencyCode}) {

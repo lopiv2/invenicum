@@ -42,6 +42,13 @@ class _IntegrationTileState extends State<IntegrationTile> {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
     final isMobile = MediaQuery.sizeOf(context).width < 700;
+    final isDark = theme.brightness == Brightness.dark;
+
+    Color lightenForDark(Color c) {
+      if (!isDark) return c;
+      final hsl = HSLColor.fromColor(c);
+      return hsl.lightness < 0.5 ? hsl.withLightness(0.5).toColor() : c;
+    }
 
     return Material(
       color: Colors.transparent,
@@ -51,7 +58,7 @@ class _IntegrationTileState extends State<IntegrationTile> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.white, widget.accent.withValues(alpha: 0.06)],
+            colors: [theme.colorScheme.surface, widget.accent.withValues(alpha: 0.06)],
           ),
           border: Border.all(color: widget.accent.withValues(alpha: 0.20)),
           boxShadow: [
@@ -80,11 +87,11 @@ class _IntegrationTileState extends State<IntegrationTile> {
                               ? l10n.integrationStatusConnected
                               : l10n.integrationStatusNotConfigured,
                           background: widget.isLinked
-                              ? const Color(0xFFDCFCE7)
-                              : const Color(0xFFFFEDD5),
+                              ? (isDark ? const Color(0xFF064E3B) : const Color(0xFFDCFCE7))
+                              : (isDark ? const Color(0xFF431407) : const Color(0xFFFFEDD5)),
                           foreground: widget.isLinked
-                              ? const Color(0xFF166534)
-                              : const Color(0xFF9A3412),
+                              ? (isDark ? const Color(0xFF6EE7B7) : const Color(0xFF166534))
+                              : (isDark ? const Color(0xFFFDBA74) : const Color(0xFF9A3412)),
                           icon: widget.isLinked
                               ? Icons.check_circle_rounded
                               : Icons.tune_rounded,
@@ -93,8 +100,8 @@ class _IntegrationTileState extends State<IntegrationTile> {
                           label: widget.integration.isDataSource
                               ? l10n.integrationTypeDataSource
                               : l10n.integrationTypeConnector,
-                          background: widget.accent.withValues(alpha: 0.12),
-                          foreground: widget.accent,
+                          background: lightenForDark(widget.accent).withValues(alpha: 0.15),
+                          foreground: lightenForDark(widget.accent),
                           icon: widget.integration.isDataSource
                               ? Icons.cloud_download_outlined
                               : Icons.settings_input_component_rounded,
@@ -171,7 +178,7 @@ class _IntegrationTileState extends State<IntegrationTile> {
                     ),
                   const Spacer(),
                   Material(
-                    color: widget.accent,
+                    color: lightenForDark(widget.accent),
                     borderRadius: BorderRadius.circular(999),
                     child: InkWell(
                       onTap: widget.onTap,

@@ -74,6 +74,8 @@ class IntegrationService {
     required String query,
     required String source,
     String locale = "es",
+    int? page = 1,
+    int? pageSize = 30,
     Map<String, List<String>>? dropdownContext,
   }) async {
     try {
@@ -84,6 +86,8 @@ class IntegrationService {
           'query': query,
           'source': source,
           'locale': locale,
+          if (page != null) 'page': page,
+          'pageSize': pageSize,
           if (dropdownContext != null)
             'fieldOptions': jsonEncode(dropdownContext),
         },

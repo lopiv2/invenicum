@@ -3,32 +3,35 @@ import 'package:invenicum/data/services/api_service.dart';
 
 class AchievementService {
   final ApiService _apiService;
-
   AchievementService(this._apiService);
-
   Dio get _dio => _apiService.dio;
 
-  /// Recupera la lista de todos los logros y su estado para el usuario actual
   Future<List<Map<String, dynamic>>> getAchievements() async {
-    try {
-      final response = await _dio.get('/achievements');
-      final List<dynamic> data = response.data['data'];
-      return data.cast<Map<String, dynamic>>();
-    } catch (e) {
-      rethrow;
-    }
+    final response = await _dio.get('/achievements');
+    final List<dynamic> data = response.data['data'];
+    return data.cast<Map<String, dynamic>>();
   }
 
-  /// Notifica al servidor que se ha cumplido una acción (opcional, 
-  /// el backend suele calcular esto por su cuenta mediante triggers)
-  Future<void> triggerAction(String actionType, dynamic value) async {
+  /// Dispara un evento al backend y devuelve los logros recién desbloqueados
+  Future<List<Map<String, dynamic>>> processEvent(
+    String type, {
+    int value = 1,
+    Map<String, dynamic>? metadata,
+  }) async {
     try {
-      await _dio.post('/achievements/check', data: {
-        'action': actionType,
-        'value': value,
-      });
+      final response = await _dio.post(
+        '/achievements/event',
+        data: {
+          'type': type,
+          'value': value,
+          if (metadata != null) 'metadata': metadata,
+        },
+      );
+      final data = response.data['data'];
+      final newUnlocks = data['newUnlocks'] as List? ?? [];
+      return newUnlocks.cast<Map<String, dynamic>>();
     } catch (e) {
-      // Error silencioso para no interrumpir la UX
+      return [];
     }
   }
 }

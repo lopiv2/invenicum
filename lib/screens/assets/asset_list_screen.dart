@@ -6,8 +6,11 @@ import 'package:csv/csv.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/async_task_helper.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
+import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_search_bar.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_type_main_content.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_cylinder_gallery.dart';
@@ -168,22 +171,20 @@ class _AssetListScreenState extends State<AssetListScreen>
     final cIdInt = int.tryParse(widget.containerId) ?? 0;
     final atIdInt = int.tryParse(widget.assetTypeId) ?? 0;
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showAppDialog<bool>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.syncPricesTitle),
-        content: Text(l10n.syncPricesDescription),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(l10n.syncLabel),
-          ),
-        ],
-      ),
+      title: l10n.syncPricesTitle,
+      body: Text(l10n.syncPricesDescription),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.syncLabel),
+        ),
+      ],
     );
 
     if (confirmed != true) return;
@@ -198,50 +199,49 @@ class _AssetListScreenState extends State<AssetListScreen>
         loadingMessage: l10n.syncingMarketPrices,
         errorMessage: l10n.couldNotSyncPrices,
       );
+      await AppUtils.trackAndToast(context, 'PRICE_REGISTERED', value: summary['updated'] ?? 0);
 
       if (!context.mounted) return;
 
-      showDialog(
+      showAppDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: Text(l10n.syncCompletedTitle),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SyncResultRow(
-                icon: Icons.trending_up,
-                color: Colors.green,
-                label: l10n.updatedLabel,
-                value: summary['updated'] ?? 0,
-              ),
-              SyncResultRow(
-                icon: Icons.remove_circle_outline,
-                color: Colors.orange,
-                label: l10n.noApiPriceLabel,
-                value: summary['skipped'] ?? 0,
-              ),
-              SyncResultRow(
-                icon: Icons.error_outline,
-                color: Colors.red,
-                label: l10n.errorsLabel,
-                value: summary['errors'] ?? 0,
-              ),
-              const Divider(),
-              SyncResultRow(
-                icon: Icons.inventory_2_outlined,
-                color: Colors.grey,
-                label: l10n.totalProcessedLabel,
-                value: summary['total'] ?? 0,
-              ),
-            ],
-          ),
-          actions: [
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(l10n.closeLabel),
+        title: l10n.syncCompletedTitle,
+        body: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SyncResultRow(
+              icon: Icons.trending_up,
+              color: Colors.green,
+              label: l10n.updatedLabel,
+              value: summary['updated'] ?? 0,
+            ),
+            SyncResultRow(
+              icon: Icons.remove_circle_outline,
+              color: Colors.orange,
+              label: l10n.noApiPriceLabel,
+              value: summary['skipped'] ?? 0,
+            ),
+            SyncResultRow(
+              icon: Icons.error_outline,
+              color: Colors.red,
+              label: l10n.errorsLabel,
+              value: summary['errors'] ?? 0,
+            ),
+            const Divider(),
+            SyncResultRow(
+              icon: Icons.inventory_2_outlined,
+              color: Colors.grey,
+              label: l10n.totalProcessedLabel,
+              value: summary['total'] ?? 0,
             ),
           ],
         ),
+        actions: [
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.closeLabel),
+          ),
+        ],
       );
     } catch (_) {}
   }
@@ -347,59 +347,57 @@ class _AssetListScreenState extends State<AssetListScreen>
       text: _selectedCountValue,
     );
 
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.countItemsByValue),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(labelText: l10n.fieldToCount),
-              initialValue: tempFieldId,
-              items: assetType.fieldDefinitions
-                  .map(
-                    (def) => DropdownMenuItem(
-                      value: def.id.toString(),
-                      child: Text(def.name),
-                    ),
-                  )
-                  .toList(),
-              onChanged: (val) => tempFieldId = val,
-            ),
-            const SizedBox(height: 15),
-            TextField(
-              controller: tempValueController,
-              decoration: InputDecoration(
-                labelText: l10n.specificValueToCount,
-                hintText: l10n.exampleFilterHint,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              setState(() {
-                _selectedCountFieldId = null;
-                _selectedCountValue = null;
-              });
-              context.pop();
-            },
-            child: Text(l10n.clearCounter),
+      title: l10n.countItemsByValue,
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          DropdownButtonFormField<String>(
+            decoration: InputDecoration(labelText: l10n.fieldToCount),
+            initialValue: tempFieldId,
+            items: assetType.fieldDefinitions
+                .map(
+                  (def) => DropdownMenuItem(
+                    value: def.id.toString(),
+                    child: Text(def.name),
+                  ),
+                )
+                .toList(),
+            onChanged: (val) => tempFieldId = val,
           ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _selectedCountFieldId = tempFieldId;
-                _selectedCountValue = tempValueController.text.trim();
-              });
-              context.pop();
-            },
-            child: Text(l10n.apply),
+          const SizedBox(height: 15),
+          TextField(
+            controller: tempValueController,
+            decoration: InputDecoration(
+              labelText: l10n.specificValueToCount,
+              hintText: l10n.exampleFilterHint,
+            ),
           ),
         ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _selectedCountFieldId = null;
+              _selectedCountValue = null;
+            });
+            context.pop();
+          },
+          child: Text(l10n.clearCounter),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _selectedCountFieldId = tempFieldId;
+              _selectedCountValue = tempValueController.text.trim();
+            });
+            context.pop();
+          },
+          child: Text(l10n.apply),
+        ),
+      ],
     );
   }
 
@@ -445,10 +443,11 @@ class _AssetListScreenState extends State<AssetListScreen>
         }
 
         // Items filtrados localmente para los widgets de estadísticas
-        // (contadores, barra de posesión, galería). No afectan a PlutoGrid.
+        // (contadores, barra de posesión, galería). No afectan a TrinaGrid.
         final statsItems = _filterForStats(data.items);
         final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
         final colorScheme = Theme.of(context).colorScheme;
+        final showLogo = context.watch<PreferencesProvider>().showAssetTypeLogo;
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
@@ -551,6 +550,7 @@ class _AssetListScreenState extends State<AssetListScreen>
                         children: [
                           AssetListHeader(
                             assetType: assetType,
+                            showAssetTypeLogo: showLogo,
                             onSyncPrices: () => _syncMarketPrices(context),
                             onGoToCreateAsset: () async {
                               await context.pushNamed(
@@ -668,7 +668,7 @@ class _AssetListScreenState extends State<AssetListScreen>
   }
 
   /// Filtra la lista solo para los widgets de estadísticas (contadores,
-  /// barra de posesión). No tiene nada que ver con el filtrado de PlutoGrid.
+  /// barra de posesión). No tiene nada que ver con el filtrado de TrinaGrid.
   List<InventoryItem> _filterForStats(List<InventoryItem> items) {
     if (_selectedCountFieldId == null || _selectedCountValue == null) {
       return items;

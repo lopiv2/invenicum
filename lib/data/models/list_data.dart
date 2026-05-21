@@ -1,5 +1,3 @@
-// lib/models/list_data.dart
-
 class ListData {
   final int id;
   final String name;
@@ -17,19 +15,38 @@ class ListData {
     this.updatedAt,
   });
 
+  ListData copyWith({
+    int? id,
+    String? name,
+    String? description,
+    List<String>? items,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) {
+    return ListData(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      items: items ?? this.items,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
   factory ListData.fromJson(Map<String, dynamic> json) {
     return ListData(
       id: json['id'] as int,
       name: json['name'] as String,
       description: json['description'] as String?,
       items: (json['items'] as List<dynamic>?)
-          ?.map((e) => e.toString())
-          .toList() ?? [],
-      createdAt: json['created_at'] != null 
-          ? DateTime.parse(json['created_at']) 
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'])
           : null,
-      updatedAt: json['updated_at'] != null 
-          ? DateTime.parse(json['updated_at']) 
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'])
           : null,
     );
   }

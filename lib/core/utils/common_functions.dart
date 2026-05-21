@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/providers/achievement_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 
 class AppUtils {
-
   /// 🌐 Launches an external URL (Docs, Web, etc.)
   static Future<void> launchUrlWeb(String url) async {
     final Uri uri = Uri.parse(url.startsWith('http') ? url : 'https://$url');
@@ -91,6 +94,53 @@ class AppUtils {
         return CustomFieldType.price;
       default:
         return CustomFieldType.text;
+    }
+  }
+
+  /// Build the full public URL of an image safely.
+  ///
+  /// Handles the three possible cases that can come from the DB:
+  ///   1. Absolute URL: "http://server/images/asset-types/file.jpg" → returns as is
+  ///   2. Relative URL with leading slash: "/images/asset-types/file.jpg"       → appends the host
+  ///   3. Relative URL without leading slash: "asset-types/file.jpg" (old records) → appends host + /images/
+  static String buildImageUrl(String rawUrl) {
+    if (rawUrl.isEmpty) return '';
+
+    // Case 1: already absolute
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+      return rawUrl;
+    }
+
+    // Host without trailing slash
+    final host = Environment.apiUrl.endsWith('/')
+        ? Environment.apiUrl.substring(0, Environment.apiUrl.length - 1)
+        : Environment.apiUrl;
+
+    // Case 2: correct relative URL ("/images/...")
+    if (rawUrl.startsWith('/')) {
+      return '$host$rawUrl';
+    }
+
+    // Case 3: relative URL without leading slash (old records)
+    // Add the /images/ prefix that it should have
+    final staticPrefix = '/images';
+    return '$host$staticPrefix/$rawUrl';
+  }
+
+  static Future<void> trackAndToast(
+    BuildContext context,
+    String eventType, {
+    int value = 1,
+    Map<String, dynamic>? metadata,
+  }) async {
+    final newUnlocks = await context.read<AchievementProvider>().trackEvent(
+      context,
+      eventType,
+      value: value,
+      metadata: metadata,
+    );
+    for (final ach in newUnlocks) {
+      ToastService.achievement(ach.title);
     }
   }
 

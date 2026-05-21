@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -39,12 +40,13 @@ class NotificationSettingsCardWidget extends StatelessWidget {
                 color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: ReorderableListView.builder(
+              child: Material(type: MaterialType.transparency, child: ReorderableListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: channels.length,
-                onReorder: (oldIndex, newIndex) {
+                onReorder: (oldIndex, newIndex) async{
                   prefsProv.reorderChannels(oldIndex, newIndex);
+                  await AppUtils.trackAndToast(context, 'NOTIFICATION_REORDERED');
                 },
                 itemBuilder: (context, index) {
                   final channel = channels[index];
@@ -64,6 +66,7 @@ class NotificationSettingsCardWidget extends StatelessWidget {
                   );
                 },
               ),
+            ),
             ),
 
             const Padding(

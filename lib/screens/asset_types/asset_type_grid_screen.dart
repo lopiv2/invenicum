@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/screens/asset_types/local_widgets/asset_type_badge.dart';
 import 'package:provider/provider.dart';
 
 import 'package:invenicum/data/models/asset_type_model.dart';
@@ -138,12 +139,19 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
-                  child: Text(
-                    l10n.assetTypesInContainer(container.name),
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: theme.colorScheme.onSurface,
-                    ),
+                  child: Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 12,
+                    children: [
+                      Text(
+                        l10n.assetTypesInContainer(container.name),
+                        style: theme.textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: theme.colorScheme.onSurface,
+                        ),
+                      ),
+                      AssetTypeBadge(isCollection: container.isCollection,),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -162,12 +170,19 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  l10n.assetTypesInContainer(container.name),
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  children: [
+                    Text(
+                      l10n.assetTypesInContainer(container.name),
+                      style: theme.textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    AssetTypeBadge(isCollection: container.isCollection,),
+                  ],
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -184,6 +199,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 ),
               ],
             ),
+          // COLOR LEGENDS
           const SizedBox(height: 20),
           if (assetTypes.isEmpty)
             Expanded(
@@ -191,7 +207,9 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
                 child: Text(
                   l10n.noAssetTypesMessage,
                   style: TextStyle(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    color: theme.colorScheme.onSurfaceVariant.withValues(
+                      alpha: 0.7,
+                    ),
                   ),
                 ),
               ),
@@ -200,7 +218,9 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
             Expanded(
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                  maxCrossAxisExtent: screenWidth > 900 ? 420 : (screenWidth > 600 ? 320 : 220),
+                  maxCrossAxisExtent: screenWidth > 900
+                      ? 420
+                      : (screenWidth > 600 ? 320 : 220),
                   crossAxisSpacing: screenWidth > 600 ? 20 : 12,
                   mainAxisSpacing: screenWidth > 600 ? 20 : 12,
                   mainAxisExtent: screenWidth > 600 ? 165 : 130,

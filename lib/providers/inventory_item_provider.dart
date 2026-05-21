@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/inventory_item_response.dart';
@@ -123,7 +124,7 @@ class InventoryItemProvider with ChangeNotifier {
   // ----------------------------------------------------------------------
 
   /// Todos los items del contexto actual, sin paginación ni filtrado.
-  /// PlutoGrid se encarga de filtrar, ordenar y paginar.
+  /// TrinaGrid se encarga de filtrar, ordenar y paginar.
   List<InventoryItem> get allInventoryItems {
     final key = _getCacheKey(_currentContainerId, _currentAssetTypeId);
     final response = _itemsCache[key];
@@ -334,7 +335,7 @@ class InventoryItemProvider with ChangeNotifier {
   }
 
   // ----------------------------------------------------------------------
-  // VALOR ECONÓMICO GLOBAL
+  // GLOBAL ECONOMIC VALUE
   // ----------------------------------------------------------------------
 
   double getTotalGlobalEconomicValue(
@@ -362,7 +363,7 @@ class InventoryItemProvider with ChangeNotifier {
   }
 
   // ----------------------------------------------------------------------
-  // BÚSQUEDA EN CACHÉ
+  // CACHE SEARCHING
   // ----------------------------------------------------------------------
 
   InventoryItem? getItemFromCache(int id) {
@@ -376,7 +377,6 @@ class InventoryItemProvider with ChangeNotifier {
     return null;
   }
 
-  // Alias para compatibilidad con código existente
   InventoryItem? getItemById(int id) => getItemFromCache(id);
 
   // ----------------------------------------------------------------------
@@ -384,6 +384,7 @@ class InventoryItemProvider with ChangeNotifier {
   // ----------------------------------------------------------------------
 
   Future<void> createInventoryItem(
+    BuildContext context,
     InventoryItem newItem, {
     FileData filesData = const [],
   }) async {
@@ -396,6 +397,11 @@ class InventoryItemProvider with ChangeNotifier {
         assetTypeId: newItem.assetTypeId,
         forceReload: true,
       );
+      await AppUtils.trackAndToast(context, 'ITEM_CREATED');
+      if (newItem.locationId != null) {
+        await AppUtils.trackAndToast(context, 'ITEM_WITH_LOCATION');
+      }
+      await AppUtils.trackAndToast(context, 'PRICE_REGISTERED');
     } catch (e) {
       _isLoading = false;
       notifyListeners();

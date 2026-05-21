@@ -1,9 +1,12 @@
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
+import 'package:invenicum/data/models/overlay_image_config_model.dart';
+import 'package:invenicum/core/utils/constants.dart';
 
 class UserPreferences {
   final int? id;
   final String language;
   final String currency;
+  final bool showAssetTypeLogo;
   final bool aiEnabled;
   final String? aiProvider;
   final String? aiModel;
@@ -11,24 +14,39 @@ class UserPreferences {
   final DateTime? updatedAt;
   final Map<String, double>? exchangeRates;
   final NotificationSettings notifications;
-
-  // 🔔 NUEVOS CAMPOS
   final bool useSystemTheme;
   final bool isDarkMode;
+  final bool autoResetFieldsOnSaveAndContinue;
+  final bool cloneBusterEnabled;
+  final String font;
+  final List<OverlayImageConfig> crossToonConfigs;
+
+  // ── Tema ────────────────────────────────────────────────────────────────────
+  final String? themeColor;      // e.g. '#55FFFF'
+  final String? themeBrightness; // 'light' | 'dark'
+  final String? paletteId;       // 'cga' | 'ega' | 'scumm_crt' | null
 
   UserPreferences({
     this.id,
     this.language = 'en',
-    this.currency = 'USD',
+    this.currency = AppCurrencies.defaultCurrency,
+    this.showAssetTypeLogo = true,
     this.aiEnabled = true,
     this.aiProvider,
     this.aiModel,
     this.userId,
     this.updatedAt,
     this.exchangeRates,
-    this.useSystemTheme = true, // Por defecto sigue al sistema
-    this.isDarkMode = false,    // Solo aplica si useSystemTheme es false
+    this.useSystemTheme = true,
+    this.isDarkMode = false,
+    this.autoResetFieldsOnSaveAndContinue = true,
+    this.cloneBusterEnabled = false,
+    this.font = 'Default',
+    this.crossToonConfigs = const [],
     NotificationSettings? notifications,
+    this.themeColor,
+    this.themeBrightness,
+    this.paletteId,
   }) : notifications = notifications ?? NotificationSettings();
 
   factory UserPreferences.fromJson(Map<String, dynamic> json) {
@@ -42,7 +60,8 @@ class UserPreferences {
     return UserPreferences(
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'en',
-      currency: json['currency'] as String? ?? 'USD',
+      currency: json['currency'] as String? ?? AppCurrencies.defaultCurrency,
+      showAssetTypeLogo: json['showAssetTypeLogo'] ?? json['show_asset_type_logo'] ?? true,
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       aiProvider: (json['aiProvider'] ?? json['ai_provider']) as String?,
       aiModel: (json['aiModel'] ?? json['ai_model']) as String?,
@@ -51,14 +70,25 @@ class UserPreferences {
           ? DateTime.parse(json['updatedAt'] as String)
           : null,
       exchangeRates: parsedRates,
-      
-      // 🔔 MAPEO DE NUEVOS CAMPOS (Vienen del DTO de Node)
       useSystemTheme: json['useSystemTheme'] as bool? ?? true,
       isDarkMode: json['isDarkMode'] as bool? ?? false,
-
+      autoResetFieldsOnSaveAndContinue:
+          json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
+      cloneBusterEnabled: json['enableCloneBusterOmatic'] ?? false,
+      font: json['font'] ?? 'Default',
+      crossToonConfigs: json['crossToonConfigs'] != null
+          ? (json['crossToonConfigs'] as List<dynamic>)
+              .map((e) =>
+                  OverlayImageConfig.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : [],
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
           : NotificationSettings(),
+      // ── Tema ────────────────────────────────────────────────────────────────
+      themeColor: json['themeColor'] as String?,
+      themeBrightness: json['themeBrightness'] as String?,
+      paletteId: json['paletteId'] as String?,
     );
   }
 
@@ -73,11 +103,19 @@ class UserPreferences {
       'userId': userId,
       'useSystemTheme': useSystemTheme,
       'isDarkMode': isDarkMode,
+      'showAssetTypeLogo': showAssetTypeLogo,
+      'autoResetFieldsOnSaveAndContinue': autoResetFieldsOnSaveAndContinue,
+      'cloneBusterEnabled': cloneBusterEnabled,
+      'font': font,
+      'crossToonConfigs': crossToonConfigs.map((e) => e.toJson()).toList(),
+      'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
+      'themeColor': themeColor,
+      'themeBrightness': themeBrightness,
+      'paletteId': paletteId,
     };
   }
 
-  /// Útil para el PATCH /visual-settings que creamos
   Map<String, dynamic> toVisualSettingsJson() {
     return {
       'useSystemTheme': useSystemTheme,
@@ -89,6 +127,7 @@ class UserPreferences {
     int? id,
     String? language,
     String? currency,
+    bool? showAssetTypeLogo,
     bool? aiEnabled,
     String? aiProvider,
     String? aiModel,
@@ -96,31 +135,54 @@ class UserPreferences {
     NotificationSettings? notifications,
     bool? useSystemTheme,
     bool? isDarkMode,
+    bool? autoResetFieldsOnSaveAndContinue,
+    bool? cloneBusterEnabled,
+    String? font,
+    List<OverlayImageConfig>? crossToonConfigs,
+    String? themeColor,
+    String? themeBrightness,
+    String? paletteId,
   }) {
     return UserPreferences(
       id: id ?? this.id,
       language: language ?? this.language,
       currency: currency ?? this.currency,
+      showAssetTypeLogo: showAssetTypeLogo ?? this.showAssetTypeLogo,
       aiEnabled: aiEnabled ?? this.aiEnabled,
       aiProvider: aiProvider ?? this.aiProvider,
       aiModel: aiModel ?? this.aiModel,
       exchangeRates: exchangeRates ?? this.exchangeRates,
       notifications: notifications ?? this.notifications,
-      // 🔔 NUEVOS
       useSystemTheme: useSystemTheme ?? this.useSystemTheme,
       isDarkMode: isDarkMode ?? this.isDarkMode,
+      autoResetFieldsOnSaveAndContinue:
+          autoResetFieldsOnSaveAndContinue ?? this.autoResetFieldsOnSaveAndContinue,
+      cloneBusterEnabled: cloneBusterEnabled ?? this.cloneBusterEnabled,
+      font: font ?? this.font,
+      crossToonConfigs: crossToonConfigs ?? this.crossToonConfigs,
+      themeColor: themeColor ?? this.themeColor,
+      themeBrightness: themeBrightness ?? this.themeBrightness,
+      paletteId: paletteId ?? this.paletteId,
     );
   }
 
   factory UserPreferences.empty() {
     return UserPreferences(
       language: 'en',
-      currency: 'USD',
+      currency: AppCurrencies.defaultCurrency,
+      showAssetTypeLogo: true,
       aiEnabled: true,
       useSystemTheme: true,
       isDarkMode: false,
+      autoResetFieldsOnSaveAndContinue: true,
+      cloneBusterEnabled: false,
+      font: 'Default',
+      crossToonConfigs: const [],
       exchangeRates: {},
       notifications: NotificationSettings(),
+      themeColor: null,
+      themeBrightness: null,
+      paletteId: null,
     );
   }
 }

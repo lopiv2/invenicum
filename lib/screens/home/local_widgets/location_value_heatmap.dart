@@ -1,5 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/inventory_ownership_utils.dart';
 import 'package:invenicum/data/models/container_node.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/location.dart';
@@ -20,17 +21,23 @@ class LocationValueHeatmap extends StatelessWidget {
     return Consumer2<InventoryItemProvider, ContainerProvider>(
       builder: (context, itemProvider, containerProvider, _) {
         final allItems = itemProvider.allDownloadedItems;
+
+        final ownedItems = InventoryOwnershipUtils.filterOwnedItems(
+          allItems,
+          containerProvider.containers,
+        );
+
         final locationIndex = _buildLocationIndex(containerProvider.containers);
-        final cells = _buildCells(allItems, locationIndex);
+        final cells = _buildCells(ownedItems, locationIndex);
 
         return _LocationValueDonutCard(
           cells: cells.take(maxRows).toList(),
           maxSlices: maxSlices,
           isLoading: itemProvider.isLoading && allItems.isEmpty,
-          unassignedCount: allItems
+          unassignedCount: ownedItems
               .where((item) => item.locationId == null)
               .length,
-          unassignedValue: allItems
+          unassignedValue: ownedItems
               .where((item) => item.locationId == null)
               .fold<double>(0, (sum, item) => sum + _resolveItemValue(item)),
         );
@@ -202,7 +209,9 @@ class _LocationValueDonutCard extends StatelessWidget {
                 runSpacing: 8,
                 children: [
                   _LegendPill(
-                    label: AppLocalizations.of(context)!.locationsCount(cells.length),
+                    label: AppLocalizations.of(
+                      context,
+                    )!.locationsCount(cells.length),
                     color: theme.colorScheme.primaryContainer,
                   ),
                   _LegendPill(
@@ -210,7 +219,9 @@ class _LocationValueDonutCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('${AppLocalizations.of(context)!.totalValueFallback} '),
+                        Text(
+                          '${AppLocalizations.of(context)!.totalValueFallback} ',
+                        ),
                         PriceDisplayWidget(
                           value: totalValue,
                           color: theme.colorScheme.onSecondaryContainer,
@@ -230,7 +241,9 @@ class _LocationValueDonutCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('$unassignedCount ${AppLocalizations.of(context)!.withoutLocationLabel} · '),
+                          Text(
+                            '$unassignedCount ${AppLocalizations.of(context)!.withoutLocationLabel} · ',
+                          ),
                           PriceDisplayWidget(
                             value: unassignedValue,
                             color: theme.colorScheme.onTertiaryContainer,
@@ -441,7 +454,8 @@ class _DonutChartPanelState extends State<_DonutChartPanel> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      highlighted?.cell.locationName ?? AppLocalizations.of(context)!.totalValueFallback,
+                      highlighted?.cell.locationName ??
+                          AppLocalizations.of(context)!.totalValueFallback,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
@@ -612,8 +626,14 @@ class _RankingRow extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: [
-                  _MetricBadge(label: '${cell.totalQuantity} ${AppLocalizations.of(context)!.unitsLabel}'),
-                  _MetricBadge(label: '${cell.totalEntries} ${AppLocalizations.of(context)!.recordsLabel}'),
+                  _MetricBadge(
+                    label:
+                        '${cell.totalQuantity} ${AppLocalizations.of(context)!.unitsLabel}',
+                  ),
+                  _MetricBadge(
+                    label:
+                        '${cell.totalEntries} ${AppLocalizations.of(context)!.recordsLabel}',
+                  ),
                   _MetricBadge(label: '${percentage.toStringAsFixed(1)}%'),
                 ],
               ),

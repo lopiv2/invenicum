@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/alert.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:provider/provider.dart';
@@ -581,186 +582,188 @@ class _AlertsScreenState extends State<AlertsScreen>
           : "15";
     }
 
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(l10n.editEventTitle),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.eventDataSection,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-                ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  leading: const Icon(
-                    Icons.calendar_today,
-                    color: Colors.indigo,
-                  ),
-                  title: Text(
-                    DateFormat('dd/MM/yyyy HH:mm').format(editedEventDate),
-                  ),
-                  onTap: () async {
-                    final date = await showDatePicker(
-                      context: context,
-                      initialDate: editedEventDate,
-                      firstDate: DateTime(2020),
-                      lastDate: DateTime(2030),
-                    );
-                    if (date != null) {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(editedEventDate),
-                      );
-                      if (time != null) {
-                        setDialogState(() {
-                          editedEventDate = DateTime(
-                            date.year,
-                            date.month,
-                            date.day,
-                            time.hour,
-                            time.minute,
-                          );
-                        });
-                      }
-                    }
-                  },
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  l10n.configureReminderLabel,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-                DropdownButton<String>(
-                  value: advanceNotice,
-                  isExpanded: true,
-                  items: [
-                    DropdownMenuItem(
-                      value: "0",
-                      child: Text(l10n.eventReminderAtTime),
-                    ),
-                    DropdownMenuItem(
-                      value: "5",
-                      child: Text(l10n.minutesBeforeLabel(5)),
-                    ),
-                    DropdownMenuItem(
-                      value: "15",
-                      child: Text(l10n.minutesBeforeLabel(15)),
-                    ),
-                    DropdownMenuItem(
-                      value: "30",
-                      child: Text(l10n.minutesBeforeLabel(30)),
-                    ),
-                    DropdownMenuItem(
-                      value: "60",
-                      child: Text(l10n.oneHourBeforeLabel),
-                    ),
-                  ],
-                  onChanged: (val) =>
-                      setDialogState(() => advanceNotice = val!),
-                ),
-                const Divider(),
-                TextField(
-                  controller: titleCtrl,
-                  decoration: InputDecoration(labelText: l10n.alertTitle),
-                ),
-                TextField(
-                  controller: msgCtrl,
-                  decoration: InputDecoration(labelText: l10n.alertMessage),
-                  maxLines: 2,
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo,
-                foregroundColor: Colors.white,
+      title: l10n.editEventTitle,
+      body: StatefulBuilder(
+        builder: (context, setDialogState) => SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.eventDataSection,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
               ),
-              onPressed: () async {
-                // Compute the new notifyAt based on the selection
-                final minutes = int.parse(advanceNotice);
-                final newNotifyAt = editedEventDate.subtract(
-                  Duration(minutes: minutes),
-                );
-
-                await context.read<AlertProvider>().updateAlert(alert.id, {
-                  'title': titleCtrl.text,
-                  'message': msgCtrl.text,
-                  'scheduledAt': editedEventDate.toIso8601String(),
-                  'notifyAt': newNotifyAt.toIso8601String(),
-                  'isEvent': true,
-                });
-
-                Navigator.pop(context);
-                ToastService.success(l10n.eventUpdated);
-              },
-              child: Text(l10n.saveChanges),
-            ),
-          ],
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(
+                  Icons.calendar_today,
+                  color: Colors.indigo,
+                ),
+                title: Text(
+                  DateFormat('dd/MM/yyyy HH:mm').format(editedEventDate),
+                ),
+                onTap: () async {
+                  final date = await showDatePicker(
+                    context: context,
+                    initialDate: editedEventDate,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2030),
+                  );
+                  if (date != null) {
+                    final time = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.fromDateTime(editedEventDate),
+                    );
+                    if (time != null) {
+                      setDialogState(() {
+                        editedEventDate = DateTime(
+                          date.year,
+                          date.month,
+                          date.day,
+                          time.hour,
+                          time.minute,
+                        );
+                      });
+                    }
+                  }
+                },
+              ),
+              const SizedBox(height: 10),
+              Text(
+                l10n.configureReminderLabel,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+              ),
+              DropdownButton<String>(
+                value: advanceNotice,
+                isExpanded: true,
+                items: [
+                  DropdownMenuItem(
+                    value: "0",
+                    child: Text(l10n.eventReminderAtTime),
+                  ),
+                  DropdownMenuItem(
+                    value: "5",
+                    child: Text(l10n.minutesBeforeLabel(5)),
+                  ),
+                  DropdownMenuItem(
+                    value: "15",
+                    child: Text(l10n.minutesBeforeLabel(15)),
+                  ),
+                  DropdownMenuItem(
+                    value: "30",
+                    child: Text(l10n.minutesBeforeLabel(30)),
+                  ),
+                  DropdownMenuItem(
+                    value: "60",
+                    child: Text(l10n.oneHourBeforeLabel),
+                  ),
+                ],
+                onChanged: (val) =>
+                    setDialogState(() => advanceNotice = val!),
+              ),
+              const Divider(),
+              TextField(
+                controller: titleCtrl,
+                decoration: InputDecoration(labelText: l10n.alertTitle),
+              ),
+              TextField(
+                controller: msgCtrl,
+                decoration: InputDecoration(labelText: l10n.alertMessage),
+                maxLines: 2,
+              ),
+            ],
+          ),
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () async {
+            // Compute the new notifyAt based on the selection
+            final minutes = int.parse(advanceNotice);
+            final newNotifyAt = editedEventDate.subtract(
+              Duration(minutes: minutes),
+            );
+
+            await context.read<AlertProvider>().updateAlert(alert.id, {
+              'title': titleCtrl.text,
+              'message': msgCtrl.text,
+              'scheduledAt': editedEventDate.toIso8601String(),
+              'notifyAt': newNotifyAt.toIso8601String(),
+              'isEvent': true,
+            });
+
+            Navigator.pop(context);
+            ToastService.success(l10n.eventUpdated);
+          },
+          child: Text(l10n.saveChanges),
+        ),
+      ],
     );
   }
 
   void _showDetailsDialog(BuildContext context, dynamic alert) {
     final l10n = AppLocalizations.of(context)!;
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: Row(
-          children: [
-            _buildLeadingIcon(alert.type, alert.isRead, alert.isEvent),
-            const SizedBox(width: 10),
-            Expanded(child: Text(alert.title)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (alert.isEvent && alert.scheduledAt != null) ...[
-              Row(
-                children: [
-                  const Icon(
-                    Icons.calendar_month,
-                    size: 18,
-                    color: Colors.indigo,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    DateFormat('dd/MM/yyyy - HH:mm').format(alert.scheduledAt!),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ],
+      title: alert.title.toString(),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              _buildLeadingIcon(alert.type, alert.isRead, alert.isEvent),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  alert.title,
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
-              const Divider(),
             ],
-            Text(
-              l10n.messageWithColon,
-              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-            ),
-            const SizedBox(height: 5),
-            Text(alert.message),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(l10n.closeLabel),
           ),
+          const SizedBox(height: 16),
+          if (alert.isEvent && alert.scheduledAt != null) ...[
+            Row(
+              children: [
+                const Icon(
+                  Icons.calendar_month,
+                  size: 18,
+                  color: Colors.indigo,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  DateFormat('dd/MM/yyyy - HH:mm').format(alert.scheduledAt!),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+            const Divider(),
+          ],
+          Text(
+            l10n.messageWithColon,
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+          ),
+          const SizedBox(height: 5),
+          Text(alert.message),
         ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.closeLabel),
+        ),
+      ],
     );
   }
 
@@ -796,138 +799,136 @@ class _AlertsScreenState extends State<AlertsScreen>
     final msgCtrl = TextEditingController();
     String advanceNotice = "15";
 
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          title: Text(l10n.createAlertOrEventTitle),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                SwitchListTile(
-                  title: Text(l10n.isEventQuestion),
-                  value: isEvent,
-                  onChanged: (v) => setDialogState(() => isEvent = v),
-                ),
-                if (isEvent) ...[
-                  ListTile(
-                    leading: const Icon(Icons.calendar_today),
-                    title: Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
-                    onTap: () async {
-                      final date = await showDatePicker(
-                        context: context,
-                        initialDate: selectedDate,
-                        firstDate: DateTime.now(),
-                        lastDate: DateTime(2030),
+      title: l10n.createAlertOrEventTitle,
+      body: StatefulBuilder(
+        builder: (context, setDialogState) => SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SwitchListTile(
+                title: Text(l10n.isEventQuestion),
+                value: isEvent,
+                onChanged: (v) => setDialogState(() => isEvent = v),
+              ),
+              if (isEvent) ...[
+                ListTile(
+                  leading: const Icon(Icons.calendar_today),
+                  title: Text(DateFormat('dd/MM/yyyy').format(selectedDate)),
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: selectedDate,
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime(2030),
+                    );
+                    if (date != null) {
+                      setDialogState(
+                        () => selectedDate = DateTime(
+                          date.year,
+                          date.month,
+                          date.day,
+                          selectedDate.hour,
+                          selectedDate.minute,
+                        ),
                       );
-                      if (date != null) {
-                        setDialogState(
-                          () => selectedDate = DateTime(
-                            date.year,
-                            date.month,
-                            date.day,
-                            selectedDate.hour,
-                            selectedDate.minute,
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.access_time),
-                    title: Text(DateFormat('HH:mm').format(selectedDate)),
-                    onTap: () async {
-                      final time = await showTimePicker(
-                        context: context,
-                        initialTime: TimeOfDay.fromDateTime(selectedDate),
-                      );
-                      if (time != null) {
-                        setDialogState(
-                          () => selectedDate = DateTime(
-                            selectedDate.year,
-                            selectedDate.month,
-                            selectedDate.day,
-                            time.hour,
-                            time.minute,
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    l10n.remindMeLabel,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  DropdownButton<String>(
-                    value: advanceNotice,
-                    isExpanded: true,
-                    items: [
-                      DropdownMenuItem(
-                        value: "0",
-                        child: Text(l10n.eventReminderAtTime),
-                      ),
-                      DropdownMenuItem(
-                        value: "5",
-                        child: Text(l10n.minutesBeforeLabel(5)),
-                      ),
-                      DropdownMenuItem(
-                        value: "15",
-                        child: Text(l10n.minutesBeforeLabel(15)),
-                      ),
-                      DropdownMenuItem(
-                        value: "30",
-                        child: Text(l10n.minutesBeforeLabel(30)),
-                      ),
-                      DropdownMenuItem(
-                        value: "60",
-                        child: Text(l10n.oneHourBeforeLabel),
-                      ),
-                    ],
-                    onChanged: (val) =>
-                        setDialogState(() => advanceNotice = val!),
-                  ),
-                ],
-                TextField(
-                  controller: titleCtrl,
-                  decoration: InputDecoration(labelText: l10n.alertTitle),
+                    }
+                  },
                 ),
-                TextField(
-                  controller: msgCtrl,
-                  decoration: InputDecoration(labelText: l10n.alertMessage),
+                ListTile(
+                  leading: const Icon(Icons.access_time),
+                  title: Text(DateFormat('HH:mm').format(selectedDate)),
+                  onTap: () async {
+                    final time = await showTimePicker(
+                      context: context,
+                      initialTime: TimeOfDay.fromDateTime(selectedDate),
+                    );
+                    if (time != null) {
+                      setDialogState(
+                        () => selectedDate = DateTime(
+                          selectedDate.year,
+                          selectedDate.month,
+                          selectedDate.day,
+                          time.hour,
+                          time.minute,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  l10n.remindMeLabel,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                DropdownButton<String>(
+                  value: advanceNotice,
+                  isExpanded: true,
+                  items: [
+                    DropdownMenuItem(
+                      value: "0",
+                      child: Text(l10n.eventReminderAtTime),
+                    ),
+                    DropdownMenuItem(
+                      value: "5",
+                      child: Text(l10n.minutesBeforeLabel(5)),
+                    ),
+                    DropdownMenuItem(
+                      value: "15",
+                      child: Text(l10n.minutesBeforeLabel(15)),
+                    ),
+                    DropdownMenuItem(
+                      value: "30",
+                      child: Text(l10n.minutesBeforeLabel(30)),
+                    ),
+                    DropdownMenuItem(
+                      value: "60",
+                      child: Text(l10n.oneHourBeforeLabel),
+                    ),
+                  ],
+                  onChanged: (val) =>
+                      setDialogState(() => advanceNotice = val!),
                 ),
               ],
-            ),
+              TextField(
+                controller: titleCtrl,
+                decoration: InputDecoration(labelText: l10n.alertTitle),
+              ),
+              TextField(
+                controller: msgCtrl,
+                decoration: InputDecoration(labelText: l10n.alertMessage),
+              ),
+            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.cancel),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final minutes = int.parse(advanceNotice);
-                // Compute the notification date by subtracting the advance notice from the chosen date
-                final notificationDate = selectedDate.subtract(
-                  Duration(minutes: minutes),
-                );
-                context.read<AlertProvider>().createAlert(
-                  titleCtrl.text,
-                  msgCtrl.text,
-                  'info',
-                  isEvent: isEvent,
-                  scheduledAt: isEvent ? selectedDate : null,
-                  notifyAt: isEvent ? notificationDate : null,
-                );
-                Navigator.pop(context);
-                ToastService.success(l10n.createdSuccessfully);
-              },
-              child: Text(l10n.save),
-            ),
-          ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final minutes = int.parse(advanceNotice);
+            // Compute the notification date by subtracting the advance notice from the chosen date
+            final notificationDate = selectedDate.subtract(
+              Duration(minutes: minutes),
+            );
+            context.read<AlertProvider>().createAlert(
+              titleCtrl.text,
+              msgCtrl.text,
+              'info',
+              isEvent: isEvent,
+              scheduledAt: isEvent ? selectedDate : null,
+              notifyAt: isEvent ? notificationDate : null,
+            );
+            Navigator.pop(context);
+            ToastService.success(l10n.createdSuccessfully);
+          },
+          child: Text(l10n.save),
+        ),
+      ],
     );
   }
 }

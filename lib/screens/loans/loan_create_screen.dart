@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/loan.dart';
 import 'package:invenicum/providers/alert_provider.dart';
@@ -90,37 +92,35 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
       }
 
       if (mounted) {
-        showDialog(
+        showAppDialog(
           context: context,
-          builder: (ctx) => AlertDialog(
-            title: Text(l10n.selectObjectTitle),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: allItems.isEmpty
-                  ? Center(child: Text(l10n.noObjectsAvailable))
-                  : ListView.builder(
-                      itemCount: allItems.length,
-                      itemBuilder: (context, index) {
-                        final item = allItems[index];
-                        return ListTile(
-                          title: Text(item.name),
-                          subtitle: Text(
-                            l10n.availableQuantity(item.quantity),
-                          ),
-                          onTap: () {
-                            setState(() {
-                              _selectedItem = item;
-                              _currentStock = item.quantity;
-                              _quantityController.text = _currentStock > 0
-                                  ? '1'
-                                  : '0';
-                            });
-                            Navigator.of(ctx).pop();
-                          },
-                        );
-                      },
-                    ),
-            ),
+          title: l10n.selectObjectTitle,
+          body: SizedBox(
+            width: double.maxFinite,
+            child: allItems.isEmpty
+                ? Center(child: Text(l10n.noObjectsAvailable))
+                : ListView.builder(
+                    itemCount: allItems.length,
+                    itemBuilder: (context, index) {
+                      final item = allItems[index];
+                      return ListTile(
+                        title: Text(item.name),
+                        subtitle: Text(
+                          l10n.availableQuantity(item.quantity),
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _selectedItem = item;
+                            _currentStock = item.quantity;
+                            _quantityController.text = _currentStock > 0
+                                ? '1'
+                                : '0';
+                          });
+                          Navigator.of(context).pop();
+                        },
+                      );
+                    },
+                  ),
           ),
         );
       }
@@ -179,6 +179,7 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
             RouteNames.loans,
             pathParameters: {'containerId': widget.containerId.toString()},
           );
+          await AppUtils.trackAndToast(context, 'LOAN_CREATED');
         }
       } catch (e) {
         if (mounted) {

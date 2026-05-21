@@ -12,6 +12,8 @@ class SidebarTreeSection extends StatefulWidget {
 }
 
 class _SidebarTreeSectionState extends State<SidebarTreeSection> {
+  static final PageStorageBucket _treeBucket = PageStorageBucket();
+
   @override
   Widget build(BuildContext context) {
     return Consumer<ContainerProvider>(
@@ -32,17 +34,18 @@ class _SidebarTreeSectionState extends State<SidebarTreeSection> {
             padding: const EdgeInsets.symmetric(horizontal: 8),
             child: provider.containers.isEmpty
                 ? _buildEmptyState(context)
-                : ContainerTreeView(
-                    // 🔑 MEJORA: La key ahora incluye la suma de listas y préstamos
-                    // Si cualquiera de esos números cambia, el TreeView se refresca sí o sí.
-                    key: ValueKey(
-                      'tree_v3_${provider.containers.length}_${_getTotalItemsCount(provider)}'
+                : PageStorage(
+                    bucket: _treeBucket,
+                    child: ContainerTreeView(
+                      key: ValueKey(
+                        'tree_v3_${provider.containers.length}_${_getTotalItemsCount(provider)}'
+                      ),
+                      onDeleteContainer: provider.deleteContainer,
+                      onRenameContainer: provider.renameContainer,
+                      onContainerTap: (container, subSection) {
+                        // Navegación lógica opcional
+                      },
                     ),
-                    onDeleteContainer: provider.deleteContainer,
-                    onRenameContainer: provider.renameContainer,
-                    onContainerTap: (container, subSection) {
-                      // Navegación lógica opcional
-                    },
                   ),
           ),
         );
@@ -56,13 +59,17 @@ class _SidebarTreeSectionState extends State<SidebarTreeSection> {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final theme = Theme.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Text(
           AppLocalizations.of(context)!.createFirstContainer,
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 12, color: Colors.grey.withValues(alpha: 0.6)),
+          style: TextStyle(
+            fontSize: 12,
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+          ),
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/store_plugin_model.dart';
 import 'package:invenicum/providers/plugin_provider.dart';
 import 'package:invenicum/screens/plugins/local_widgets/plugin_editor_dialog.dart';
@@ -184,9 +185,7 @@ class ModernPluginCard extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: () => provider.updateFromStore(plugin),
                 icon: const Icon(Icons.system_update_alt, size: 14),
-                label: Text(
-                  l10n.updateToVersion(plugin.latestVersion),
-                ),
+                label: Text(l10n.updateToVersion(plugin.latestVersion)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange.shade700,
                   foregroundColor: Colors.white,
@@ -407,11 +406,10 @@ class ModernPluginCard extends StatelessWidget {
     switch (action) {
       case 'edit':
         // 1. Esperamos a que el diálogo se cierre y capturemos los datos
-        final Map<String, dynamic>? result =
-            await showDialog<Map<String, dynamic>>(
-              context: context,
-              builder: (context) => PluginEditorDialog(plugin: plugin.toJson()),
-            );
+        final result = await showAppDialog<Map<String, dynamic>>(
+          context: context,
+          builder: (_) => PluginEditorDialog(plugin: plugin.toJson()),
+        );
 
         // 2. Si el usuario no canceló (result != null), procesamos la edición
         if (result != null) {
@@ -439,79 +437,69 @@ class ModernPluginCard extends StatelessWidget {
   void _showDeleteDialog(BuildContext context, PluginProvider provider) {
     final l10n = AppLocalizations.of(context)!;
     bool deleteFromGitHub = false;
-    showDialog(
+    showAppDialog(
       context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setState) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          title: Text(l10n.deletePluginQuestion),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.deletePluginLocalWarning),
-              if (plugin.isPublic && plugin.isMine) ...[
-                const SizedBox(height: 16),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.05),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
-                  ),
-                  child: CheckboxListTile(
-                    title: Text(
-                      l10n.deleteFromGithubLabel,
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    subtitle: Text(
-                      l10n.deleteFromGithubSubtitle,
-                      style: TextStyle(fontSize: 11),
-                    ),
-                    value: deleteFromGitHub,
-                    onChanged: (val) => setState(() => deleteFromGitHub = val!),
-                    controlAffinity: ListTileControlAffinity.leading,
-                    activeColor: Colors.red,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                  ),
+      title: l10n.deletePluginQuestion,
+      body: StatefulBuilder(
+        builder: (context, setState) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.deletePluginLocalWarning),
+            if (plugin.isPublic && plugin.isMine) ...[
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
                 ),
-              ],
+                child: Material(type: MaterialType.transparency, child: CheckboxListTile(
+                  title: Text(
+                    l10n.deleteFromGithubLabel,
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                  subtitle: Text(
+                    l10n.deleteFromGithubSubtitle,
+                    style: TextStyle(fontSize: 11),
+                  ),
+                  value: deleteFromGitHub,
+                  onChanged: (val) => setState(() => deleteFromGitHub = val!),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  activeColor: Colors.red,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                ),
+              ),
+              ),
             ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: Text(
-                l10n.cancelUpper,
-                style: TextStyle(color: Colors.grey),
-              ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {
-                provider.deletePlugin(
-                  plugin.id,
-                  deleteFromGitHub: deleteFromGitHub,
-                );
-                Navigator.pop(ctx);
-              },
-              child: Text(
-                l10n.deleteUpper,
-                style: TextStyle(color: Colors.white),
-              ),
-            ),
           ],
         ),
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancelUpper, style: TextStyle(color: Colors.grey)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          onPressed: () {
+            provider.deletePlugin(
+              plugin.id,
+              deleteFromGitHub: deleteFromGitHub,
+            );
+            Navigator.pop(context);
+          },
+          child: Text(l10n.deleteUpper, style: TextStyle(color: Colors.white)),
+        ),
+      ],
     );
   }
 }

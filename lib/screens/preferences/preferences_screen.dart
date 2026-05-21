@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:invenicum/core/utils/theme_name_localizer.dart';
 import 'package:invenicum/data/models/custom_theme_model.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/theme_provider.dart';
 import 'package:invenicum/screens/preferences/local_widgets/ai_provider_card_widget.dart';
+import 'package:invenicum/screens/preferences/local_widgets/cross_toons_card_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/general_settings_card_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/loan_management_card_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/about_card_widget.dart';
@@ -12,7 +14,7 @@ import 'package:invenicum/screens/preferences/local_widgets/notification_setting
 import 'package:provider/provider.dart';
 
 // Define the categories for the side menu
-enum PreferenceCategory { general, ai, notifications, loans, about }
+enum PreferenceCategory { general, ai, notifications, crossToons, loans, about }
 
 class PreferencesScreen extends StatefulWidget {
   const PreferencesScreen({super.key});
@@ -84,6 +86,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           const SizedBox(height: 16),
           const NotificationSettingsCardWidget(),
           const SizedBox(height: 16),
+          const CrossToonsCardWidget(),
+          const SizedBox(height: 16),
           const LoanManagementCardWidget(),
           const SizedBox(height: 16),
           const AboutCardWidget(),
@@ -112,23 +116,27 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
               _buildHeader(context),
               const SizedBox(height: 40),
               _buildCategoryItem(
-                icon: Icons.settings_outlined,
+                icon: const Icon(Icons.settings_outlined),
                 category: PreferenceCategory.general,
               ),
               _buildCategoryItem(
-                icon: Icons.psychology_outlined,
+                icon: const Icon(Icons.psychology_outlined),
                 category: PreferenceCategory.ai,
               ),
               _buildCategoryItem(
-                icon: Icons.notifications_none_outlined,
+                icon: const Icon(Icons.notifications_none_outlined),
                 category: PreferenceCategory.notifications,
               ),
               _buildCategoryItem(
-                icon: Icons.handshake_outlined,
+                icon: const FaIcon(FontAwesomeIcons.ghost),
+                category: PreferenceCategory.crossToons,
+              ),
+              _buildCategoryItem(
+                icon: const Icon(Icons.handshake_outlined),
                 category: PreferenceCategory.loans,
               ),
               _buildCategoryItem(
-                icon: Icons.info_outline,
+                icon: const Icon(Icons.info_outline),
                 category: PreferenceCategory.about,
               ),
             ],
@@ -177,7 +185,7 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
   }
 
   Widget _buildCategoryItem({
-    required IconData icon,
+    required Widget icon,
     required PreferenceCategory category,
   }) {
     final isSelected = _selectedCategory == category;
@@ -190,29 +198,38 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
       PreferenceCategory.general => l10n.generalSettingsMenuLabel,
       PreferenceCategory.ai => l10n.aiAssistantMenuLabel,
       PreferenceCategory.notifications => l10n.notificationsMenuLabel,
+      PreferenceCategory.crossToons => l10n.crossToonsMenuLabel,
       PreferenceCategory.loans => l10n.loanManagementMenuLabel,
       PreferenceCategory.about => l10n.aboutMenuLabel,
     };
 
+    final coloredIcon = IconTheme.merge(
+      data: IconThemeData(color: color, size: 24),
+      child: icon,
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
-      child: ListTile(
-        onTap: () => setState(() => _selectedCategory = category),
-        leading: Icon(icon, color: color),
-        title: Text(
-          categoryTitle,
-          style: TextStyle(
-            color: isSelected
-                ? Theme.of(context).textTheme.bodyLarge?.color
-                : color,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      child: Material(
+        type: MaterialType.transparency,
+        child: ListTile(
+          onTap: () => setState(() => _selectedCategory = category),
+          leading: coloredIcon,
+          title: Text(
+            categoryTitle,
+            style: TextStyle(
+              color: isSelected
+                  ? Theme.of(context).textTheme.bodyLarge?.color
+                  : color,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
+          selected: isSelected,
+          selectedTileColor: Theme.of(
+            context,
+          ).primaryColor.withValues(alpha: 0.1),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
-        selected: isSelected,
-        selectedTileColor: Theme.of(
-          context,
-        ).primaryColor.withValues(alpha: 0.1),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -235,6 +252,8 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
         return const AiProviderCardWidget(key: ValueKey('ai'));
       case PreferenceCategory.notifications:
         return const NotificationSettingsCardWidget(key: ValueKey('notifs'));
+      case PreferenceCategory.crossToons:
+        return const CrossToonsCardWidget(key: ValueKey('crossToons'));
       case PreferenceCategory.loans:
         return const LoanManagementCardWidget(key: ValueKey('loans'));
       case PreferenceCategory.about:

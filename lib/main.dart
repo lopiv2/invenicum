@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
+import 'package:invenicum/core/utils/effects_wrapper.dart';
 import 'package:invenicum/data/services/asset_print_service.dart';
+import 'package:invenicum/data/services/scraper_service.dart';
 import 'package:invenicum/providers/achievement_provider.dart';
 import 'package:invenicum/providers/first_run_provider.dart'; // 🆕
 import 'package:invenicum/providers/integrations_provider.dart';
@@ -26,6 +27,7 @@ import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/providers/loan_provider.dart';
 import 'package:invenicum/providers/location_provider.dart';
+import 'package:invenicum/providers/scraper_provider.dart';
 import 'package:invenicum/providers/theme_provider.dart';
 import 'package:invenicum/providers/dashboard_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
@@ -50,34 +52,35 @@ final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // ── 1. Servicios base que deben estar listos antes del primer frame ────────
+  // ── 1. Core services that must be ready before the first frame ────────
   final apiService = ApiService();
-  await apiService.initializeToken(); // carga el JWT del disco a memoria
+  await apiService.initializeToken(); // loads JWT from disk into memory
 
-  // ── 2. Comprobación de primer uso (una sola petición al backend) ───────────
-  // Se hace ANTES del runApp para que el router ya tenga el resultado
-  // en su primer redirect y no haya ningún flash de pantalla incorrecta.
+  // ── 2. First-run check (single request to backend) ───────────
+  // Done BEFORE runApp so the router already has the result
+  // on its first redirect, avoiding any flash of incorrect screens.
   final firstRunProvider = FirstRunProvider(apiService);
   await firstRunProvider.check();
 
-  // ── 3. AuthProvider (sin cambios respecto a tu código original) ───────────
-  // tokenAlreadyInitialized: true porque ya llamamos apiService.initializeToken()
-  // arriba. Así AuthProvider no lo repite y _initialize() solo emite
-  // un notifyListeners() al terminar, evitando evaluaciones del redirect
-  // con estado a medias que causaban el loop setup→login→setup.
+  // ── 3. AuthProvider (no changes from your original code) ───────────
+  // tokenAlreadyInitialized: true because we already called apiService.initializeToken()
+  // above. This prevents AuthProvider from repeating it and _initialize() only emits
+  // a notifyListeners() at the end, avoiding redirect evaluations
+  // with partial state that caused the setup→login→setup loop.
   final authProvider = AuthProvider(tokenAlreadyInitialized: true);
 
   runApp(
     MultiProvider(
       providers: [
-        // --- SERVICIOS (Singletons) ---
-        // 🆕 Usamos .value para exponer la instancia ya creada arriba
+        // --- SERVICES (Singletons) ---
+        // 🆕 Use .value to expose the instance already created above
         Provider<ApiService>.value(value: apiService),
         Provider(create: (c) => PluginService(c.read<ApiService>())),
         Provider(create: (c) => DashboardService(c.read<ApiService>())),
         Provider(create: (c) => ThemeService(c.read<ApiService>())),
         Provider(create: (c) => PreferencesService(c.read<ApiService>())),
         Provider(create: (c) => ContainerService(c.read<ApiService>())),
+        Provider(create: (c) => ScraperService(c.read<ApiService>())),
         Provider(create: (c) => LocationService(c.read<ApiService>())),
         Provider(create: (c) => AssetTypeService(c.read<ApiService>())),
         Provider(create: (c) => InventoryItemService(c.read<ApiService>())),
@@ -90,10 +93,10 @@ void main() async {
         Provider(create: (c) => ReportService(c.read<ApiService>())),
         Provider(create: (c) => AssetPrintService(c.read<ApiService>())),
 
-        // --- PROVEEDORES DE ESTADO ---
+        // --- STATE PROVIDERS ---
 
-        // 🆕 FirstRunProvider: expuesto para que el router y la pantalla de
-        // setup puedan llamar a .check() de nuevo tras crear el primer usuario.
+        // 🆕 FirstRunProvider: exposed so the router and the setup screen
+        // can call .check() again after creating the first user.
         ChangeNotifierProvider<FirstRunProvider>.value(value: firstRunProvider),
 
         // Auth es la raíz de la lógica de sesión
@@ -178,22 +181,6 @@ void main() async {
             return prev!;
           },
         ),
-        ChangeNotifierProxyProvider<AuthProvider, ThemeProvider>(
-          create: (c) => ThemeProvider(c.read<ThemeService>()),
-          update: (context, auth, prev) {
-            if (auth.isAuthenticated &&
-                auth.user?.themeConfig != null &&
-                !prev!.isInitialized) {
-              final config = auth.user!.themeConfig!;
-              prev.setInitializing();
-              prev.initializeThemeFromConfig(
-                config.theme.primaryColor,
-                config.theme.brightness,
-              );
-            }
-            return prev!;
-          },
-        ),
         ChangeNotifierProxyProvider<AuthProvider, PreferencesProvider>(
           create: (c) => PreferencesProvider(c.read<PreferencesService>()),
           update: (context, auth, prev) {
@@ -205,6 +192,44 @@ void main() async {
             return prev!;
           },
         ),
+        ChangeNotifierProxyProvider2<
+          AuthProvider,
+          PreferencesProvider,
+          ThemeProvider
+        >(
+          create: (c) => ThemeProvider(c.read<ThemeService>()),
+          update: (context, auth, prefs, prev) {
+            if (prev == null)
+              return ThemeProvider(context.read<ThemeService>());
+
+            // ── 1. Tema desde PreferencesProvider (fuente de verdad con paletteId) ──
+            //
+            // PreferencesProvider.loadPreferences() ya obtiene themeColor,
+            // themeBrightness y paletteId del backend en un solo GET /preferences.
+            // Cuando prefs.isInitialized cambia a true, inicializamos el tema aquí.
+            if (auth.isAuthenticated &&
+                auth.token != null &&
+                prefs.isInitialized &&
+                !prev.isInitialized) {
+              Future.microtask(
+                () => prev.initializeTheme(
+                  prefs
+                      .prefs
+                      .themeColor, // String? — viene del JSON del backend
+                  prefs.prefs.themeBrightness, // String? — 'light' | 'dark'
+                  prefs.prefs.paletteId, // String? — 'cga' | 'ega' | null
+                ),
+              );
+            }
+
+            // ── 2. Font — sin cambios ──
+            if (prefs.isInitialized) {
+              prev.setFontFamily(prefs.selectedFontFamily);
+            }
+
+            return prev;
+          },
+        ),
         ChangeNotifierProxyProvider<AuthProvider, ContainerProvider>(
           create: (c) => ContainerProvider(
             c.read<ContainerService>(),
@@ -212,7 +237,7 @@ void main() async {
             c.read<LocationService>(),
           ),
           update: (context, auth, prev) {
-            // 🚩 Ahora solo pide contenedores si el token es válido
+            // 🚩 Now only requests containers if the token is valid
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
               if (prev != null && !prev.isLoading && prev.containers.isEmpty) {
                 Future.microtask(() => prev.loadContainers());
@@ -220,6 +245,10 @@ void main() async {
             }
             return prev!;
           },
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, ScraperProvider>(
+          create: (c) => ScraperProvider(c.read<ScraperService>()),
+          update: (_, auth, prev) => prev!,
         ),
         ChangeNotifierProxyProvider<AuthProvider, LocationProvider>(
           create: (c) => LocationProvider(c.read<LocationService>()),
@@ -233,15 +262,24 @@ void main() async {
           create: (c) => AlertProvider(c.read<AlertService>()),
           update: (_, auth, prev) => prev!,
         ),
-        ChangeNotifierProxyProvider<AuthProvider, AchievementProvider>(
+        ChangeNotifierProxyProvider2<
+          AuthProvider,
+          PreferencesProvider,
+          AchievementProvider
+        >(
           create: (c) => AchievementProvider(c.read<AchievementService>()),
-          update: (context, auth, prev) {
-            // 🚩 Protección añadida
+          update: (context, auth, prefs, prev) {
             if (auth.isAuthenticated && auth.token != null && !auth.isLoading) {
               if (prev != null &&
                   prev.achievements.isEmpty &&
                   !prev.isLoading) {
-                Future.microtask(() => prev.fetchAchievements(context));
+                Future.microtask(() => prev.fetchAchievements());
+              }
+              // When preferences are already initialized (locale ready), apply translations
+              if (prev != null &&
+                  prefs.isInitialized &&
+                  prev.serverDataLength > 0) {
+                Future.microtask(() => prev.applyLocalizations(context));
               }
             }
             return prev!;
@@ -258,7 +296,7 @@ void main() async {
 
 class MyApp extends StatefulWidget {
   final AuthProvider authProvider;
-  final FirstRunProvider firstRunProvider; // 🆕
+  final FirstRunProvider firstRunProvider;
 
   const MyApp({
     super.key,
@@ -276,7 +314,6 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // 🆕 Pasamos ambos providers al router
     _router = createAppRouter(widget.authProvider, widget.firstRunProvider);
   }
 
@@ -284,7 +321,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
     final preferencesProvider = context.watch<PreferencesProvider>();
-    // Determinamos el modo de tema
+    // Determine theme mode
     ThemeMode currentMode;
     if (preferencesProvider.useSystemTheme) {
       currentMode = ThemeMode.system;
@@ -293,7 +330,8 @@ class _MyAppState extends State<MyApp> {
           ? ThemeMode.dark
           : ThemeMode.light;
     }
-
+    final isRetro = themeProvider.isRetroMode;
+    final isDarkTheme = themeProvider.currentTheme.brightness == Brightness.dark;
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       locale: preferencesProvider.locale,
@@ -306,13 +344,29 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       title: 'Invenicum',
-      theme: themeProvider.lightTheme,
-      darkTheme: themeProvider.darkTheme,
-      themeMode: currentMode,
+
+      // ───────────────────────────────
+      // 🚨 RETRO OVERRIDE FIX
+      // ───────────────────────────────
+      theme: isRetro
+          ? themeProvider.activeRetroTheme!.toThemeData()
+          : themeProvider.lightTheme,
+
+      darkTheme: isRetro
+          ? themeProvider.activeRetroTheme!.toThemeData()
+          : themeProvider.darkTheme,
+
+      themeMode: isRetro
+          ? ThemeMode.light
+          : isDarkTheme
+              ? ThemeMode.dark
+              : currentMode,
+
       routerConfig: _router,
-      builder: (context, child) {
-        return FToastBuilder()(context, child);
-      },
+
+      builder: (context, child) => EffectsWrapper(child: child!),
     );
   }
 }
+
+

@@ -6,7 +6,7 @@ class Environment {
 
   static const String appVersion = String.fromEnvironment(
     'APP_VERSION',
-    defaultValue: '0.0.0', // Fallback only in local development
+    defaultValue: '0.0.0 "Crazy Mad Doctor"', // Fallback only in local development
   );
 
   static const String apiVersion = '/api/v1';

@@ -47,6 +47,145 @@ class AppLocalizationsDe extends AppLocalizations {
   String get aboutOpenReleases => 'Releases ansehen';
 
   @override
+  String get achievementFirstItemTitle => 'Willkommen im Herrenhaus';
+
+  @override
+  String get achievementFirstItemDesc =>
+      'Füge dein erstes Objekt zum Inventar hinzu';
+
+  @override
+  String get achievementCatalogerSmallTitle => 'Kleines Lager';
+
+  @override
+  String get achievementCatalogerSmallDesc =>
+      'Registriere 10 Objekte in deiner Sammlung';
+
+  @override
+  String get achievementCatalogerMediumTitle => 'Museumskurator';
+
+  @override
+  String get achievementCatalogerMediumDesc =>
+      'Registriere 50 Objekte in deiner Sammlung';
+
+  @override
+  String get achievementCatalogerLargeTitle => 'Besitzer eines Imperiums';
+
+  @override
+  String get achievementCatalogerLargeDesc =>
+      'Registriere 200 Objekte (Legendäre Stufe)';
+
+  @override
+  String get achievementOrderMasterTitle => 'Absolute Ordnung';
+
+  @override
+  String get achievementOrderMasterDesc =>
+      'Weise 20 Objekten einen physischen Standort zu';
+
+  @override
+  String get achievementEyeForValueTitle => 'Blick für Werte';
+
+  @override
+  String get achievementEyeForValueDesc =>
+      'Erfasse den Kaufpreis von 5 Objekten';
+
+  @override
+  String get achievementFirstGrailTitle => 'Erster Gral';
+
+  @override
+  String get achievementFirstGrailDesc =>
+      'Füge ein Objekt hinzu, das mehr als 100€ wert ist';
+
+  @override
+  String get achievementMuseumPieceTitle => 'Museumsstück';
+
+  @override
+  String get achievementMuseumPieceDesc =>
+      'Füge ein Objekt hinzu, das mehr als 500€ wert ist';
+
+  @override
+  String get achievementGrowingWealthTitle => 'Wachsender Reichtum';
+
+  @override
+  String get achievementGrowingWealthDesc =>
+      'Dein Gesamtinventar übersteigt 1.000€';
+
+  @override
+  String get achievementWallStreetWolfTitle => 'Wall-Street-Wolf';
+
+  @override
+  String get achievementWallStreetWolfDesc =>
+      'Dein Gesamtinventar übersteigt 10.000€';
+
+  @override
+  String get achievementBargainHunterTitle => 'Schnäppchenjäger';
+
+  @override
+  String get achievementBargainHunterDesc =>
+      'Erfasse ein Objekt, das doppelt so viel wert ist wie du bezahlt hast';
+
+  @override
+  String get achievementBlindTrustTitle => 'Blindes Vertrauen';
+
+  @override
+  String get achievementBlindTrustDesc =>
+      'Verleihe zum ersten Mal etwas an einen Kontakt';
+
+  @override
+  String get achievementLibrarianTitle => 'Bibliothekar';
+
+  @override
+  String get achievementLibrarianDesc =>
+      'Verwalte 3 aktive Ausleihen gleichzeitig';
+
+  @override
+  String get achievementAllInOrderTitle => 'Alles in Ordnung';
+
+  @override
+  String get achievementAllInOrderDesc =>
+      'Hole ein ausgeliehenes Objekt zurück und markiere es als zurückgegeben';
+
+  @override
+  String get achievementLegendaryLenderTitle => 'Legendärer Verleiher';
+
+  @override
+  String get achievementLegendaryLenderDesc =>
+      'Schließe 20 Ausleihen erfolgreich ab';
+
+  @override
+  String get achievementCyberCollectorTitle => 'Cyber-Sammler';
+
+  @override
+  String get achievementCyberCollectorDesc =>
+      'Identifiziere zum ersten Mal ein Objekt mit KI';
+
+  @override
+  String get achievementHawkEyeTitle => 'Falkenblick';
+
+  @override
+  String get achievementHawkEyeDesc =>
+      'Nutze KI, um 15 Objekte zu identifizieren';
+
+  @override
+  String get achievementPolyglotTitle => 'Polyglott';
+
+  @override
+  String get achievementPolyglotDesc => 'Ändere die globale Währung der App';
+
+  @override
+  String get achievementForecasterTitle => 'Vorausplaner';
+
+  @override
+  String get achievementForecasterDesc =>
+      'Aktiviere 3 verschiedene Wartungserinnerungen';
+
+  @override
+  String get achievementMasterUserTitle => 'Meisternutzer';
+
+  @override
+  String get achievementMasterUserDesc =>
+      'Passe die Reihenfolge deiner Benachrichtigungen an';
+
+  @override
   String get active => 'Aktiv';
 
   @override
@@ -215,6 +354,12 @@ class AppLocalizationsDe extends AppLocalizations {
   String get collectionFieldsConfigured => 'Sammlungsfelder konfiguriert.';
 
   @override
+  String get collectionLabel => 'Sammlung';
+
+  @override
+  String get collectionsLabel => 'Sammlungen';
+
+  @override
   String get condition => 'Zustand';
 
   @override
@@ -243,6 +388,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get configureVoucherBody => 'Inhalt des Scheins konfigurieren...';
+
+  @override
+  String get confirm => 'Bestätigen';
 
   @override
   String get confirmDeleteAlert => 'Benachrichtigung löschen';
@@ -559,6 +707,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get inventoryLabel => 'Inventar';
 
   @override
+  String get inventoriesLabel => 'Inventare';
+
+  @override
   String get january => 'Januar';
 
   @override
@@ -726,6 +877,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get noNotifications => 'Keine Benachrichtigungen';
 
   @override
+  String get noResultsFound => 'Keine Ergebnisse gefunden.';
+
+  @override
   String get noThemesSaved => 'Noch keine Designs gespeichert';
 
   @override
@@ -779,6 +933,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get preferences => 'Einstellungen';
+
+  @override
+  String get preferencesUpdated => 'Einstellungen aktualisiert';
 
   @override
   String get previewPDF => 'Vorschau';
@@ -847,6 +1004,130 @@ class AppLocalizationsDe extends AppLocalizations {
   String get saveAsset => 'Aktiv speichern';
 
   @override
+  String get saveAndContinueAsset => 'Speichern & fortfahren';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinue =>
+      'Felder beim Speichern zurücksetzen';
+
+  @override
+  String get autoResetFieldsOnSaveAndContinueDescription =>
+      'Formular nach dem Speichern automatisch leeren';
+
+  @override
+  String get enableCloneBuster => 'aktivieren';
+
+  @override
+  String get enableCloneBusterDescription =>
+      'Garantiert, um redundante Einträge zu vermeiden oder Ihr Geld zurück! (Angebot ungültig in allen Zeitlinien außer 1993)';
+
+  @override
+  String get cloneBusterDialogTitle => 'Clone-Buster-O-Matic™ Aktiviert';
+
+  @override
+  String get cloneBusterMessage1 =>
+      'System aktiviert. Doktor Fred wäre stolz auf dieses Maß an Effizienz! (Bitte ignorieren Sie den leichten Geruch von verbranntem Toast und das Geräusch manischen Lachens von Ihrer Festplatte).';
+
+  @override
+  String get cloneBusterMessage2 =>
+      'Der Clone-Buster-O-Matic™ wird aktiviert... Bitte halten Sie Hände, Füße und etwaige eineiige Zwillinge während der Initialisierung vom Monitor fern.';
+
+  @override
+  String get cloneBusterMessage3 =>
+      'System aktiviert. Wir haben Ihr \'zukünftiges Ich\' darüber informiert, dass Sie diese Duplikate nicht mehr benötigen. Wenn Sie plötzlich ein Kribbeln spüren oder aufhören zu existieren, ignorieren Sie es.';
+
+  @override
+  String get cloneBusterMessage4 =>
+      'Clone-Buster aktiv. Alle überflüssigen Einträge werden auf humane Weise verdampft und in generisches Rauschen umgewandelt. Keine Sorge, sie werden nichts spüren (denken wir).';
+
+  @override
+  String get cloneBusterMessage5 =>
+      'Warnung: Das Aktivieren dieses Moduls kann eine Erhöhung der RAM-Nutzung um 0,004 % und eine Verringerung um 100 % beim zweimaligen Sehen desselben Dings verursachen. Fahren Sie mit äußerstem Selbstvertrauen fort!';
+
+  @override
+  String get cloneBusterMessage6 =>
+      'Der Clone-Buster steht nun Wache. Es ist wie ein winziger, sehr wütender Bibliothekar in Ihrem Computer, der es hasst, Doppelgänger zu sehen. Klicken.';
+
+  @override
+  String get cloneBusterDescription =>
+      'The Clone-Buster-O-Matic™ durchsucht Ihr Inventar mit quantenpräziser Genauigkeit, um doppelte Einträge zu erkennen und zu verhindern. Stellen Sie auf Paranoisch für maximale Erkennung.';
+
+  @override
+  String get cloneBusterDisclaimer =>
+      'Haftungsausschluss: Diese Funktion ist so nutzlos wie ein Gummihuhn mit einer Rolle in der Mitte. Aktivieren auf eigene Gefahr (und Langeweile)!';
+
+  @override
+  String get fontFamilyLabel => 'Schriftfamilie';
+
+  @override
+  String get selectFontFamily => 'Schriftart der Anwendung auswählen';
+
+  @override
+  String get fontDefault => 'Standard (System)';
+
+  @override
+  String get fontSCUMMCredits => 'SCUMM Credits';
+
+  @override
+  String get fontSCUMMSolid => 'SCUMM Solid';
+
+  @override
+  String get fontDayOfTheTentacle => 'Day of the Tentacle';
+
+  @override
+  String get fontEfmi => 'Efmi';
+
+  @override
+  String get fontPUSAB => 'PUSAB';
+
+  @override
+  String get fontActionForce => 'Action Force';
+
+  @override
+  String get fontStarjedi => 'Starjedi';
+
+  @override
+  String get fontTransformersMovie => 'Transformers Movie';
+
+  @override
+  String get cloneBusterDuplicateTitle => 'Mögliches Duplikat Erkannt!';
+
+  @override
+  String cloneBusterDuplicateMessage(String similarity, String itemName) {
+    return 'Dieser Artikel ist zu $similarity% ähnlich wie \"$itemName\". Möchten Sie trotzdem fortfahren?';
+  }
+
+  @override
+  String get cloneBusterContinueAnyway => 'Trotzdem Fortfahren';
+
+  @override
+  String get cloneBusterReview => 'Überprüfen';
+
+  @override
+  String get cloneBusterDialogAction => 'Verstanden!';
+
+  @override
+  String get cloneBusterSensitivityLevel => 'SENSIBILITÄTSSTUFE';
+
+  @override
+  String get cloneBusterSensitivityLow => 'Niedrig';
+
+  @override
+  String get cloneBusterSensitivityHigh => 'Hoch';
+
+  @override
+  String get cloneBusterSensitivityParanoid => 'Paranoid';
+
+  @override
+  String get cloneBusterDialogOk => 'OK';
+
+  @override
+  String get cloneBusterDialogCancel => 'ABBRECHEN';
+
+  @override
+  String get cloneBusterDialogHelp => '?HILFE';
+
+  @override
   String get saveChanges => 'Änderungen speichern';
 
   @override
@@ -854,6 +1135,9 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get saveCustomTheme => 'Benutzerdefiniertes Design speichern';
+
+  @override
+  String get searchByName => 'Nach Namen suchen...';
 
   @override
   String get searchInAllColumns => 'In allen Spalten suchen...';
@@ -906,6 +1190,13 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get showAsList => 'Als Liste anzeigen';
+
+  @override
+  String get showAssetTypeLogo => 'Asset-Typ-Logo anzeigen';
+
+  @override
+  String get showAssetTypeLogoDescription =>
+      'Wenn der Asset-Typ ein Bild hat, dieses als Logo in der Listenansicht anzeigen.';
 
   @override
   String get sortAsc => 'Aufsteigend';
@@ -1158,6 +1449,27 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get integrationTcgdexDesc =>
       'Karten und Erweiterungen von Sammelkartenspielen abfragen, um dein Inventar automatisch anzureichern.';
+
+  @override
+  String get integrationPokemonPriceTrackerDesc =>
+      'Verbinde dein PokemonPriceTracker-Konto, um deine Sammlung automatisch zu synchronisieren.';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyLabel => 'API-Schlüssel';
+
+  @override
+  String get integrationPokemonPriceTrackerApiKeyHint =>
+      'Gib deinen PokemonPriceTracker-API-Schlüssel ein';
+
+  @override
+  String get integrationRawgDesc =>
+      'Durchsuche die RAWG-Datenbank nach Videospielen, um dein Inventar automatisch zu erweitern.';
+
+  @override
+  String get integrationRawgApiKeyLabel => 'API-Schlüssel';
+
+  @override
+  String get integrationRawgApiKeyHint => 'Gib deinen RAWG-API-Schlüssel ein';
 
   @override
   String get integrationQrGeneratorName => 'QR-Generator';
@@ -2124,6 +2436,21 @@ class AppLocalizationsDe extends AppLocalizations {
   String get zoomToFit => 'Ansicht anpassen';
 
   @override
+  String get currencyEur => 'Euro';
+
+  @override
+  String get currencyUsd => 'US-Dollar';
+
+  @override
+  String get currencyGbp => 'Britisches Pfund';
+
+  @override
+  String get currencyJpy => 'Japanischer Yen';
+
+  @override
+  String get currencyMxn => 'Mexikanischer Peso';
+
+  @override
   String get generalSettingsMenuLabel => 'Allgemeine Einstellungen';
 
   @override
@@ -2137,6 +2464,77 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get aboutMenuLabel => 'Info';
+
+  @override
+  String get crossToonsMenuLabel => 'CrossToons™';
+
+  @override
+  String get crossToonsTitle => 'CrossToons™';
+
+  @override
+  String get crossToonsDescription =>
+      'Verwalte deine schwebenden Overlay-Bilder, die über den Bildschirm wandern. Alle Bilder müssen im webp-Format sein und nach rechts schauen, außer es ist Michael Jackson, du weißt schon...';
+
+  @override
+  String get crossToonsAddNew => 'Neues CrossToon hinzufügen';
+
+  @override
+  String get crossToonsUploadImage => 'Bild hochladen';
+
+  @override
+  String get crossToonsConfigure => 'Konfigurieren';
+
+  @override
+  String get crossToonsDeleteConfirm => 'Dieses CrossToon löschen?';
+
+  @override
+  String crossToonsDeleteConfirmMessage(String name) {
+    return 'Bist du sicher, dass du $name löschen möchtest?';
+  }
+
+  @override
+  String get crossToonsDirectionLabel => 'Richtung';
+
+  @override
+  String get crossToonsZoneLabel => 'Zone';
+
+  @override
+  String get crossToonsSpeedLabel => 'Geschwindigkeit (Sekunden)';
+
+  @override
+  String get crossToonsFrequencyLabel => 'Häufigkeit (Sekunden)';
+
+  @override
+  String get crossToonsImageSizeLabel => 'Größe (px)';
+
+  @override
+  String get crossToonsFpsLabel => 'Animations-FPS';
+
+  @override
+  String get crossToonsTurnModeLabel => 'Wendemodus';
+
+  @override
+  String get crossToonsImageLabel => 'Bild';
+
+  @override
+  String get crossToonsImageHint => 'Bild auswählen';
+
+  @override
+  String get crossToonsTurnMinDelayLabel =>
+      'Minimale Wendeverzögerung (Sekunden)';
+
+  @override
+  String get crossToonsTurnMaxDelayLabel =>
+      'Maximale Wendeverzögerung (Sekunden)';
+
+  @override
+  String get crossToonsMaxTurnsLabel => 'Maximale Wendungen';
+
+  @override
+  String get crossToonsPreviewLabel => 'Vorschau';
+
+  @override
+  String get disable => 'Deaktivieren';
 
   @override
   String get automaticDarkModeLabel => 'Automatischer Dunkelmodus';
@@ -2523,6 +2921,45 @@ class AppLocalizationsDe extends AppLocalizations {
   String get elementDeletedSuccess => 'Element erfolgreich gelöscht';
 
   @override
+  String get scrapers => 'Scrapers';
+
+  @override
+  String get newScraperLabel => 'New scraper';
+
+  @override
+  String get noScrapers => 'There are no scrapers. Create a new one.';
+
+  @override
+  String get confirmDeleteScraper => 'Delete Scraper';
+
+  @override
+  String confirmDeleteScraperMessage(String name) {
+    return 'Are you sure you want to delete scraper \"$name\"? This action cannot be undone.';
+  }
+
+  @override
+  String get scraperDeletedSuccess => 'Scraper deleted successfully.';
+
+  @override
+  String errorDeletingScraper(String error) {
+    return 'Error deleting scraper: $error';
+  }
+
+  @override
+  String get testScraper => 'Test';
+
+  @override
+  String get runResultTitle => 'Test result';
+
+  @override
+  String runError(String error) {
+    return 'Error running test: $error';
+  }
+
+  @override
+  String get ok => 'OK';
+
+  @override
   String get enterYourNameValidation => 'Gib deinen Namen ein.';
 
   @override
@@ -2715,6 +3152,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get themeDeepNight => 'Tiefe Nacht';
+
+  @override
+  String get themeSnowy => 'Snowy';
+
+  @override
+  String get themeFiesta => 'Party!';
+
+  @override
+  String get themeMatrix => 'Matrix';
+
+  @override
+  String get themeVolcano => 'Volcano';
+
+  @override
+  String get themePipboy3000Notes =>
+      'Warnung: Dieses Design könnte Ihren 3dfx Voodoo2 ins Schwitzen bringen.';
 
   @override
   String get loginSuccess => 'Anmeldung erfolgreich';

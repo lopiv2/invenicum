@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
-import 'package:pluto_grid/pluto_grid.dart';
+import 'package:trina_grid/trina_grid.dart';
 
-/// Footer de paginación personalizado para PlutoGrid.
+/// Footer de paginación personalizado para TrinaGrid.
 /// Combina la paginación nativa con un campo "ir a página".
-class PlutoPaginationFooter extends StatefulWidget {
-  final PlutoGridStateManager stateManager;
+class TrinaPaginationFooter extends StatefulWidget {
+  final TrinaGridStateManager stateManager;
 
-  const PlutoPaginationFooter({super.key, required this.stateManager});
+  const TrinaPaginationFooter({super.key, required this.stateManager});
 
   @override
-  State<PlutoPaginationFooter> createState() => _PlutoPaginationFooterState();
+  State<TrinaPaginationFooter> createState() => _TrinaPaginationFooterState();
 }
 
-class _PlutoPaginationFooterState extends State<PlutoPaginationFooter> {
+class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
   final TextEditingController _pageController = TextEditingController();
   late int _currentPage;
   late int _totalPages;
@@ -67,7 +67,7 @@ class _PlutoPaginationFooterState extends State<PlutoPaginationFooter> {
       child: Row(
         children: [
           Expanded(
-            child: PlutoPagination(widget.stateManager),
+            child: TrinaPagination(widget.stateManager),
           ),
           Container(
             width: 1,

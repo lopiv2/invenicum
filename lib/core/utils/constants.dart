@@ -97,6 +97,8 @@ class AppIntegrations {
   static const String bgg = 'bgg';
   static const String pokemon = 'pokemon';
   static const String tcgdex = 'tcgdex';
+  static const String pokemonPriceTracker = 'pokemon_price_tracker';
+  static const String rawg = 'rawg';
 
   /// Returns the complete list of models for the UI
   static List<IntegrationModel> getAvailableIntegrations(BuildContext context) {
@@ -243,6 +245,42 @@ class AppIntegrations {
         icon: const Icon(Icons.style_outlined, color: Colors.deepOrange),
         description: l10n.integrationTcgdexDesc,
         fields: [],
+      ),
+      IntegrationModel(
+        id: pokemonPriceTracker,
+        name: 'PokemonPriceTracker',
+        isDataSource: true,
+        image: Image.asset(
+          'assets/images/pokemonpricetracker_logo.png',
+          height: 35,
+        ),
+        description: l10n.integrationPokemonPriceTrackerDesc,
+        fields: [
+          IntegrationField(
+            id: 'apiKey',
+            label: l10n.integrationPokemonPriceTrackerApiKeyLabel,
+            type: IntegrationFieldType.password,
+            helperText: l10n.integrationPokemonPriceTrackerApiKeyHint,
+          ),
+        ],
+      ),
+      IntegrationModel(
+        id: rawg,
+        name: 'RAWG',
+        isDataSource: true,
+        image: Image.asset(
+          'assets/images/RAWG_logo.png',
+          height: 35,
+        ),
+        description: l10n.integrationRawgDesc,
+        fields: [
+          IntegrationField(
+            id: 'apiKey',
+            label: l10n.integrationRawgApiKeyLabel,
+            type: IntegrationFieldType.password,
+            helperText: l10n.integrationRawgApiKeyHint,
+          ),
+        ],
       ),
 
       // --- TOOLS ---
@@ -427,142 +465,141 @@ class AppSlots {
 }
 
 class AppAchievements {
-  // IDs to avoid typos (Hardcoded IDs)
-  static const String firstItem = 'first_item';
-  static const String catalogerSmall = 'cataloger_small';
-  static const String catalogerMedium = 'cataloger_medium';
-  static const String catalogerLarge = 'cataloger_large';
-  static const String orderMaster = 'order_master';
-  static const String eyeForValue = 'eye_for_value';
-  static const String firstGrail = 'first_grail';
-  static const String museumPiece = 'museum_piece';
-  static const String growingWealth = 'growing_wealth';
-  static const String wallStreetWolf = 'wall_street_wolf';
-  static const String bargainHunter = 'bargain_hunter';
-  static const String blindTrust = 'blind_trust';
+  static const String firstItem = 'firstItem';
+  static const String catalogerSmall = 'catalogerSmall';
+  static const String catalogerMedium = 'catalogerMedium';
+  static const String catalogerLarge = 'catalogerLarge';
+  static const String orderMaster = 'orderMaster';
+  static const String eyeForValue = 'eyeForValue';
+  static const String firstGrail = 'firstGrail';
+  static const String museumPiece = 'museumPiece';
+  static const String growingWealth = 'growingWealth';
+  static const String wallStreetWolf = 'wallStreetWolf';
+  static const String bargainHunter = 'bargainHunter';
+  static const String blindTrust = 'blindTrust';
   static const String librarian = 'librarian';
-  static const String allInOrder = 'all_in_order';
-  static const String legendaryLender = 'legendary_lender';
-  static const String cyberCollector = 'cyber_collector';
-  static const String hawkEye = 'hawk_eye';
+  static const String allInOrder = 'allInOrder';
+  static const String legendaryLender = 'legendaryLender';
+  static const String cyberCollector = 'cyberCollector';
+  static const String hawkEye = 'hawkEye';
   static const String polyglot = 'polyglot';
   static const String forecaster = 'forecaster';
-  static const String masterUser = 'master_user';
+  static const String masterUser = 'masterUser';
 
   /// Returns the official list of the 20 Invenicum achievements
   static List<AchievementDefinition> getDefinitions(BuildContext context) {
-    // Note: Here you could use AppLocalizations.of(context) if you want to translate them
-    return const [
+    final l10n = AppLocalizations.of(context)!;
+    return [
       // --- COLLECTION ---
       AchievementDefinition(
-        id: firstItem,
-        title: 'Welcome to the Mansion',
-        desc: 'Add your first item to the inventory',
+        id: AppAchievements.firstItem,
+        title: l10n.achievementFirstItemTitle,
+        desc: l10n.achievementFirstItemDesc,
         icon: Icons.home_repair_service_outlined,
         category: 'collection',
       ),
       AchievementDefinition(
-        id: catalogerSmall,
-        title: 'Small Warehouse',
-        desc: 'Register 10 items in your collectiontotal',
+        id: AppAchievements.catalogerSmall,
+        title: l10n.achievementCatalogerSmallTitle,
+        desc: l10n.achievementCatalogerSmallDesc,
         icon: Icons.inventory_2_outlined,
         category: 'collection',
       ),
       AchievementDefinition(
-        id: catalogerMedium,
-        title: 'Museum Curator',
-        desc: 'Register 50 items in your collection',
+        id: AppAchievements.catalogerMedium,
+        title: l10n.achievementCatalogerMediumTitle,
+        desc: l10n.achievementCatalogerMediumDesc,
         icon: Icons.account_balance_outlined,
         category: 'collection',
       ),
       AchievementDefinition(
-        id: catalogerLarge,
-        title: 'Owner of an Empire',
-        desc: 'Register 200 items (Legendary Level)',
+        id: AppAchievements.catalogerLarge,
+        title: l10n.achievementCatalogerLargeTitle,
+        desc: l10n.achievementCatalogerLargeDesc,
         icon: Icons.fort_outlined,
         category: 'collection',
         isLegendary: true,
       ),
       AchievementDefinition(
-        id: orderMaster,
-        title: 'Absolute Order',
-        desc: 'Assign a physical location to 20 items',
+        id: AppAchievements.orderMaster,
+        title: l10n.achievementOrderMasterTitle,
+        desc: l10n.achievementOrderMasterDesc,
         icon: Icons.shelves,
         category: 'collection',
       ),
 
       // --- MARKET ---
       AchievementDefinition(
-        id: eyeForValue,
-        title: 'Eye for Value',
-        desc: 'Register the purchase price of 5 items',
+        id: AppAchievements.eyeForValue,
+        title: l10n.achievementEyeForValueTitle,
+        desc: l10n.achievementEyeForValueDesc,
         icon: Icons.visibility_outlined,
         category: 'market',
       ),
       AchievementDefinition(
-        id: firstGrail,
-        title: 'First "Grail"',
-        desc: 'Add an item worth more than 100€',
+        id: AppAchievements.firstGrail,
+        title: l10n.achievementFirstGrailTitle,
+        desc: l10n.achievementFirstGrailDesc,
         icon: Icons.workspace_premium_outlined,
         category: 'market',
       ),
       AchievementDefinition(
-        id: museumPiece,
-        title: 'Museum Piece',
-        desc: 'Add an item worth more than 500€',
+        id: AppAchievements.museumPiece,
+        title: l10n.achievementMuseumPieceTitle,
+        desc: l10n.achievementMuseumPieceDesc,
         icon: Icons.diamond_outlined,
         category: 'market',
         isLegendary: true,
       ),
       AchievementDefinition(
-        id: growingWealth,
-        title: 'Growing Wealth',
-        desc: 'Your total inventory exceeds 1,000€',
+        id: AppAchievements.growingWealth,
+        title: l10n.achievementGrowingWealthTitle,
+        desc: l10n.achievementGrowingWealthDesc,
         icon: Icons.trending_up_rounded,
         category: 'market',
       ),
       AchievementDefinition(
-        id: wallStreetWolf,
-        title: 'Wall Street Wolf',
-        desc: 'Your total inventory exceeds 10,000€',
+        id: AppAchievements.wallStreetWolf,
+        title: l10n.achievementWallStreetWolfTitle,
+        desc: l10n.achievementWallStreetWolfDesc,
         icon: Icons.query_stats_rounded,
         category: 'market',
         isLegendary: true,
       ),
       AchievementDefinition(
-        id: bargainHunter,
-        title: 'Bargain Hunter',
-        desc: 'Register an item worth double what you paid',
+        id: AppAchievements.bargainHunter,
+        title: l10n.achievementBargainHunterTitle,
+        desc: l10n.achievementBargainHunterDesc,
         icon: Icons.auto_graph_rounded,
         category: 'market',
       ),
 
       // --- LOANS ---
       AchievementDefinition(
-        id: blindTrust,
-        title: 'Blind Trust',
-        desc: 'Make your first loan to a contact',
+        id: AppAchievements.blindTrust,
+        title: l10n.achievementBlindTrustTitle,
+        desc: l10n.achievementBlindTrustDesc,
         icon: Icons.handshake_outlined,
         category: 'loans',
       ),
       AchievementDefinition(
-        id: librarian,
-        title: 'Librarian',
-        desc: 'Manage 3 active loans simultaneously',
+        id: AppAchievements.librarian,
+        title: l10n.achievementLibrarianTitle,
+        desc: l10n.achievementLibrarianDesc,
         icon: Icons.menu_book_rounded,
         category: 'loans',
       ),
       AchievementDefinition(
-        id: allInOrder,
-        title: 'All in Order',
-        desc: 'Retrieve and mark a loaned item as returned',
+        id: AppAchievements.allInOrder,
+        title: l10n.achievementAllInOrderTitle,
+        desc: l10n.achievementAllInOrderDesc,
         icon: Icons.assignment_turned_in_outlined,
         category: 'loans',
       ),
       AchievementDefinition(
-        id: legendaryLender,
-        title: 'Legendary Lender',
-        desc: 'Complete 20 loans successfully',
+        id: AppAchievements.legendaryLender,
+        title: l10n.achievementLegendaryLenderTitle,
+        desc: l10n.achievementLegendaryLenderDesc,
         icon: Icons.verified_user_outlined,
         category: 'loans',
         isLegendary: true,
@@ -570,40 +607,168 @@ class AppAchievements {
 
       // --- TOOLS AND AI ---
       AchievementDefinition(
-        id: cyberCollector,
-        title: 'Cyber Collector',
-        desc: 'Identify an item using AI for the first time',
+        id: AppAchievements.cyberCollector,
+        title: l10n.achievementCyberCollectorTitle,
+        desc: l10n.achievementCyberCollectorDesc,
         icon: Icons.psychology_outlined,
         category: 'tools',
       ),
       AchievementDefinition(
-        id: hawkEye,
-        title: 'Hawk Eye',
-        desc: 'Use Gemini to identify 15 items',
+        id: AppAchievements.hawkEye,
+        title: l10n.achievementHawkEyeTitle,
+        desc: l10n.achievementHawkEyeDesc,
         icon: Icons.camera_enhance_outlined,
         category: 'tools',
       ),
       AchievementDefinition(
-        id: polyglot,
-        title: 'Polyglot',
-        desc: 'Change the global currency of the app',
+        id: AppAchievements.polyglot,
+        title: l10n.achievementPolyglotTitle,
+        desc: l10n.achievementPolyglotDesc,
         icon: Icons.currency_exchange_rounded,
         category: 'tools',
       ),
       AchievementDefinition(
-        id: forecaster,
-        title: 'Forecaster',
-        desc: 'Activate 3 different maintenance alerts',
+        id: AppAchievements.forecaster,
+        title: l10n.achievementForecasterTitle,
+        desc: l10n.achievementForecasterDesc,
         icon: Icons.fmd_bad_outlined,
         category: 'tools',
       ),
       AchievementDefinition(
-        id: masterUser,
-        title: 'Master User',
-        desc: 'Customize the order of your notifications',
+        id: AppAchievements.masterUser,
+        title: l10n.achievementMasterUserTitle,
+        desc: l10n.achievementMasterUserDesc,
         icon: Icons.reorder_rounded,
         category: 'tools',
       ),
     ];
   }
+}
+
+//Font families available in the app, with their corresponding size deltas to adjust the UI accordingly (e.g. SCUMM fonts are smaller, so we apply a negative delta)
+class AppFonts {
+  static List<(String id, double delta, String label)> getFonts(
+    BuildContext context,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    return [
+      ('Default', 0, l10n.fontDefault),
+      ('SCUMMCredits', -4, l10n.fontSCUMMCredits),
+      ('SCUMMSolid', -4, l10n.fontSCUMMSolid),
+      ('DayOfTheTentacle', 4, l10n.fontDayOfTheTentacle),
+      ('Efmi', 0, l10n.fontEfmi),
+      ('PUSAB', 0, l10n.fontPUSAB),
+      ('ActionForce', 0, l10n.fontActionForce),
+      ('Starjedi', 0, l10n.fontStarjedi),
+      ('TransformersMovie', 0, l10n.fontTransformersMovie),
+    ];
+  }
+
+  static double getDelta(String? fontFamily) {
+    // Lista estática solo con id y delta para uso fuera del contexto
+    const deltas = <(String, double)>[
+      ('SCUMMCredits', -4),
+      ('SCUMMSolid', -4),
+      ('DayOfTheTentacle', 4),
+      ('Efmi', 0),
+      ('PUSAB', 0),
+      ('ActionForce', 0),
+      ('Starjedi', 0),
+      ('TransformersMovie', 0),
+    ];
+    return deltas
+        .firstWhere((f) => f.$1 == fontFamily, orElse: () => ('', 0.0))
+        .$2;
+  }
+}
+
+// ── Predefined Themes & Brand Identity ──────────────────────────────────────
+class AppCurrencies {
+  static const String defaultCurrency = 'USD';
+
+  static const String eur = 'EUR';
+  static const String usd = 'USD';
+  static const String gbp = 'GBP';
+  static const String jpy = 'JPY';
+  static const String mxn = 'MXN';
+
+  static const List<String> allCodes = [eur, usd, gbp, jpy, mxn];
+
+  static String getSymbol(String currencyCode) {
+    switch (currencyCode) {
+      case eur:
+        return '€';
+      case gbp:
+        return '£';
+      case jpy:
+        return '¥';
+      case mxn:
+      case usd:
+      default:
+        return '\$';
+    }
+  }
+
+  static bool usesTrailingSymbol(String currencyCode) {
+    return currencyCode == eur;
+  }
+
+  static int getDecimalDigits(String currencyCode) {
+    return currencyCode == jpy ? 0 : 2;
+  }
+
+  static Map<String, String> getLabels(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return {
+      eur: l10n.currencyEur,
+      usd: l10n.currencyUsd,
+      gbp: l10n.currencyGbp,
+      jpy: l10n.currencyJpy,
+      mxn: l10n.currencyMxn,
+    };
+  }
+
+  static String getLabel(BuildContext context, String code) {
+    return getLabels(context)[code] ?? code;
+  }
+}
+
+// ── Overlay Floating Images ─────────────────────────────────────────────────
+
+/// Vertical zone of the screen where the overlay image appears.
+enum OverlayZone {
+  /// Near the top edge.
+  top,
+  /// Central area of the screen.
+  middle,
+  /// Near the bottom edge.
+  bottom,
+  /// Any random vertical position.
+  random,
+}
+
+/// Which direction the sprite faces in the asset file.
+///
+/// The animation moves the sprite left-to-right (for [leftToRight]) or
+/// right-to-left (for [rightToLeft]). When the movement direction does not
+/// match the facing direction the image is flipped horizontally.
+enum AnimationDirection {
+  /// Sprite faces right. Animation moves left-to-right, no flip.
+  leftToRight,
+  /// Sprite faces left. Animation moves right-to-left, no flip.
+  rightToLeft,
+  /// Sprite faces right by convention. Movement direction is random;
+  /// the image is flipped when moving left.
+  alternate,
+}
+
+/// Whether and how the sprite can randomly turn around mid-animation.
+enum TurnMode {
+  /// Sprite always turns at random intervals within [turnMinDelay, turnMaxDelay].
+  on,
+  /// Sprite never turns mid-animation.
+  off,
+  /// Each turn opportunity is decided randomly (≈ 50 % chance), with a
+  /// fully random delay. [turnMinDelay] and [turnMaxDelay] are ignored.
+  random,
 }

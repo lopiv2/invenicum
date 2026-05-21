@@ -1,6 +1,7 @@
 // lib/widgets/location_dropdown_field.dart
 
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/providers/location_provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
@@ -33,93 +34,79 @@ class LocationDropdownField extends StatelessWidget {
     final formKey = GlobalKey<FormState>();
     String? newName;
     int? selectedParentId;
+    final nameCtrl = TextEditingController();
 
-    await showDialog<void>(
+    await showAppDialog<void>(
       context: context,
-      builder: (ctx) {
-        final nameCtrl = TextEditingController();
-        // StatefulBuilder para que el dropdown de padre pueda hacer setState
-        // dentro del diálogo sin reconstruir todo el árbol exterior.
-        return StatefulBuilder(
-          builder: (ctx, setDialogState) {
-            return AlertDialog(
-              title: Row(
-                children: [
-                  const Icon(Icons.location_on_outlined, color: Colors.teal),
-                  const SizedBox(width: 8),
-                  Text(l10n.newLocationLabel),
-                ],
-              ),
-              content: Form(
-                key: formKey,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextFormField(
-                      controller: nameCtrl,
-                      autofocus: true,
-                      decoration: InputDecoration(
-                        labelText: l10n.name,
-                        hintText: l10n.newLocationHint,
-                        border: const OutlineInputBorder(),
-                      ),
-                      validator: (v) => (v == null || v.trim().isEmpty)
-                          ? l10n.pleaseEnterAName
-                          : null,
-                      onFieldSubmitted: (_) {
-                        if (formKey.currentState!.validate()) {
-                          newName = nameCtrl.text.trim();
-                          Navigator.pop(ctx);
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    // Selector de ubicación padre — usa las mismas ubicaciones
-                    // que el dropdown principal (deduplicadas por id).
-                    DropdownButtonFormField<int>(
-                      value: selectedParentId,
-                      decoration: InputDecoration(
-                        labelText: l10n.parentLocationOptionalLabel,
-                        border: const OutlineInputBorder(),
-                        prefixIcon: const Icon(Icons.account_tree_outlined, size: 18),
-                      ),
-                      items: [
-                        DropdownMenuItem<int>(
-                          value: null,
-                          child: Text(l10n.noneRootLabel),
-                        ),
-                        ...{ for (final loc in availableLocations) loc.id: loc }
-                            .values
-                            .map((loc) => DropdownMenuItem<int>(
-                                  value: loc.id,
-                                  child: Text(loc.name),
-                                )),
-                      ],
-                      onChanged: (v) =>
-                          setDialogState(() => selectedParentId = v),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: Text(l10n.cancel),
-                ),
-                FilledButton(
-                  onPressed: () {
+      title: l10n.newLocationLabel,
+      body: StatefulBuilder(
+        builder: (ctx, setDialogState) {
+          return Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: nameCtrl,
+                  autofocus: true,
+                  decoration: InputDecoration(
+                    labelText: l10n.name,
+                    hintText: l10n.newLocationHint,
+                    border: const OutlineInputBorder(),
+                  ),
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? l10n.pleaseEnterAName
+                      : null,
+                  onFieldSubmitted: (_) {
                     if (formKey.currentState!.validate()) {
                       newName = nameCtrl.text.trim();
                       Navigator.pop(ctx);
                     }
                   },
-                  child: Text(l10n.create),
+                ),
+                const SizedBox(height: 16),
+                DropdownButtonFormField<int>(
+                  initialValue: selectedParentId,
+                  decoration: InputDecoration(
+                    labelText: l10n.parentLocationOptionalLabel,
+                    border: const OutlineInputBorder(),
+                    prefixIcon: const Icon(Icons.account_tree_outlined, size: 18),
+                  ),
+                  items: [
+                    DropdownMenuItem<int>(
+                      value: null,
+                      child: Text(l10n.noneRootLabel),
+                    ),
+                    ...{ for (final loc in availableLocations) loc.id: loc }
+                        .values
+                        .map((loc) => DropdownMenuItem<int>(
+                              value: loc.id,
+                              child: Text(loc.name),
+                            )),
+                  ],
+                  onChanged: (v) =>
+                      setDialogState(() => selectedParentId = v),
                 ),
               ],
-            );
+            ),
+          );
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            if (formKey.currentState!.validate()) {
+              newName = nameCtrl.text.trim();
+              Navigator.pop(context);
+            }
           },
-        );
-      },
+          child: Text(l10n.create),
+        ),
+      ],
     );
 
     if (newName == null || containerId == null) return;
@@ -163,7 +150,7 @@ class LocationDropdownField extends StatelessWidget {
         : null;
 
     return DropdownButtonFormField<int>(
-      value: safeValue,
+      initialValue: safeValue,
       decoration: InputDecoration(
         labelText: l10n.location,
         border: const OutlineInputBorder(),

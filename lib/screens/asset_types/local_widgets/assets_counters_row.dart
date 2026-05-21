@@ -113,13 +113,14 @@ class AssetCountersRow extends StatelessWidget {
     bool isSyncing,
     AppLocalizations l10n,
   ) {
+    final chipTheme = Theme.of(context);
     return Chip(
       elevation: 0,
       shadowColor: Colors.transparent,
-      avatar: Icon(Icons.analytics, size: 16, color: Colors.blueGrey),
+      avatar: Icon(Icons.analytics, size: 16, color: chipTheme.colorScheme.onSurface.withValues(alpha: 0.6)),
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-      backgroundColor: Colors.blueGrey.withValues(alpha: 0.1),
+      backgroundColor: chipTheme.colorScheme.onSurface.withValues(alpha: 0.08),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       label: Container(
         constraints: const BoxConstraints(minHeight: 18),
@@ -143,7 +144,7 @@ class AssetCountersRow extends StatelessWidget {
               PriceDisplayWidget(
                 value: totalValue,
                 fontSize: 12,
-                color: Colors.black,
+                color: chipTheme.colorScheme.onSurface,
               ),
           ],
         ),
@@ -158,6 +159,7 @@ class AssetCountersRow extends StatelessWidget {
     dynamic value,
     bool loading,
   ) {
+    final chipTheme = Theme.of(context);
     final bool isPrice = type == 'price' || type == CustomFieldType.price.name;
 
     return Chip(
@@ -189,7 +191,7 @@ class AssetCountersRow extends StatelessWidget {
               PriceDisplayWidget(
                 value: value,
                 fontSize: 12,
-                color: Colors.black,
+                color: chipTheme.colorScheme.onSurface,
               )
             else
               Text(
@@ -231,8 +233,8 @@ class AssetCountersRow extends StatelessWidget {
         constraints: const BoxConstraints(minHeight: 18),
         child: Text(
           label,
-          style: const TextStyle(
-            color: Colors.black,
+          style: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.bold,
             fontSize: 12,
           ),

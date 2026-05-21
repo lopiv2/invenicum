@@ -390,7 +390,7 @@ class ContainerProvider with ChangeNotifier {
           // Mapeamos la respuesta de la API al fordadmato del desplegable
           results.add({
             'name': item['name'] ?? 'No name',
-            'subtitle': 'Activo en ${item['container_name']}',  
+            'subtitle': 'Activo en ${item['container_name']}',
             'icon': Icons.precision_manufacturing_outlined,
             // Construimos la ruta dinámica según tu estructura de GoRouter
             'route':
@@ -479,6 +479,55 @@ class ContainerProvider with ChangeNotifier {
 
   // --- Lógica de Listas Personalizadas (Mantenido igual) ---
 
+  Future<void> addItemToDataList({
+    required int containerId,
+    required int listId,
+    required String value,
+  }) async {
+    final containerIndex = _containers.indexWhere((c) => c.id == containerId);
+    if (containerIndex == -1) throw Exception('Container not found');
+
+    final container = _containers[containerIndex];
+    final listIndex = container.dataLists.indexWhere((l) => l.id == listId);
+    if (listIndex == -1) throw Exception('DataList not found');
+
+    final list = container.dataLists[listIndex];
+    final updatedItems = [...list.items, value];
+
+    final updatedList = await _containerService.updateDataList(
+      dataListId: listId,
+      name: list.name,
+      description: list.description ?? '',
+      items: updatedItems,
+    );
+
+    final updatedLists = [...container.dataLists];
+    updatedLists[listIndex] = updatedList;
+
+    final newContainersList = List<ContainerNode>.from(_containers);
+    newContainersList[containerIndex] = container.copyWith(
+      dataLists: updatedLists,
+      locations: container.locations,
+    );
+    _containers = newContainersList;
+
+    notifyListeners(); //
+  }
+
+  // Getter auxiliar para que el widget pueda leer los items frescos del provider
+  // sin depender del mapa listFieldValues que se construyó al montar el formulario.
+  List<String> getDataListItems(int containerId, int listId) {
+    final container = _containers.firstWhere(
+      (c) => c.id == containerId,
+      orElse: () => throw Exception('Container $containerId not found'),
+    );
+    final list = container.dataLists.firstWhere(
+      (l) => l.id == listId,
+      orElse: () => throw Exception('DataList $listId not found'),
+    );
+    return list.items;
+  }
+
   // 🚩 Cambia Future<void> por Future<ListData>
   Future<ListData> createDataList({
     required int containerId,
@@ -487,10 +536,6 @@ class ContainerProvider with ChangeNotifier {
     required List<String> items,
   }) async {
     try {
-      final index = _containers.indexWhere((c) => c.id == containerId);
-      if (index == -1) throw Exception('Container not found');
-
-      // 1. Llamada al servicio
       final newList = await _containerService.createDataList(
         containerId: containerId,
         name: name,
@@ -498,28 +543,18 @@ class ContainerProvider with ChangeNotifier {
         items: items,
       );
 
-      // 2. Actualización de estado con inmutabilidad estricta
+      final index = _containers.indexWhere((c) => c.id == containerId);
+      if (index == -1) throw Exception('Container not found');
+
       final container = _containers[index];
 
-      // 🚩 CLAVE: Forzamos la creación de una nueva instancia de lista
-      final List<ListData> updatedDataLists = List<ListData>.from(
-        container.dataLists,
-      )..add(newList);
+      final updatedLists = [...container.dataLists, newList];
 
-      final updatedContainer = container.copyWith(
-        dataLists: updatedDataLists,
-        locations: List.from(
-          container.locations,
-        ), // También refrescamos locations por si acaso
+      _containers[index] = container.copyWith(
+        dataLists: updatedLists,
+        locations: container.locations,
       );
 
-      // 3. Reemplazo de la lista principal
-      final newContainersList = List<ContainerNode>.from(_containers);
-      newContainersList[index] = updatedContainer;
-
-      _containers = newContainersList;
-
-      // 4. Notificar a la UI
       notifyListeners();
 
       return newList;
@@ -529,7 +564,7 @@ class ContainerProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateDataList({
+  Future<ListData> updateDataList({
     required int dataListId,
     required String name,
     required String description,
@@ -543,29 +578,28 @@ class ContainerProvider with ChangeNotifier {
         items: items,
       );
 
-      for (int i = 0; i < _containers.length; i++) {
-        final listIndex = _containers[i].dataLists.indexWhere(
+      for (final container in _containers) {
+        final listIndex = container.dataLists.indexWhere(
           (l) => l.id == dataListId,
         );
+
         if (listIndex != -1) {
-          final container = _containers[i];
-          final updatedLists = List<ListData>.from(container.dataLists);
+          final updatedLists = [...container.dataLists];
           updatedLists[listIndex] = updatedList;
 
-          // 🎯 CORRECCIÓN: Ya no pasamos locationsCount
-          final updatedContainer = container.copyWith(
+          final index = _containers.indexOf(container);
+
+          _containers[index] = container.copyWith(
             dataLists: updatedLists,
             locations: container.locations,
           );
-
-          final newContainersList = List<ContainerNode>.from(_containers);
-          newContainersList[i] = updatedContainer;
-          _containers = newContainersList;
 
           notifyListeners();
           break;
         }
       }
+
+      return updatedList;
     } catch (e) {
       debugPrint('Error updating data list: $e');
       rethrow;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
-import 'package:invenicum/screens/assets/local_widgets/location_dropdown_widget.dart';
+import 'package:invenicum/providers/location_provider.dart';
+import 'package:invenicum/screens/assets/local_widgets/smart_dropdown_field.dart';
+import 'package:provider/provider.dart';
 import 'common_form_field.dart';
 import 'card_section_widget.dart';
 import 'section_header_widget.dart';
@@ -139,11 +141,37 @@ class MainDataSectionWidget extends StatelessWidget {
             highlighted: highlightedFields.contains('description'),
           ),
           const SizedBox(height: 16),
-          LocationDropdownField(
-            availableLocations: availableLocations,
-            selectedLocationId: selectedLocationId,
-            onChanged: onLocationChanged,
-            containerId: containerId,
+          AppDropdownField<Location>(
+            label: l10n.location,
+            values: availableLocations,
+            itemLabel: (location) => location.name,
+
+            selectedValue:
+                availableLocations.any((l) => l.id == selectedLocationId)
+                ? availableLocations.firstWhere(
+                    (l) => l.id == selectedLocationId,
+                  )
+                : null,
+
+            onChanged: (location) {
+              onLocationChanged(location?.id);
+            },
+
+            // ADD NEW
+            addNewDialogTitle: l10n.create,
+            addNewHint: l10n.location,
+
+            onAddNew: (name) async {
+              final provider = context.read<LocationProvider>();
+
+              final created = await provider.createLocation(
+                context: context,
+                containerId: containerId!,
+                name: name,
+              );
+
+              return created;
+            },
           ),
         ],
       ),

@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/screens/preferences/local_widgets/clone_buster_switch_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/currency_dropdown_widget.dart';
+import 'package:invenicum/screens/preferences/local_widgets/font_family_dropdown_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/language_dropdown_widget.dart';
 import 'package:provider/provider.dart';
 
@@ -48,7 +51,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               trailing: CircleAvatar(backgroundColor: themeColor, radius: 12),
               onTap: onThemePickerTap,
             ),
-            // --- MODO OSCURO AUTOMÁTICO ---
+            // --- AUTOMATIC DARK MODE ---
             SwitchListTile(
               secondary: const Icon(Icons.brightness_auto),
               title: Text(l10n.automaticDarkModeLabel),
@@ -59,7 +62,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               },
             ),
 
-            // --- MODO OSCURO MANUAL (Se deshabilita si el automático está activo) ---
+            // --- MANUAL DARK MODE (Disabled if automatic is active) ---
             SwitchListTile(
               secondary: const Icon(Icons.dark_mode_outlined),
               title: Text(l10n.manualDarkModeLabel),
@@ -67,11 +70,41 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                   ? Text(l10n.disableAutomaticToChange)
                   : Text(l10n.changeLightDark),
               value: isManualDark,
-              // 🚀 CRÍTICO: Si isAutoDark es true, el switch se ve gris y no responde
+              // 🚀 CRITICAL: If isAutoDark is true, the switch appears grey and unresponsive
               onChanged: prefsProvider.useSystemTheme
                   ? null
                   : (bool value) => prefsProvider.setDarkMode(value),
             ),
+            SwitchListTile(
+              title: Text(l10n.showAssetTypeLogo),
+              subtitle: Text(l10n.showAssetTypeLogoDescription),
+              secondary: const Icon(Icons.image_outlined),
+              value: context.watch<PreferencesProvider>().showAssetTypeLogo,
+              onChanged: (val) => {
+                context.read<PreferencesProvider>().updatePreference(
+                  'showAssetTypeLogo',
+                  val,
+                ),
+                ToastService.success(
+                  AppLocalizations.of(context)!.preferencesUpdated,
+                ),
+              },
+            ),
+            SwitchListTile(
+              title: Text(l10n.autoResetFieldsOnSaveAndContinue),
+              subtitle: Text(l10n.autoResetFieldsOnSaveAndContinueDescription),
+              secondary: const Icon(Icons.restart_alt_outlined),
+              value: context.watch<PreferencesProvider>()
+                  .autoResetFieldsOnSaveAndContinue,
+              onChanged: (val) => {
+                context.read<PreferencesProvider>()
+                    .setAutoResetFieldsOnSaveAndContinue(val),
+                ToastService.success(
+                  AppLocalizations.of(context)!.preferencesUpdated,
+                ),
+              },
+            ),
+            const CloneBusterSwitchWidget(),
             const Divider(),
             ListTile(
               leading: const Icon(Icons.language),
@@ -91,7 +124,16 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               trailing: const CurrencyDropdownWidget(),
               onTap: null,
             ),
-            if (prefsProvider.selectedCurrency != 'USD' &&
+            ListTile(
+              leading: const Icon(Icons.text_fields),
+              title: Text(AppLocalizations.of(context)!.fontFamilyLabel),
+              subtitle: Text(
+                AppLocalizations.of(context)!.selectFontFamily,
+              ),
+              trailing: const FontFamilyDropdownWidget(),
+              onTap: null,
+            ),
+            if (prefsProvider.selectedCurrency != AppCurrencies.usd &&
                 prefsProvider.exchangeRates != null)
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -145,33 +187,34 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               ),
             SwitchListTile(
               title: Text(l10n.enableAiAndChatbot),
-              // Mostramos un subtítulo de advertencia solo si no está conectado
+              // Show a warning subtitle only if not connected
               subtitle: !isGeminiConnected
                   ? Text(
                       l10n.requiresGeminiLinking,
-                      style: const TextStyle(color: Colors.orange, fontSize: 12),
+                      style: const TextStyle(
+                        color: Colors.orange,
+                        fontSize: 12,
+                      ),
                     )
                   : Text(l10n.aiOrganizeInventory),
               secondary: Icon(
                 Icons.auto_awesome,
-                // Cambiamos el color del icono según la disponibilidad
+                // Change icon color based on availability
                 color: isGeminiConnected ? Colors.blue : Colors.grey,
               ),
               // El valor del switch depende de las preferencias,
-              // pero si Gemini no está conectado, forzamos que se vea apagado
+              // but if Gemini is not connected, we force it to appear off
               value: isGeminiConnected && prefsProvider.aiEnabled,
 
-              // LÓGICA DE VALIDACIÓN
+              // VALIDATION LOGIC
               onChanged: (bool value) async {
                 if (!isGeminiConnected) {
                   // Si intenta activarlo sin estar vinculado, avisamos
-                  ToastService.info(
-                    l10n.requiresGeminiLinking,
-                  );
+                  ToastService.info(l10n.requiresGeminiLinking);
                   return;
                 }
 
-                // Si está vinculado, procedemos normal
+                  // If linked, proceed normally
                 try {
                   await prefsProvider.setAiEnabled(value);
                   ToastService.success(

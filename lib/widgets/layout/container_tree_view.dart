@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/loan_provider.dart';
@@ -116,6 +117,17 @@ class ContainerTreeView extends StatelessWidget {
                     ),
                     _buildSubItem(
                       context,
+                      icon: Icons.web_outlined,
+                      label: 'Scrapers',
+                      onTap: () => context.goNamed(
+                        RouteNames.scrapers,
+                        pathParameters: {
+                          'containerId': container.id.toString(),
+                        },
+                      ),
+                    ),
+                    _buildSubItem(
+                      context,
                       icon: Icons.handshake_outlined,
                       label:
                           "${AppLocalizations.of(context)!.loans} (${loanProvider.loans.length})",
@@ -219,32 +231,33 @@ class ContainerTreeView extends StatelessWidget {
     final controller = TextEditingController(text: container.name);
     final formKey = GlobalKey<FormState>();
 
-    final bool? confirmed = await showDialog<bool>(
+    final bool? confirmed = await showAppDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.renameContainer),
-        content: Form(
-          key: formKey,
-          child: TextFormField(
-            controller: controller,
-            autofocus: true,
-            validator: (v) =>
-                (v == null || v.isEmpty)
-                    ? l10n.fieldRequiredWithName(l10n.containerName)
-                    : null,
-          ),
+      title: l10n.renameContainer,
+      body: Form(
+        key: formKey,
+        child: TextFormField(
+          controller: controller,
+          autofocus: true,
+          validator: (v) => (v == null || v.isEmpty)
+              ? l10n.fieldRequiredWithName(l10n.containerName)
+              : null,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.rename),
-          ),
-        ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () {
+            if (formKey.currentState!.validate()) {
+              Navigator.pop(context, true);
+            }
+          },
+          child: Text(l10n.rename),
+        ),
+      ],
     );
 
     if (confirmed == true) {
@@ -257,22 +270,20 @@ class ContainerTreeView extends StatelessWidget {
     ContainerNode container,
   ) async {
     final l10n = AppLocalizations.of(context)!;
-    final bool? confirmed = await showDialog<bool>(
+    final bool? confirmed = await showAppDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.confirmDeletion),
-        content: Text(l10n.confirmDeleteContainer(container.name)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: Text(l10n.yes),
-          ),
-        ],
-      ),
+      title: l10n.confirmDeletion,
+      body: Text(l10n.confirmDeleteContainer(container.name)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: Text(l10n.cancel),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(l10n.yes),
+        ),
+      ],
     );
 
     if (confirmed == true) {

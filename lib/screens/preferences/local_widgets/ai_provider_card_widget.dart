@@ -1,6 +1,7 @@
 // screens/preferences/local_widgets/ai_provider_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/services/veni_chatbot_service.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/toast_service.dart';
@@ -36,40 +37,34 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
   }
 
   Future<void> _confirmAndPurgeHistory(AppLocalizations l10n) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(l10n.purgeChatHistoryConfirmTitle),
-        content: Text(l10n.purgeChatHistoryConfirmMessage),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel),
-          ),
-          FilledButton.tonal(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(l10n.purgeChatHistoryConfirmAction),
-          ),
-        ],
+  final confirmed = await showAppDialog<bool>(
+    context: context,
+    title: l10n.purgeChatHistoryConfirmTitle,
+    body: Text(l10n.purgeChatHistoryConfirmMessage),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.of(context).pop(false),
+        child: Text(l10n.cancel),
       ),
-    );
+      FilledButton.tonal(
+        onPressed: () => Navigator.of(context).pop(true),
+        child: Text(l10n.purgeChatHistoryConfirmAction),
+      ),
+    ],
+  );
 
-    if (confirmed != true || !mounted) return;
+  if (confirmed != true || !mounted) return;
 
-    setState(() => _isPurgingHistory = true);
-    try {
-      await context.read<ChatService>().purgeRemoteHistory();
-      if (mounted) {
-        ToastService.success(l10n.purgeChatHistorySuccess);
-      }
-    } catch (_) {
-      if (mounted) {
-        ToastService.error(l10n.purgeChatHistoryError);
-      }
-    } finally {
-      if (mounted) setState(() => _isPurgingHistory = false);
-    }
+  setState(() => _isPurgingHistory = true);
+  try {
+    await context.read<ChatService>().purgeRemoteHistory();
+    if (mounted) ToastService.success(l10n.purgeChatHistorySuccess);
+  } catch (_) {
+    if (mounted) ToastService.error(l10n.purgeChatHistoryError);
+  } finally {
+    if (mounted) setState(() => _isPurgingHistory = false);
   }
+}
 
   @override
   Widget build(BuildContext context) {

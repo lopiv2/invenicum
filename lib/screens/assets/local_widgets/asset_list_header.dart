@@ -1,6 +1,7 @@
 // widgets/asset_list_header.dart
 
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ import '../../../data/models/asset_type_model.dart';
 
 class AssetListHeader extends StatelessWidget {
   final AssetType assetType;
+  final bool showAssetTypeLogo;
   final VoidCallback onGoToCreateAsset;
   final VoidCallback onShowCountFilterDialog;
   final VoidCallback onImportCSV;
@@ -18,6 +20,7 @@ class AssetListHeader extends StatelessWidget {
   const AssetListHeader({
     super.key,
     required this.assetType,
+    this.showAssetTypeLogo = false,
     required this.onGoToCreateAsset,
     required this.onShowCountFilterDialog,
     required this.onImportCSV,
@@ -31,18 +34,28 @@ class AssetListHeader extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final bool isMobile = MediaQuery.of(context).size.width < 760;
     final theme = Theme.of(context);
+    final hasImage =
+        assetType.images.isNotEmpty && (assetType.images[0].url.isNotEmpty);
+    final showLogo = showAssetTypeLogo && hasImage;
+    final fullImageUrl = assetType.images.isNotEmpty
+        ? AppUtils.buildImageUrl(assetType.images.first.url)
+        : '';
     final titleBlock = Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Text(
-          assetType.name,
-          style: theme.textTheme.headlineSmall?.copyWith(
-            fontWeight: FontWeight.w800,
-            fontSize: isMobile ? 22 : 24,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        if (showLogo)
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(
+              fullImageUrl,
+              height: isMobile ? 48 : 80,
+              width: isMobile ? 48 : 80,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => _assetTypeName(theme, isMobile),
+            ),
+          )
+        else
+          _assetTypeName(theme, isMobile),
         const SizedBox(height: 2),
         Text(
           l10n.manageSearchSyncAssets,
@@ -145,6 +158,18 @@ class AssetListHeader extends StatelessWidget {
         const SizedBox(width: 16),
         Flexible(child: actionsBlock),
       ],
+    );
+  }
+
+  Widget _assetTypeName(ThemeData theme, bool isMobile) {
+    return Text(
+      assetType.name,
+      style: theme.textTheme.headlineSmall?.copyWith(
+        fontWeight: FontWeight.w800,
+        fontSize: isMobile ? 22 : 24,
+      ),
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 

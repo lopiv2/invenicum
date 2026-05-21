@@ -50,9 +50,6 @@ Notes: {notes}
 _________________________ | _________________________
 Signature of Deliverer    | Signature of Receiver''
 
-
-
-
 _________________________ | _________________________
 Signature of Receiver     | Signature of Returner''';
   }
