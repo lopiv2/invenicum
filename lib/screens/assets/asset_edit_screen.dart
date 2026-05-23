@@ -12,6 +12,7 @@ import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/providers/alert_provider.dart';
+import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:invenicum/data/services/ai_service.dart';
 import 'package:invenicum/data/services/api_service.dart';
@@ -141,10 +142,10 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    // Cargar fuentes de datos para el enriquecimiento
+    final integrationProv = context.read<IntegrationProvider>();
     final sources = AppIntegrations.getAvailableIntegrations(
       context,
-    ).where((i) => i.isDataSource).toList();
+    ).where((i) => i.isDataSource && integrationProv.isLinked(i.id)).toList();
     if (sources.length != _availableDataSources.length) {
       _availableDataSources = sources;
       if (_selectedSource == null && sources.isNotEmpty) {

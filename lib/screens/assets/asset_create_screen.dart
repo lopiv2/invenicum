@@ -8,6 +8,7 @@ import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
+import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
@@ -96,20 +97,21 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   late IntegrationService _integrationService;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final apiService = context.read<ApiService>();
-    _integrationService = IntegrationService(apiService);
-    final sources = AppIntegrations.getAvailableIntegrations(
-      context,
-    ).where((i) => i.isDataSource).toList();
-    if (sources.length != _availableDataSources.length) {
-      _availableDataSources = sources;
-      if (_selectedSource == null && sources.isNotEmpty) {
-        _selectedSource = sources.first.id;
-      }
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  final apiService = context.read<ApiService>();
+  _integrationService = IntegrationService(apiService);
+  final integrationProv = context.read<IntegrationProvider>();
+  final sources = AppIntegrations.getAvailableIntegrations(
+    context,
+  ).where((i) => i.isDataSource && integrationProv.isLinked(i.id)).toList();
+  if (sources.length != _availableDataSources.length) {
+    _availableDataSources = sources;
+    if (_selectedSource == null && sources.isNotEmpty) {
+      _selectedSource = sources.first.id;
     }
   }
+}
 
   @override
   void initState() {
