@@ -76,6 +76,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   bool _isMagicLoading = false;
   bool _isEnrichLoading = false;
+  bool _isSaving = false;
   final Set<String> _highlightedFields = {};
   late AIService _aiService;
   late IntegrationService _integrationService;
@@ -831,10 +832,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // Guardar
+  // Save asset
   // ---------------------------------------------------------------------------
 
   Future<void> _saveAsset() async {
+    if (_isSaving) return;
     if (!AssetFormUtils.validateForm(_formKey) ||
         widget.initialItem == null ||
         _assetType == null ||
@@ -962,12 +964,11 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           ],
         );
 
-        if (shouldContinue != true) {
-          return;
-        }
+        if (shouldContinue != true) return;
       }
     }
 
+    setState(() => _isSaving = true);
     try {
       await itemProvider.updateAssetWithFiles(
         updatedItem,
@@ -1001,6 +1002,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           AppLocalizations.of(context)!.errorUpdatingAsset(e.toString()),
         );
       }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -1211,7 +1214,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
               ),
             ),
           ),
-          SaveAssetFloatingButton(onPressed: _saveAsset),
+          SaveAssetFloatingButton(onPressed: _saveAsset, isLoading: _isSaving),
         ],
       ),
     );

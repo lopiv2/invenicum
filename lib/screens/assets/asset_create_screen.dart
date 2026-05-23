@@ -76,6 +76,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   bool _isMagicLoading = false;
   final Set<String> _highlightedFields = {};
   String? selectedId;
+  bool _isSaving = false;
 
   int? _selectedLocationId;
   List<String> _imagePreviewUrls = [];
@@ -655,6 +656,7 @@ void didChangeDependencies() {
   }
 
   Future<void> _saveAsset() async {
+    if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
     final prefsProvider = context.read<PreferencesProvider>();
@@ -668,7 +670,7 @@ void didChangeDependencies() {
       }
       return;
     }
-
+ 
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
@@ -694,7 +696,7 @@ void didChangeDependencies() {
         }
       }
     }
-
+ 
     final newItem = InventoryItem(
       id: 0,
       containerId: _containerId!,
@@ -710,13 +712,13 @@ void didChangeDependencies() {
       marketValue: _marketValue,
       customFieldValues: customFieldValues,
     );
-
+ 
     if (prefsProvider.cloneBusterEnabled && mounted) {
       final result = CloneBusterService.checkForDuplicates(
         newItem: newItem,
         existingItems: _getSameTypeItems(itemProvider),
       );
-
+ 
       if (result.isDuplicate && mounted) {
         final shouldContinue = await showAppDialog<bool>(
           context: context,
@@ -738,13 +740,12 @@ void didChangeDependencies() {
             ),
           ],
         );
-
-        if (shouldContinue != true) {
-          return;
-        }
+ 
+        if (shouldContinue != true) return;
       }
     }
-
+ 
+    setState(() => _isSaving = true);
     try {
       await context.read<InventoryItemProvider>().createInventoryItem(
         context,
@@ -771,10 +772,13 @@ void didChangeDependencies() {
       }
     } catch (e) {
       ToastService.error(l10n.errorCreatingAsset(e.toString()));
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
   Future<void> _saveAndContinue() async {
+    if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
     final prefsProvider = context.read<PreferencesProvider>();
@@ -788,6 +792,7 @@ void didChangeDependencies() {
       }
       return;
     }
+ 
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
@@ -813,7 +818,7 @@ void didChangeDependencies() {
         }
       }
     }
-
+ 
     final newItem = InventoryItem(
       id: 0,
       containerId: _containerId!,
@@ -829,13 +834,13 @@ void didChangeDependencies() {
       marketValue: _marketValue,
       customFieldValues: customFieldValues,
     );
-
+ 
     if (prefsProvider.cloneBusterEnabled && mounted) {
       final result = CloneBusterService.checkForDuplicates(
         newItem: newItem,
         existingItems: _getSameTypeItems(itemProvider),
       );
-
+ 
       if (result.isDuplicate && mounted) {
         final shouldContinue = await showAppDialog<bool>(
           context: context,
@@ -857,13 +862,12 @@ void didChangeDependencies() {
             ),
           ],
         );
-
-        if (shouldContinue != true) {
-          return;
-        }
+ 
+        if (shouldContinue != true) return;
       }
     }
-
+ 
+    setState(() => _isSaving = true);
     try {
       await context.read<InventoryItemProvider>().createInventoryItem(
         context,
@@ -900,12 +904,12 @@ void didChangeDependencies() {
             curve: Curves.easeOut,
           );
         }
-        if (mounted) {
-          setState(() {});
-        }
+        if (mounted) setState(() {});
       }
     } catch (e) {
       ToastService.error(l10n.errorCreatingAsset(e.toString()));
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -1076,13 +1080,15 @@ void didChangeDependencies() {
                   child: Form(
                     key: _formKey,
                     child: AssetFormLayout(
-                      // ── Fila 0: Banner IA (URL mágica) ──
+
+                      // -- Row 0: AI Banner
                       aiBanner: aiEnabled
                           ? AiMagicBannerWidget(
                               isLoading: _isMagicLoading,
                               onPressed: _showMagicDialog,
                             )
                           : null,
+
                       // ── Row 1a: Scraper ──
                       scraperBento: CollapsibleBentoBoxWidget(
                         title: 'Scraper Import',
@@ -1092,6 +1098,7 @@ void didChangeDependencies() {
                           onResults: _handleScraperResults,
                         ),
                       ),
+
                       // ── Row 1b: Import from external source ──
                       importBento: CollapsibleBentoBoxWidget(
                         title: l10n.externalImportTitle,
@@ -1107,7 +1114,7 @@ void didChangeDependencies() {
                         ),
                       ),
 
-                      // ── Fila 2a: Datos principales ──
+                      // -- Row 2a: Main Data
                       mainDataBento: CollapsibleBentoBoxWidget(
                         collapsible: false,
                         title: l10n.mainDataTitle,
@@ -1126,7 +1133,7 @@ void didChangeDependencies() {
                         ),
                       ),
 
-                      // ── Fila 2b: Galería ──
+                      // -- Row 2b: Gallery --
                       galleryBento: CollapsibleBentoBoxWidget(
                         collapsible: false,
                         title: l10n.galleryTitle,
@@ -1140,14 +1147,14 @@ void didChangeDependencies() {
                         ),
                       ),
 
-                      // ── Fila 3a: Estado ──
+                      // -- Row 3a: Status
                       statusWidget: StatusSectionWidget(
                         selectedCondition: _selectedCondition,
                         onConditionChanged: (val) =>
                             setState(() => _selectedCondition = val),
                       ),
 
-                      // ── Fila 3b: Stock y Codificación ──
+                      // ── Row 3b: Stock and Codification ──
                       stockBento: CollapsibleBentoBoxWidget(
                         collapsible: false,
                         title: l10n.stockAndCodingTitle,
@@ -1163,7 +1170,7 @@ void didChangeDependencies() {
                         ),
                       ),
 
-                      // ── Fila 4: Especificaciones (full width si hay campos) ──
+                      // -- Row 4: Specifications (full width if there are custom fields) --
                       specsBento: _assetType!.fieldDefinitions.isNotEmpty
                           ? CollapsibleBentoBoxWidget(
                               collapsible: false,
@@ -1196,6 +1203,7 @@ void didChangeDependencies() {
               ),
             ),
             AssetSaveButtonBar(
+              isLoading: _isSaving,
               onSaveAsset: _saveAsset,
               onSaveAndContinue: _saveAndContinue,
             ),
@@ -1205,7 +1213,3 @@ void didChangeDependencies() {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Layout compartido — usado tanto en Create como en Edit
-// ---------------------------------------------------------------------------

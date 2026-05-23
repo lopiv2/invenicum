@@ -83,7 +83,8 @@ class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
   void _closeOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
-    if (mounted) setState(() => _isOpen = false);
+    _isOpen = false;
+    if (mounted) setState(() {});
   }
 
   void _onItemSelected(String? raw) {

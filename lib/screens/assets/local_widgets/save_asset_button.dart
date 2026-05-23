@@ -6,12 +6,14 @@ class SaveAssetFloatingButton extends StatelessWidget {
   final VoidCallback onPressed;
   final String? label;
   final IconData icon;
+  final bool isLoading;
 
   const SaveAssetFloatingButton({
     super.key,
     required this.onPressed,
     this.label,
     this.icon = Icons.check_circle_outline_rounded,
+    this.isLoading = false,
   });
 
   @override
@@ -43,7 +45,9 @@ class SaveAssetFloatingButton extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
               child: Container(
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.85),
+                  color: theme.colorScheme.primary.withValues(
+                    alpha: isLoading ? 0.65 : 0.85,
+                  ),
                   borderRadius: BorderRadius.circular(35),
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.2),
@@ -51,25 +55,38 @@ class SaveAssetFloatingButton extends StatelessWidget {
                   ),
                 ),
                 child: InkWell(
-                  onTap: onPressed,
+                  onTap: isLoading ? null : onPressed,
                   borderRadius: BorderRadius.circular(35),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(icon, color: Colors.white, size: 24),
-                      const SizedBox(width: 12),
-                      Text(
-                        (label == null || label!.isEmpty)
-                            ? l10n.saveAsset.toUpperCase()
-                            : label!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ],
+                  child: Center(
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(icon, color: Colors.white, size: 24),
+                              const SizedBox(width: 12),
+                              Text(
+                                (label == null || label!.isEmpty)
+                                    ? l10n.saveAsset.toUpperCase()
+                                    : label!,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ],
+                          ),
                   ),
                 ),
               ),

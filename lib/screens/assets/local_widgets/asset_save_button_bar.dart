@@ -5,11 +5,13 @@ import 'package:invenicum/l10n/app_localizations.dart';
 class AssetSaveButtonBar extends StatelessWidget {
   final VoidCallback onSaveAsset;
   final VoidCallback onSaveAndContinue;
+  final bool isLoading;
 
   const AssetSaveButtonBar({
     super.key,
     required this.onSaveAsset,
     required this.onSaveAndContinue,
+    this.isLoading = false,
   });
 
   @override
@@ -40,36 +42,55 @@ class AssetSaveButtonBar extends StatelessWidget {
                 filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.85),
+                    color: theme.colorScheme.primary.withValues(
+                      alpha: isLoading ? 0.65 : 0.85,
+                    ),
                     borderRadius: BorderRadius.circular(35),
                     border: Border.all(
                       color: Colors.white.withValues(alpha: 0.2),
                       width: 1.5,
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _buildButton(
-                        context,
-                        icon: Icons.check_circle_outline_rounded,
-                        label: l10n.saveAsset.toUpperCase(),
-                        onPressed: onSaveAsset,
-                      ),
-                      Container(
-                        width: 1,
-                        height: 40,
-                        color: Colors.white.withValues(alpha: 0.2),
-                      ),
-                      _buildButton(
-                        context,
-                        icon: Icons.add_circle_outline_rounded,
-                        label: l10n.saveAndContinueAsset,
-                        onPressed: onSaveAndContinue,
-                        fontSize: 13,
-                      ),
-                    ],
-                  ),
+                  child: isLoading
+                      ? const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 32,
+                            vertical: 14,
+                          ),
+                          child: SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.5,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _buildButton(
+                              context,
+                              icon: Icons.check_circle_outline_rounded,
+                              label: l10n.saveAsset.toUpperCase(),
+                              onPressed: onSaveAsset,
+                            ),
+                            Container(
+                              width: 1,
+                              height: 40,
+                              color: Colors.white.withValues(alpha: 0.2),
+                            ),
+                            _buildButton(
+                              context,
+                              icon: Icons.add_circle_outline_rounded,
+                              label: l10n.saveAndContinueAsset,
+                              onPressed: onSaveAndContinue,
+                              fontSize: 13,
+                            ),
+                          ],
+                        ),
                 ),
               ),
             ),
