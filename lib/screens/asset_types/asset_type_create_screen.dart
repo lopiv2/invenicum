@@ -46,8 +46,6 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
     _loadDataLists();
   }
 
-  // --- Lógica de negocio (Mantenida igual para no romper funcionalidad) ---
-
   Future<void> _addImage() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       type: FileType.image,
