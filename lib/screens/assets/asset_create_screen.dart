@@ -8,6 +8,7 @@ import 'package:invenicum/core/routing/route_names.dart';
 import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
+import 'package:invenicum/providers/integrations_provider.dart';
 import 'package:invenicum/screens/assets/local_widgets/ai_button_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/api_field_mapping_dialog.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_form_layout.dart';
@@ -75,6 +76,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   bool _isMagicLoading = false;
   final Set<String> _highlightedFields = {};
   String? selectedId;
+  bool _isSaving = false;
 
   int? _selectedLocationId;
   List<String> _imagePreviewUrls = [];
@@ -100,9 +102,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     super.didChangeDependencies();
     final apiService = context.read<ApiService>();
     _integrationService = IntegrationService(apiService);
+    final integrationProv = context.read<IntegrationProvider>();
     final sources = AppIntegrations.getAvailableIntegrations(
       context,
-    ).where((i) => i.isDataSource).toList();
+    ).where((i) => i.isDataSource && integrationProv.isLinked(i.id)).toList();
     if (sources.length != _availableDataSources.length) {
       _availableDataSources = sources;
       if (_selectedSource == null && sources.isNotEmpty) {
@@ -653,6 +656,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   Future<void> _saveAsset() async {
+    if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
     final prefsProvider = context.read<PreferencesProvider>();
@@ -737,12 +741,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           ],
         );
 
-        if (shouldContinue != true) {
-          return;
-        }
+        if (shouldContinue != true) return;
       }
     }
 
+    setState(() => _isSaving = true);
     try {
       await context.read<InventoryItemProvider>().createInventoryItem(
         context,
@@ -769,10 +772,13 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       }
     } catch (e) {
       ToastService.error(l10n.errorCreatingAsset(e.toString()));
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
   Future<void> _saveAndContinue() async {
+    if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
     final itemProvider = context.read<InventoryItemProvider>();
     final prefsProvider = context.read<PreferencesProvider>();
@@ -786,6 +792,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       }
       return;
     }
+
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
@@ -856,12 +863,11 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           ],
         );
 
-        if (shouldContinue != true) {
-          return;
-        }
+        if (shouldContinue != true) return;
       }
     }
 
+    setState(() => _isSaving = true);
     try {
       await context.read<InventoryItemProvider>().createInventoryItem(
         context,
@@ -898,12 +904,12 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
             curve: Curves.easeOut,
           );
         }
-        if (mounted) {
-          setState(() {});
-        }
+        if (mounted) setState(() {});
       }
     } catch (e) {
       ToastService.error(l10n.errorCreatingAsset(e.toString()));
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -955,18 +961,25 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
         _nameController.text = results['name'].toString();
         _highlightedFields.add('name');
       }
-      // Descripción
+      // Description
       if (results['description'] != null) {
         _descriptionController.text = results['description'].toString();
         _highlightedFields.add('description');
       }
-      // Imagen: si viene URL absoluta la añade directamente
+      // Barcode
+      final barcodeVal = results['barcode'] ?? results['upc'] ?? results['UPC'];
+      if (barcodeVal != null && barcodeVal.toString().isNotEmpty) {
+        _barcodeController.text = barcodeVal.toString().trim();
+        _highlightedFields.add('barcode');
+      }
+      // Image: if an absolute URL is provided, add it directly
       final imageVal =
           results['image'] ?? results['imageUrl'] ?? results['imagen'];
       if (imageVal != null) {
         _addImageFromUrl(imageVal.toString());
       }
-      // Campos custom: busca por nombre de campo
+
+      // Custom fields: search by field name (case-insensitive)
       for (final fieldDef in _assetType?.fieldDefinitions ?? []) {
         final key = fieldDef.name.toLowerCase();
         final match = results.entries.firstWhere(
@@ -992,7 +1005,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       }
     });
 
-    ToastService.success('Data extracted successfully');
+    final l10n = AppLocalizations.of(context)!;
+    ToastService.success(l10n.dataExtractedSuccess);
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) setState(() => _highlightedFields.clear());
     });
@@ -1074,13 +1088,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                   child: Form(
                     key: _formKey,
                     child: AssetFormLayout(
-                      // ── Fila 0: Banner IA (URL mágica) ──
+                      // -- Row 0: AI Banner
                       aiBanner: aiEnabled
                           ? AiMagicBannerWidget(
                               isLoading: _isMagicLoading,
                               onPressed: _showMagicDialog,
                             )
                           : null,
+
                       // ── Row 1a: Scraper ──
                       scraperBento: CollapsibleBentoBoxWidget(
                         title: 'Scraper Import',
@@ -1090,6 +1105,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                           onResults: _handleScraperResults,
                         ),
                       ),
+
                       // ── Row 1b: Import from external source ──
                       importBento: CollapsibleBentoBoxWidget(
                         title: l10n.externalImportTitle,
@@ -1105,7 +1121,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         ),
                       ),
 
-                      // ── Fila 2a: Datos principales ──
+                      // -- Row 2a: Main Data
                       mainDataBento: CollapsibleBentoBoxWidget(
                         collapsible: false,
                         title: l10n.mainDataTitle,
@@ -1124,7 +1140,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         ),
                       ),
 
-                      // ── Fila 2b: Galería ──
+                      // -- Row 2b: Gallery --
                       galleryBento: CollapsibleBentoBoxWidget(
                         collapsible: false,
                         title: l10n.galleryTitle,
@@ -1138,14 +1154,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         ),
                       ),
 
-                      // ── Fila 3a: Estado ──
+                      // -- Row 3a: Status
                       statusWidget: StatusSectionWidget(
                         selectedCondition: _selectedCondition,
                         onConditionChanged: (val) =>
                             setState(() => _selectedCondition = val),
                       ),
 
-                      // ── Fila 3b: Stock y Codificación ──
+                      // ── Row 3b: Stock and Codification ──
                       stockBento: CollapsibleBentoBoxWidget(
                         collapsible: false,
                         title: l10n.stockAndCodingTitle,
@@ -1161,7 +1177,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         ),
                       ),
 
-                      // ── Fila 4: Especificaciones (full width si hay campos) ──
+                      // -- Row 4: Specifications (full width if there are custom fields) --
                       specsBento: _assetType!.fieldDefinitions.isNotEmpty
                           ? CollapsibleBentoBoxWidget(
                               collapsible: false,
@@ -1194,6 +1210,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
               ),
             ),
             AssetSaveButtonBar(
+              isLoading: _isSaving,
               onSaveAsset: _saveAsset,
               onSaveAndContinue: _saveAndContinue,
             ),
@@ -1203,7 +1220,3 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Layout compartido — usado tanto en Create como en Edit
-// ---------------------------------------------------------------------------

@@ -6177,6 +6177,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Error downloading image: {error}'**
   String errorDownloadingImage(String error);
+
+  /// No description provided for @dataExtractedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Data extracted successfully'**
+  String get dataExtractedSuccess;
 }
 
 class _AppLocalizationsDelegate

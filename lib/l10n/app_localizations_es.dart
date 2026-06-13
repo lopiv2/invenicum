@@ -3392,4 +3392,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String errorDownloadingImage(String error) {
     return 'Error descargando imagen: $error';
   }
+
+  @override
+  String get dataExtractedSuccess => 'Datos extraídos correctamente';
 }

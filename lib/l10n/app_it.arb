@@ -1737,5 +1737,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "@dataExtractedSuccess": {},
+  "dataExtractedSuccess": "Dati estratti con successo"
 }

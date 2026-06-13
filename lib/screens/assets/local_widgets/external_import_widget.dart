@@ -76,20 +76,15 @@ class ExternalImportWidget extends StatelessWidget {
 
         if (isWide) {
           return Row(
-            // Cambiamos a CrossAxisAlignment.start o center para que el
-            // dropdown y el searchField se alineen mejor visualmente
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Primera columna: Dropdown
               Expanded(child: dropdown),
-              const SizedBox(width: 16), // Espacio entre columnas
-              // Segunda columna: SearchField
+              const SizedBox(width: 16),
               Expanded(child: searchField),
             ],
           );
         }
 
-        // En móvil (no wide) se mantiene igual
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [dropdown, const SizedBox(height: 12), searchField],
