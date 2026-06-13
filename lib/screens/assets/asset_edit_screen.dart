@@ -1009,23 +1009,29 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
   void _handleScraperResults(Map<String, dynamic> results) {
     setState(() {
-      // Nombre
+      // Name
       if (results['name'] != null) {
         _nameController.text = results['name'].toString();
         _highlightedFields.add('name');
       }
-      // Descripción
+      // Description
       if (results['description'] != null) {
         _descriptionController.text = results['description'].toString();
         _highlightedFields.add('description');
       }
-      // Imagen: si viene URL absoluta la añade directamente
+      // Barcode
+      final barcodeVal = results['barcode'] ?? results['upc'] ?? results['UPC'];
+      if (barcodeVal != null && barcodeVal.toString().isNotEmpty) {
+        _barcodeController.text = barcodeVal.toString().trim();
+        _highlightedFields.add('barcode');
+      }
+      // Image: if an absolute URL is provided, add it directly
       final imageVal =
           results['image'] ?? results['imageUrl'] ?? results['imagen'];
       if (imageVal != null) {
         _addImageFromUrl(imageVal.toString());
       }
-      // Campos custom: busca por nombre de campo
+      // Custom fields: search by field name (case-insensitive)
       for (final fieldDef in _assetType?.fieldDefinitions ?? []) {
         final key = fieldDef.name.toLowerCase();
         final match = results.entries.firstWhere(
@@ -1051,7 +1057,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       }
     });
 
-    ToastService.success('Data extracted successfully');
+    final l10n = AppLocalizations.of(context)!;
+    ToastService.success(l10n.dataExtractedSuccess);
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) setState(() => _highlightedFields.clear());
     });

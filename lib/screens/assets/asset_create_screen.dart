@@ -98,21 +98,21 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   late IntegrationService _integrationService;
 
   @override
-void didChangeDependencies() {
-  super.didChangeDependencies();
-  final apiService = context.read<ApiService>();
-  _integrationService = IntegrationService(apiService);
-  final integrationProv = context.read<IntegrationProvider>();
-  final sources = AppIntegrations.getAvailableIntegrations(
-    context,
-  ).where((i) => i.isDataSource && integrationProv.isLinked(i.id)).toList();
-  if (sources.length != _availableDataSources.length) {
-    _availableDataSources = sources;
-    if (_selectedSource == null && sources.isNotEmpty) {
-      _selectedSource = sources.first.id;
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final apiService = context.read<ApiService>();
+    _integrationService = IntegrationService(apiService);
+    final integrationProv = context.read<IntegrationProvider>();
+    final sources = AppIntegrations.getAvailableIntegrations(
+      context,
+    ).where((i) => i.isDataSource && integrationProv.isLinked(i.id)).toList();
+    if (sources.length != _availableDataSources.length) {
+      _availableDataSources = sources;
+      if (_selectedSource == null && sources.isNotEmpty) {
+        _selectedSource = sources.first.id;
+      }
     }
   }
-}
 
   @override
   void initState() {
@@ -670,7 +670,7 @@ void didChangeDependencies() {
       }
       return;
     }
- 
+
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
@@ -696,7 +696,7 @@ void didChangeDependencies() {
         }
       }
     }
- 
+
     final newItem = InventoryItem(
       id: 0,
       containerId: _containerId!,
@@ -712,13 +712,13 @@ void didChangeDependencies() {
       marketValue: _marketValue,
       customFieldValues: customFieldValues,
     );
- 
+
     if (prefsProvider.cloneBusterEnabled && mounted) {
       final result = CloneBusterService.checkForDuplicates(
         newItem: newItem,
         existingItems: _getSameTypeItems(itemProvider),
       );
- 
+
       if (result.isDuplicate && mounted) {
         final shouldContinue = await showAppDialog<bool>(
           context: context,
@@ -740,11 +740,11 @@ void didChangeDependencies() {
             ),
           ],
         );
- 
+
         if (shouldContinue != true) return;
       }
     }
- 
+
     setState(() => _isSaving = true);
     try {
       await context.read<InventoryItemProvider>().createInventoryItem(
@@ -792,7 +792,7 @@ void didChangeDependencies() {
       }
       return;
     }
- 
+
     final Map<String, dynamic> customFieldValues = {};
     for (var fieldDef in _assetType!.fieldDefinitions) {
       if (fieldDef.type == CustomFieldType.dropdown) {
@@ -818,7 +818,7 @@ void didChangeDependencies() {
         }
       }
     }
- 
+
     final newItem = InventoryItem(
       id: 0,
       containerId: _containerId!,
@@ -834,13 +834,13 @@ void didChangeDependencies() {
       marketValue: _marketValue,
       customFieldValues: customFieldValues,
     );
- 
+
     if (prefsProvider.cloneBusterEnabled && mounted) {
       final result = CloneBusterService.checkForDuplicates(
         newItem: newItem,
         existingItems: _getSameTypeItems(itemProvider),
       );
- 
+
       if (result.isDuplicate && mounted) {
         final shouldContinue = await showAppDialog<bool>(
           context: context,
@@ -862,11 +862,11 @@ void didChangeDependencies() {
             ),
           ],
         );
- 
+
         if (shouldContinue != true) return;
       }
     }
- 
+
     setState(() => _isSaving = true);
     try {
       await context.read<InventoryItemProvider>().createInventoryItem(
@@ -961,18 +961,25 @@ void didChangeDependencies() {
         _nameController.text = results['name'].toString();
         _highlightedFields.add('name');
       }
-      // Descripción
+      // Description
       if (results['description'] != null) {
         _descriptionController.text = results['description'].toString();
         _highlightedFields.add('description');
       }
-      // Imagen: si viene URL absoluta la añade directamente
+      // Barcode
+      final barcodeVal = results['barcode'] ?? results['upc'] ?? results['UPC'];
+      if (barcodeVal != null && barcodeVal.toString().isNotEmpty) {
+        _barcodeController.text = barcodeVal.toString().trim();
+        _highlightedFields.add('barcode');
+      }
+      // Image: if an absolute URL is provided, add it directly
       final imageVal =
           results['image'] ?? results['imageUrl'] ?? results['imagen'];
       if (imageVal != null) {
         _addImageFromUrl(imageVal.toString());
       }
-      // Campos custom: busca por nombre de campo
+
+      // Custom fields: search by field name (case-insensitive)
       for (final fieldDef in _assetType?.fieldDefinitions ?? []) {
         final key = fieldDef.name.toLowerCase();
         final match = results.entries.firstWhere(
@@ -998,7 +1005,8 @@ void didChangeDependencies() {
       }
     });
 
-    ToastService.success('Data extracted successfully');
+    final l10n = AppLocalizations.of(context)!;
+    ToastService.success(l10n.dataExtractedSuccess);
     Future.delayed(const Duration(seconds: 4), () {
       if (mounted) setState(() => _highlightedFields.clear());
     });
@@ -1080,7 +1088,6 @@ void didChangeDependencies() {
                   child: Form(
                     key: _formKey,
                     child: AssetFormLayout(
-
                       // -- Row 0: AI Banner
                       aiBanner: aiEnabled
                           ? AiMagicBannerWidget(
