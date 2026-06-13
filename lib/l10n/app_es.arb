@@ -1765,5 +1765,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "@dataExtractedSuccess": {},
+  "dataExtractedSuccess": "Datos extraídos correctamente"
 }

@@ -3399,4 +3399,7 @@ class AppLocalizationsDe extends AppLocalizations {
   String errorDownloadingImage(String error) {
     return 'Fehler beim Herunterladen des Bildes: $error';
   }
+
+  @override
+  String get dataExtractedSuccess => 'Daten erfolgreich extrahiert';
 }
