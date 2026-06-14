@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/widgets/layout/sidebar_container_header.dart';
 import 'package:invenicum/widgets/ui/sidebar_nav_button.dart';
 import 'package:invenicum/widgets/layout/sidebar_tree_section.dart';
+import 'package:invenicum/widgets/layout/webp_animator_version.dart';
 
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -108,23 +109,9 @@ class SidebarLayout extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(
-                    'assets/images/doctor_version.png',
-                    width: 38,
-                    height: 38,
-                  ),
-                  const SizedBox(width: 6),
-                  Text(
-                    'v${Environment.appVersion}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: colorScheme.outline,
-                    ),
-                  ),
-                ],
+              child: WebpAnimatorVersion(
+                assetPath: 'assets/images/doctorFred_dancing.webp',
+                versionText: 'v${Environment.appVersion}',
               ),
             ),
           ],
