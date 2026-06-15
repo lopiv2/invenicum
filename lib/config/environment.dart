@@ -4,9 +4,14 @@ class Environment {
     defaultValue: 'http://192.168.1.43:3000', // Default URL for development
   );
 
+  static const String mayorVersion = String.fromEnvironment(
+    '"Crazy Mad Doctor"',
+    defaultValue: '"Crazy Mad Doctor"', // Fallback only in local development
+  );
+
   static const String appVersion = String.fromEnvironment(
-    'APP_VERSION',
-    defaultValue: '0.0.0 "Crazy Mad Doctor"', // Fallback only in local development
+    'APP_VERSION $mayorVersion',
+    defaultValue: '0.0.0 $mayorVersion', // Fallback only in local development
   );
 
   static const String apiVersion = '/api/v1';
