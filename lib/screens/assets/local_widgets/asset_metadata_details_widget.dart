@@ -19,18 +19,21 @@ class AssetMetadataWidget extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildMetaRow(
+          context,
           l10n.createdAt, 
           AppUtils.formatDate(context, item.createdAt!),
           Icons.calendar_today_rounded,
         ),
         const SizedBox(height: 12),
         _buildMetaRow(
+          context,
           l10n.updatedAt, 
           AppUtils.formatDate(context, item.updatedAt!),
           Icons.update_rounded,
         ),
         const SizedBox(height: 12),
         _buildMetaRow(
+          context,
           l10n.internalReferenceLabel,
           "#${item.id}",
           Icons.fingerprint_rounded,
@@ -39,28 +42,30 @@ class AssetMetadataWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildMetaRow(String label, String value, IconData icon) {
+  Widget _buildMetaRow(BuildContext context, String label, String value, IconData icon) {
+    final cs = Theme.of(context).colorScheme;
     return Row(
       children: [
-        Icon(icon, size: 16, color: Colors.grey[400]),
+        Icon(icon, size: 16, color: cs.onSurfaceVariant),
         const SizedBox(width: 8),
         Text(
           label, 
-          style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.w500)
+          style: TextStyle(fontSize: 12, color: cs.onSurfaceVariant, fontWeight: FontWeight.w500)
         ),
         const Spacer(),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           decoration: BoxDecoration(
-            color: Colors.grey[100],
+            color: cs.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12, 
               fontWeight: FontWeight.bold,
-              fontFamily: 'monospace', // Ideal para IDs y fechas
+              fontFamily: 'monospace',
+              color: cs.onSurfaceVariant,
             ),
           ),
         ),

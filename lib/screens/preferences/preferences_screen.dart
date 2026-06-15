@@ -189,9 +189,9 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
     required PreferenceCategory category,
   }) {
     final isSelected = _selectedCategory == category;
-    final color = isSelected
-        ? Theme.of(context).primaryColor
-        : Theme.of(context).hintColor;
+    final cs = Theme.of(context).colorScheme;
+
+    final color = isSelected ? cs.primary : cs.onSurfaceVariant;
 
     final l10n = AppLocalizations.of(context)!;
     final categoryTitle = switch (category) {
@@ -218,16 +218,12 @@ class _PreferencesScreenState extends State<PreferencesScreen> {
           title: Text(
             categoryTitle,
             style: TextStyle(
-              color: isSelected
-                  ? Theme.of(context).textTheme.bodyLarge?.color
-                  : color,
+              color: isSelected ? cs.onSurface : color,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
           ),
           selected: isSelected,
-          selectedTileColor: Theme.of(
-            context,
-          ).primaryColor.withValues(alpha: 0.1),
+          selectedTileColor: cs.primary.withValues(alpha: 0.12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
