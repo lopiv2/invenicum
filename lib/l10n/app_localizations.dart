@@ -6183,6 +6183,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Data extracted successfully'**
   String get dataExtractedSuccess;
+
+  /// No description provided for @scraperUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'URL to scrape'**
+  String get scraperUrlLabel;
+
+  /// No description provided for @scraperUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://example.com/item/123'**
+  String get scraperUrlHint;
+
+  /// No description provided for @scraperNoScrapers.
+  ///
+  /// In en, this message translates to:
+  /// **'No scrapers configured for this container.'**
+  String get scraperNoScrapers;
+
+  /// No description provided for @scraperSelectLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Scraper'**
+  String get scraperSelectLabel;
+
+  /// No description provided for @scraperSelectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select scraper'**
+  String get scraperSelectHint;
+
+  /// No description provided for @scraperExtract.
+  ///
+  /// In en, this message translates to:
+  /// **'Extract'**
+  String get scraperExtract;
+
+  /// No description provided for @scraperAutoDetected.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-detected: {name}'**
+  String scraperAutoDetected(String name);
+
+  /// No description provided for @scraperImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scraper Import'**
+  String get scraperImportTitle;
+
+  /// No description provided for @scraperClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get scraperClear;
 }
 
 class _AppLocalizationsDelegate

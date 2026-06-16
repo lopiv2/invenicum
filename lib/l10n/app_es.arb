@@ -1767,5 +1767,21 @@
     }
   },
   "@dataExtractedSuccess": {},
-  "dataExtractedSuccess": "Datos extraídos correctamente"
+  "dataExtractedSuccess": "Datos extraídos correctamente",
+  "scraperUrlLabel": "URL a scrapear",
+  "scraperUrlHint": "https://ejemplo.com/articulo/123",
+  "scraperNoScrapers": "No hay scrapers configurados para este contenedor.",
+  "scraperSelectLabel": "Scraper",
+  "scraperSelectHint": "Seleccionar scraper",
+  "scraperExtract": "Extraer",
+  "scraperAutoDetected": "Auto-detectado: {name}",
+  "@scraperAutoDetected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "scraperImportTitle": "Importar con Scraper",
+  "scraperClear": "Limpiar"
 }
