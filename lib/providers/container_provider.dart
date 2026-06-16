@@ -7,17 +7,20 @@ import 'package:invenicum/data/models/list_data.dart';
 import 'package:invenicum/data/services/asset_type_service.dart';
 import 'package:invenicum/data/services/container_service.dart';
 import 'package:invenicum/data/services/location_service.dart';
+import 'package:invenicum/data/services/scraper_service.dart';
 import 'package:flutter/material.dart';
 
 class ContainerProvider with ChangeNotifier {
   final ContainerService _containerService;
   final AssetTypeService _assetTypeService;
   final LocationService _locationService;
+  final ScraperService _scraperService;
 
   ContainerProvider(
     this._containerService,
     this._assetTypeService,
     this._locationService,
+    this._scraperService,
   );
 
   // 1. La variable de estado privada que almacena los datos
@@ -58,10 +61,14 @@ class ContainerProvider with ChangeNotifier {
             final dataLists = await _containerService.getDataLists(
               apiContainer.id,
             );
+            final scrapers = await _scraperService.getScrapers(
+              apiContainer.id,
+            );
 
             return apiContainer.copyWith(
               locations: locations,
               assetTypes: apiContainer.assetTypes,
+              scrapers: scrapers,
               dataLists: dataLists,
             );
           }),

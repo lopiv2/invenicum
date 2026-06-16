@@ -235,6 +235,7 @@ void main() async {
             c.read<ContainerService>(),
             c.read<AssetTypeService>(),
             c.read<LocationService>(),
+            c.read<ScraperService>(),
           ),
           update: (context, auth, prev) {
             // 🚩 Now only requests containers if the token is valid

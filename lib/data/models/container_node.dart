@@ -3,6 +3,7 @@
 import 'package:invenicum/data/models/asset_type_model.dart';
 import 'package:invenicum/data/models/list_data.dart';
 import 'package:invenicum/data/models/location.dart';
+import 'package:invenicum/data/models/scraper.dart';
 
 class ContainerNode {
   final int id;
@@ -17,6 +18,7 @@ class ContainerNode {
   final List<AssetType> assetTypes;
   // 🎯 Lista de ubicaciones ya disponible en el contenedor
   final List<Location> locations;
+  final List<Scraper> scrapers;
   // 🎯 Indicar si el contenedor es una colección
   final bool isCollection;
 
@@ -31,6 +33,7 @@ class ContainerNode {
     this.assetTypes = const [],
     // 🎯 Inicializar locations
     this.locations = const [],
+    this.scrapers = const [],
     // 🎯 Inicializar isCollection
     this.isCollection = false,
   });
@@ -49,6 +52,7 @@ class ContainerNode {
     List<AssetType>? assetTypes,
     // 🎯 Añadir locations para copia inmutable
     List<Location>? locations,
+    List<Scraper>? scrapers,
     // 🎯 Añadir isCollection para copia inmutable
     bool? isCollection,
   }) {
@@ -63,6 +67,7 @@ class ContainerNode {
       assetTypes: assetTypes ?? this.assetTypes,
       // 🎯 Aplicar locations
       locations: locations ?? this.locations,
+      scrapers: scrapers ?? this.scrapers,
       // 🎯 Aplicar isCollection
       isCollection: isCollection ?? this.isCollection,
     );
