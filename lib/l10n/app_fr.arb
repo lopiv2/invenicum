@@ -1755,5 +1755,7 @@
     }
   },
   "scraperImportTitle": "Scraper Import",
-  "scraperClear": "Clear"
+  "scraperClear": "Clear",
+  "hideToolbar": "Hide",
+  "showToolbar": "Show"
 }

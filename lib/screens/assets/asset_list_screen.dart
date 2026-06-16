@@ -76,6 +76,7 @@ class _AssetListScreenState extends State<AssetListScreen>
   bool get wantKeepAlive => true;
 
   bool _isListView = true;
+  bool _isToolbarExpanded = true;
   bool _showRefreshDone = false;
   String? _selectedCountFieldId;
   String? _selectedCountValue;
@@ -548,42 +549,64 @@ class _AssetListScreenState extends State<AssetListScreen>
                       ),
                       child: Column(
                         children: [
-                          AssetListHeader(
-                            assetType: assetType,
-                            showAssetTypeLogo: showLogo,
-                            onSyncPrices: () => _syncMarketPrices(context),
-                            onGoToCreateAsset: () async {
-                              await context.pushNamed(
-                                RouteNames.assetCreate,
-                                pathParameters: {
-                                  'containerId': widget.containerId,
-                                  'assetTypeId': widget.assetTypeId,
-                                },
-                              );
-                              if (!context.mounted) return;
-                              await _refreshTable(context);
-                            },
-                            onImportCSV: () async {
-                              await context.pushNamed(
-                                RouteNames.assetImport,
-                                pathParameters: {
-                                  'containerId': widget.containerId,
-                                  'assetTypeId': widget.assetTypeId,
-                                },
-                              );
-                              if (!context.mounted) return;
-                              await _refreshTable(context);
-                            },
-                            onExportCSV: () =>
-                                _exportCsv(context, assetType, data.items),
-                            onShowCountFilterDialog: () =>
-                                _showCountFilterDialog(context, assetType),
-                            selectedCountFieldId: _selectedCountFieldId,
+                          AnimatedSize(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            alignment: Alignment.topCenter,
+                            child: _isToolbarExpanded
+                                ? Column(
+                                    children: [
+                                      AssetListHeader(
+                                        assetType: assetType,
+                                        showAssetTypeLogo: showLogo,
+                                        onSyncPrices: () =>
+                                            _syncMarketPrices(context),
+                                        onGoToCreateAsset: () async {
+                                          await context.pushNamed(
+                                            RouteNames.assetCreate,
+                                            pathParameters: {
+                                              'containerId':
+                                                  widget.containerId,
+                                              'assetTypeId':
+                                                  widget.assetTypeId,
+                                            },
+                                          );
+                                          if (!context.mounted) return;
+                                          await _refreshTable(context);
+                                        },
+                                        onImportCSV: () async {
+                                          await context.pushNamed(
+                                            RouteNames.assetImport,
+                                            pathParameters: {
+                                              'containerId':
+                                                  widget.containerId,
+                                              'assetTypeId':
+                                                  widget.assetTypeId,
+                                            },
+                                          );
+                                          if (!context.mounted) return;
+                                          await _refreshTable(context);
+                                        },
+                                        onExportCSV: () =>
+                                            _exportCsv(context, assetType,
+                                                data.items),
+                                        onShowCountFilterDialog: () =>
+                                            _showCountFilterDialog(
+                                                context, assetType),
+                                        selectedCountFieldId:
+                                            _selectedCountFieldId,
+                                      ),
+                                      const SizedBox(height: 10),
+                                    ],
+                                  )
+                                : const SizedBox.shrink(),
                           ),
-                          const SizedBox(height: 10),
                           AssetSearchBar(
                             searchController: _searchController,
                             isListView: _isListView,
+                            isToolbarExpanded: _isToolbarExpanded,
+                            onToggleToolbar: () => setState(
+                                () => _isToolbarExpanded = !_isToolbarExpanded),
                             onToggleView: () =>
                                 setState(() => _isListView = !_isListView),
                             onToggleGallery: () =>

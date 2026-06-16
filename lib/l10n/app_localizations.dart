@@ -6237,6 +6237,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get scraperClear;
+
+  /// No description provided for @hideToolbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get hideToolbar;
+
+  /// No description provided for @showToolbar.
+  ///
+  /// In en, this message translates to:
+  /// **'Show'**
+  String get showToolbar;
 }
 
 class _AppLocalizationsDelegate
