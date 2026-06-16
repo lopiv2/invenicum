@@ -1783,5 +1783,7 @@
     }
   },
   "scraperImportTitle": "Importar con Scraper",
-  "scraperClear": "Limpiar"
+  "scraperClear": "Limpiar",
+  "hideToolbar": "Ocultar",
+  "showToolbar": "Mostrar"
 }

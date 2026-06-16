@@ -6,6 +6,8 @@ import 'package:invenicum/l10n/app_localizations.dart';
 class AssetSearchBar extends StatelessWidget {
   final TextEditingController searchController;
   final bool isListView;
+  final bool isToolbarExpanded;
+  final VoidCallback onToggleToolbar;
   final VoidCallback onToggleView;
   final VoidCallback onToggleGallery;
 
@@ -13,6 +15,8 @@ class AssetSearchBar extends StatelessWidget {
     super.key,
     required this.searchController,
     required this.isListView,
+    required this.isToolbarExpanded,
+    required this.onToggleToolbar,
     required this.onToggleView,
     required this.onToggleGallery,
   });
@@ -48,8 +52,9 @@ class AssetSearchBar extends StatelessWidget {
                       )
                     : null,
                 border: InputBorder.none,
+                isDense: true,
                 contentPadding: const EdgeInsets.symmetric(
-                  vertical: 10,
+                  vertical: 1,
                   horizontal: 12,
                 ),
               ),
@@ -70,6 +75,25 @@ class AssetSearchBar extends StatelessWidget {
               horizontal: isCompact ? 12 : 14,
               vertical: 10,
             ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        FilledButton.tonalIcon(
+          onPressed: onToggleToolbar,
+          icon: Icon(
+            isToolbarExpanded
+                ? Icons.unfold_less_rounded
+                : Icons.unfold_more_rounded,
+          ),
+          label: Text(
+            isToolbarExpanded ? l10n.hideToolbar : l10n.showToolbar,
+          ),
+          style: FilledButton.styleFrom(
+            visualDensity: VisualDensity.compact,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),

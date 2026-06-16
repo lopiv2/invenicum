@@ -3431,4 +3431,10 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get scraperClear => 'Clear';
+
+  @override
+  String get hideToolbar => 'Hide';
+
+  @override
+  String get showToolbar => 'Show';
 }
