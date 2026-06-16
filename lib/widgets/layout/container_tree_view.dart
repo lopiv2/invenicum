@@ -118,7 +118,8 @@ class ContainerTreeView extends StatelessWidget {
                     _buildSubItem(
                       context,
                       icon: Icons.web_outlined,
-                      label: 'Scrapers',
+                      label:
+                          'Scrapers (${container.scrapers.length})',
                       onTap: () => context.goNamed(
                         RouteNames.scrapers,
                         pathParameters: {
