@@ -79,6 +79,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   bool _isSaving = false;
 
   int? _selectedLocationId;
+  final _scraperKey = GlobalKey<ScraperImportWidgetState>();
   List<String> _imagePreviewUrls = [];
 
   AssetType? _assetType;
@@ -898,12 +899,13 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           }
           _selectedListValues.clear();
           _booleanFieldValues.clear();
-          _scrollController.animateTo(
-            0,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeOut,
-          );
+          _scraperKey.currentState?.clearUrl();
         }
+        _scrollController.animateTo(
+          0,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
         if (mounted) setState(() {});
       }
     } catch (e) {
@@ -1098,9 +1100,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
                       // ── Row 1a: Scraper ──
                       scraperBento: CollapsibleBentoBoxWidget(
-                        title: 'Scraper Import',
+                        title: l10n.scraperImportTitle,
                         icon: Icons.travel_explore,
                         child: ScraperImportWidget(
+                          key: _scraperKey,
                           containerId: _containerId!,
                           onResults: _handleScraperResults,
                         ),

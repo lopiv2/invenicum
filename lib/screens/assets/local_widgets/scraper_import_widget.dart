@@ -1,7 +1,7 @@
-// lib/screens/assets/local_widgets/scraper_import_widget.dart
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/scraper.dart';
 import 'package:invenicum/data/services/scraper_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
 class ScraperImportWidget extends StatefulWidget {
@@ -15,15 +15,20 @@ class ScraperImportWidget extends StatefulWidget {
   });
 
   @override
-  State<ScraperImportWidget> createState() => _ScraperImportWidgetState();
+  State<ScraperImportWidget> createState() => ScraperImportWidgetState();
 }
 
-class _ScraperImportWidgetState extends State<ScraperImportWidget> {
+class ScraperImportWidgetState extends State<ScraperImportWidget> {
   final _urlController = TextEditingController();
   List<Scraper> _scrapers = [];
   Scraper? _selectedScraper;
   bool _loading = false;
   bool _loadingScrapers = true;
+
+  void clearUrl() {
+    _urlController.clear();
+    setState(() => _selectedScraper = null);
+  }
 
   @override
   void initState() {
@@ -119,6 +124,7 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final hasMatch = _selectedScraper != null;
 
@@ -130,16 +136,13 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
           controller: _urlController,
           keyboardType: TextInputType.url,
           decoration: InputDecoration(
-            labelText: 'URL to scrape',
-            hintText: 'https://example.com/item/123',
+            labelText: l10n.scraperUrlLabel,
+            hintText: l10n.scraperUrlHint,
             prefixIcon: const Icon(Icons.link_outlined),
             suffixIcon: _urlController.text.isNotEmpty
                 ? IconButton(
                     icon: const Icon(Icons.clear),
-                    onPressed: () {
-                      _urlController.clear();
-                      setState(() => _selectedScraper = null);
-                    },
+                    onPressed: clearUrl,
                   )
                 : null,
           ),
@@ -151,7 +154,7 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
           const LinearProgressIndicator()
         else if (_scrapers.isEmpty)
           Text(
-            'No scrapers configured for this container.',
+            l10n.scraperNoScrapers,
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.outline,
             ),
@@ -163,7 +166,7 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
                 child: DropdownButtonFormField<Scraper>(
                   value: _selectedScraper,
                   decoration: InputDecoration(
-                    labelText: 'Scraper',
+                    labelText: l10n.scraperSelectLabel,
                     prefixIcon: Icon(
                       hasMatch
                           ? Icons.check_circle_outline
@@ -178,10 +181,9 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
                         (s) => DropdownMenuItem(
                           value: s,
                           child: Row(
-                            mainAxisSize: MainAxisSize.min, // ← clave
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Flexible(
-                                // ← Flexible en vez de Expanded
                                 child: Text(
                                   s.name,
                                   overflow: TextOverflow.ellipsis,
@@ -202,7 +204,7 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
                       )
                       .toList(),
                   onChanged: (s) => setState(() => _selectedScraper = s),
-                  hint: const Text('Select scraper'),
+                  hint: Text(l10n.scraperSelectHint),
                 ),
               ),
               const SizedBox(width: 12),
@@ -220,7 +222,7 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
                         child: CircularProgressIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.play_arrow),
-                label: const Text('Extract'),
+                label: Text(l10n.scraperExtract),
               ),
             ],
           ),
@@ -239,7 +241,7 @@ class _ScraperImportWidgetState extends State<ScraperImportWidget> {
                     color: theme.colorScheme.onSecondaryContainer,
                   ),
                   label: Text(
-                    'Auto-detected: ${_selectedScraper!.name}',
+                    l10n.scraperAutoDetected(_selectedScraper!.name),
                     style: theme.textTheme.labelSmall,
                   ),
                   backgroundColor: theme.colorScheme.secondaryContainer,

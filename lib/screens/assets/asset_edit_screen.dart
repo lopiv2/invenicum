@@ -1006,7 +1006,6 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       if (mounted) setState(() => _isSaving = false);
     }
   }
-
   void _handleScraperResults(Map<String, dynamic> results) {
     setState(() {
       // Name
@@ -1107,7 +1106,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                     // ── Row 1a: Scraper ──
                     scraperBento: CollapsibleBentoBoxWidget(
                       collapsible: true,
-                      title: 'Scraper Import',
+                      title: l10n.scraperImportTitle,
                       icon: Icons.travel_explore,
                       child: ScraperImportWidget(
                         containerId: int.parse(widget.containerId),
