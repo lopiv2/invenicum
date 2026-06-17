@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:trina_grid/trina_grid.dart';
 
-/// Footer de paginación personalizado para TrinaGrid.
-/// Combina la paginación nativa con un campo "ir a página".
 class TrinaPaginationFooter extends StatefulWidget {
   final TrinaGridStateManager stateManager;
 
@@ -15,12 +13,15 @@ class TrinaPaginationFooter extends StatefulWidget {
 
 class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
   final TextEditingController _pageController = TextEditingController();
+  static const List<int> _pageSizes = [10, 30, 50];
   late int _currentPage;
   late int _totalPages;
+  late int _pageSize;
 
   @override
   void initState() {
     super.initState();
+    _pageSize = widget.stateManager.pageSize;
     _sync();
     widget.stateManager.addListener(_onStateChanged);
   }
@@ -40,6 +41,12 @@ class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
   void _sync() {
     _currentPage = widget.stateManager.page;
     _totalPages = widget.stateManager.totalPage;
+    _pageSize = widget.stateManager.pageSize;
+  }
+
+  void _setPageSize(int size) {
+    widget.stateManager.setPageSize(size);
+    widget.stateManager.setPage(1);
   }
 
   void _goToPage(String value) {
@@ -54,11 +61,12 @@ class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
     return Container(
       height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         border: Border(
           top: BorderSide(color: theme.dividerColor, width: 1),
@@ -66,6 +74,10 @@ class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
       ),
       child: Row(
         children: [
+          Text(l10n.rowsPerPageTitle, style: theme.textTheme.bodySmall),
+          const SizedBox(width: 6),
+          ..._pageSizes.map((size) => _buildPageSizeButton(size)),
+          const SizedBox(width: 12),
           Expanded(
             child: TrinaPagination(widget.stateManager),
           ),
@@ -73,9 +85,9 @@ class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
             width: 1,
             height: 24,
             color: theme.dividerColor,
-            margin: const EdgeInsets.symmetric(horizontal: 16),
+            margin: const EdgeInsets.symmetric(horizontal: 12),
           ),
-          Text(AppLocalizations.of(context)!.goToPageLabel, style: theme.textTheme.bodySmall),
+          Text(l10n.goToPageLabel, style: theme.textTheme.bodySmall),
           const SizedBox(width: 8),
           SizedBox(
             width: 56,
@@ -101,6 +113,42 @@ class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
           const SizedBox(width: 6),
           Text('/ $_totalPages', style: theme.textTheme.bodySmall),
         ],
+      ),
+    );
+  }
+
+  Widget _buildPageSizeButton(int size) {
+    final isActive = _pageSize == size;
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: InkWell(
+        onTap: () => _setPageSize(size),
+        borderRadius: BorderRadius.circular(6),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          decoration: BoxDecoration(
+            color: isActive
+                ? Theme.of(context).colorScheme.primaryContainer
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(6),
+            border: Border.all(
+              color: isActive
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).dividerColor,
+              width: isActive ? 1.5 : 1,
+            ),
+          ),
+          child: Text(
+            size.toString(),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: isActive
+                  ? Theme.of(context).colorScheme.onPrimaryContainer
+                  : null,
+            ),
+          ),
+        ),
       ),
     );
   }
