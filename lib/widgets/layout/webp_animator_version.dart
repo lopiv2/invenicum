@@ -3,15 +3,15 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../core/utils/constants.dart';
+
 class WebpAnimatorVersion extends StatefulWidget {
-  final String assetPath;
-  final String versionText;
+  final VersionArt versionArt;
   final double? size;
 
   const WebpAnimatorVersion({
     super.key,
-    required this.assetPath,
-    required this.versionText,
+    required this.versionArt,
     this.size,
   });
 
@@ -31,7 +31,7 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
 
   Future<void> _loadFirstFrame() async {
     try {
-      final data = await rootBundle.load(widget.assetPath);
+      final data = await rootBundle.load(widget.versionArt.assetPath);
       final codec = await ui.instantiateImageCodec(data.buffer.asUint8List());
       final frameInfo = await codec.getNextFrame();
       if (mounted) {
@@ -60,7 +60,7 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              widget.versionText,
+              '${widget.versionArt.versionLabel} ${widget.versionArt.versionName}',
               style: TextStyle(
                 fontSize: 14,
                 color: colorScheme.outline,
@@ -85,7 +85,7 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
   Widget _buildImage(double size) {
     if (_isPlaying) {
       return Image.asset(
-        widget.assetPath,
+        widget.versionArt.assetPath,
         width: size,
         height: size,
       );

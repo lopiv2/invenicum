@@ -243,10 +243,9 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         enableFilterMenuItem: false,
       ),
       TrinaColumn(
-        title: l10n.imageColumnLabel,
+        title: '',
         field: 'image',
         type: TrinaColumnType.text(),
-        enableSorting: false,
         enableFilterMenuItem: false,
         width: 80,
         renderer: (rendererContext) {
@@ -620,6 +619,15 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         stateManager?.setShowColumnFilter(true);
         final rows = _buildRows(widget.items);
         stateManager?.appendRows(rows);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted || stateManager == null) return;
+          final imageCol =
+              stateManager!.refColumns.firstWhere((c) => c.field == 'image');
+          final nameCol =
+              stateManager!.refColumns.firstWhere((c) => c.field == 'name');
+          stateManager!.toggleFrozenColumn(imageCol, TrinaColumnFrozen.start);
+          stateManager!.toggleFrozenColumn(nameCol, TrinaColumnFrozen.start);
+        });
       },
       onRowDoubleTap: (event) {
         final item = event.row.cells['item_object']!.value as InventoryItem;

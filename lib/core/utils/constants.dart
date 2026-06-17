@@ -733,6 +733,49 @@ class AppCurrencies {
   }
 }
 
+// ── Version Art (Sprite Vault) ──────────────────────────────────────────────
+
+/// An animated sprite tied to a major version of the app.
+///
+/// Each major version of Invenicum has its own mascot/theme webp.
+/// The current version's sprite is shown at the bottom of the sidebar,
+/// and all past (and present) sprites live in the Sprite Vault for
+/// users to browse, preview, and download.
+class VersionArt {
+  /// The version name as it appears in [Environment.mayorVersion] e.g. "Crazy Mad Doctor"
+  final String versionName;
+
+  /// Human-readable label e.g. "v0.0.0"
+  final String versionLabel;
+
+  /// Asset path e.g. "assets/images/doctorFred_dancing.webp"
+  final String assetPath;
+
+  /// Short description / flavour text.
+  final String description;
+
+  const VersionArt({
+    required this.versionName,
+    required this.versionLabel,
+    required this.assetPath,
+    this.description = '',
+  });
+
+  static const List<VersionArt> all = [
+    VersionArt(
+      versionName: 'Crazy Mad Doctor',
+      versionLabel: 'v0.0.0',
+      assetPath: 'assets/images/doctorFred_dancing.webp',
+      description: 'The original — a mad scientist dancing his way into your inventory.',
+    ),
+  ];
+
+  /// Look up the [VersionArt] whose [versionName] matches [name].
+  static VersionArt? findByName(String name) {
+    return all.where((a) => a.versionName == name).firstOrNull;
+  }
+}
+
 // ── Overlay Floating Images ─────────────────────────────────────────────────
 
 /// Vertical zone of the screen where the overlay image appears.

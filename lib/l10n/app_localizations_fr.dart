@@ -3400,37 +3400,37 @@ class AppLocalizationsFr extends AppLocalizations {
   String get dataExtractedSuccess => 'Données extraites avec succès';
 
   @override
-  String get scraperUrlLabel => 'URL to scrape';
+  String get scraperUrlLabel => 'URL à extraire';
 
   @override
   String get scraperUrlHint => 'https://example.com/item/123';
 
   @override
-  String get scraperNoScrapers => 'No scrapers configured for this container.';
+  String get scraperNoScrapers => 'Aucun scraper configuré pour ce conteneur.';
 
   @override
   String get scraperSelectLabel => 'Scraper';
 
   @override
-  String get scraperSelectHint => 'Select scraper';
+  String get scraperSelectHint => 'Sélectionner un scraper';
 
   @override
-  String get scraperExtract => 'Extract';
+  String get scraperExtract => 'Extraire';
 
   @override
   String scraperAutoDetected(String name) {
-    return 'Auto-detected: $name';
+    return 'Auto-détecté : $name';
   }
 
   @override
-  String get scraperImportTitle => 'Scraper Import';
+  String get scraperImportTitle => 'Import par scraper';
 
   @override
-  String get scraperClear => 'Clear';
+  String get scraperClear => 'Effacer';
 
   @override
-  String get hideToolbar => 'Hide';
+  String get hideToolbar => 'Masquer';
 
   @override
-  String get showToolbar => 'Show';
+  String get showToolbar => 'Afficher';
 }

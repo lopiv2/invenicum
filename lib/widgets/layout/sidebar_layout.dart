@@ -3,9 +3,11 @@ import 'package:go_router/go_router.dart';
 import 'package:invenicum/widgets/layout/sidebar_container_header.dart';
 import 'package:invenicum/widgets/ui/sidebar_nav_button.dart';
 import 'package:invenicum/widgets/layout/sidebar_tree_section.dart';
+import 'package:invenicum/widgets/layout/sprite_vault_dialog.dart';
 import 'package:invenicum/widgets/layout/webp_animator_version.dart';
 
 import 'package:invenicum/config/environment.dart';
+import 'package:invenicum/core/utils/constants.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/widgets/ui/stac_slot.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -58,6 +60,14 @@ class SidebarLayout extends StatelessWidget {
                   SliverList(
                     delegate: SliverChildListDelegate([
                       const Divider(indent: 16, endIndent: 16),
+                      SidebarNavButton(
+                        icon: Icons.videocam_rounded,
+                        title: 'Sprite Vault™',
+                        onTap: () => showDialog(
+                          context: context,
+                          builder: (_) => const SpriteVaultDialog(),
+                        ),
+                      ),
                       const StacSlot(slotName: 'left_sidebar'),
                       SidebarNavButton(
                         icon: Icons.emoji_events_outlined,
@@ -110,8 +120,8 @@ class SidebarLayout extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
               child: WebpAnimatorVersion(
-                assetPath: 'assets/images/doctorFred_dancing.webp',
-                versionText: 'v${Environment.appVersion}',
+                versionArt: VersionArt.findByName(Environment.mayorVersion) ??
+                    VersionArt.all.first,
               ),
             ),
           ],
