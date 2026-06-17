@@ -243,11 +243,9 @@ class AssetCountersRow extends StatelessWidget {
     );
   }
 
-  // Función para sumar los precios de mercado
   double _calculateTotalMarketValue(List<InventoryItem> items) {
     return items.fold(0.0, (sum, item) {
-      // Usamos el campo marketPrice del modelo InventoryItem
-      return sum + (item.totalMarketValue);
+      return sum + (item.marketValue * item.quantity);
     });
   }
 

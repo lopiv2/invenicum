@@ -335,7 +335,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       TrinaColumn(
         title: l10n.marketPriceLabel,
         field: 'marketValue',
-        type: TrinaColumnType.text(),
+        type: TrinaColumnType.number(),
         width: 150,
         renderer: (rendererContext) {
           // Usamos item_object para tener el enum real y mostrar el badge.
@@ -510,7 +510,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         'location': TrinaCell(value: item.location?.name ?? ''),
         'serialNumber': TrinaCell(value: item.serialNumber ?? ''),
         'barcode': TrinaCell(value: item.barcode ?? ''),
-        'marketValue': TrinaCell(value: item.marketValue.toString()),
+        'marketValue': TrinaCell(value: item.marketValue),
         // El valor de la celda DEBE ser el string localizado del select
         // para que TrinaGrid pueda filtrar correctamente con el dropdown.
         'condition': TrinaCell(
