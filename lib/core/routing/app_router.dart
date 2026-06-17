@@ -14,6 +14,7 @@ import 'package:invenicum/screens/templates/asset_template_editor_screen.dart';
 import 'package:invenicum/screens/templates/asset_templates_market_screen.dart';
 import 'package:invenicum/screens/integrations/integrations_screen.dart';
 import 'package:invenicum/screens/plugins/plugins_screen.dart';
+import 'package:invenicum/screens/sprite_vault/sprite_vault_screen.dart';
 import 'package:invenicum/screens/home/profile_screen.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/screens/achievements/achievements_screen.dart';
@@ -276,6 +277,11 @@ GoRouter createAppRouter(
             },
           ),
         ],
+      ),
+      GoRoute(
+        name: RouteNames.spriteVault,
+        path: '/sprite-vault',
+        builder: (context, state) => _layout(const SpriteVaultScreen()),
       ),
       GoRoute(
         name: RouteNames.plugins,

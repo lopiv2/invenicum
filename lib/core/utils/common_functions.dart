@@ -66,10 +66,7 @@ class AppUtils {
   static Future<void> copyToClipboard(BuildContext context, String text) async {
     await Clipboard.setData(ClipboardData(text: text));
     if (context.mounted) {
-      final l10n = AppLocalizations.of(context)!;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.copiedToClipboard)));
+      ToastService.success(AppLocalizations.of(context)!.copiedToClipboard);
     }
   }
 

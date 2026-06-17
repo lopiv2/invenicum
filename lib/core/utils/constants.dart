@@ -742,7 +742,7 @@ class AppCurrencies {
 /// and all past (and present) sprites live in the Sprite Vault for
 /// users to browse, preview, and download.
 class VersionArt {
-  /// The version name as it appears in [Environment.mayorVersion] e.g. "Crazy Mad Doctor"
+  /// The human-readable version name e.g. "Crazy Mad Doctor"
   final String versionName;
 
   /// Human-readable label e.g. "v0.0.0"
@@ -754,25 +754,51 @@ class VersionArt {
   /// Short description / flavour text.
   final String description;
 
+  /// Display size for the sprite in the sidebar (square, in logical pixels).
+  final double size;
+
   const VersionArt({
     required this.versionName,
     required this.versionLabel,
     required this.assetPath,
     this.description = '',
+    this.size = 100,
   });
 
   static const List<VersionArt> all = [
     VersionArt(
+      versionName: 'The Powerful Man',
+      versionLabel: 'v1.0.0',
+      assetPath: 'assets/images/He-man.webp',
+      description: 'By the power of Grayskull, your inventory has never been more organized. '
+          'The most powerful man in the universe vanquishes clutter with a single swing.',
+      size: 200,
+    ),
+    VersionArt(
       versionName: 'Crazy Mad Doctor',
-      versionLabel: 'v0.0.0',
+      versionLabel: 'v1.1.0',
       assetPath: 'assets/images/doctorFred_dancing.webp',
-      description: 'The original — a mad scientist dancing his way into your inventory.',
+      description: 'The original and crazy mad scientist dancing his way into your inventory.',
+      size: 200,
     ),
   ];
 
   /// Look up the [VersionArt] whose [versionName] matches [name].
   static VersionArt? findByName(String name) {
     return all.where((a) => a.versionName == name).firstOrNull;
+  }
+
+  /// Derive the [VersionArt] from a semver [appVersion] (e.g. `"1.1.2"`).
+  ///
+  /// Extracts `major.minor` and matches against [versionLabel] (e.g. `"v1.1.0"`).
+  /// Returns `null` if no entry matches.
+  static VersionArt? findByVersion(String appVersion) {
+    final parts = appVersion.split('.');
+    if (parts.length >= 2) {
+      final majorMinor = 'v${parts[0]}.${parts[1]}';
+      return all.where((a) => a.versionLabel.startsWith(majorMinor)).firstOrNull;
+    }
+    return null;
   }
 }
 

@@ -45,6 +45,7 @@ import 'package:invenicum/data/services/voucher_service.dart';
 import 'package:invenicum/data/services/dashboard_service.dart';
 import 'package:invenicum/data/services/preferences_service.dart';
 import 'package:invenicum/data/services/report_service.dart';
+import 'package:invenicum/config/environment.dart';
 
 final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -68,6 +69,8 @@ void main() async {
   // a notifyListeners() at the end, avoiding redirect evaluations
   // with partial state that caused the setup→login→setup loop.
   final authProvider = AuthProvider(tokenAlreadyInitialized: true);
+
+  await Environment.init();
 
   runApp(
     MultiProvider(

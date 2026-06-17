@@ -3,65 +3,54 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/utils/constants.dart';
+import '../../data/services/toast_service.dart';
 
-class SpriteVaultDialog extends StatefulWidget {
-  const SpriteVaultDialog({super.key});
+class SpriteVaultScreen extends StatefulWidget {
+  const SpriteVaultScreen({super.key});
 
   @override
-  State<SpriteVaultDialog> createState() => _SpriteVaultDialogState();
+  State<SpriteVaultScreen> createState() => _SpriteVaultScreenState();
 }
 
-class _SpriteVaultDialogState extends State<SpriteVaultDialog> {
+class _SpriteVaultScreenState extends State<SpriteVaultScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
 
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
-      child: Container(
-        width: 640,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: scheme.surface,
-        ),
-        clipBehavior: Clip.antiAlias,
+    return Scaffold(
+      backgroundColor: scheme.surface,
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(32, 24, 32, 24),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildHeader(context, scheme),
-            const Divider(height: 1),
+            Row(
+              children: [
+                FaIcon(FontAwesomeIcons.skull, color: scheme.primary, size: 28),
+                const SizedBox(width: 12),
+                Text(
+                  'Sprite Vault™',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Browse and preview every major-version sprite.',
+              style: TextStyle(color: scheme.onSurfaceVariant),
+            ),
+            const Divider(height: 32),
             Expanded(child: _buildGrid(context, scheme)),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, ColorScheme scheme) {
-    final t = Theme.of(context);
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 8, 12),
-      child: Row(
-        children: [
-          Icon(Icons.videocam_rounded, color: scheme.primary, size: 24),
-          const SizedBox(width: 12),
-          Text(
-            'Sprite Vault™',
-            style: t.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: scheme.onSurface,
-            ),
-          ),
-          const Spacer(),
-          IconButton(
-            icon: const Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-        ],
       ),
     );
   }
@@ -85,7 +74,7 @@ class _SpriteVaultDialogState extends State<SpriteVaultDialog> {
         final art = arts[index];
         return _SpriteCard(
           art: art,
-          isCurrent: false,
+          isCurrent: index == arts.length - 1,
           onTap: () => _openPreview(context, art),
         );
       },
@@ -116,7 +105,7 @@ class _SpriteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final size = 100.0;
+    final size = art.size;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -175,7 +164,7 @@ class _SpriteCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      art.versionName,
+                      '"${art.versionName}"',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -260,22 +249,12 @@ class _SpritePreviewState extends State<_SpritePreview> {
         await launchUrl(uri);
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Saved to ${file.path}'),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
+          ToastService.success('Saved to ${file.path}');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Could not save: $e'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+        ToastService.error('Could not save: $e');
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -284,7 +263,7 @@ class _SpritePreviewState extends State<_SpritePreview> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size.width * 0.5;
+    final size = MediaQuery.of(context).size.width * 0.25;
 
     return Scaffold(
       backgroundColor: Colors.black87,
@@ -317,45 +296,48 @@ class _SpritePreviewState extends State<_SpritePreview> {
         ],
       ),
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: _buildImage(size),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              widget.art.versionLabel,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.white.withValues(alpha: 0.7),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: _buildImage(size),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              widget.art.versionName,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            if (widget.art.description.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 40),
-                child: Text(
-                  widget.art.description,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white.withValues(alpha: 0.6),
-                  ),
+              const SizedBox(height: 24),
+              Text(
+                widget.art.versionLabel,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white.withValues(alpha: 0.7),
                 ),
               ),
+              const SizedBox(height: 4),
+              Text(
+                '"${widget.art.versionName}"',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              if (widget.art.description.isNotEmpty) ...[
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  child: Text(
+                    maxLines: 3,
+                    widget.art.description,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white.withValues(alpha: 0.6),
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

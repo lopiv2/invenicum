@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/scraper.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/providers/scraper_provider.dart';
 import 'package:invenicum/screens/scrapers/shared/scraper_test_mixin.dart';
 import 'package:provider/provider.dart';
@@ -91,8 +92,7 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
       if (!mounted) return;
       context.go('/container/${widget.containerId}/scrapers');
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
+      ToastService.error('Error: $e');
     }
   }
 
