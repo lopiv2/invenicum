@@ -1740,13 +1740,13 @@
   },
   "@dataExtractedSuccess": {},
   "dataExtractedSuccess": "Données extraites avec succès",
-  "scraperUrlLabel": "URL to scrape",
+  "scraperUrlLabel": "URL à extraire",
   "scraperUrlHint": "https://example.com/item/123",
-  "scraperNoScrapers": "No scrapers configured for this container.",
+  "scraperNoScrapers": "Aucun scraper configuré pour ce conteneur.",
   "scraperSelectLabel": "Scraper",
-  "scraperSelectHint": "Select scraper",
-  "scraperExtract": "Extract",
-  "scraperAutoDetected": "Auto-detected: {name}",
+  "scraperSelectHint": "Sélectionner un scraper",
+  "scraperExtract": "Extraire",
+  "scraperAutoDetected": "Auto-détecté : {name}",
   "@scraperAutoDetected": {
     "placeholders": {
       "name": {
@@ -1754,8 +1754,8 @@
       }
     }
   },
-  "scraperImportTitle": "Scraper Import",
-  "scraperClear": "Clear",
-  "hideToolbar": "Hide",
-  "showToolbar": "Show"
+  "scraperImportTitle": "Import par scraper",
+  "scraperClear": "Effacer",
+  "hideToolbar": "Masquer",
+  "showToolbar": "Afficher"
 }
