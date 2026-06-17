@@ -16,6 +16,10 @@ class SidebarNavButton extends StatelessWidget {
   /// se ignora. Útil para rutas anidadas o lógica especial.
   final bool? selectedOverride;
 
+  /// Widget de icono alternativo (p.ej. FaIcon de FontAwesome).
+  /// Si se proporciona, reemplaza al [icon] por defecto.
+  final Widget? customIcon;
+
   const SidebarNavButton({
     super.key,
     required this.icon,
@@ -24,6 +28,7 @@ class SidebarNavButton extends StatelessWidget {
     this.routeName,
     this.selectedOverride,
     this.compact = false,
+    this.customIcon,
   });
 
   @override
@@ -56,13 +61,24 @@ class SidebarNavButton extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(
-                icon,
-                size: 20,
-                color: selected
-                    ? colorScheme.primary
-                    : colorScheme.onSurfaceVariant,
-              ),
+              if (customIcon != null)
+                IconTheme(
+                  data: IconThemeData(
+                    size: 20,
+                    color: selected
+                        ? colorScheme.primary
+                        : colorScheme.onSurfaceVariant,
+                  ),
+                  child: customIcon!,
+                )
+              else
+                Icon(
+                  icon,
+                  size: 20,
+                  color: selected
+                      ? colorScheme.primary
+                      : colorScheme.onSurfaceVariant,
+                ),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(

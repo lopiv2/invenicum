@@ -56,11 +56,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
         _jsonError = null;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(AppLocalizations.of(context)!.cannotFormatInvalidJson),
-        ),
-      );
+      ToastService.error(AppLocalizations.of(context)!.cannotFormatInvalidJson);
     }
   }
 

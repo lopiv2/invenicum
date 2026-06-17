@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/widgets/layout/sidebar_container_header.dart';
 import 'package:invenicum/widgets/ui/sidebar_nav_button.dart';
 import 'package:invenicum/widgets/layout/sidebar_tree_section.dart';
-import 'package:invenicum/widgets/layout/sprite_vault_dialog.dart';
 import 'package:invenicum/widgets/layout/webp_animator_version.dart';
 
 import 'package:invenicum/config/environment.dart';
@@ -61,12 +61,11 @@ class SidebarLayout extends StatelessWidget {
                     delegate: SliverChildListDelegate([
                       const Divider(indent: 16, endIndent: 16),
                       SidebarNavButton(
-                        icon: Icons.videocam_rounded,
+                        icon: Icons.collections,
                         title: 'Sprite Vault™',
-                        onTap: () => showDialog(
-                          context: context,
-                          builder: (_) => const SpriteVaultDialog(),
-                        ),
+                        routeName: RouteNames.spriteVault,
+                        onTap: () => context.goNamed(RouteNames.spriteVault),
+                        customIcon: const FaIcon(FontAwesomeIcons.skull),
                       ),
                       const StacSlot(slotName: 'left_sidebar'),
                       SidebarNavButton(
@@ -120,8 +119,9 @@ class SidebarLayout extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
               child: WebpAnimatorVersion(
-                versionArt: VersionArt.findByName(Environment.mayorVersion) ??
-                    VersionArt.all.first,
+                versionArt: VersionArt.findByVersion(Environment.appVersion) ??
+                    VersionArt.all.last,
+                appVersion: Environment.appVersion,
               ),
             ),
           ],

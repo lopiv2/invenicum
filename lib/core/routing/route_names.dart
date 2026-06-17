@@ -26,6 +26,9 @@ abstract class RouteNames {
   static const templateCreate  = 'templateCreate'; // nested: templates/create
   static const templateDetail  = 'templateDetail'; // nested: templates/details/:templateId
 
+  // ── Sprite Vault ──────────────────────────────────────────────────────────
+  static const spriteVault     = 'spriteVault';    // path: /sprite-vault
+
   // ── Plugins ──────────────────────────────────────────────────────────────
   static const plugins         = 'plugins';        // path: /plugins-admin
   static const pluginDetail    = 'pluginDetail';   // path: /plugins/:pluginId

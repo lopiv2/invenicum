@@ -8,11 +8,13 @@ import '../../core/utils/constants.dart';
 class WebpAnimatorVersion extends StatefulWidget {
   final VersionArt versionArt;
   final double? size;
+  final String? appVersion;
 
   const WebpAnimatorVersion({
     super.key,
     required this.versionArt,
     this.size,
+    this.appVersion,
   });
 
   @override
@@ -50,7 +52,7 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final size = widget.size ?? MediaQuery.of(context).size.width / 6;
+    final size = widget.versionArt.size;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +62,9 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '${widget.versionArt.versionLabel} ${widget.versionArt.versionName}',
+              widget.appVersion != null
+                  ? 'v${widget.appVersion} "${widget.versionArt.versionName}"'
+                  : '${widget.versionArt.versionLabel} "${widget.versionArt.versionName}"',
               style: TextStyle(
                 fontSize: 14,
                 color: colorScheme.outline,
@@ -88,6 +92,7 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
         widget.versionArt.assetPath,
         width: size,
         height: size,
+        fit: BoxFit.contain,
       );
     }
     if (_firstFrame != null) {
@@ -95,7 +100,7 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
         width: size,
         height: size,
         child: FittedBox(
-          fit: BoxFit.scaleDown,
+          fit: BoxFit.contain,
           child: RawImage(image: _firstFrame!),
         ),
       );

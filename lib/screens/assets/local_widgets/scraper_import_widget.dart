@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/scraper.dart';
 import 'package:invenicum/data/services/scraper_service.dart';
+import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -113,9 +114,7 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
       widget.onResults(results);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+        ToastService.error('Error: $e');
       }
     } finally {
       if (mounted) setState(() => _loading = false);
