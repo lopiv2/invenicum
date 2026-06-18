@@ -829,6 +829,8 @@ enum AnimationDirection {
   /// Sprite faces right by convention. Movement direction is random;
   /// the image is flipped when moving left.
   alternate,
+  /// Walks around the screen border: bottom → right → top → left → repeat.
+  borderWalk,
 }
 
 /// Whether and how the sprite can randomly turn around mid-animation.
@@ -841,3 +843,5 @@ enum TurnMode {
   /// fully random delay. [turnMinDelay] and [turnMaxDelay] are ignored.
   random,
 }
+
+

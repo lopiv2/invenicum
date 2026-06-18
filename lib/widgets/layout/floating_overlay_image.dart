@@ -10,10 +10,7 @@ import 'package:invenicum/data/models/overlay_image_config_model.dart';
 class FloatingOverlayImage extends StatefulWidget {
   final List<OverlayImageConfig> configs;
 
-  const FloatingOverlayImage({
-    super.key,
-    required this.configs,
-  });
+  const FloatingOverlayImage({super.key, required this.configs});
 
   @override
   State<FloatingOverlayImage> createState() => _FloatingOverlayImageState();
@@ -21,20 +18,32 @@ class FloatingOverlayImage extends StatefulWidget {
 
 class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
   OverlayImageConfig? _currentConfig;
-  double _verticalFraction = 0;
   bool _isActive = false;
   bool _moveRightToLeft = false;
-  double _originX = 0;
-  double _targetX = 0;
   double _dx = 0;
   int _turnCount = 0;
   Timer? _animTimer;
   Timer? _turnTimer;
   bool _disposed = false;
+  bool _needsBorderFlip = false;
+  bool _needsVerticalFlip = false;
   final Random _rng = Random();
 
-  // Notifier aislado: solo reconstruye el Positioned, no el widget imagen.
+  // ─── Horizontal mode state ──────────────────────────────────────────────────
+  double _verticalFraction = 0;
+  double _originX = 0;
+  double _targetX = 0;
   final ValueNotifier<double> _xNotifier = ValueNotifier(0);
+
+  // ─── Border-walk mode state ────────────────────────────────────────────────
+  final ValueNotifier<Offset> _posNotifier = ValueNotifier(Offset.zero);
+  double _segOrigin = 0; // starting position on current axis
+  double _segTarget = 0; // target position on current axis
+  double _segDx = 0; // per-tick step on current axis
+  String _segAxis = 'x'; // 'x' or 'y'
+  double _rotationAngle = 0;
+
+  // ─── Shared ─────────────────────────────────────────────────────────────────
 
   // Cache del widget imagen para evitar que se reconstruya (y parpadee) en cada tick.
   Widget? _cachedImage;
@@ -54,9 +63,11 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
   @override
   void didUpdateWidget(FloatingOverlayImage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final wasEmpty =
-        oldWidget.configs.where((c) => c.enabled).isEmpty;
-    if (!_isActive && _currentConfig == null && _activeConfigs.isNotEmpty && wasEmpty) {
+    final wasEmpty = oldWidget.configs.where((c) => c.enabled).isEmpty;
+    if (!_isActive &&
+        _currentConfig == null &&
+        _activeConfigs.isNotEmpty &&
+        wasEmpty) {
       _scheduleNext();
     }
   }
@@ -67,6 +78,7 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
     _turnTimer?.cancel();
     _animTimer?.cancel();
     _xNotifier.dispose();
+    _posNotifier.dispose();
     super.dispose();
   }
 
@@ -94,6 +106,8 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
         moveRightToLeft = true;
       case AnimationDirection.alternate:
         moveRightToLeft = _rng.nextBool();
+      case AnimationDirection.borderWalk:
+        moveRightToLeft = false;
     }
 
     double verticalFraction;
@@ -115,7 +129,9 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
     setState(() {
       _currentConfig = config;
       _moveRightToLeft = moveRightToLeft;
-      _verticalFraction = verticalFraction;
+      if (config.direction != AnimationDirection.borderWalk) {
+        _verticalFraction = verticalFraction;
+      }
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => _startFirstSegment());
@@ -166,8 +182,8 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
     final relative = path.startsWith('/images/')
         ? path.substring(8)
         : path.startsWith('images/')
-            ? path.substring(7)
-            : path;
+        ? path.substring(7)
+        : path;
 
     return Image.network(
       '${Environment.apiUrl}/images/$relative',
@@ -184,6 +200,21 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
   void _startFirstSegment() {
     if (_disposed || !mounted || _currentConfig == null) return;
 
+    final isBorderWalk =
+        _currentConfig!.direction == AnimationDirection.borderWalk;
+
+    if (isBorderWalk) {
+      _startBorderWalk();
+    } else {
+      _startHorizontal();
+    }
+  }
+
+  // ─── Horizontal mode ────────────────────────────────────────────────────────
+
+  void _startHorizontal() {
+    if (_disposed || !mounted || _currentConfig == null) return;
+
     final w = MediaQuery.of(context).size.width;
     final imgSize = _currentConfig!.imageSize;
     final startX = _moveRightToLeft ? w + imgSize : -imgSize;
@@ -196,11 +227,11 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
 
     setState(() => _isActive = true);
 
-    _launchTicker();
+    _launchHorizontalTicker();
     _startTurnTimer();
   }
 
-  void _launchTicker() {
+  void _launchHorizontalTicker() {
     _animTimer?.cancel();
 
     final totalPx = (_targetX - _originX).abs();
@@ -213,10 +244,13 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
 
     _dx = (totalPx / totalTicks) * (_targetX > _originX ? 1 : -1);
 
-    _animTimer = Timer.periodic(Duration(milliseconds: tickMs), _onTick);
+    _animTimer = Timer.periodic(
+      Duration(milliseconds: tickMs),
+      _onHorizontalTick,
+    );
   }
 
-  void _onTick(Timer t) {
+  void _onHorizontalTick(Timer t) {
     if (_disposed || !_isActive) {
       t.cancel();
       return;
@@ -224,17 +258,155 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
 
     _xNotifier.value += _dx;
 
-    final crossed =
-        _dx > 0 ? _xNotifier.value >= _targetX : _xNotifier.value <= _targetX;
+    final crossed = _dx > 0
+        ? _xNotifier.value >= _targetX
+        : _xNotifier.value <= _targetX;
 
     if (crossed) {
       _xNotifier.value = _targetX;
       t.cancel();
-      _onSegmentEnd();
+      _endCurrent();
     }
   }
 
-  void _onSegmentEnd() {
+  // ─── Border-walk mode ──────────────────────────────────────────────────────
+
+  void _startBorderWalk() {
+    if (_disposed || !mounted || _currentConfig == null) return;
+
+    final screenW = MediaQuery.of(context).size.width;
+    final screenH = MediaQuery.of(context).size.height;
+    final imgSize = _currentConfig!.imageSize;
+
+    // Pick a random edge: 0=bottom, 1=right, 2=top, 3=left
+    final edge = _rng.nextInt(4);
+    // Pick direction: 0=forward (clockwise), 1=backward (counter-clockwise)
+    final forward = _rng.nextBool();
+
+    _posNotifier.value = Offset.zero;
+    _turnCount = 0;
+
+    switch (edge) {
+      case 0: // Bottom edge
+        _segAxis = 'x';
+        _needsVerticalFlip = false;
+        if (forward) {
+          _segOrigin = -imgSize;
+          _segTarget = screenW;
+          _posNotifier.value = Offset(-imgSize, screenH - imgSize);
+          _rotationAngle = 0;
+          _needsBorderFlip = false;
+        } else {
+          _segOrigin = screenW;
+          _segTarget = -imgSize;
+          _posNotifier.value = Offset(screenW, screenH - imgSize);
+          _rotationAngle = 0;
+          _needsBorderFlip = true; // solo flip horizontal, sin rotar
+        }
+        break;
+      case 1: // Right edge
+        _segAxis = 'y';
+        _needsVerticalFlip = false;
+        if (forward) {
+          _segOrigin = -imgSize;
+          _segTarget = screenH;
+          _posNotifier.value = Offset(screenW - imgSize, -imgSize);
+          _rotationAngle = pi / 2;
+          _needsBorderFlip = true; // cabeza a la izquierda bajando
+        } else {
+          _segOrigin = screenH;
+          _segTarget = -imgSize;
+          _posNotifier.value = Offset(screenW - imgSize, screenH);
+          _rotationAngle = -pi / 2; // mismo ángulo
+          _needsBorderFlip = false; // sin flip subiendo
+        }
+        break;
+      case 2: // Top edge
+        _segAxis = 'x';
+        _needsVerticalFlip = true;
+        if (forward) {
+          _segOrigin = -imgSize;
+          _segTarget = screenW;
+          _posNotifier.value = Offset(-imgSize, 0);
+          _rotationAngle = 0;
+          _needsBorderFlip = false;
+        } else {
+          _segOrigin = screenW;
+          _segTarget = -imgSize;
+          _posNotifier.value = Offset(screenW, 0);
+          _rotationAngle = 0;
+          _needsBorderFlip = true;
+        }
+        break;
+      case 3: // Left edge
+        _segAxis = 'y';
+        _needsVerticalFlip = false;
+        if (forward) {
+          _segOrigin = -imgSize;
+          _segTarget = screenH;
+          _posNotifier.value = Offset(0, -imgSize);
+          _rotationAngle = pi / 2;
+          _needsBorderFlip = false;
+        } else {
+          _segOrigin = screenH;
+          _segTarget = -imgSize;
+          _posNotifier.value = Offset(0, screenH);
+          _rotationAngle = -pi / 2;
+          _needsBorderFlip = true;
+        }
+        break;
+    }
+
+    _setupBorderWalkTicker();
+    setState(() => _isActive = true);
+  }
+
+  void _setupBorderWalkTicker() {
+    _animTimer?.cancel();
+
+    final totalPx = (_segTarget - _segOrigin).abs();
+    if (totalPx <= 0) return;
+
+    final fps = _currentConfig!.animationFps.clamp(1, 120);
+    final tickMs = 1000 ~/ fps;
+
+    // Calcular píxeles por segundo basándose en screenWidth como referencia
+    final screenW = MediaQuery.of(context).size.width;
+    final screenH = MediaQuery.of(context).size.height;
+    final refDistance = screenW + screenH; // perímetro parcial de referencia
+    final totalDurationMs = _currentConfig!.speed.inMilliseconds;
+    final pxPerTick = (refDistance / totalDurationMs) * tickMs;
+
+    _segDx = pxPerTick * (_segTarget > _segOrigin ? 1 : -1);
+
+    _animTimer = Timer.periodic(
+      Duration(milliseconds: tickMs),
+      _onBorderWalkTick,
+    );
+  }
+
+  void _onBorderWalkTick(Timer t) {
+    if (_disposed || !_isActive) {
+      t.cancel();
+      return;
+    }
+
+    final cur = _posNotifier.value;
+    final newVal = (_segAxis == 'x' ? cur.dx : cur.dy) + _segDx;
+    final crossed = _segDx > 0 ? newVal >= _segTarget : newVal <= _segTarget;
+
+    if (crossed) {
+      t.cancel();
+      _endCurrent();
+    } else {
+      final updated = _segAxis == 'x'
+          ? Offset(newVal, cur.dy)
+          : Offset(cur.dx, newVal);
+      _posNotifier.value = updated;
+    }
+  }
+
+  void _endCurrent() {
     _turnTimer?.cancel();
     if (_disposed || !mounted) return;
     setState(() {
@@ -245,6 +417,8 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
   }
 
   void _startTurnTimer() {
+    // Border walk doesn't use turn mode
+    if (_currentConfig?.direction == AnimationDirection.borderWalk) return;
     final mode = _currentConfig?.turnMode;
     if (mode == null || mode == TurnMode.off) return;
     if (_turnCount >= _currentConfig!.maxTurns) return;
@@ -288,32 +462,45 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
   Widget build(BuildContext context) {
     if (!_isActive || _currentConfig == null) return const SizedBox.shrink();
 
+    final isBorderWalk =
+        _currentConfig!.direction == AnimationDirection.borderWalk;
+
     Widget image = _cachedImage ?? const SizedBox.shrink();
 
-    if (_needsFlip) {
+    if (isBorderWalk) {
       image = Transform.scale(
-        scaleX: -1,
+        scaleY: _needsVerticalFlip ? -1 : 1,
+        scaleX: _needsBorderFlip ? -1 : 1,
         alignment: Alignment.center,
-        child: image,
+        child: Transform.rotate(angle: _rotationAngle, child: image),
       );
     }
 
     return LayoutBuilder(
       builder: (context, constraints) {
+        if (isBorderWalk) {
+          return Stack(
+            clipBehavior: Clip.none,
+            children: [
+              ValueListenableBuilder<Offset>(
+                valueListenable: _posNotifier,
+                builder: (_, pos, child) =>
+                    Positioned(top: pos.dy, left: pos.dx, child: child!),
+                child: image,
+              ),
+            ],
+          );
+        }
+
         final top = constraints.maxHeight * _verticalFraction;
 
         return Stack(
           clipBehavior: Clip.none,
           children: [
-            // ValueListenableBuilder reconstruye SOLO el Positioned en cada tick,
-            // no el widget imagen → el WebP/GIF nunca se interrumpe.
             ValueListenableBuilder<double>(
               valueListenable: _xNotifier,
-              builder: (_, x, child) => Positioned(
-                top: top,
-                left: x,
-                child: child!,
-              ),
+              builder: (_, x, child) =>
+                  Positioned(top: top, left: x, child: child!),
               child: image,
             ),
           ],

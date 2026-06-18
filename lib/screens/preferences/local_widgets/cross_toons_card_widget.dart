@@ -283,7 +283,14 @@ class CrossToonsCardWidget extends StatelessWidget {
                         return DropdownMenuItem(value: d, child: Text(d.name));
                       }).toList(),
                       onChanged: (v) {
-                        if (v != null) setDialogState(() => direction = v);
+                        if (v != null) {
+                          setDialogState(() {
+                            direction = v;
+                            if (v == AnimationDirection.borderWalk) {
+                              zone = OverlayZone.bottom;
+                            }
+                          });
+                        }
                       },
                     ),
                     const SizedBox(height: 12),
@@ -296,9 +303,11 @@ class CrossToonsCardWidget extends StatelessWidget {
                       items: OverlayZone.values.map((z) {
                         return DropdownMenuItem(value: z, child: Text(z.name));
                       }).toList(),
-                      onChanged: (v) {
-                        if (v != null) setDialogState(() => zone = v);
-                      },
+                      onChanged: direction == AnimationDirection.borderWalk
+                          ? null
+                          : (v) {
+                              if (v != null) setDialogState(() => zone = v);
+                            },
                     ),
                     const SizedBox(height: 12),
                     TextField(
@@ -432,7 +441,6 @@ class _PreviewAnimation extends StatefulWidget {
   final double imageSize;
   final Duration speed;
   final AnimationDirection direction;
-
   const _PreviewAnimation({
     super.key,
     required this.image,
@@ -551,7 +559,9 @@ class _PreviewAnimationState extends State<_PreviewAnimation>
                           ? Icons.arrow_forward
                           : widget.direction == AnimationDirection.rightToLeft
                               ? Icons.arrow_back
-                              : Icons.swap_horiz,
+                              : widget.direction == AnimationDirection.borderWalk
+                                  ? Icons.rotate_90_degrees_ccw_outlined
+                                  : Icons.swap_horiz,
                       size: 14,
                       color:
                           Theme.of(context).hintColor.withValues(alpha: 0.4),
@@ -608,6 +618,9 @@ class _PreviewAnimationState extends State<_PreviewAnimation>
         } else {
           return containerWidth - total * ((value - 0.5) * 2);
         }
+      case AnimationDirection.borderWalk:
+        // For border walk in the horizontal preview, just center the sprite
+        return (containerWidth - imgSize) / 2;
     }
   }
 }

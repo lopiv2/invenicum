@@ -34,6 +34,7 @@ class OverlayImageConfig {
 
   /// Vertical zone of the screen where the image appears.
   ///
+  /// Ignored when [direction] is [AnimationDirection.borderWalk].
   /// Defaults to [OverlayZone.bottom].
   final OverlayZone zone;
 
