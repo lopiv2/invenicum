@@ -186,6 +186,13 @@ class InventoryItemProvider with ChangeNotifier {
 
     final hasCachedValue = _itemsCache.containsKey(key);
     if (hasCachedValue && _isCacheEntryFresh(key)) {
+      final cached = _itemsCache[key]!;
+      _aggregationDefinitions = List<dynamic>.from(
+        cached.aggregationDefinitions,
+      );
+      _aggregationResults = Map<String, dynamic>.from(
+        cached.aggregationResults,
+      );
       _isLoading = false;
       notifyListeners();
       return;
