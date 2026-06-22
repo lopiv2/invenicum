@@ -74,7 +74,9 @@ class Scraper {
     final createdAtRaw = json['created_at'] ?? json['createdAt'];
     DateTime? createdAt;
     try {
-      if (createdAtRaw != null) createdAt = DateTime.tryParse(createdAtRaw.toString());
+      if (createdAtRaw != null) {
+        createdAt = DateTime.tryParse(createdAtRaw.toString());
+      }
     } catch (_) {
       createdAt = null;
     }
@@ -86,7 +88,10 @@ class Scraper {
       urlPattern: json['url_pattern'] ?? json['urlPattern'],
       createdAt: createdAt,
       fields: fieldsJson is List
-          ? fieldsJson.where((e) => e is Map<String, dynamic>).map((e) => ScraperField.fromJson(e as Map<String, dynamic>)).toList()
+          ? fieldsJson
+                .whereType<Map<String, dynamic>>()
+                .map((e) => ScraperField.fromJson(e))
+                .toList()
           : [],
     );
   }

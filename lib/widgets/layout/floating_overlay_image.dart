@@ -52,7 +52,6 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
 
   // El asset siempre mira a la derecha por defecto.
   // Solo hay que voltear cuando el movimiento es hacia la izquierda.
-  bool get _needsFlip => _moveRightToLeft;
 
   @override
   void initState() {
@@ -164,7 +163,7 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
         height: size,
         fit: BoxFit.contain,
         gaplessPlayback: true,
-        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        errorBuilder: (_, _, _) => const SizedBox.shrink(),
       );
     }
 
@@ -175,7 +174,7 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
         height: size,
         fit: BoxFit.contain,
         gaplessPlayback: true,
-        errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+        errorBuilder: (_, _, _) => const SizedBox.shrink(),
       );
     }
 
@@ -191,7 +190,7 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
       height: size,
       fit: BoxFit.contain,
       gaplessPlayback: true,
-      errorBuilder: (_, __, ___) => const SizedBox.shrink(),
+      errorBuilder: (_, _, _) => const SizedBox.shrink(),
     );
   }
 

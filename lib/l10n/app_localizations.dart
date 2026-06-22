@@ -742,6 +742,24 @@ abstract class AppLocalizations {
   /// **'Collection'**
   String get collectionLabel;
 
+  /// No description provided for @standardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get standardLabel;
+
+  /// No description provided for @possessionDesiredOnlyInCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Possession and wishlist fields can only be configured inside collection containers.'**
+  String get possessionDesiredOnlyInCollection;
+
+  /// No description provided for @collectionFieldsOnlyForNonSerialized.
+  ///
+  /// In en, this message translates to:
+  /// **'Collection fields can only be assigned to non-serialized types.'**
+  String get collectionFieldsOnlyForNonSerialized;
+
   /// No description provided for @collectionsLabel.
   ///
   /// In en, this message translates to:
@@ -3531,6 +3549,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} elements'**
   String elementsCount(int count);
+
+  /// No description provided for @assetCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} assets'**
+  String assetCount(int count);
 
   /// No description provided for @dataListNeedsAtLeastOneElement.
   ///

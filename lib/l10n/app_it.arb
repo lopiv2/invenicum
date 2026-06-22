@@ -307,6 +307,9 @@
   "collectionContainerInfo": "I contenitori di raccolta dispongono di barre di rilevamento della raccolta, valore investito, valore di mercato e visualizzazione della mostra",
   "collectionFieldsConfigured": "Campi di raccolta configurati.",
   "collectionLabel": "Collezione",
+  "standardLabel": "Standard",
+  "possessionDesiredOnlyInCollection": "I campi di possesso e desideri possono essere configurati solo all'interno di contenitori di raccolta.",
+  "collectionFieldsOnlyForNonSerialized": "I campi di raccolta possono essere assegnati solo a tipi non serializzati.",
   "collectionsLabel": "Collezioni",
   "condition": "Condizione",
   "condition_mint": "scatola originale",
@@ -888,6 +891,14 @@
   "noCustomListsCreateOne": "Non sono presenti elenchi personalizzati. Creane uno nuovo.",
   "elementsCount": "{count} elementi",
   "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetCount": "{count} beni",
+  "@assetCount": {
     "placeholders": {
       "count": {
         "type": "int"

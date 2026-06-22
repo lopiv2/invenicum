@@ -49,8 +49,8 @@ class AssetListHeader extends StatelessWidget {
             child: Image.network(
               fullImageUrl,
               height: isMobile ? 48 : 80,
-              width: isMobile ? 48 : 80,
-              fit: BoxFit.cover,
+              width: isMobile ? 48 : 256,
+              fit: BoxFit.contain,
               errorBuilder: (_, _, _) => _assetTypeName(theme, isMobile),
             ),
           )

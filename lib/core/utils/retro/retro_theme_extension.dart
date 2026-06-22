@@ -20,6 +20,7 @@ import 'package:invenicum/core/utils/retro/retro_theme.dart';
 /// Read:
 ///
 /// final retro = Theme.of(context)
+// ignore: unintended_html_in_doc_comment
 ///     .extension<RetroThemeExtension>()
 ///     ?.retro;
 ///

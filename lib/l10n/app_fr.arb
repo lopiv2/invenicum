@@ -307,6 +307,9 @@
   "collectionContainerInfo": "Les conteneurs de collection ont des barres de suivi de collection, une valeur investie, une valeur marchande et une vue d'exposition",
   "collectionFieldsConfigured": "Champs de collection configurés.",
   "collectionLabel": "Collection",
+  "standardLabel": "Standard",
+  "possessionDesiredOnlyInCollection": "Les champs de possession et de souhait ne peuvent être configurés que dans des conteneurs de collection.",
+  "collectionFieldsOnlyForNonSerialized": "Les champs de collection ne peuvent être attribués qu'à des types non sérialisés.",
   "collectionsLabel": "Collections",
   "condition": "État",
   "condition_mint": "Boîte d'origine",
@@ -888,6 +891,14 @@
   "noCustomListsCreateOne": "Il n'y a pas de listes personnalisées. Créez-en une nouvelle.",
   "elementsCount": "{count} éléments",
   "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetCount": "{count} actifs",
+  "@assetCount": {
     "placeholders": {
       "count": {
         "type": "int"

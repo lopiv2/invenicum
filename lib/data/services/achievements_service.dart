@@ -21,11 +21,7 @@ class AchievementService {
     try {
       final response = await _dio.post(
         '/achievements/event',
-        data: {
-          'type': type,
-          'value': value,
-          if (metadata != null) 'metadata': metadata,
-        },
+        data: {'type': type, 'value': value, 'metadata': ?metadata},
       );
       final data = response.data['data'];
       final newUnlocks = data['newUnlocks'] as List? ?? [];

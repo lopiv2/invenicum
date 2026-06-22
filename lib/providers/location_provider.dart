@@ -7,30 +7,28 @@ import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/data/services/location_service.dart';
 import 'package:provider/provider.dart';
 
-/// Un Provider (ChangeNotifier) para manejar el estado de las Ubicaciones.
-/// Utiliza LocationService para la comunicación con la API.
+/// A Provider (ChangeNotifier) for managing Location state.
+/// Uses LocationService for API communication.
 class LocationProvider with ChangeNotifier {
   final LocationService _locationService;
 
-  // Estado
+  // State
   List<Location> _locations = [];
   bool _isLoading = false;
   String? _errorMessage;
 
-  // Constructor que recibe el servicio mediante inyección de dependencia
+  // Constructor that receives the service via dependency injection
   LocationProvider(this._locationService);
 
-  // Getters para acceder al estado
+  // Getters to access state
   List<Location> get locations => _locations;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  // --- Métodos de CRUD y Fetch ---
+  // --- CRUD and Fetch Methods ---
 
-  /**
-   * Carga todas las ubicaciones de un contenedor específico.
-   * @param containerId El ID del contenedor.
-   */
+  /// Loads all locations for a specific container.
+  /// @param containerId The container ID.
   Future<void> fetchLocations(int containerId) async {
     _isLoading = true;
     _errorMessage = null;
@@ -42,7 +40,7 @@ class LocationProvider with ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       if (kDebugMode) {
-        debugPrint('Error al cargar ubicaciones: $_errorMessage');
+        debugPrint('Error loading locations: $_errorMessage');
       }
     } finally {
       _isLoading = false;
@@ -50,9 +48,7 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  /**
-   * Crea una nueva ubicación y la añade a la lista local.
-   */
+  /// Creates a new location and adds it to the local list.
   Future<Location?> createLocation({
     required BuildContext context,
     required int containerId,
@@ -74,23 +70,21 @@ class LocationProvider with ChangeNotifier {
       await fetchLocations(containerId);
       final containerProvider = context.read<ContainerProvider>();
       await containerProvider.loadDataLists(containerId);
-      // Si la creación fue exitosa, la añadimos al estado local y notificamos.
+      // If creation was successful, add it to local state and notify.
       return newLocation;
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
-      rethrow; // Relanzar para que el widget pueda manejar errores específicos (ej. validación)
+      rethrow; // Rethrow so the widget can handle specific errors (e.g., validation)
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
-  /**
-   * Actualiza una ubicación y refresca la lista local.
-   */
+  /// Updates a location and refreshes the local list.
   Future<Location?> updateLocation({
-    required BuildContext context, // 🔑 Añadido BuildContext
-    required int containerId, // 🔑 Añadido containerId para la sincronización
+    required BuildContext context, // 🔑 Added BuildContext
+    required int containerId, // 🔑 Added containerId for synchronization
     required int locationId,
     required String name,
     String? description,
@@ -108,17 +102,17 @@ class LocationProvider with ChangeNotifier {
         parentId: parentId,
       );
 
-      // 1. Actualizar la lista local
+      // 1. Update the local list
       final index = _locations.indexWhere((loc) => loc.id == locationId);
       if (index != -1) {
         _locations[index] = updatedLocation;
       }
 
-      // 2. Notificar al ContainerProvider sobre el posible cambio en la estructura/conteo
+      // 2. Notify ContainerProvider about the possible change in structure/count
       final containerProvider = context.read<ContainerProvider>();
       await containerProvider.loadDataLists(
         containerId,
-      ); // Sincroniza las ubicaciones
+      ); // Syncs the locations
 
       return updatedLocation;
     } catch (e) {
@@ -130,14 +124,12 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  /**
-   * Elimina una ubicación y la remueve de la lista local.
-   */
+  /// Deletes a location and removes it from the local list.
   Future<void> deleteLocation(
     int locationId, {
     required int
-    containerId, // 🔑 Añadir containerId para saber qué contenedor actualizar
-    required BuildContext context, // 🔑 Añadir BuildContext
+    containerId, // 🔑 Add containerId to know which container to update
+    required BuildContext context, // 🔑 Add BuildContext
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -146,16 +138,16 @@ class LocationProvider with ChangeNotifier {
     try {
       await _locationService.deleteLocation(locationId);
 
-      // Remover de la lista local
+      // Remove from local list
       _locations.removeWhere((loc) => loc.id == locationId);
 
-      // 🔑 PASO CLAVE: Notificar al ContainerProvider sobre el cambio
+      // 🔑 KEY STEP: Notify ContainerProvider about the change
       final containerProvider = context.read<ContainerProvider>();
 
-      // Llamamos al método que ya existe y que recarga las ubicaciones del contenedor.
+      // Call the existing method that reloads the container's locations.
       await containerProvider.loadDataLists(
         containerId,
-      ); // Esto actualiza la lista 'locations' del ContainerNode y su length.
+      ); // This updates the 'locations' list of the ContainerNode and its length.
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
       rethrow;
@@ -165,9 +157,7 @@ class LocationProvider with ChangeNotifier {
     }
   }
 
-  /**
-   * Limpia el estado de las ubicaciones (útil al cambiar de contenedor o cerrar sesión).
-   */
+  /// Clears the location state (useful when switching containers or logging out).
   void clearState() {
     _locations = [];
     _isLoading = false;

@@ -355,6 +355,17 @@ class AppLocalizationsPt extends AppLocalizations {
   String get collectionLabel => 'Coleção';
 
   @override
+  String get standardLabel => 'Padrão';
+
+  @override
+  String get possessionDesiredOnlyInCollection =>
+      'Os campos de posse e desejados só podem ser configurados dentro de contêineres de coleção.';
+
+  @override
+  String get collectionFieldsOnlyForNonSerialized =>
+      'Os campos de coleção só podem ser atribuídos a tipos não serializados.';
+
+  @override
   String get collectionsLabel => 'Coleções';
 
   @override
@@ -1902,6 +1913,11 @@ class AppLocalizationsPt extends AppLocalizations {
   @override
   String elementsCount(int count) {
     return '$count elementos';
+  }
+
+  @override
+  String assetCount(int count) {
+    return '$count ativos';
   }
 
   @override

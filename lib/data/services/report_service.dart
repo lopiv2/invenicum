@@ -11,7 +11,7 @@ class ReportService {
   ReportService(this._apiService);
 
   /// Solicita la generación de un informe al backend y lo descarga
-  /// 
+  ///
   /// [containerId] - ID del contenedor
   /// [reportType] - Tipo de informe: 'inventory', 'loans', 'assets'
   /// [format] - Formato: 'pdf' o 'excel'
@@ -23,19 +23,13 @@ class ReportService {
     Map<String, dynamic>? filters,
   }) async {
     try {
-      final queryParams = {
-        'type': reportType,
-        'format': format,
-        if (filters != null) ...filters,
-      };
+      final queryParams = {'type': reportType, 'format': format, ...?filters};
 
       // Solicitar al backend con responseType: arraybuffer para descargar binarios
       final response = await _dio.get(
         '/reports/generate/$containerId',
         queryParameters: queryParams,
-        options: Options(
-          responseType: ResponseType.bytes,
-        ),
+        options: Options(responseType: ResponseType.bytes),
       );
 
       if (response.statusCode == 200 && response.data != null) {
@@ -57,7 +51,7 @@ class ReportService {
   }
 
   /// Obtiene la vista previa de un informe
-  /// 
+  ///
   /// [containerId] - ID del contenedor
   /// [reportType] - Tipo de informe
   Future<String?> getReportPreview({
@@ -84,9 +78,7 @@ class ReportService {
     required int containerId,
   }) async {
     try {
-      final response = await _dio.get(
-        '/reports/history/$containerId',
-      );
+      final response = await _dio.get('/reports/history/$containerId');
 
       final List<dynamic> data = response.data['data'] ?? [];
       return data.cast<Map<String, dynamic>>();
@@ -96,20 +88,17 @@ class ReportService {
   }
 
   /// Descarga un reporte previamente generado por su ID
-  Future<void> downloadReport({
-    required int reportId,
-  }) async {
+  Future<void> downloadReport({required int reportId}) async {
     try {
       final response = await _dio.get(
         '/reports/download/$reportId',
-        options: Options(
-          responseType: ResponseType.bytes,
-        ),
+        options: Options(responseType: ResponseType.bytes),
       );
 
       if (response.statusCode == 200 && response.data != null) {
         final bytes = Uint8List.fromList(response.data as List<int>);
-        final fileName = response.headers.value('content-disposition') ??
+        final fileName =
+            response.headers.value('content-disposition') ??
             'reporte_$reportId.pdf';
         _downloadFile(bytes, fileName, _getMimeType('pdf'));
       }
@@ -119,9 +108,7 @@ class ReportService {
   }
 
   /// Elimina un reporte del historial
-  Future<void> deleteReport({
-    required int reportId,
-  }) async {
+  Future<void> deleteReport({required int reportId}) async {
     try {
       await _dio.delete('/reports/$reportId');
     } on DioException catch (e) {
@@ -134,34 +121,33 @@ class ReportService {
   // ========================
 
   /// Descarga un archivo en el navegador
-  static void _downloadFile(
-  Uint8List bytes,
-  String fileName,
-  String mimeType,
-) {
-  // 1. Convertir la lista de Dart a un Array de JS y envolverlo en un Blob
-  // package:web requiere que los datos sean JSAny
-  final blob = web.Blob(
-    [bytes.toJS].toJS, 
-    web.BlobPropertyBag(type: mimeType),
-  );
+  static void _downloadFile(Uint8List bytes, String fileName, String mimeType) {
+    // 1. Convertir la lista de Dart a un Array de JS y envolverlo en un Blob
+    // package:web requiere que los datos sean JSAny
+    final blob = web.Blob(
+      [bytes.toJS].toJS,
+      web.BlobPropertyBag(type: mimeType),
+    );
 
-  // 2. Generar la URL (En package:web se usa web.URL, no web.Url)
-  final url = web.URL.createObjectURL(blob);
+    // 2. Generar la URL (En package:web se usa web.URL, no web.Url)
+    final url = web.URL.createObjectURL(blob);
 
-  // 3. Crear el elemento Anchor usando el documento
-  final anchor = web.document.createElement('a') as web.HTMLAnchorElement;
-  anchor.href = url;
-  anchor.download = fileName;
+    // 3. Crear el elemento Anchor usando el documento
+    final anchor = web.document.createElement('a') as web.HTMLAnchorElement;
+    anchor.href = url;
+    anchor.download = fileName;
 
-  // 4. Disparar la descarga y limpiar
-  anchor.click();
-  web.URL.revokeObjectURL(url);
-}
+    // 4. Disparar la descarga y limpiar
+    anchor.click();
+    web.URL.revokeObjectURL(url);
+  }
 
   /// Genera un nombre de archivo basado en el tipo y formato
   static String _generateFileName(String reportType, String format) {
-    final timestamp = DateTime.now().toIso8601String().replaceAll(':', '').split('.')[0];
+    final timestamp = DateTime.now()
+        .toIso8601String()
+        .replaceAll(':', '')
+        .split('.')[0];
     final extension = format == 'pdf' ? 'pdf' : 'xlsx';
     return 'informe_${reportType}_$timestamp.$extension';
   }
