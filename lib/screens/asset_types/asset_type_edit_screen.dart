@@ -111,7 +111,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
   // --- Lógica de archivos y campos (Mantenida igual) ---
 
   Future<void> _addImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.image,
       allowMultiple: false,
       withData: true,

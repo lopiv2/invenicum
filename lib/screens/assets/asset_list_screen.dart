@@ -302,10 +302,10 @@ class _AssetListScreenState extends State<AssetListScreen>
         rows.add(row);
       }
 
-      final csvContent = const ListToCsvConverter(
+      final csvContent = Csv(
         fieldDelimiter: ';',
-        eol: '\n',
-      ).convert(rows);
+        lineDelimiter: '\n',
+      ).encode(rows);
 
       final bytes = Uint8List.fromList(utf8.encode(csvContent));
       final time = DateTime.now().toIso8601String().replaceAll(':', '-');
@@ -315,7 +315,7 @@ class _AssetListScreenState extends State<AssetListScreen>
           .replaceAll(RegExp(r'[^A-Za-z0-9_\-]'), '');
       final fileName = 'assets_${safeTypeName}_$time.csv';
 
-      final savedPath = await FilePicker.platform.saveFile(
+      final savedPath = await FilePicker.saveFile(
         dialogTitle: l10n.exportLabel,
         fileName: fileName,
         type: FileType.custom,
