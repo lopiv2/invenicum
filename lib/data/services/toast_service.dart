@@ -116,7 +116,7 @@ class ToastService {
     entry = OverlayEntry(
       builder: (_) => ValueListenableBuilder<double>(
         valueListenable: topNotifier,
-        builder: (_, top, __) => _AchievementToastOverlay(
+        builder: (_, top, _) => _AchievementToastOverlay(
           message: message,
           duration: const Duration(seconds: 8),
           topOffset: top,
@@ -140,7 +140,8 @@ class ToastService {
 
   static void _rebuildAll() {
     for (int i = 0; i < _activeEntries.length; i++) {
-      _activeEntries[i].topNotifier.value = _topBase + i * (_toastHeight + _gap);
+      _activeEntries[i].topNotifier.value =
+          _topBase + i * (_toastHeight + _gap);
     }
   }
 

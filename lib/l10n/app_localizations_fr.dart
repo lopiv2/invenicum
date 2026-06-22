@@ -356,6 +356,17 @@ class AppLocalizationsFr extends AppLocalizations {
   String get collectionLabel => 'Collection';
 
   @override
+  String get standardLabel => 'Standard';
+
+  @override
+  String get possessionDesiredOnlyInCollection =>
+      'Les champs de possession et de souhait ne peuvent être configurés que dans des conteneurs de collection.';
+
+  @override
+  String get collectionFieldsOnlyForNonSerialized =>
+      'Les champs de collection ne peuvent être attribués qu\'à des types non sérialisés.';
+
+  @override
   String get collectionsLabel => 'Collections';
 
   @override
@@ -1910,6 +1921,11 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String elementsCount(int count) {
     return '$count éléments';
+  }
+
+  @override
+  String assetCount(int count) {
+    return '$count actifs';
   }
 
   @override

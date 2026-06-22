@@ -86,7 +86,7 @@ class IntegrationService {
           'query': query,
           'source': source,
           'locale': locale,
-          if (page != null) 'page': page,
+          'page': ?page,
           'pageSize': pageSize,
           if (dropdownContext != null)
             'fieldOptions': jsonEncode(dropdownContext),

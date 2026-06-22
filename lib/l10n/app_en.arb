@@ -307,6 +307,9 @@
   "collectionContainerInfo": "Collection containers have collection tracking bars, invested value, market value and Exhibition view",
   "collectionFieldsConfigured": "Collection fields configured.",
   "collectionLabel": "Collection",
+  "standardLabel": "Standard",
+  "possessionDesiredOnlyInCollection": "Possession and wishlist fields can only be configured inside collection containers.",
+  "collectionFieldsOnlyForNonSerialized": "Collection fields can only be assigned to non-serialized types.",
   "collectionsLabel": "Collections",
   "condition": "Condition",
   "condition_mint": "Mint (Original box)",
@@ -888,6 +891,14 @@
   "noCustomListsCreateOne": "There are no custom lists. Create a new one.",
   "elementsCount": "{count} elements",
   "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetCount": "{count} assets",
+  "@assetCount": {
     "placeholders": {
       "count": {
         "type": "int"

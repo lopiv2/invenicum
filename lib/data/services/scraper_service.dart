@@ -12,7 +12,7 @@ class ScraperService {
     try {
       final response = await _dio.get(
         '/scrapers',
-        queryParameters: {if (containerId != null) 'containerId': containerId},
+        queryParameters: {'containerId': ?containerId},
       );
 
       if (response.statusCode == 200) {
@@ -24,8 +24,8 @@ class ScraperService {
           list = data;
         }
         return list
-            .where((e) => e is Map<String, dynamic>)
-            .map((e) => Scraper.fromJson(e as Map<String, dynamic>))
+            .whereType<Map<String, dynamic>>()
+            .map((e) => Scraper.fromJson(e))
             .toList();
       }
       throw Exception('Error fetching scrapers: ${response.statusCode}');
@@ -47,8 +47,8 @@ class ScraperService {
       final payload = {
         'name': name,
         'url': url,
-        if (urlPattern != null) 'urlPattern': urlPattern,
-        if (containerId != null) 'containerId': containerId,
+        'urlPattern': ?urlPattern,
+        'containerId': ?containerId,
         'fields': fields ?? [],
       };
 
@@ -82,7 +82,7 @@ class ScraperService {
       final payload = {
         'name': name,
         'url': url,
-        if (urlPattern != null) 'urlPattern': urlPattern,
+        'urlPattern': ?urlPattern,
         'fields': fields ?? [],
       };
 
@@ -125,12 +125,13 @@ class ScraperService {
     try {
       final response = await _dio.post(
         '/scrapers/$scraperId/fields',
-        data: {'name': name, 'xpath': xpath, if (order != null) 'order': order},
+        data: {'name': name, 'xpath': xpath, 'order': ?order},
       );
       if (response.statusCode == 201 || response.statusCode == 200) {
         final data = response.data;
-        if (data is Map<String, dynamic> && data.containsKey('data'))
+        if (data is Map<String, dynamic> && data.containsKey('data')) {
           return data['data'] as Map<String, dynamic>;
+        }
         if (data is Map<String, dynamic>) return data;
       }
       throw Exception('Error adding field: ${response.statusCode}');
@@ -153,16 +154,17 @@ class ScraperService {
   }) async {
     try {
       final payload = {
-        if (name != null) 'name': name,
+        'name': ?name,
         'url': url,
-        if (urlPattern != null) 'urlPattern': urlPattern,
+        'urlPattern': ?urlPattern,
         'fields': fields ?? [],
       };
       final response = await _dio.post('/scrapers/run-ad-hoc', data: payload);
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data;
-        if (data is Map<String, dynamic> && data.containsKey('data'))
+        if (data is Map<String, dynamic> && data.containsKey('data')) {
           return data['data'] as Map<String, dynamic>;
+        }
         if (data is Map<String, dynamic>) return data;
         return {'result': data};
       }
@@ -197,11 +199,7 @@ class ScraperService {
       url: testUrl,
       urlPattern: urlPattern,
       fields: [
-        {
-          'name': fieldName,
-          'xpath': fieldXpath,
-          'order': fieldOrder,
-        },
+        {'name': fieldName, 'xpath': fieldXpath, 'order': fieldOrder},
       ],
     );
   }

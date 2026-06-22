@@ -59,35 +59,41 @@ class CrossToonsCardWidget extends StatelessWidget {
               )
             else
               ...customConfigs.asMap().entries.map(
-                    (entry) => _CrossToonTile(
-                      index: entry.key,
-                      config: entry.value,
-                      onEdit: entry.value.isDefault
-                          ? null
-                          : () => _editCrossToon(
-                                context, prefsProv, entry.key, entry.value,
-                              ),
-                      onDelete: entry.value.isDefault
-                          ? null
-                          : () async {
-                              final confirmed = await showAppConfirmDialog(
-                                context: context,
-                                title: l10n.crossToonsDeleteConfirm,
-                                message: l10n.crossToonsDeleteConfirmMessage(
-                                  entry.value.imagePath.split('/').last,
-                                ),
-                                confirmLabel: l10n.delete,
-                                destructive: true,
-                              );
-                              if (confirmed && context.mounted) {
-                                prefsProv.removeCrossToonConfig(entry.key);
-                              }
-                            },
-                      onToggle: entry.value.isDefault
-                          ? null
-                          : (v) => prefsProv.toggleCrossToonEnabled(entry.key, v ?? false),
-                    ),
-                  ),
+                (entry) => _CrossToonTile(
+                  index: entry.key,
+                  config: entry.value,
+                  onEdit: entry.value.isDefault
+                      ? null
+                      : () => _editCrossToon(
+                          context,
+                          prefsProv,
+                          entry.key,
+                          entry.value,
+                        ),
+                  onDelete: entry.value.isDefault
+                      ? null
+                      : () async {
+                          final confirmed = await showAppConfirmDialog(
+                            context: context,
+                            title: l10n.crossToonsDeleteConfirm,
+                            message: l10n.crossToonsDeleteConfirmMessage(
+                              entry.value.imagePath.split('/').last,
+                            ),
+                            confirmLabel: l10n.delete,
+                            destructive: true,
+                          );
+                          if (confirmed && context.mounted) {
+                            prefsProv.removeCrossToonConfig(entry.key);
+                          }
+                        },
+                  onToggle: entry.value.isDefault
+                      ? null
+                      : (v) => prefsProv.toggleCrossToonEnabled(
+                          entry.key,
+                          v ?? false,
+                        ),
+                ),
+              ),
           ],
         ),
       ),
@@ -100,29 +106,24 @@ class CrossToonsCardWidget extends StatelessWidget {
       withData: true,
     );
     if (result != null && result.files.first.bytes != null) {
-      return (
-        bytes: result.files.first.bytes!,
-        name: result.files.first.name,
-      );
+      return (bytes: result.files.first.bytes!, name: result.files.first.name);
     }
     return null;
   }
 
   void _addCrossToon(BuildContext context, PreferencesProvider prefsProv) {
-    _showConfigDialog(
-      context,
-      prefsProv,
-      null,
-      null,
-      ({required Uint8List? bytes, required String? name, required OverlayImageConfig config}) async {
-        if (bytes == null || name == null) return;
-        await prefsProv.addCrossToonConfig(
-          imageBytes: bytes,
-          imageName: name,
-          config: config,
-        );
-      },
-    );
+    _showConfigDialog(context, prefsProv, null, null, ({
+      required Uint8List? bytes,
+      required String? name,
+      required OverlayImageConfig config,
+    }) async {
+      if (bytes == null || name == null) return;
+      await prefsProv.addCrossToonConfig(
+        imageBytes: bytes,
+        imageName: name,
+        config: config,
+      );
+    });
   }
 
   void _editCrossToon(
@@ -131,20 +132,18 @@ class CrossToonsCardWidget extends StatelessWidget {
     int index,
     OverlayImageConfig config,
   ) {
-    _showConfigDialog(
-      context,
-      prefsProv,
-      config,
-      index,
-      ({required Uint8List? bytes, required String? name, required OverlayImageConfig config}) async {
-        await prefsProv.updateCrossToonConfig(
-          index: index,
-          config: config,
-          imageBytes: bytes,
-          imageName: name,
-        );
-      },
-    );
+    _showConfigDialog(context, prefsProv, config, index, ({
+      required Uint8List? bytes,
+      required String? name,
+      required OverlayImageConfig config,
+    }) async {
+      await prefsProv.updateCrossToonConfig(
+        index: index,
+        config: config,
+        imageBytes: bytes,
+        imageName: name,
+      );
+    });
   }
 
   void _showConfigDialog(
@@ -156,7 +155,8 @@ class CrossToonsCardWidget extends StatelessWidget {
       required Uint8List? bytes,
       required String? name,
       required OverlayImageConfig config,
-    }) onSave,
+    })
+    onSave,
   ) {
     final speedCtrl = TextEditingController(
       text: (existing?.speed.inSeconds ?? 30).toString(),
@@ -209,15 +209,18 @@ class CrossToonsCardWidget extends StatelessWidget {
               if (path.startsWith('assets/') || path.startsWith('images/')) {
                 return AssetImage(path);
               }
-              final normalized =
-                  path.startsWith('/images/') ? path.substring(8) : path;
+              final normalized = path.startsWith('/images/')
+                  ? path.substring(8)
+                  : path;
               return NetworkImage('${Environment.apiUrl}/images/$normalized');
             }
 
             return AlertDialog(
-              title: Text(existing != null
-                  ? l10n.crossToonsConfigure
-                  : l10n.crossToonsAddNew),
+              title: Text(
+                existing != null
+                    ? l10n.crossToonsConfigure
+                    : l10n.crossToonsAddNew,
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -398,7 +401,8 @@ class CrossToonsCardWidget extends StatelessWidget {
                 FilledButton(
                   onPressed: () async {
                     if (existing == null &&
-                        (pickedBytes == null || pickedName == null)) return;
+                        (pickedBytes == null || pickedName == null))
+                      return;
                     final config = OverlayImageConfig(
                       imagePath: existing?.imagePath ?? '',
                       direction: direction,
@@ -442,7 +446,6 @@ class _PreviewAnimation extends StatefulWidget {
   final Duration speed;
   final AnimationDirection direction;
   const _PreviewAnimation({
-    super.key,
     required this.image,
     required this.imageSize,
     required this.speed,
@@ -558,13 +561,12 @@ class _PreviewAnimationState extends State<_PreviewAnimation>
                       widget.direction == AnimationDirection.leftToRight
                           ? Icons.arrow_forward
                           : widget.direction == AnimationDirection.rightToLeft
-                              ? Icons.arrow_back
-                              : widget.direction == AnimationDirection.borderWalk
-                                  ? Icons.rotate_90_degrees_ccw_outlined
-                                  : Icons.swap_horiz,
+                          ? Icons.arrow_back
+                          : widget.direction == AnimationDirection.borderWalk
+                          ? Icons.rotate_90_degrees_ccw_outlined
+                          : Icons.swap_horiz,
                       size: 14,
-                      color:
-                          Theme.of(context).hintColor.withValues(alpha: 0.4),
+                      color: Theme.of(context).hintColor.withValues(alpha: 0.4),
                     ),
                   ),
                   // Imagen con flip según dirección de movimiento
@@ -595,10 +597,7 @@ class _PreviewAnimationState extends State<_PreviewAnimation>
         const SizedBox(height: 4),
         Text(
           '${widget.direction.name} · ${widget.speed.inSeconds}s',
-          style: TextStyle(
-            fontSize: 11,
-            color: Theme.of(context).hintColor,
-          ),
+          style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor),
         ),
       ],
     );
@@ -670,17 +669,14 @@ class _StaticPreviewState extends State<StaticPreview> {
   Future<void> _resolve() async {
     final stream = widget.image.resolve(ImageConfiguration.empty);
     final completer = Completer<void>();
-    final listener = ImageStreamListener(
-      (info, _) {
-        if (!_loaded) {
-          _info = info;
-          _loaded = true;
-          if (mounted) setState(() {});
-        }
-        completer.complete();
-      },
-      onError: (_, __) => completer.complete(),
-    );
+    final listener = ImageStreamListener((info, _) {
+      if (!_loaded) {
+        _info = info;
+        _loaded = true;
+        if (mounted) setState(() {});
+      }
+      completer.complete();
+    }, onError: (_, __) => completer.complete());
     stream.addListener(listener);
     await completer.future;
     stream.removeListener(listener);
@@ -727,17 +723,12 @@ class _CrossToonTile extends StatelessWidget {
   Widget _buildPreview(String path) {
     if (path.startsWith('data:')) {
       return StaticPreview(
-        image: MemoryImage(
-          Uint8List.fromList(path.split(',').last.codeUnits),
-        ),
+        image: MemoryImage(Uint8List.fromList(path.split(',').last.codeUnits)),
         fit: BoxFit.cover,
       );
     }
     if (path.startsWith('images/') || path.startsWith('assets/')) {
-      return StaticPreview(
-        image: AssetImage(path),
-        fit: BoxFit.contain,
-      );
+      return StaticPreview(image: AssetImage(path), fit: BoxFit.contain);
     }
     final normalized = path.startsWith('/images/') ? path.substring(8) : path;
     return StaticPreview(
@@ -757,49 +748,57 @@ class _CrossToonTile extends StatelessWidget {
           color: Theme.of(context).dividerColor.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: Material(type: MaterialType.transparency, child: ListTile(
-          dense: true,
-          leading: ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: SizedBox(
-              width: 40,
-              height: 40,
-              child: _buildPreview(config.imagePath),
+        child: Material(
+          type: MaterialType.transparency,
+          child: ListTile(
+            dense: true,
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: SizedBox(
+                width: 40,
+                height: 40,
+                child: _buildPreview(config.imagePath),
+              ),
             ),
-          ),
-          title: Text(fileName, style: const TextStyle(fontSize: 14)),
-          subtitle: Text(
-            '${config.direction.name} · ${config.zone.name} · ${config.speed.inSeconds}s',
-            style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor),
-          ),
-          trailing: config.isDefault
-              ? Icon(Icons.lock_outline,
-                  size: 16, color: Theme.of(context).hintColor)
-              : Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Tooltip(
-                      message: l10n.disable,
-                      child: Checkbox(
-                        value: config.enabled,
-                        onChanged: onToggle,
+            title: Text(fileName, style: const TextStyle(fontSize: 14)),
+            subtitle: Text(
+              '${config.direction.name} · ${config.zone.name} · ${config.speed.inSeconds}s',
+              style: TextStyle(
+                fontSize: 11,
+                color: Theme.of(context).hintColor,
+              ),
+            ),
+            trailing: config.isDefault
+                ? Icon(
+                    Icons.lock_outline,
+                    size: 16,
+                    color: Theme.of(context).hintColor,
+                  )
+                : Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Tooltip(
+                        message: l10n.disable,
+                        child: Checkbox(
+                          value: config.enabled,
+                          onChanged: onToggle,
+                        ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 18),
-                      onPressed: onEdit,
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.delete_outline,
-                        size: 18,
-                        color: Theme.of(context).colorScheme.error,
+                      IconButton(
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        onPressed: onEdit,
                       ),
-                      onPressed: onDelete,
-                    ),
-                  ],
-                ),
-        ),
+                      IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.error,
+                        ),
+                        onPressed: onDelete,
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

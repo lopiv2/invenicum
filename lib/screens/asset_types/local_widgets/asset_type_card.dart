@@ -8,8 +8,9 @@ import 'package:invenicum/data/services/toast_service.dart';
 import 'package:provider/provider.dart';
 import 'package:invenicum/providers/container_provider.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
+import 'package:invenicum/screens/asset_types/local_widgets/action_button.dart';
 
-class AssetTypeCard extends StatelessWidget {
+class AssetTypeCard extends StatefulWidget {
   final String containerId;
   final AssetType assetType;
   final int assetCount;
@@ -27,7 +28,36 @@ class AssetTypeCard extends StatelessWidget {
     this.onEdit,
   });
 
-  // --- MÉTODOS DE LÓGICA (Mantenidos igual para funcionalidad total) ---
+  @override
+  State<AssetTypeCard> createState() => _AssetTypeCardState();
+}
+
+class _AssetTypeCardState extends State<AssetTypeCard> {
+  bool _hovered = false;
+
+  // ─── Colores según tipo ───────────────────────────────────────────────────
+
+  Color get _accentColor => widget.isCollection ? Colors.green : Colors.blue;
+
+  Color get _accentContainer => widget.isCollection
+      ? Colors.green.withValues(alpha: 0.78)
+      : Colors.blue.withValues(alpha: 0.18);
+
+  Color get _onAccentContainer =>
+      widget.isCollection ? Colors.green.shade200 : Colors.blue.shade600;
+
+  LinearGradient get _badgeGradient {
+    final base = _accentColor;
+    final dark = Color.lerp(base, Colors.black, 0.35)!;
+    final light = Color.lerp(base, Colors.white, 0.25)!;
+    return LinearGradient(
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+      colors: [dark, base, light],
+    );
+  }
+
+  // ─── Lógica (sin cambios) ─────────────────────────────────────────────────
 
   Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
     return await showAppDialog<bool>(
@@ -36,9 +66,9 @@ class AssetTypeCard extends StatelessWidget {
           body: Text(
             AppLocalizations.of(
               context,
-            )!.confirmDeleteAssetType(assetType.name),
+            )!.confirmDeleteAssetType(widget.assetType.name),
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: Text(AppLocalizations.of(context)!.cancel),
@@ -61,25 +91,24 @@ class AssetTypeCard extends StatelessWidget {
   }
 
   void _showConfigureCollectionDialog(BuildContext context) async {
-    if (!isCollection) {
+    if (!widget.isCollection) {
       ToastService.error(
-        'Los campos de posesión y deseados solo se configuran dentro de contenedores de colección.',
+        AppLocalizations.of(context)!.possessionDesiredOnlyInCollection,
+      );
+      return;
+    }
+    if (widget.assetType.isSerialized) {
+      ToastService.error(
+        AppLocalizations.of(context)!.collectionFieldsOnlyForNonSerialized,
       );
       return;
     }
 
-    if (assetType.isSerialized) {
-      ToastService.error(
-        'Los campos de colección solo pueden asignarse a tipos no seriados. Cambia este tipo a no seriado antes de configurarlos.',
-      );
-      return;
-    }
+    String? possessionFieldId = widget.assetType.possessionFieldId;
+    String? desiredFieldId = widget.assetType.desiredFieldId;
 
-    String? possessionFieldId = assetType.possessionFieldId;
-    String? desiredFieldId = assetType.desiredFieldId;
-
-    final booleanFields = assetType.fieldDefinitions
-        .where((field) => field.type == CustomFieldType.boolean)
+    final booleanFields = widget.assetType.fieldDefinitions
+        .where((f) => f.type == CustomFieldType.boolean)
         .toList();
 
     if (!context.mounted) return;
@@ -88,7 +117,7 @@ class AssetTypeCard extends StatelessWidget {
       context: context,
       title: AppLocalizations.of(context)!.configureCollectionFields,
       body: StatefulBuilder(
-        builder: (context, setState) => SingleChildScrollView(
+        builder: (context, setDialogState) => SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +137,8 @@ class AssetTypeCard extends StatelessWidget {
                 context,
                 value: possessionFieldId,
                 fields: booleanFields,
-                onChanged: (val) => setState(() => possessionFieldId = val),
+                onChanged: (val) =>
+                    setDialogState(() => possessionFieldId = val),
               ),
               const SizedBox(height: 20),
               _buildDropdownLabel(AppLocalizations.of(context)!.desiredField),
@@ -116,7 +146,7 @@ class AssetTypeCard extends StatelessWidget {
                 context,
                 value: desiredFieldId,
                 fields: booleanFields,
-                onChanged: (val) => setState(() => desiredFieldId = val),
+                onChanged: (val) => setDialogState(() => desiredFieldId = val),
               ),
             ],
           ),
@@ -144,21 +174,24 @@ class AssetTypeCard extends StatelessWidget {
 
     if (result != null && context.mounted) {
       try {
-        final containerIdInt = int.tryParse(containerId);
+        final containerIdInt = int.tryParse(widget.containerId);
         if (containerIdInt == null) return;
-
         await context.read<ContainerProvider>().updateAssetTypeCollectionFields(
           containerId: containerIdInt,
-          assetTypeId: assetType.id,
+          assetTypeId: widget.assetType.id,
           possessionFieldId: result['possession'],
           desiredFieldId: result['desired'],
         );
-
         if (context.mounted) {
-          ToastService.success('Configuración guardada correctamente.');
+          ToastService.success(
+            AppLocalizations.of(context)!.configurationSaved,
+          );
         }
       } catch (e) {
-        if (context.mounted) ToastService.error('Error: $e');
+        if (context.mounted)
+          ToastService.error(
+            AppLocalizations.of(context)!.errorSaving(e.toString()),
+          );
       }
     }
   }
@@ -168,110 +201,75 @@ class AssetTypeCard extends StatelessWidget {
     if (confirmed) {
       try {
         await context.read<ContainerProvider>().deleteAssetType(
-          int.parse(containerId),
-          assetType.id,
+          int.parse(widget.containerId),
+          widget.assetType.id,
         );
         if (context.mounted) {
-          ToastService.success(AppLocalizations.of(context)!.assetTypeDeletedSuccess(assetType.name));
+          ToastService.success(
+            AppLocalizations.of(
+              context,
+            )!.assetTypeDeletedSuccess(widget.assetType.name),
+          );
         }
       } catch (e) {
-        if (context.mounted) ToastService.error(AppLocalizations.of(context)!.unknownError);
+        if (context.mounted) {
+          ToastService.error(AppLocalizations.of(context)!.unknownError);
+        }
       }
     }
   }
 
-  // --- DISEÑO ACTUALIZADO CON NOMBRE ARRIBA ---
-
-  
+  // ─── Build ────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isMobile = screenWidth < 600;
-    final isTablet = screenWidth >= 600 && screenWidth < 900;
-    
-    final indicatorColor = isCollection
-        ? Colors.lightGreen
-        : theme.primaryColor;
-    final fullImageUrl = assetType.images.isNotEmpty
-        ? AppUtils.buildImageUrl(assetType.images.first.url)
+    final hasImage = widget.assetType.images.isNotEmpty;
+    final fullImageUrl = hasImage
+        ? AppUtils.buildImageUrl(widget.assetType.images.first.url)
         : '';
-    
-    // Dimensiones responsivas
-    final imageWidth = isMobile ? 80.0 : (isTablet ? 100.0 : 110.0);
-    final cardHeight = isMobile ? 110.0 : 125.0;
-    final fontSize = isMobile ? 14.0 : 18.0;
-    final padding = isMobile ? 12.0 : 16.0;
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        border: Border(
-          bottom: BorderSide(
-            color: indicatorColor,
-            width: 4,
+    return MouseRegion(
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOut,
+        margin: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        transform: Matrix4.translationValues(0, _hovered ? -3 : 0, 0),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          color: theme.colorScheme.primaryContainer.withValues(alpha: 0.75),
+          border: Border.all(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
           ),
+          boxShadow: [
+            if (_hovered)
+              BoxShadow(
+                color: theme.colorScheme.shadow.withValues(alpha: 0.9),
+                blurRadius: 15,
+                offset: const Offset(0, 12),
+              ),
+            BoxShadow(
+              color: theme.colorScheme.shadow.withValues(alpha: 0.7),
+              blurRadius: _hovered ? 8 : 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Material(
-          color: theme.colorScheme.surfaceContainerHigh,
-          child: InkWell(
-            onTap: onTap,
-            child: SizedBox(
-              height: cardHeight,
-              child: Row(
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Material(
+            color: Colors.transparent, // necesario para InkWell
+            child: InkWell(
+              onTap: widget.onTap,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Imagen lateral - responsive
-                  _buildHeroImage(fullImageUrl, theme, imageWidth),
-
-                  // Contenido Principal
                   Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.all(padding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 1. NOMBRE
-                          Flexible(
-                            child: Text(
-                              assetType.name,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                fontSize: fontSize,
-                                letterSpacing: -0.5,
-                              ),
-                              maxLines: isMobile ? 1 : 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          // 2. NÚMERO DE ACTIVOS
-                          _buildAssetBadge(context, theme, isMobile),
-                          const SizedBox(height: 4),
-                          // 3. BOTONES
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: _buildActionRow(
-                              context,
-                              theme,
-                              isMobile,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    child: _buildImageSection(theme, hasImage, fullImageUrl),
                   ),
+                  _buildFooter(theme, hasImage),
                 ],
               ),
             ),
@@ -281,34 +279,207 @@ class AssetTypeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildHeroImage(
-    String url,
-    ThemeData theme,
-    double width,
-  ) {
-    return Container(
-      width: width,
-      height: double.infinity,
-      decoration: BoxDecoration(
-        color: theme.primaryColor.withValues(alpha: 0.05),
-      ),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          url.isNotEmpty
-              ? Image.network(
-                  url,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, _, _) => _buildPlaceholder(theme),
-                )
-              : _buildPlaceholder(theme),
+  // ─── Sección imagen ───────────────────────────────────────────────────────
+
+  Widget _buildImageSection(ThemeData theme, bool hasImage, String imageUrl) {
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (hasImage)
+          AnimatedScale(
+            scale: _hovered ? 1.04 : 1.0,
+            duration: const Duration(milliseconds: 300),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              color: theme.colorScheme.scrim.withValues(alpha: 0.15),
+              colorBlendMode: BlendMode.darken,
+              errorBuilder: (_, __, ___) => _buildPlaceholder(theme),
+            ),
+          )
+        else
+          _buildPlaceholder(theme),
+
+        if (hasImage)
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-                colors: [Colors.black12, Colors.transparent],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.transparent,
+                  theme.colorScheme.scrim.withValues(alpha: 0.72),
+                ],
+                stops: const [0.25, 1.0],
               ),
+            ),
+          ),
+
+        Positioned(
+          top: 10,
+          left: 10,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              gradient: _badgeGradient,
+              borderRadius: BorderRadius.circular(7),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.shadow.withValues(alpha: 0.22),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Text(
+              widget.isCollection
+                  ? AppLocalizations.of(context)!.collectionLabel.toUpperCase()
+                  : AppLocalizations.of(context)!.standardLabel.toUpperCase(),
+              style: TextStyle(
+                color: theme.colorScheme.onPrimary,
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.9,
+              ),
+            ),
+          ),
+        ),
+
+        if (hasImage)
+          Positioned(
+            bottom: 10,
+            left: 12,
+            right: 12,
+            child: Text(
+              widget.assetType.name,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.4,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    blurRadius: 6,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+
+        Positioned(
+          top: 8,
+          right: 8,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (widget.isCollection)
+                ActionButton(
+                  icon: Icons.tune_rounded,
+                  tooltip: AppLocalizations.of(
+                    context,
+                  )!.configureCollectionFields,
+                  hoverColor: theme.colorScheme.outline.withValues(alpha: 0.88),
+                  defaultColor: theme.colorScheme.onPrimary.withValues(
+                    alpha: 0.80,
+                  ),
+                  onPressed: () => _showConfigureCollectionDialog(context),
+                ),
+              ActionButton(
+                icon: Icons.edit_rounded,
+                tooltip: AppLocalizations.of(context)!.edit,
+                hoverColor: theme.colorScheme.secondary.withValues(alpha: 0.88),
+                defaultColor: theme.colorScheme.onPrimary.withValues(
+                  alpha: 0.80,
+                ),
+                onPressed: widget.onEdit,
+              ),
+              ActionButton(
+                icon: Icons.delete_outline_rounded,
+                tooltip: AppLocalizations.of(context)!.delete,
+                hoverColor: theme.colorScheme.error.withValues(alpha: 0.88),
+                defaultColor: theme.colorScheme.onPrimary.withValues(
+                  alpha: 0.80,
+                ),
+                onPressed: () => _handleDelete(context),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPlaceholder(ThemeData theme) {
+    return Container(
+      color: theme.colorScheme.surfaceContainerHighest,
+      child: Center(
+        child: Icon(
+          Icons.category_outlined,
+          size: 36,
+          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.25),
+        ),
+      ),
+    );
+  }
+
+  // ─── Footer ───────────────────────────────────────────────────────────────
+
+  Widget _buildFooter(ThemeData theme, bool hasImage) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: _accentColor.withValues(alpha: 0.06),
+        border: Border(top: BorderSide(color: _accentColor, width: 3)),
+      ),
+      child: Row(
+        children: [
+          if (!hasImage) ...[
+            Expanded(
+              child: Text(
+                widget.assetType.name,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 10),
+          ],
+          if (hasImage) const Spacer(),
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 3),
+            decoration: BoxDecoration(
+              color: _accentContainer,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: _accentColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  AppLocalizations.of(context)!.assetCount(widget.assetCount),
+                  style: TextStyle(
+                    color: _onAccentContainer,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -316,84 +487,7 @@ class AssetTypeCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPlaceholder(ThemeData theme) {
-    return Icon(
-      Icons.category_outlined,
-      color: theme.primaryColor.withValues(alpha: 0.2),
-      size: 35,
-    );
-  }
-
-  Widget _buildAssetBadge(
-    BuildContext context,
-    ThemeData theme,
-    bool isMobile,
-  ) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        horizontal: isMobile ? 6.0 : 10.0,
-        vertical: isMobile ? 3.0 : 4.0,
-      ),
-      decoration: BoxDecoration(
-        color: theme.primaryColor.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(
-        '$assetCount ${AppLocalizations.of(context)!.active}',
-        style: TextStyle(
-          fontSize: isMobile ? 11.0 : 12.0,
-          fontWeight: FontWeight.bold,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
-    );
-  }
-
-  Widget _buildActionRow(
-    BuildContext context,
-    ThemeData theme,
-    bool isMobile,
-  ) {
-    final buttonSize = isMobile ? 36.0 : 40.0;
-    final iconSize = isMobile ? 18.0 : 20.0;
-    
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (isCollection)
-          _CircleIconButton(
-            icon: Icons.tune_rounded,
-            color: Colors.orange,
-            size: buttonSize,
-            iconSize: iconSize,
-            onPressed: () => _showConfigureCollectionDialog(context),
-            tooltip: 'Campos de colección',
-          ),
-        const SizedBox(width: 4),
-        _CircleIconButton(
-          icon: Icons.edit_rounded,
-          color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-          size: buttonSize,
-          iconSize: iconSize,
-          onPressed: onEdit,
-          tooltip: 'Editar',
-        ),
-        const SizedBox(width: 4),
-        _CircleIconButton(
-          icon: Icons.delete_outline_rounded,
-          color: Colors.redAccent,
-          size: buttonSize,
-          iconSize: iconSize,
-          onPressed: () => _handleDelete(context),
-          tooltip: 'Eliminar',
-        ),
-      ],
-    );
-  }
-
-  // --- HELPERS PARA DIÁLOGOS ---
+  // ─── Helpers para diálogos ────────────────────────────────────────────────
 
   Widget _buildDropdownLabel(String label) {
     return Padding(
@@ -415,7 +509,10 @@ class AssetTypeCard extends StatelessWidget {
     if (fields.isEmpty) {
       return Text(
         AppLocalizations.of(context)!.noBooleanFields,
-        style: TextStyle(color: dropdownTheme.colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 13),
+        style: TextStyle(
+          color: dropdownTheme.colorScheme.onSurface.withValues(alpha: 0.5),
+          fontSize: 13,
+        ),
       );
     }
     return DropdownButtonFormField<String?>(
@@ -440,49 +537,6 @@ class AssetTypeCard extends StatelessWidget {
         ),
       ],
       onChanged: onChanged,
-    );
-  }
-}
-
-class _CircleIconButton extends StatelessWidget {
-  final IconData icon;
-  final Color color;
-  final VoidCallback? onPressed;
-  final String tooltip;
-  final double size;
-  final double iconSize;
-
-  const _CircleIconButton({
-    required this.icon,
-    required this.color,
-    required this.onPressed,
-    required this.tooltip,
-    this.size = 40.0,
-    this.iconSize = 20.0,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 2),
-      child: Tooltip(
-        message: tooltip,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Center(
-              child: Icon(icon, size: iconSize, color: color),
-            ),
-          ),
-        ),
-      ),
     );
   }
 }

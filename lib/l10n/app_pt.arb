@@ -307,6 +307,9 @@
   "collectionContainerInfo": "Recipientes de coleção têm barras de rastreamento, valor investido, valor de mercado e visualização de exposição",
   "collectionFieldsConfigured": "Campos de coleção configurados.",
   "collectionLabel": "Coleção",
+  "standardLabel": "Padrão",
+  "possessionDesiredOnlyInCollection": "Os campos de posse e desejados só podem ser configurados dentro de contêineres de coleção.",
+  "collectionFieldsOnlyForNonSerialized": "Os campos de coleção só podem ser atribuídos a tipos não serializados.",
   "collectionsLabel": "Coleções",
   "condition": "Condição",
   "condition_mint": "Caixa original",
@@ -888,6 +891,14 @@
   "noCustomListsCreateOne": "Nenhuma lista personalizada. Crie uma nova.",
   "elementsCount": "{count} elementos",
   "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetCount": "{count} ativos",
+  "@assetCount": {
     "placeholders": {
       "count": {
         "type": "int"

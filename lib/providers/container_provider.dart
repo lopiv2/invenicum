@@ -61,9 +61,7 @@ class ContainerProvider with ChangeNotifier {
             final dataLists = await _containerService.getDataLists(
               apiContainer.id,
             );
-            final scrapers = await _scraperService.getScrapers(
-              apiContainer.id,
-            );
+            final scrapers = await _scraperService.getScrapers(apiContainer.id);
 
             return apiContainer.copyWith(
               locations: locations,
@@ -193,7 +191,7 @@ class ContainerProvider with ChangeNotifier {
     String? desiredFieldId,
   }) async {
     // Función auxiliar para encontrar y actualizar un AssetType dentro del estado local
-    void _updateLocalAssetType({required AssetType newAssetType}) {
+    void updateLocalAssetType({required AssetType newAssetType}) {
       final containerIndex = _containers.indexWhere((c) => c.id == containerId);
 
       if (containerIndex != -1) {
@@ -244,7 +242,7 @@ class ContainerProvider with ChangeNotifier {
         desiredFieldId: desiredFieldId,
       );
 
-      _updateLocalAssetType(newAssetType: updatedAssetTypeOptimistic);
+      updateLocalAssetType(newAssetType: updatedAssetTypeOptimistic);
 
       debugPrint('✅ Local optimistic state updated.');
 
@@ -259,13 +257,13 @@ class ContainerProvider with ChangeNotifier {
 
       // 3. PASO DE CONFIRMACIÓN: Actualizar con la respuesta del servidor (si es diferente o por seguridad)
       debugPrint('🔄 Updating with server response (Confirmation)...');
-      _updateLocalAssetType(newAssetType: updatedAssetTypeFromApi);
+      updateLocalAssetType(newAssetType: updatedAssetTypeFromApi);
 
       debugPrint('✅ Collection fields update completed successfully.');
     } catch (e) {
       debugPrint('🚨 Error updating collection fields: $e');
 
-      _updateLocalAssetType(newAssetType: oldAssetType);
+      updateLocalAssetType(newAssetType: oldAssetType);
 
       // ⚠️ OPCIONAL pero RECOMENDADO: Si falla el servidor, deberías revertir
       // el estado optimista a los valores ANTERIORES.

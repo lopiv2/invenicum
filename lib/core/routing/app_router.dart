@@ -134,10 +134,7 @@ GoRouter createAppRouter(
     },
     routes: [
       // ── Root redirect ───────────────────────────────────────
-      GoRoute(
-        path: '/',
-        redirect: (_, __) => '/dashboard',
-      ),
+      GoRoute(path: '/', redirect: (_, _) => '/dashboard'),
       // ── Public routes (outside Shell) ────────────────────────────
       GoRoute(
         name: RouteNames.login,
@@ -180,9 +177,9 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.dashboard,
         path: '/dashboard',
-        builder: (context, state) => _layout(DashboardScreen(
-          dashboardService: context.read<DashboardService>(),
-        )),
+        builder: (context, state) => _layout(
+          DashboardScreen(dashboardService: context.read<DashboardService>()),
+        ),
       ),
       GoRoute(
         name: RouteNames.alerts,
@@ -202,7 +199,8 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.voucherEditor,
         path: '/delivery-voucher-editor',
-        builder: (context, state) => _layout(const DeliveryVoucherEditorScreen()),
+        builder: (context, state) =>
+            _layout(const DeliveryVoucherEditorScreen()),
       ),
 
       // --- CONTAINERS / ASSET TYPES ---
@@ -217,29 +215,35 @@ GoRouter createAppRouter(
           GoRoute(
             name: RouteNames.assetTypeCreate,
             path: 'new',
-            builder: (context, state) => _layout(AssetTypeCreateScreen(
-              containerId: state.pathParameters['containerId']!,
-            )),
+            builder: (context, state) => _layout(
+              AssetTypeCreateScreen(
+                containerId: state.pathParameters['containerId']!,
+              ),
+            ),
           ),
           GoRoute(
             name: RouteNames.assetTypeEdit,
             path: ':assetTypeId/edit',
-            builder: (context, state) => _layout(AssetTypeEditScreen(
-              containerId: state.pathParameters['containerId']!,
-              assetTypeId: state.pathParameters['assetTypeId']!,
-            )),
+            builder: (context, state) => _layout(
+              AssetTypeEditScreen(
+                containerId: state.pathParameters['containerId']!,
+                assetTypeId: state.pathParameters['assetTypeId']!,
+              ),
+            ),
           ),
         ],
       ),
       GoRoute(
         name: RouteNames.achievements,
         path: '/achievements',
-        builder: (context, state) => _layout(const Scaffold(
-          body: SingleChildScrollView(
-            padding: EdgeInsets.all(40.0),
-            child: AchievementsCardWidget(),
+        builder: (context, state) => _layout(
+          const Scaffold(
+            body: SingleChildScrollView(
+              padding: EdgeInsets.all(40.0),
+              child: AchievementsCardWidget(),
+            ),
           ),
-        )),
+        ),
       ),
       GoRoute(
         name: RouteNames.integrations,
@@ -249,7 +253,8 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.templates,
         path: '/templates',
-        builder: (context, state) => _layout(const AssetTemplatesMarketScreen()),
+        builder: (context, state) =>
+            _layout(const AssetTemplatesMarketScreen()),
         routes: [
           GoRoute(
             name: RouteNames.templateCreate,
@@ -270,10 +275,12 @@ GoRouter createAppRouter(
               final AssetTemplate? templateFromExtra =
                   state.extra as AssetTemplate?;
               final String templateId = state.pathParameters['templateId']!;
-              return _layout(AssetTemplateDetailScreen(
-                templateId: templateId,
-                initialTemplate: templateFromExtra,
-              ));
+              return _layout(
+                AssetTemplateDetailScreen(
+                  templateId: templateId,
+                  initialTemplate: templateFromExtra,
+                ),
+              );
             },
           ),
         ],
@@ -307,12 +314,14 @@ GoRouter createAppRouter(
           );
           final processedUi = provider.getProcessedUi(plugin.ui!);
           final l10n = AppLocalizations.of(context)!;
-          return _layout(Scaffold(
-            appBar: AppBar(title: Text(plugin.name)),
-            body:
-                Stac.fromJson(processedUi, context) ??
-                Center(child: Text(l10n.pluginLoadError)),
-          ));
+          return _layout(
+            Scaffold(
+              appBar: AppBar(title: Text(plugin.name)),
+              body:
+                  Stac.fromJson(processedUi, context) ??
+                  Center(child: Text(l10n.pluginLoadError)),
+            ),
+          );
         },
       ),
 
@@ -320,47 +329,57 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.assetList,
         path: '/container/:containerId/asset-types/:assetTypeId/assets',
-        builder: (context, state) => _layout(AssetListScreen(
-          containerId: state.pathParameters['containerId']!,
-          assetTypeId: state.pathParameters['assetTypeId']!,
-        )),
+        builder: (context, state) => _layout(
+          AssetListScreen(
+            containerId: state.pathParameters['containerId']!,
+            assetTypeId: state.pathParameters['assetTypeId']!,
+          ),
+        ),
         routes: [
           GoRoute(
             name: RouteNames.assetCreate,
             path: 'new',
-            builder: (context, state) => _layout(AssetCreateScreen(
-              containerId: state.pathParameters['containerId']!,
-              assetTypeId: state.pathParameters['assetTypeId']!,
-            )),
+            builder: (context, state) => _layout(
+              AssetCreateScreen(
+                containerId: state.pathParameters['containerId']!,
+                assetTypeId: state.pathParameters['assetTypeId']!,
+              ),
+            ),
           ),
           GoRoute(
             name: RouteNames.assetImport,
             path: 'import-csv',
-            builder: (context, state) => _layout(AssetImportScreen(
-              containerId: state.pathParameters['containerId']!,
-              assetTypeId: state.pathParameters['assetTypeId']!,
-            )),
+            builder: (context, state) => _layout(
+              AssetImportScreen(
+                containerId: state.pathParameters['containerId']!,
+                assetTypeId: state.pathParameters['assetTypeId']!,
+              ),
+            ),
           ),
           GoRoute(
             name: RouteNames.assetDetail,
             path: ':assetId',
-            builder: (context, state) => _layout(AssetDetailScreen(
-              containerId: state.pathParameters['containerId']!,
-              assetTypeId: state.pathParameters['assetTypeId']!,
-              itemId: state.pathParameters['assetId']!,
-            )),
+            builder: (context, state) => _layout(
+              AssetDetailScreen(
+                containerId: state.pathParameters['containerId']!,
+                assetTypeId: state.pathParameters['assetTypeId']!,
+                itemId: state.pathParameters['assetId']!,
+              ),
+            ),
           ),
           GoRoute(
             name: RouteNames.assetEdit,
             path: ':assetId/edit',
             builder: (context, state) {
               final item = state.extra as InventoryItem?;
-              return _layout(AssetEditScreen(
-                containerId: state.pathParameters['containerId']!,
-                assetTypeId: state.pathParameters['assetTypeId']!,
-                assetItemId: state.pathParameters['assetId']!,
-                initialItem: item,
-              ));
+              return _layout(
+                AssetEditScreen(
+                  containerId: state.pathParameters['containerId']!,
+                  assetTypeId: state.pathParameters['assetTypeId']!,
+                  assetItemId: state.pathParameters['assetId']!,
+                  initialItem: item,
+                ),
+              );
             },
           ),
         ],
@@ -370,27 +389,31 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.dataLists,
         path: '/container/:containerId/datalists',
-        builder: (context, state) => _layout(DataListGridScreen(
-          containerId: state.pathParameters['containerId']!,
-        )),
+        builder: (context, state) => _layout(
+          DataListGridScreen(containerId: state.pathParameters['containerId']!),
+        ),
         routes: [
           GoRoute(
             name: RouteNames.dataListCreate,
             path: 'new',
-            builder: (context, state) => _layout(DataListCreateScreen(
-              containerId: state.pathParameters['containerId']!,
-            )),
+            builder: (context, state) => _layout(
+              DataListCreateScreen(
+                containerId: state.pathParameters['containerId']!,
+              ),
+            ),
           ),
           GoRoute(
             name: RouteNames.dataListEdit,
             path: ':dataListId/edit',
             builder: (context, state) {
               final listData = state.extra as ListData?;
-              return _layout(DataListEditScreen(
-                containerId: state.pathParameters['containerId']!,
-                dataListId: state.pathParameters['dataListId']!,
-                initialData: listData!,
-              ));
+              return _layout(
+                DataListEditScreen(
+                  containerId: state.pathParameters['containerId']!,
+                  dataListId: state.pathParameters['dataListId']!,
+                  initialData: listData!,
+                ),
+              );
             },
           ),
         ],
@@ -399,27 +422,31 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.scrapers,
         path: '/container/:containerId/scrapers',
-        builder: (context, state) => _layout(ScraperGridScreen(
-          containerId: state.pathParameters['containerId']!,
-        )),
+        builder: (context, state) => _layout(
+          ScraperGridScreen(containerId: state.pathParameters['containerId']!),
+        ),
         routes: [
           GoRoute(
             name: RouteNames.scraperCreate,
             path: 'new',
-            builder: (context, state) => _layout(ScraperCreateScreen(
-              containerId: state.pathParameters['containerId']!,
-            )),
+            builder: (context, state) => _layout(
+              ScraperCreateScreen(
+                containerId: state.pathParameters['containerId']!,
+              ),
+            ),
           ),
           GoRoute(
             name: RouteNames.scraperEdit,
             path: ':scraperId/edit',
             builder: (context, state) {
               final scraper = state.extra as dynamic;
-              return _layout(ScraperEditScreen(
-                containerId: state.pathParameters['containerId']!,
-                scraperId: state.pathParameters['scraperId']!,
-                initial: scraper!,
-              ));
+              return _layout(
+                ScraperEditScreen(
+                  containerId: state.pathParameters['containerId']!,
+                  scraperId: state.pathParameters['scraperId']!,
+                  initial: scraper!,
+                ),
+              );
             },
           ),
         ],
@@ -429,16 +456,18 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.locations,
         path: '/container/:containerId/locations',
-        builder: (context, state) => _layout(LocationsScreen(
-          containerId: state.pathParameters['containerId']!,
-        )),
+        builder: (context, state) => _layout(
+          LocationsScreen(containerId: state.pathParameters['containerId']!),
+        ),
         routes: [
           GoRoute(
             name: RouteNames.locationCreate,
             path: 'new',
-            builder: (context, state) => _layout(LocationCreateScreen(
-              containerId: state.pathParameters['containerId']!,
-            )),
+            builder: (context, state) => _layout(
+              LocationCreateScreen(
+                containerId: state.pathParameters['containerId']!,
+              ),
+            ),
           ),
           GoRoute(
             name: RouteNames.locationEdit,
@@ -457,10 +486,12 @@ GoRouter createAppRouter(
                   );
                 } catch (_) {}
               }
-              return _layout(LocationEditScreen(
-                containerId: containerId,
-                location: location!,
-              ));
+              return _layout(
+                LocationEditScreen(
+                  containerId: containerId,
+                  location: location!,
+                ),
+              );
             },
           ),
         ],
@@ -470,15 +501,18 @@ GoRouter createAppRouter(
       GoRoute(
         name: RouteNames.loans,
         path: '/container/:containerId/loans',
-        builder: (context, state) =>
-            _layout(LoansScreen(containerId: state.pathParameters['containerId']!)),
+        builder: (context, state) => _layout(
+          LoansScreen(containerId: state.pathParameters['containerId']!),
+        ),
         routes: [
           GoRoute(
             name: RouteNames.loanCreate,
             path: 'new',
-            builder: (context, state) => _layout(LoanCreateScreen(
-              containerId: state.pathParameters['containerId']!,
-            )),
+            builder: (context, state) => _layout(
+              LoanCreateScreen(
+                containerId: state.pathParameters['containerId']!,
+              ),
+            ),
           ),
         ],
       ),

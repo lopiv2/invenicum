@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -24,12 +23,12 @@ class PreferencesProvider with ChangeNotifier {
 
   Map<String, double>? get exchangeRates => _prefs.exchangeRates;
 
-  // Helpers actualizados
+  // Updated helpers
   Locale get locale => Locale(_prefs.language);
   bool get aiEnabled => _prefs.aiEnabled;
   String? get aiProvider => _prefs.aiProvider;
   String? get aiModel => _prefs.aiModel;
-  // 🔑 Ahora la moneda viene de las preferencias guardadas
+  // 🔑 Now currency comes from saved preferences
   String get selectedCurrency => _prefs.currency;
   bool get showAssetTypeLogo => _prefs.showAssetTypeLogo;
   bool get autoResetFieldsOnSaveAndContinue =>
@@ -42,38 +41,37 @@ class PreferencesProvider with ChangeNotifier {
 
   NotificationSettings get notificationSettings => _prefs.notifications;
 
-  /// Cambia si debemos seguir el tema del sistema operativo
-  /// Cambia si debemos seguir el tema del sistema operativo
+  /// Changes whether to follow the operating system theme
   Future<void> setUseSystemTheme(bool value) async {
-    // 1. Guardamos el estado completo actual por si falla la red
+    // 1. Save full current state in case network fails
     final bool oldSystemValue = _useSystemTheme;
     final bool oldDarkValue = _isDarkMode;
     final UserPreferences oldPrefs = _prefs;
 
-    // 2. Aplicamos la regla de negocio localmente de forma optimista
+    // 2. Apply business rule locally optimistically
     _useSystemTheme = value;
 
     if (value == true) {
-      // REGLA: Si activamos automático, el modo oscuro manual DEBE ser false (0)
+      // RULE: If auto is enabled, manual dark mode MUST be false (0)
       _isDarkMode = false;
     }
 
-    // Sincronizamos el objeto UserPreferences principal
+    // Sync the main UserPreferences object
     _prefs = _prefs.copyWith(
       useSystemTheme: _useSystemTheme,
       isDarkMode: _isDarkMode,
     );
 
-    notifyListeners(); // La UI se actualiza al instante
+    notifyListeners(); // UI updates instantly
 
     try {
-      // 3. Persistimos en el backend
+      // 3. Persist in the backend
       await _preferencesService.updateVisualStatus(
         useSystemTheme: _useSystemTheme,
         isDarkMode: _isDarkMode,
       );
     } catch (e) {
-      // 4. Si hay error, revertimos absolutamente todo al estado anterior
+      // 4. If error, revert everything to previous state
       _useSystemTheme = oldSystemValue;
       _isDarkMode = oldDarkValue;
       _prefs = oldPrefs;
@@ -83,23 +81,23 @@ class PreferencesProvider with ChangeNotifier {
     }
   }
 
-  /// Cambia manualmente entre modo claro y oscuro
+  /// Manually switches between light and dark mode
   Future<void> setDarkMode(bool value) async {
-    // Guardamos estado para revertir
+    // Save state for rollback
     final bool oldSystemValue = _useSystemTheme;
     final bool oldDarkValue = _isDarkMode;
     final UserPreferences oldPrefs = _prefs;
 
-    // --- LÓGICA INVERSA ---
+    // --- REVERSE LOGIC ---
     _isDarkMode = value;
 
-    // Si el usuario activa el modo oscuro manual,
-    // asumimos que ya no quiere seguir al sistema.
+    // If user manually enables dark mode,
+    // assume they no longer want to follow the system.
     if (value == true) {
       _useSystemTheme = false;
     }
 
-    // Actualizamos el objeto global
+    // Update the global object
     _prefs = _prefs.copyWith(
       isDarkMode: _isDarkMode,
       useSystemTheme: _useSystemTheme,
@@ -113,7 +111,7 @@ class PreferencesProvider with ChangeNotifier {
         isDarkMode: _isDarkMode,
       );
     } catch (e) {
-      // Reversión
+      // Rollback
       _isDarkMode = oldDarkValue;
       _useSystemTheme = oldSystemValue;
       _prefs = oldPrefs;
@@ -151,44 +149,44 @@ class PreferencesProvider with ChangeNotifier {
       _isDarkMode = _prefs.isDarkMode;
 
       _isInitialized = true;
-      notifyListeners(); // ← esto dispara el ProxyProvider2 en main.dart,
-      //   que llama a prev.initializeTheme() con los
-      //   3 campos que ya están en _prefs
+      notifyListeners(); // ← this triggers ProxyProvider2 in main.dart,
+      //   which calls prev.initializeTheme() with the
+      //   3 fields already in _prefs
     } catch (e) {
-      debugPrint('Error cargando preferencias: $e');
+      debugPrint('Error loading preferences: $e');
       _isInitialized = true;
       notifyListeners();
     }
   }
 
-  // En preferences_provider.dart
+  // In preferences_provider.dart
 
-  // Lógica para el Drag and Drop
+  // Drag and Drop logic
   void reorderChannels(int oldIndex, int newIndex) {
     if (newIndex > oldIndex) newIndex -= 1;
 
-    // 1. Accedemos a la lista dentro de la clase anidada
+    // 1. Access the list inside the nested class
     final List<String> items = List.from(_prefs.notifications.channelOrder);
     final String item = items.removeAt(oldIndex);
     items.insert(newIndex, item);
 
-    // 2. Actualizamos usando el copyWith anidado
+    // 2. Update using nested copyWith
     _prefs = _prefs.copyWith(
       notifications: _prefs.notifications.copyWith(channelOrder: items),
     );
     notifyListeners();
 
-    // 3. Sincronizar con backend (enviamos el objeto completo o solo la lista)
+    // 3. Sync with backend (send full object or just the list)
     _preferencesService.updateNotificationSettings(_prefs.notifications);
   }
 
-  // Lógica para los switches
+  // Switch logic
   Future<void> setNotificationAlert(String type, bool enabled) async {
     final previousPrefs = _prefs;
     NotificationSettings currentNotifs = _prefs.notifications;
     NotificationSettings updatedNotifs;
 
-    // 🔑 Mapeamos los tipos de la UI a los nuevos campos del modelo
+    // 🔑 Map UI types to the new model fields
     switch (type) {
       case 'stock':
         updatedNotifs = currentNotifs.copyWith(alertStockLow: enabled);
@@ -212,19 +210,19 @@ class PreferencesProvider with ChangeNotifier {
         return;
     }
 
-    // 3. Actualización optimista del estado principal
+    // 3. Optimistic update of main state
     _prefs = _prefs.copyWith(notifications: updatedNotifs);
     notifyListeners();
 
     try {
-      // 🚀 Persistencia: enviamos el objeto que ahora genera las llaves
-      // correctas para el backend (alertPreSales, alertLoanReminders, etc.)
+      // 🚀 Persistence: send the object that now generates the correct
+      // keys for the backend (alertPreSales, alertLoanReminders, etc.)
       await _preferencesService.updateNotificationSettings(updatedNotifs);
     } catch (e) {
       // Rollback
       _prefs = previousPrefs;
       notifyListeners();
-      debugPrint('Error actualizando alertas: $e');
+      debugPrint('Error updating alerts: $e');
     }
   }
 
@@ -272,16 +270,16 @@ class PreferencesProvider with ChangeNotifier {
   Future<void> setCurrency(String currencyCode) async {
     final previousPrefs = _prefs;
 
-    // 1. Actualización optimista (instantánea en la UI)
+    // 1. Optimistic update (instant UI)
     _prefs = _prefs.copyWith(currency: currencyCode);
     notifyListeners();
 
     try {
-      // 2. Persistencia en el backend (usando tu servicio existente)
-      // Asegúrate de añadir 'updateCurrency' en tu PreferencesService
+      // 2. Persist in the backend (using your existing service)
+      // Make sure to add 'updateCurrency' in your PreferencesService
       await _preferencesService.updateCurrency(currencyCode);
     } catch (e) {
-      // 3. Rollback si falla la red
+      // 3. Rollback if network fails
       _prefs = previousPrefs;
       notifyListeners();
       debugPrint('Error actualizando moneda: $e');
@@ -289,43 +287,43 @@ class PreferencesProvider with ChangeNotifier {
     }
   }
 
-  /// Actualiza el idioma localmente y en el backend
+  /// Updates the language locally and in the backend
   Future<void> setLanguage(String languageCode) async {
     final previousPrefs = _prefs;
 
-    // Actualización optimista
+    // Optimistic update
     _prefs = _prefs.copyWith(language: languageCode);
     notifyListeners();
 
     try {
       await _preferencesService.updateLanguage(languageCode);
     } catch (e) {
-      _prefs = previousPrefs; // Revertimos si falla
+      _prefs = previousPrefs; // Rollback if it fails
       notifyListeners();
       debugPrint('Error updating language: $e');
       rethrow;
     }
   }
 
-  /// Actualiza el estado de la IA (On/Off)
+  /// Updates the AI state (On/Off)
   Future<void> setAiEnabled(bool enabled) async {
     final previousPrefs = _prefs;
 
-    // Actualización optimista
+    // Optimistic update
     _prefs = _prefs.copyWith(aiEnabled: enabled);
     notifyListeners();
 
     try {
       await _preferencesService.updateAiStatus(enabled);
     } catch (e) {
-      _prefs = previousPrefs; // Revertimos si falla
+      _prefs = previousPrefs; // Rollback if it fails
       notifyListeners();
-      debugPrint('Error actualizando estado IA: $e');
+      debugPrint('Error updating AI state: $e');
       rethrow;
     }
   }
 
-  /// Actualiza el proveedor de IA y el modelo activo
+  /// Updates the AI provider and active model
   Future<void> updateAiProvider(String provider, String model) async {
     final previousPrefs = _prefs;
 
@@ -340,7 +338,7 @@ class PreferencesProvider with ChangeNotifier {
     } catch (e) {
       _prefs = previousPrefs;
       notifyListeners();
-      debugPrint('Error actualizando proveedor de IA: $e');
+      debugPrint('Error updating AI provider: $e');
       rethrow;
     }
   }
@@ -436,7 +434,9 @@ class PreferencesProvider with ChangeNotifier {
         imageName: imageName,
         config: config,
       );
-      final updatedList = List<OverlayImageConfig>.from(_prefs.crossToonConfigs);
+      final updatedList = List<OverlayImageConfig>.from(
+        _prefs.crossToonConfigs,
+      );
       updatedList[index] = saved;
       _prefs = _prefs.copyWith(crossToonConfigs: updatedList);
       notifyListeners();

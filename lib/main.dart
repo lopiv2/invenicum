@@ -202,8 +202,9 @@ void main() async {
         >(
           create: (c) => ThemeProvider(c.read<ThemeService>()),
           update: (context, auth, prefs, prev) {
-            if (prev == null)
+            if (prev == null) {
               return ThemeProvider(context.read<ThemeService>());
+            }
 
             // ── 1. Tema desde PreferencesProvider (fuente de verdad con paletteId) ──
             //
@@ -335,7 +336,8 @@ class _MyAppState extends State<MyApp> {
           : ThemeMode.light;
     }
     final isRetro = themeProvider.isRetroMode;
-    final isDarkTheme = themeProvider.currentTheme.brightness == Brightness.dark;
+    final isDarkTheme =
+        themeProvider.currentTheme.brightness == Brightness.dark;
     return MaterialApp.router(
       scaffoldMessengerKey: rootScaffoldMessengerKey,
       locale: preferencesProvider.locale,
@@ -363,8 +365,8 @@ class _MyAppState extends State<MyApp> {
       themeMode: isRetro
           ? ThemeMode.light
           : isDarkTheme
-              ? ThemeMode.dark
-              : currentMode,
+          ? ThemeMode.dark
+          : currentMode,
 
       routerConfig: _router,
 
@@ -372,5 +374,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
-

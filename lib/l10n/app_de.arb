@@ -307,6 +307,9 @@
   "collectionContainerInfo": "Sammlungs-Container haben Sammlungs-Fortschrittsbalken, Investitionswert, Marktwert und Ausstellungsansicht",
   "collectionFieldsConfigured": "Sammlungsfelder konfiguriert.",
   "collectionLabel": "Sammlung",
+  "standardLabel": "Standard",
+  "possessionDesiredOnlyInCollection": "Besitz- und Wunschfelder können nur in Sammlungscontainern konfiguriert werden.",
+  "collectionFieldsOnlyForNonSerialized": "Sammlungsfelder können nur nicht-serialisierten Typen zugewiesen werden.",
   "collectionsLabel": "Sammlungen",
   "condition": "Zustand",
   "condition_mint": "Originalverpackung",
@@ -888,6 +891,14 @@
   "noCustomListsCreateOne": "Keine benutzerdefinierten Listen. Erstelle eine neue.",
   "elementsCount": "{count} Elemente",
   "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetCount": "{count} Assets",
+  "@assetCount": {
     "placeholders": {
       "count": {
         "type": "int"

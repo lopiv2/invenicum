@@ -307,6 +307,9 @@
   "collectionContainerInfo": "Los contenedores de colección tienen barras de seguimiento de colecciones, valor invertido, valor de mercado y vista de Exposición",
   "collectionFieldsConfigured": "Campos de colección configurados.",
   "collectionLabel": "Colección",
+  "standardLabel": "Estándar",
+  "possessionDesiredOnlyInCollection": "Los campos de posesión y deseados solo se configuran dentro de contenedores de colección.",
+  "collectionFieldsOnlyForNonSerialized": "Los campos de colección solo pueden asignarse a tipos no seriados.",
   "collectionsLabel": "Colecciones",
   "condition": "Condición",
   "condition_mint": "Caja original",
@@ -888,6 +891,14 @@
   "noCustomListsCreateOne": "No hay listas personalizadas. Crea una nueva.",
   "elementsCount": "{count} elementos",
   "@elementsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "assetCount": "{count} activos",
+  "@assetCount": {
     "placeholders": {
       "count": {
         "type": "int"
