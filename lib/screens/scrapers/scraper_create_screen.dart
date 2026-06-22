@@ -202,10 +202,8 @@ class _ScraperCreateScreenState extends State<ScraperCreateScreen>
             if (_fields.isEmpty)
               const Text('No fields yet. Add one above.')
             else
-              Flexible(
+              Expanded(
                 child: ReorderableListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: _fields.length,
                   onReorder: (oldIndex, newIndex) {
                     setState(() {
