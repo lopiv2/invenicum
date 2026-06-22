@@ -916,7 +916,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   }
 
   Future<void> _addImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.image,
       allowMultiple: true,
       withData: true,

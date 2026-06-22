@@ -146,7 +146,7 @@ class _AssetImportScreenState extends State<AssetImportScreen> {
       _csvData = [];
     });
 
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.custom,
       allowedExtensions: ['csv'],
     );
@@ -175,10 +175,10 @@ class _AssetImportScreenState extends State<AssetImportScreen> {
           _filePath = filePath;
         }
 
-        final List<List<dynamic>> rowsAsListOfLists = const CsvToListConverter(
+        final List<List<dynamic>> rowsAsListOfLists = Csv(
           fieldDelimiter: ';',
-          eol: '\n',
-        ).convert(content);
+          lineDelimiter: '\n',
+        ).decode(content);
 
         if (rowsAsListOfLists.isNotEmpty) {
           _csvData = rowsAsListOfLists;

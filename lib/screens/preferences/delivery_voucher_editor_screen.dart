@@ -82,7 +82,7 @@ Signature of Receiver     | Signature of Returner''';
 
   // Pick image logic as you had it (using FilePicker)
   Future<void> _pickImage() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.image,
       withData: true,
     );

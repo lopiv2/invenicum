@@ -756,7 +756,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // ---------------------------------------------------------------------------
 
   Future<void> _addNewImages() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
+    FilePickerResult? result = await FilePicker.pickFiles(
       type: FileType.image,
       allowMultiple: true,
       withData: true,

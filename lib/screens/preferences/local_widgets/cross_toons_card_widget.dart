@@ -101,7 +101,7 @@ class CrossToonsCardWidget extends StatelessWidget {
   }
 
   Future<({Uint8List bytes, String name})?> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.pickFiles(
       type: FileType.image,
       withData: true,
     );
