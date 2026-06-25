@@ -44,14 +44,9 @@ class _FloatingOverlayImageState extends State<FloatingOverlayImage> {
   double _rotationAngle = 0;
 
   // ─── Shared ─────────────────────────────────────────────────────────────────
-
-  // Cache del widget imagen para evitar que se reconstruya (y parpadee) en cada tick.
   Widget? _cachedImage;
   String? _cachedImagePath;
   double? _cachedImageSize;
-
-  // El asset siempre mira a la derecha por defecto.
-  // Solo hay que voltear cuando el movimiento es hacia la izquierda.
 
   @override
   void initState() {

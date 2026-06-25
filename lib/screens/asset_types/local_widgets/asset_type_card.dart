@@ -246,12 +246,12 @@ class _AssetTypeCardState extends State<AssetTypeCard> {
           boxShadow: [
             if (_hovered)
               BoxShadow(
-                color: theme.colorScheme.shadow.withValues(alpha: 0.9),
+                color: theme.colorScheme.shadow.withValues(alpha: 0.5),
                 blurRadius: 15,
                 offset: const Offset(0, 12),
               ),
             BoxShadow(
-              color: theme.colorScheme.shadow.withValues(alpha: 0.7),
+              color: theme.colorScheme.shadow.withValues(alpha: 0.4),
               blurRadius: _hovered ? 8 : 10,
               offset: const Offset(0, 2),
             ),

@@ -13,6 +13,80 @@ import 'card_section_widget.dart';
 import 'common_form_field.dart';
 import 'section_header_widget.dart';
 
+class _DateFieldWidget extends StatefulWidget {
+  final CustomFieldDefinition fieldDef;
+  final TextEditingController controller;
+  final VoidCallback onTap;
+  final VoidCallback onClear;
+
+  const _DateFieldWidget({
+    required this.fieldDef,
+    required this.controller,
+    required this.onTap,
+    required this.onClear,
+  });
+
+  @override
+  State<_DateFieldWidget> createState() => _DateFieldWidgetState();
+}
+
+class _DateFieldWidgetState extends State<_DateFieldWidget> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onControllerChanged);
+  }
+
+  @override
+  void didUpdateWidget(_DateFieldWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller.removeListener(_onControllerChanged);
+      widget.controller.addListener(_onControllerChanged);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onControllerChanged);
+    super.dispose();
+  }
+
+  void _onControllerChanged() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: CommonFormField(
+        controller: widget.controller,
+        label: widget.fieldDef.name,
+        icon: Icons.calendar_today_outlined,
+        hint: 'DD/MM/YYYY',
+        helper: widget.fieldDef.isRequired ? l10n.obligatory : null,
+        readOnly: true,
+        onTap: widget.onTap,
+        suffixIcon: widget.controller.text.isNotEmpty
+            ? IconButton(
+                icon: const Icon(Icons.close, size: 18),
+                onPressed: widget.onClear,
+              )
+            : null,
+        validator: (value) {
+          if (widget.fieldDef.isRequired && (value == null || value.isEmpty)) {
+            return l10n.requiredFieldValidation;
+          }
+          return null;
+        },
+      ),
+    );
+  }
+}
+
 /// Widget para la sección de campos personalizados
 class CustomFieldsSectionWidget extends StatelessWidget {
   final List<CustomFieldDefinition> fieldDefinitions;
@@ -110,8 +184,6 @@ class CustomFieldsSectionWidget extends StatelessWidget {
     CustomFieldDefinition fieldDef,
     TextEditingController controller,
   ) {
-    final l10n = AppLocalizations.of(context)!;
-
     Future<void> pickDate() async {
       final now = DateTime.now();
 
@@ -131,26 +203,16 @@ class CustomFieldsSectionWidget extends StatelessWidget {
       }
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: GestureDetector(
-        onTap: pickDate,
-        child: AbsorbPointer(
-          child: CommonFormField(
-            controller: controller,
-            label: fieldDef.name,
-            icon: Icons.calendar_today_outlined,
-            hint: 'DD/MM/YYYY',
-            helper: fieldDef.isRequired ? 'Obligatorio' : null,
-            validator: (value) {
-              if (fieldDef.isRequired && (value == null || value.isEmpty)) {
-                return l10n.requiredFieldValidation;
-              }
-              return null;
-            },
-          ),
-        ),
-      ),
+    void clearDate() {
+      controller.clear();
+      onControllerText(fieldDef.id!, controller);
+    }
+
+    return _DateFieldWidget(
+      fieldDef: fieldDef,
+      controller: controller,
+      onTap: pickDate,
+      onClear: clearDate,
     );
   }
 
@@ -195,8 +257,6 @@ class CustomFieldsSectionWidget extends StatelessWidget {
       ),
     );
   }
-
-  // Reemplaza _buildDropdownField en CustomFieldsSectionWidget
 
   Widget _buildDropdownField(
     AppLocalizations l10n,

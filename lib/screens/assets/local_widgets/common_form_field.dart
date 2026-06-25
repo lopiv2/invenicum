@@ -19,6 +19,8 @@ class CommonFormField extends StatelessWidget {
   final Widget? suffixIcon;
   final FocusNode? focusNode;
   final void Function(String)? onFieldSubmitted;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const CommonFormField({
     super.key,
@@ -38,6 +40,8 @@ class CommonFormField extends StatelessWidget {
     this.suffixIcon,
     this.focusNode,
     this.onFieldSubmitted,
+    this.readOnly = false,
+    this.onTap,
   });
 
   @override
@@ -93,6 +97,8 @@ class CommonFormField extends StatelessWidget {
     return TextFormField(
       controller: controller,
       focusNode: focusNode,
+      readOnly: readOnly,
+      onTap: onTap,
       keyboardType: keyboardType,
       minLines: minLines,
       maxLines: maxLines,
