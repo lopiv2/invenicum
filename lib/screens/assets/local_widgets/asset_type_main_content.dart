@@ -4,7 +4,7 @@ import 'package:invenicum/screens/asset_types/asset_data_table_trina.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_grid_view.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_cylinder_gallery.dart';
 
-class AssetTypeMainContent extends StatelessWidget {
+class AssetTypeMainContent extends StatefulWidget {
   const AssetTypeMainContent({
     super.key,
     required bool isListView,
@@ -29,30 +29,38 @@ class AssetTypeMainContent extends StatelessWidget {
   final TextEditingController? searchController;
 
   @override
+  State<AssetTypeMainContent> createState() => _AssetTypeMainContentState();
+}
+
+class _AssetTypeMainContentState extends State<AssetTypeMainContent>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
-    if (!isCurrentRoute) {
-      return const SizedBox.shrink();
-    }
-    if (isGalleryMode) {
-      return AssetCylinderGallery(items: viewItems);
-    }
+    super.build(context);
+
+    if (widget.isGalleryMode)
+      return AssetCylinderGallery(items: widget.viewItems);
+
     return RepaintBoundary(
-      child: _isListView
+      child: widget._isListView
           ? AssetPlutoTable(
-              key: ValueKey('pluto_$atIdInt'),
-              assetType: assetType!,
-              containerId: cIdInt,
-              assetTypeId: atIdInt,
-              items: viewItems,
-              availableLocations: locations ?? [],
-              searchController: searchController,
+              key: ValueKey('pluto_${widget.atIdInt}'),
+              assetType: widget.assetType!,
+              containerId: widget.cIdInt,
+              assetTypeId: widget.atIdInt,
+              items: widget.viewItems,
+              availableLocations: widget.locations ?? [],
+              searchController: widget.searchController,
             )
           : AssetGridView(
-              assetType: assetType,
-              items: viewItems,
-              containerId: cIdInt,
-              assetTypeId: atIdInt,
-              searchController: searchController,
+              assetType: widget.assetType,
+              items: widget.viewItems,
+              containerId: widget.cIdInt,
+              assetTypeId: widget.atIdInt,
+              searchController: widget.searchController,
             ),
     );
   }

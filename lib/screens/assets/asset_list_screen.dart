@@ -26,10 +26,6 @@ import '../../providers/container_provider.dart';
 import '../../providers/inventory_item_provider.dart';
 import 'local_widgets/asset_list_header.dart';
 
-// ---------------------------------------------------------------------------
-// Data class para el Selector
-// ---------------------------------------------------------------------------
-
 class _PageStateData {
   final List<InventoryItem> items;
   final bool loading;
@@ -51,10 +47,6 @@ class _PageStateData {
   @override
   int get hashCode => Object.hash(loading, fingerprint);
 }
-
-// ---------------------------------------------------------------------------
-// Widget
-// ---------------------------------------------------------------------------
 
 class AssetListScreen extends StatefulWidget {
   final String containerId;
@@ -81,6 +73,11 @@ class _AssetListScreenState extends State<AssetListScreen>
   String? _selectedCountFieldId;
   String? _selectedCountValue;
   final TextEditingController _searchController = TextEditingController();
+
+  // ── Estado estable para el grid ──────────────────────────────────────────
+  AssetType? _stableAssetType;
+  ContainerNode? _stableContainer;
+  List<InventoryItem> _stableItems = [];
 
   int get _cIdInt => int.tryParse(widget.containerId) ?? 0;
   int get _atIdInt => int.tryParse(widget.assetTypeId) ?? 0;
@@ -118,6 +115,21 @@ class _AssetListScreenState extends State<AssetListScreen>
     final cIdInt = _cIdInt;
     final atIdInt = _atIdInt;
 
+    // Resolver assetType y container aquí donde tenemos context
+    final containerProvider = context.read<ContainerProvider>();
+    final container = containerProvider.containers
+        .cast<ContainerNode?>()
+        .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
+    final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
+      (at) => at?.id == atIdInt,
+      orElse: () => null,
+    );
+
+    if (container != null && assetType != null) {
+      _stableContainer = container;
+      _stableAssetType = assetType;
+    }
+
     if (provider.currentContainerId != cIdInt ||
         provider.currentAssetTypeId != atIdInt) {
       provider.updateContextIds(cIdInt, atIdInt);
@@ -138,17 +150,10 @@ class _AssetListScreenState extends State<AssetListScreen>
     final l10n = AppLocalizations.of(context)!;
     final provider = context.read<InventoryItemProvider>();
     try {
-      debugPrint(
-        '[AssetListScreen] refresh start cId=$_cIdInt atId=$_atIdInt at=${DateTime.now().toIso8601String()}',
-      );
       await provider.loadInventoryItems(
         containerId: _cIdInt,
         assetTypeId: _atIdInt,
-        forceReload: true, // Esto obliga a ignorar el caché y pedir al server
-      );
-      final items = provider.allInventoryItems;
-      debugPrint(
-        '[AssetListScreen] refresh done cId=$_cIdInt atId=$_atIdInt items=${items.length} firstUpdatedAt=${items.isNotEmpty ? items.first.updatedAt : 'n/a'}',
+        forceReload: true,
       );
       _showRefreshDoneAnimation();
     } catch (_) {
@@ -200,7 +205,11 @@ class _AssetListScreenState extends State<AssetListScreen>
         loadingMessage: l10n.syncingMarketPrices,
         errorMessage: l10n.couldNotSyncPrices,
       );
-      await AppUtils.trackAndToast(context, 'PRICE_REGISTERED', value: summary['updated'] ?? 0);
+      await AppUtils.trackAndToast(
+        context,
+        'PRICE_REGISTERED',
+        value: summary['updated'] ?? 0,
+      );
 
       if (!context.mounted) return;
 
@@ -402,6 +411,40 @@ class _AssetListScreenState extends State<AssetListScreen>
     );
   }
 
+  List<InventoryItem> _filterForStats(List<InventoryItem> items) {
+    if (_selectedCountFieldId == null || _selectedCountValue == null) {
+      return items;
+    }
+    return items.where((item) {
+      final val = item.customFieldValues?[_selectedCountFieldId];
+      return val?.toString().toLowerCase().trim() ==
+          _selectedCountValue!.toLowerCase().trim();
+    }).toList();
+  }
+
+  void _openGallery(BuildContext context, List<InventoryItem> items) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) => Dialog.fullscreen(
+        backgroundColor: Colors.black.withValues(alpha: 0.9),
+        child: Stack(
+          children: [
+            AssetCylinderGallery(items: items),
+            Positioned(
+              top: 40,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                onPressed: () => Navigator.pop(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // ---------------------------------------------------------------------------
   // BUILD
   // ---------------------------------------------------------------------------
@@ -414,19 +457,41 @@ class _AssetListScreenState extends State<AssetListScreen>
     final cIdInt = _cIdInt;
     final atIdInt = _atIdInt;
 
+    final currentItems = context.read<InventoryItemProvider>().allInventoryItems;
+
+    // ── Widget estable para el grid — NO se reconstruye con el Selector ──
+    final stableGrid = _stableAssetType != null && _stableContainer != null
+        ? AssetTypeMainContent(
+            key: ValueKey('content_$atIdInt'),
+            isListView: _isListView,
+            isCurrentRoute: true,
+            assetType: _stableAssetType!,
+            cIdInt: cIdInt,
+            atIdInt: atIdInt,
+            viewItems: currentItems,
+            locations: _stableContainer!.locations,
+            isGalleryMode: false,
+            searchController: _searchController,
+          )
+        : const SizedBox.shrink();
+
     return Selector<InventoryItemProvider, _PageStateData>(
       selector: (_, prov) => _PageStateData(
         items: prov.allInventoryItems,
         loading: prov.isLoading,
         fingerprint: _itemsFingerprint(prov.allInventoryItems),
       ),
+      child: stableGrid, // ← no se reconstruye cuando el selector cambia
       builder: (context, data, child) {
-        final containerProvider = context.read<ContainerProvider>();
+        // Actualizar items estables cuando cambian
+        if (data.items != _stableItems) {
+          _stableItems = data.items;
+        }
 
+        final containerProvider = context.read<ContainerProvider>();
         final container = containerProvider.containers
             .cast<ContainerNode?>()
             .firstWhere((c) => c?.id == cIdInt, orElse: () => null);
-
         final assetType = container?.assetTypes.cast<AssetType?>().firstWhere(
           (at) => at?.id == atIdInt,
           orElse: () => null,
@@ -440,15 +505,15 @@ class _AssetListScreenState extends State<AssetListScreen>
         }
 
         if (container == null || assetType == null) {
-          return Scaffold(body: Center(child: Text(l10n.invalidNavigationIds)));
+          return Scaffold(
+            body: Center(child: Text(l10n.invalidNavigationIds)),
+          );
         }
 
-        // Items filtrados localmente para los widgets de estadísticas
-        // (contadores, barra de posesión, galería). No afectan a TrinaGrid.
         final statsItems = _filterForStats(data.items);
-        final isCurrentRoute = ModalRoute.of(context)?.isCurrent ?? false;
         final colorScheme = Theme.of(context).colorScheme;
-        final showLogo = context.watch<PreferencesProvider>().showAssetTypeLogo;
+        final showLogo =
+            context.watch<PreferencesProvider>().showAssetTypeLogo;
 
         return Scaffold(
           backgroundColor: colorScheme.surface,
@@ -488,7 +553,6 @@ class _AssetListScreenState extends State<AssetListScreen>
               const SizedBox(width: 8),
             ],
           ),
-
           body: Stack(
             children: [
               Positioned(
@@ -565,10 +629,8 @@ class _AssetListScreenState extends State<AssetListScreen>
                                           await context.pushNamed(
                                             RouteNames.assetCreate,
                                             pathParameters: {
-                                              'containerId':
-                                                  widget.containerId,
-                                              'assetTypeId':
-                                                  widget.assetTypeId,
+                                              'containerId': widget.containerId,
+                                              'assetTypeId': widget.assetTypeId,
                                             },
                                           );
                                           if (!context.mounted) return;
@@ -578,21 +640,23 @@ class _AssetListScreenState extends State<AssetListScreen>
                                           await context.pushNamed(
                                             RouteNames.assetImport,
                                             pathParameters: {
-                                              'containerId':
-                                                  widget.containerId,
-                                              'assetTypeId':
-                                                  widget.assetTypeId,
+                                              'containerId': widget.containerId,
+                                              'assetTypeId': widget.assetTypeId,
                                             },
                                           );
                                           if (!context.mounted) return;
                                           await _refreshTable(context);
                                         },
-                                        onExportCSV: () =>
-                                            _exportCsv(context, assetType,
-                                                data.items),
+                                        onExportCSV: () => _exportCsv(
+                                          context,
+                                          assetType,
+                                          data.items,
+                                        ),
                                         onShowCountFilterDialog: () =>
                                             _showCountFilterDialog(
-                                                context, assetType),
+                                          context,
+                                          assetType,
+                                        ),
                                         selectedCountFieldId:
                                             _selectedCountFieldId,
                                       ),
@@ -606,7 +670,9 @@ class _AssetListScreenState extends State<AssetListScreen>
                             isListView: _isListView,
                             isToolbarExpanded: _isToolbarExpanded,
                             onToggleToolbar: () => setState(
-                                () => _isToolbarExpanded = !_isToolbarExpanded),
+                              () =>
+                                  _isToolbarExpanded = !_isToolbarExpanded,
+                            ),
                             onToggleView: () =>
                                 setState(() => _isListView = !_isListView),
                             onToggleGallery: () =>
@@ -666,20 +732,9 @@ class _AssetListScreenState extends State<AssetListScreen>
                         ),
                         child: Stack(
                           children: [
-                            AssetTypeMainContent(
-                              key: ValueKey('content_$atIdInt'),
-                              isListView: _isListView,
-                              isCurrentRoute: isCurrentRoute,
-                              assetType: assetType,
-                              cIdInt: cIdInt,
-                              atIdInt: atIdInt,
-                              viewItems: data.items,
-                              locations: container.locations,
-                              isGalleryMode: false,
-                              searchController: _searchController,
-                            ),
+                            child!, // ← grid estable aquí
                             if (data.loading)
-                              Positioned.fill(
+                              const Positioned.fill(
                                 child: Center(
                                   child: CircularProgressIndicator(),
                                 ),
@@ -695,42 +750,6 @@ class _AssetListScreenState extends State<AssetListScreen>
           ),
         );
       },
-    );
-  }
-
-  /// Filtra la lista solo para los widgets de estadísticas (contadores,
-  /// barra de posesión). No tiene nada que ver con el filtrado de TrinaGrid.
-  List<InventoryItem> _filterForStats(List<InventoryItem> items) {
-    if (_selectedCountFieldId == null || _selectedCountValue == null) {
-      return items;
-    }
-    return items.where((item) {
-      final val = item.customFieldValues?[_selectedCountFieldId];
-      return val?.toString().toLowerCase().trim() ==
-          _selectedCountValue!.toLowerCase().trim();
-    }).toList();
-  }
-
-  void _openGallery(BuildContext context, List<InventoryItem> items) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (context) => Dialog.fullscreen(
-        backgroundColor: Colors.black.withValues(alpha: 0.9),
-        child: Stack(
-          children: [
-            AssetCylinderGallery(items: items),
-            Positioned(
-              top: 40,
-              right: 20,
-              child: IconButton(
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-                onPressed: () => Navigator.pop(context),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
