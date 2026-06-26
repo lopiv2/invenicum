@@ -45,26 +45,20 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   TrinaGridStateManager? stateManager;
   late List<TrinaColumn> columns;
   late List<TrinaRow> _initialRows;
-  bool _goToLastPage = false;
+  bool _isShowingImageDialog = false;
 
   @override
   void initState() {
     super.initState();
-    // columns se construye en didChangeDependencies porque _buildColumns()
-    // llama a getLocalizedString(context) que necesita las localizaciones,
-    // las cuales no están disponibles en initState.
-    _initialRows = [];
     widget.searchController?.addListener(_onSearchChanged);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Reconstruimos las columnas aquí donde context ya tiene localizaciones.
-    // Solo la primera vez — si ya hay un stateManager activo no tocamos las columnas
-    // para no romper el grid mientras está renderizado.
     if (stateManager == null) {
       columns = _buildColumns();
+      _initialRows = _buildRows(widget.items);
     }
   }
 
@@ -104,23 +98,14 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         !_areItemListsEqual(oldWidget.items, widget.items);
 
     if (itemsChanged && stateManager != null) {
+      final savedPage = stateManager!.page;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || stateManager == null) return;
-        stateManager!.setShowLoading(true, level: TrinaGridLoadingLevel.rows);
-        final currentPage = stateManager!.page;
+        stateManager!.removeAllRows(notify: false);
         final newRows = _buildRows(widget.items);
-        stateManager!.removeAllRows();
         stateManager!.appendRows(newRows);
-        if (_goToLastPage) {
-          stateManager!.setPage(stateManager!.totalPage);
-          _goToLastPage = false;
-        } else {
-          final maxPage = stateManager!.totalPage;
-          stateManager!.setPage(
-            currentPage > maxPage ? maxPage : currentPage,
-          );
-        }
-        stateManager!.setShowLoading(false);
+        final maxPage = stateManager!.totalPage;
+        stateManager!.setPage(savedPage > maxPage ? maxPage : savedPage);
       });
     }
   }
@@ -146,12 +131,20 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   }
 
   Future<void> _reloadItems() async {
+    if (_isShowingImageDialog)
+      return; // ←no reload if the image dialog is open, to avoid closing it.
+    final savedPage = stateManager?.page ?? 1;
     try {
       await context.read<InventoryItemProvider>().loadInventoryItems(
         containerId: widget.containerId,
         assetTypeId: widget.assetTypeId,
         forceReload: true,
       );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || stateManager == null) return;
+        final maxPage = stateManager!.totalPage;
+        stateManager!.setPage(savedPage > maxPage ? maxPage : savedPage);
+      });
     } catch (_) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context)!;
@@ -264,19 +257,18 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                       message: l10n.viewImageTooltip,
                       child: MouseRegion(
                         cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: () => _showImageDialog(context, fullImageUrl),
-                          child: Image.network(
-                            fullImageUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) =>
-                                const Icon(Icons.image_not_supported, size: 20),
-                          ),
+                        child: Image.network(
+                          fullImageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) =>
+                              const Icon(Icons.image_not_supported, size: 20),
                         ),
                       ),
                     )
                   : Container(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.surfaceContainerHighest,
                       child: Icon(
                         Icons.image,
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -341,7 +333,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         type: TrinaColumnType.number(),
         width: 150,
         renderer: (rendererContext) {
-          // Usamos item_object para tener el enum real y mostrar el badge.
           final item =
               rendererContext.row.cells['item_object']!.value as InventoryItem;
           return Padding(
@@ -362,13 +353,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       TrinaColumn(
         title: l10n.conditionColumnLabel,
         field: 'condition',
-        // select con los strings localizados — TrinaGrid muestra un dropdown
-        // al filtrar con exactamente estas opciones.
         type: TrinaColumnType.select(conditionLabels),
         width: 150,
         enableFilterMenuItem: true,
         renderer: (rendererContext) {
-          // Usamos item_object para tener el enum real y mostrar el badge.
           final item =
               rendererContext.row.cells['item_object']!.value as InventoryItem;
           return Padding(
@@ -396,7 +384,9 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
                   isChecked ? Icons.check_box : Icons.check_box_outline_blank,
                   color: isChecked
                       ? Theme.of(context).primaryColor
-                      : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
+                      : Theme.of(
+                          context,
+                        ).colorScheme.onSurface.withValues(alpha: 0.3),
                 );
               }
             : field.type == CustomFieldType.price
@@ -514,8 +504,6 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
         'serialNumber': TrinaCell(value: item.serialNumber ?? ''),
         'barcode': TrinaCell(value: item.barcode ?? ''),
         'marketValue': TrinaCell(value: item.marketValue),
-        // El valor de la celda DEBE ser el string localizado del select
-        // para que TrinaGrid pueda filtrar correctamente con el dropdown.
         'condition': TrinaCell(
           value: item.condition.getLocalizedString(context),
         ),
@@ -551,9 +539,13 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   }
 
   void _showImageDialog(BuildContext context, String fullImageUrl) {
-    showDialog(
+    showGeneralDialog(
       context: context,
-      builder: (BuildContext dialogContext) {
+      useRootNavigator: true, // ← clave: usa el navigator raíz
+      barrierDismissible: true,
+      barrierLabel: '',
+      barrierColor: Colors.black54,
+      pageBuilder: (context, _, __) {
         return Dialog(
           child: ConstrainedBox(
             constraints: BoxConstraints(
@@ -567,34 +559,12 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
               child: Image.network(
                 fullImageUrl,
                 fit: BoxFit.contain,
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                          : null,
-                    ),
-                  );
-                },
                 errorBuilder: (context, error, stackTrace) => Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      Icons.broken_image,
-                      size: 60,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
+                    Icon(Icons.broken_image, size: 60),
                     const SizedBox(height: 10),
-                    Text(
-                      AppLocalizations.of(context)!.imageLoadError,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    Text(
-                      AppLocalizations.of(context)!.imageUrlHint,
-                      textAlign: TextAlign.center,
-                    ),
+                    Text(AppLocalizations.of(context)!.imageLoadError),
                   ],
                 ),
               ),
@@ -621,14 +591,16 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       onLoaded: (event) {
         stateManager = event.stateManager;
         stateManager?.setShowColumnFilter(true);
-        final rows = _buildRows(widget.items);
-        stateManager?.appendRows(rows);
+        //final rows = _buildRows(widget.items);
+        //stateManager?.appendRows(rows);
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (!mounted || stateManager == null) return;
-          final imageCol =
-              stateManager!.refColumns.firstWhere((c) => c.field == 'image');
-          final nameCol =
-              stateManager!.refColumns.firstWhere((c) => c.field == 'name');
+          final imageCol = stateManager!.refColumns.firstWhere(
+            (c) => c.field == 'image',
+          );
+          final nameCol = stateManager!.refColumns.firstWhere(
+            (c) => c.field == 'name',
+          );
           stateManager!.toggleFrozenColumn(imageCol, TrinaColumnFrozen.start);
           stateManager!.toggleFrozenColumn(nameCol, TrinaColumnFrozen.start);
         });
@@ -636,6 +608,18 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       onRowDoubleTap: (event) {
         final item = event.row.cells['item_object']!.value as InventoryItem;
         _openAssetDetail(item);
+      },
+      onBeforeActiveCellChange: (event) {
+        final imageCell = stateManager!.refRows[event.newRowIdx].cells['image'];
+        if (imageCell?.key == event.newCell.key) {
+          final url = event.newCell.value.toString();
+          if (url.isNotEmpty) {
+            final fullUrl = '${Environment.apiUrl}$url';
+            _showImageDialog(context, fullUrl);
+          }
+          return false;
+        }
+        return true;
       },
       configuration: TrinaGridConfiguration(
         style: isDark
