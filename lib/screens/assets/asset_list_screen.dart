@@ -664,20 +664,28 @@ class _AssetListScreenState extends State<AssetListScreen>
                             ),
                           ),
                         ),
-                        child: data.loading
-                            ? const Center(child: CircularProgressIndicator())
-                            : AssetTypeMainContent(
-                                key: ValueKey('content_${data.items.hashCode}'),
-                                isListView: _isListView,
-                                isCurrentRoute: isCurrentRoute,
-                                assetType: assetType,
-                                cIdInt: cIdInt,
-                                atIdInt: atIdInt,
-                                viewItems: data.items,
-                                locations: container.locations,
-                                isGalleryMode: false,
-                                searchController: _searchController,
+                        child: Stack(
+                          children: [
+                            AssetTypeMainContent(
+                              key: ValueKey('content_$atIdInt'),
+                              isListView: _isListView,
+                              isCurrentRoute: isCurrentRoute,
+                              assetType: assetType,
+                              cIdInt: cIdInt,
+                              atIdInt: atIdInt,
+                              viewItems: data.items,
+                              locations: container.locations,
+                              isGalleryMode: false,
+                              searchController: _searchController,
+                            ),
+                            if (data.loading)
+                              Positioned.fill(
+                                child: Center(
+                                  child: CircularProgressIndicator(),
+                                ),
                               ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

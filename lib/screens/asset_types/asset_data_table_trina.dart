@@ -107,6 +107,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!mounted || stateManager == null) return;
         stateManager!.setShowLoading(true, level: TrinaGridLoadingLevel.rows);
+        final currentPage = stateManager!.page;
         final newRows = _buildRows(widget.items);
         stateManager!.removeAllRows();
         stateManager!.appendRows(newRows);
@@ -114,7 +115,10 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
           stateManager!.setPage(stateManager!.totalPage);
           _goToLastPage = false;
         } else {
-          stateManager!.setPage(1);
+          final maxPage = stateManager!.totalPage;
+          stateManager!.setPage(
+            currentPage > maxPage ? maxPage : currentPage,
+          );
         }
         stateManager!.setShowLoading(false);
       });

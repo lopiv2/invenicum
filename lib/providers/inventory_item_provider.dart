@@ -179,12 +179,10 @@ class InventoryItemProvider with ChangeNotifier {
       aggFilters: aggregationFilters,
     );
 
-    if (forceReload || _disableItemsCacheForDebug) {
-      _removeCacheEntry(key);
-    }
-
     final hasCachedValue = _itemsCache.containsKey(key);
-    if (hasCachedValue && _isCacheEntryFresh(key)) {
+    final cacheFresh = hasCachedValue && _isCacheEntryFresh(key);
+
+    if (cacheFresh && !forceReload && !_disableItemsCacheForDebug) {
       final cached = _itemsCache[key]!;
       _aggregationDefinitions = List<dynamic>.from(
         cached.aggregationDefinitions,
@@ -197,9 +195,9 @@ class InventoryItemProvider with ChangeNotifier {
       return;
     }
 
-    if (hasCachedValue) {
-      _removeCacheEntry(key);
-    }
+    // No eliminamos el caché antes de la petición para que
+    // allInventoryItems siga devolviendo datos antiguos durante la recarga
+    // y el Selector no detecte un cambio de items vacío.
 
     if (!_isLoading) {
       _isLoading = true;
