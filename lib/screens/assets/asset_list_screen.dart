@@ -457,36 +457,32 @@ class _AssetListScreenState extends State<AssetListScreen>
     final cIdInt = _cIdInt;
     final atIdInt = _atIdInt;
 
-    final currentItems = context.read<InventoryItemProvider>().allInventoryItems;
-
-    // ── Widget estable para el grid — NO se reconstruye con el Selector ──
-    final stableGrid = _stableAssetType != null && _stableContainer != null
-        ? AssetTypeMainContent(
-            key: ValueKey('content_$atIdInt'),
-            isListView: _isListView,
-            isCurrentRoute: true,
-            assetType: _stableAssetType!,
-            cIdInt: cIdInt,
-            atIdInt: atIdInt,
-            viewItems: currentItems,
-            locations: _stableContainer!.locations,
-            isGalleryMode: false,
-            searchController: _searchController,
-          )
-        : const SizedBox.shrink();
-
     return Selector<InventoryItemProvider, _PageStateData>(
       selector: (_, prov) => _PageStateData(
         items: prov.allInventoryItems,
         loading: prov.isLoading,
         fingerprint: _itemsFingerprint(prov.allInventoryItems),
       ),
-      child: stableGrid, // ← no se reconstruye cuando el selector cambia
-      builder: (context, data, child) {
+      builder: (context, data, _) {
         // Actualizar items estables cuando cambian
         if (data.items != _stableItems) {
           _stableItems = data.items;
         }
+
+        final grid = _stableAssetType != null && _stableContainer != null
+            ? AssetTypeMainContent(
+                key: ValueKey('content_$atIdInt'),
+                isListView: _isListView,
+                isCurrentRoute: true,
+                assetType: _stableAssetType!,
+                cIdInt: cIdInt,
+                atIdInt: atIdInt,
+                viewItems: data.items,
+                locations: _stableContainer!.locations,
+                isGalleryMode: false,
+                searchController: _searchController,
+              )
+            : const SizedBox.shrink();
 
         final containerProvider = context.read<ContainerProvider>();
         final container = containerProvider.containers
@@ -732,7 +728,7 @@ class _AssetListScreenState extends State<AssetListScreen>
                         ),
                         child: Stack(
                           children: [
-                            child!, // ← grid estable aquí
+                            grid,
                             if (data.loading)
                               const Positioned.fill(
                                 child: Center(
