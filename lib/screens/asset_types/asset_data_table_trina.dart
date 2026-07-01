@@ -45,7 +45,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   TrinaGridStateManager? stateManager;
   late List<TrinaColumn> columns;
   late List<TrinaRow> _initialRows;
-  bool _isShowingImageDialog = false;
+  final bool _isShowingImageDialog = false;
 
   @override
   void initState() {
@@ -131,8 +131,9 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
   }
 
   Future<void> _reloadItems() async {
-    if (_isShowingImageDialog)
+    if (_isShowingImageDialog) {
       return; // ←no reload if the image dialog is open, to avoid closing it.
+    }
     final savedPage = stateManager?.page ?? 1;
     try {
       await context.read<InventoryItemProvider>().loadInventoryItems(
@@ -545,7 +546,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
       barrierDismissible: true,
       barrierLabel: '',
       barrierColor: Colors.black54,
-      pageBuilder: (context, _, __) {
+      pageBuilder: (context, _, _) {
         return Dialog(
           child: ConstrainedBox(
             constraints: BoxConstraints(
