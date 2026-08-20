@@ -8,6 +8,7 @@ class AssetType {
 
   final int id;
   final String name;
+  final String kind;
   final List<CustomFieldDefinition> fieldDefinitions;
   final List<InventoryItemImage> images;
   final String? possessionFieldId;
@@ -18,6 +19,7 @@ class AssetType {
   AssetType({
     required this.id,
     required this.name,
+    this.kind = 'standard',
     this.fieldDefinitions = const [],
     this.images = const [],
     this.possessionFieldId,
@@ -45,6 +47,8 @@ class AssetType {
     return AssetType(
       id: json['id'] as int,
       name: json['name'] as String,
+      kind:
+          json['kind'] as String? ?? json['assetKind'] as String? ?? 'standard',
       images: images,
       isSerialized: json['isSerialized'] as bool? ?? true,
       fieldDefinitions:
@@ -68,6 +72,7 @@ class AssetType {
     return {
       'id': id,
       'name': name,
+      'kind': kind,
       'images': images.map((e) => e.toJson()).toList(),
       'fieldDefinitions': fieldDefinitions.map((e) => e.toJson()).toList(),
       'possessionFieldId': possessionFieldId,
@@ -82,6 +87,7 @@ class AssetType {
   AssetType copyWith({
     int? id,
     String? name,
+    String? kind,
     List<CustomFieldDefinition>? fieldDefinitions,
     List<InventoryItemImage>? images,
     Object? possessionFieldId = _unset,
@@ -91,6 +97,7 @@ class AssetType {
     return AssetType(
       id: id ?? this.id,
       name: name ?? this.name,
+      kind: kind ?? this.kind,
       fieldDefinitions: fieldDefinitions ?? this.fieldDefinitions,
       images: images ?? this.images,
       isSerialized: isSerialized ?? this.isSerialized,

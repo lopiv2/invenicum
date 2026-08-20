@@ -42,6 +42,7 @@ import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/screens/assets/local_widgets/asset_create_app_bar.dart';
 import 'package:invenicum/screens/assets/local_widgets/custom_fields_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/images_section.dart';
+import 'package:invenicum/screens/assets/local_widgets/model_3d_input_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/inventory_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/main_data_section.dart';
 
@@ -82,6 +83,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   int? _selectedLocationId;
   final _scraperKey = GlobalKey<ScraperImportWidgetState>();
   List<String> _imagePreviewUrls = [];
+  List<PlatformFile> _model3dFiles = [];
+  final _model3dPathController = TextEditingController();
 
   AssetType? _assetType;
   int? _containerId;
@@ -749,11 +752,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
     setState(() => _isSaving = true);
     try {
-      await context.read<InventoryItemProvider>().createInventoryItem(
-        context,
-        newItem,
-        filesData: AssetFormUtils.processImages(_imagePreviewUrls),
-      );
+      final createdItem = await context
+          .read<InventoryItemProvider>()
+          .createInventoryItem(
+            context,
+            newItem,
+            filesData: AssetFormUtils.processImages(_imagePreviewUrls),
+          );
+      await _upload3dModels(createdItem);
       if (mounted) {
         ToastService.success(l10n.assetCreatedSuccess);
         await itemProvider.loadInventoryItems(
@@ -776,6 +782,38 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       ToastService.error(l10n.errorCreatingAsset(e.toString()));
     } finally {
       if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
+  Future<void> _upload3dModels(InventoryItem item) async {
+    if (_assetType?.kind != 'gallery3d') return;
+
+    try {
+      final service = context.read<InventoryItemService>();
+      for (var i = 0; i < _model3dFiles.length; i++) {
+        final file = _model3dFiles[i];
+        if (file.bytes != null) {
+          await service.uploadModel3D(
+            itemId: item.id,
+            bytes: file.bytes!,
+            filename: file.name,
+            order: i,
+          );
+        }
+      }
+
+      final path = _model3dPathController.text.trim();
+      if (path.isNotEmpty) {
+        await service.addServerModel3D(
+          itemId: item.id,
+          relativePath: path,
+          order: _model3dFiles.length,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ToastService.error('Error subiendo modelos 3D: ${e.toString()}');
+      }
     }
   }
 
@@ -871,11 +909,14 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
 
     setState(() => _isSaving = true);
     try {
-      await context.read<InventoryItemProvider>().createInventoryItem(
-        context,
-        newItem,
-        filesData: AssetFormUtils.processImages(_imagePreviewUrls),
-      );
+      final createdItem = await context
+          .read<InventoryItemProvider>()
+          .createInventoryItem(
+            context,
+            newItem,
+            filesData: AssetFormUtils.processImages(_imagePreviewUrls),
+          );
+      await _upload3dModels(createdItem);
       if (mounted) {
         ToastService.success(l10n.assetCreatedSuccess);
         await itemProvider.loadInventoryItems(
@@ -883,6 +924,8 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           assetTypeId: _assetTypeId!,
         );
         _imagePreviewUrls.clear();
+        _model3dFiles.clear();
+        _model3dPathController.clear();
         final shouldReset = context
             .read<PreferencesProvider>()
             .autoResetFieldsOnSaveAndContinue;
@@ -1034,6 +1077,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _minStockController.dispose();
     _aiSearchController.dispose();
     _scrollController.dispose();
+    _model3dPathController.dispose();
     _nameAutocompleteFocusNode.dispose();
     for (var n in _customAutocompleteFocusNodes.values) {
       n.dispose();
@@ -1149,12 +1193,25 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         collapsible: false,
                         title: l10n.galleryTitle,
                         icon: Icons.camera_alt_outlined,
-                        child: ImagesSectionWidget(
-                          imageUrls: _imagePreviewUrls,
-                          onAddImage: _addImage,
-                          onRemoveImage: (url) =>
-                              setState(() => _imagePreviewUrls.remove(url)),
-                          onAddImageFromUrl: _addImageFromUrl,
+                        child: Column(
+                          children: [
+                            ImagesSectionWidget(
+                              imageUrls: _imagePreviewUrls,
+                              onAddImage: _addImage,
+                              onRemoveImage: (url) =>
+                                  setState(() => _imagePreviewUrls.remove(url)),
+                              onAddImageFromUrl: _addImageFromUrl,
+                            ),
+                            if (_assetType?.kind == 'gallery3d') ...[
+                              const Divider(height: 32),
+                              Model3DInputSection(
+                                files: _model3dFiles,
+                                pathController: _model3dPathController,
+                                onFilesChanged: (files) =>
+                                    setState(() => _model3dFiles = files),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
 

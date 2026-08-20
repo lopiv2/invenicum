@@ -38,6 +38,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   bool _isLoadingLists = true;
   String? _imagePreviewUrl;
   bool _isSerialized = true;
+  String _assetKind = 'standard';
   bool _isCollection = false;
 
   @override
@@ -131,6 +132,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
           imageBytes: imageBytes,
           imageName: imageName,
           isSerialized: _isSerialized,
+          kind: _assetKind,
         );
         if (mounted) {
           context.goNamed(
@@ -185,7 +187,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                           onRemoveImage: _removeImage,
                         ),
                       ),
-                
+
                       _buildBentoBox(
                         width: 480,
                         child: Column(
@@ -199,6 +201,29 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                             ),
                             const SizedBox(height: 20),
                             AssetTypeNameField(controller: _nameController),
+                            const SizedBox(height: 24),
+                            DropdownButtonFormField<String>(
+                              value: _assetKind,
+                              decoration: const InputDecoration(
+                                labelText: 'Tipo de contenido',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'standard',
+                                  child: Text('Estándar'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'gallery3d',
+                                  child: Text('Galería 3D'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() => _assetKind = value);
+                                }
+                              },
+                            ),
                             const SizedBox(height: 24),
                             const Divider(),
                             const SizedBox(height: 16),
@@ -220,7 +245,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                      l10n.collectionContainerWarning,
+                                        l10n.collectionContainerWarning,
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(
                                               color: theme
@@ -265,7 +290,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
 
                   AssetTypeActionButtons(
                     onSave: _saveAssetType,
-                  saveLabel: l10n.createAssetTypeButton,
+                    saveLabel: l10n.createAssetTypeButton,
                   ),
                 ],
               ),
@@ -283,9 +308,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(
-          28,
-        ),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(
           color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
         ),

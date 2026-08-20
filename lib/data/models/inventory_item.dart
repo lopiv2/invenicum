@@ -44,6 +44,65 @@ class InventoryItemImage {
     );
   }
 }
+
+class InventoryItemModel3D {
+  final int id;
+  final String sourceType;
+  final String relativePath;
+  final String url;
+  final String? originalName;
+  final int order;
+
+  const InventoryItemModel3D({
+    required this.id,
+    required this.sourceType,
+    required this.relativePath,
+    required this.url,
+    this.originalName,
+    required this.order,
+  });
+
+  factory InventoryItemModel3D.fromJson(Map<String, dynamic> json) {
+    return InventoryItemModel3D(
+      id: (json['id'] ?? 0).toInt(),
+      sourceType: json['sourceType'] as String? ?? 'upload',
+      relativePath: json['relativePath'] as String? ?? '',
+      url: json['url'] as String? ?? '',
+      originalName: json['originalName'] as String?,
+      order: (json['order'] ?? 0).toInt(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'sourceType': sourceType,
+      'relativePath': relativePath,
+      'url': url,
+      'originalName': originalName,
+      'order': order,
+    };
+  }
+
+  InventoryItemModel3D copyWith({
+    int? id,
+    String? sourceType,
+    String? relativePath,
+    String? url,
+    String? originalName,
+    int? order,
+  }) {
+    return InventoryItemModel3D(
+      id: id ?? this.id,
+      sourceType: sourceType ?? this.sourceType,
+      relativePath: relativePath ?? this.relativePath,
+      url: url ?? this.url,
+      originalName: originalName ?? this.originalName,
+      order: order ?? this.order,
+    );
+  }
+}
+
 class InventoryItem {
   final int id;
   final String name;
@@ -57,6 +116,7 @@ class InventoryItem {
   final int minStock;
   final Location? location;
   final List<InventoryItemImage> images;
+  final List<InventoryItemModel3D> model3dFiles;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final Map<String, dynamic>? customFieldValues;
@@ -84,6 +144,7 @@ class InventoryItem {
     this.updatedAt,
     this.customFieldValues,
     this.images = const [],
+    this.model3dFiles = const [],
     this.location,
     this.marketValue = 0.0,
     this.currency = AppCurrencies.defaultCurrency,
@@ -112,6 +173,11 @@ class InventoryItem {
           (imgJson) =>
               InventoryItemImage.fromJson(imgJson as Map<String, dynamic>),
         )
+        .toList();
+    final modelListJson = itemData['model3dFiles'] as List<dynamic>? ?? [];
+    final model3dFiles = modelListJson
+        .whereType<Map<String, dynamic>>()
+        .map(InventoryItemModel3D.fromJson)
         .toList();
 
     final List<dynamic> priceHistoryJson =
@@ -158,45 +224,52 @@ class InventoryItem {
       updatedAt: parseDate(itemData['updatedAt']),
       customFieldValues: rawCustomFields,
       images: images,
+      model3dFiles: model3dFiles,
 
       location: itemData['location'] != null
           ? Location.fromJson(itemData['location'] as Map<String, dynamic>)
           : null,
 
       marketValue: (itemData['marketValue'] ?? 0.0).toDouble(),
-      currency: itemData['currency'] as String? ?? AppCurrencies.defaultCurrency,
+      currency:
+          itemData['currency'] as String? ?? AppCurrencies.defaultCurrency,
       totalMarketValue: (itemData['totalMarketValue'] ?? 0.0).toDouble(),
       lastPriceUpdate: parseDate(itemData['lastPriceUpdate']),
     );
   }
 
   Map<String, dynamic> toJson() {
-  return {
-    'id': id,
-    'containerId': containerId,
-    'assetTypeId': assetTypeId,
-    'locationId': locationId,
-    'quantity': quantity,
-    'minStock': minStock,
-    'name': name,
-    'description': description,
-    'condition': (condition as Enum).name,
-    'barcode': (barcode?.trim().isEmpty ?? true) ? null : barcode,
-    'serialNumber': (serialNumber?.trim().isEmpty ?? true) ? null : serialNumber,
+    return {
+      'id': id,
+      'containerId': containerId,
+      'assetTypeId': assetTypeId,
+      'locationId': locationId,
+      'quantity': quantity,
+      'minStock': minStock,
+      'name': name,
+      'description': description,
+      'condition': (condition as Enum).name,
+      'barcode': (barcode?.trim().isEmpty ?? true) ? null : barcode,
+      'serialNumber': (serialNumber?.trim().isEmpty ?? true)
+          ? null
+          : serialNumber,
 
-    'customFieldValues': customFieldValues != null 
-        ? Map<String, dynamic>.from(customFieldValues!.map((k, v) => MapEntry(k.toString(), v))) 
-        : null,
+      'customFieldValues': customFieldValues != null
+          ? Map<String, dynamic>.from(
+              customFieldValues!.map((k, v) => MapEntry(k.toString(), v)),
+            )
+          : null,
 
-    'images': images.map((img) => img.toJson()).toList(),
-    'createdAt': createdAt?.toIso8601String(),
-    'updatedAt': updatedAt?.toIso8601String(),
-    
-    'marketValue': marketValue,
-    'currency': currency,
-    'lastPriceUpdate': lastPriceUpdate?.toIso8601String(),
-  };
-}
+      'images': images.map((img) => img.toJson()).toList(),
+      'model3dFiles': model3dFiles.map((m) => m.toJson()).toList(),
+      'createdAt': createdAt?.toIso8601String(),
+      'updatedAt': updatedAt?.toIso8601String(),
+
+      'marketValue': marketValue,
+      'currency': currency,
+      'lastPriceUpdate': lastPriceUpdate?.toIso8601String(),
+    };
+  }
 
   InventoryItem copyWith({
     int? id,
@@ -216,6 +289,7 @@ class InventoryItem {
     int? quantity,
     int? minStock,
     List<InventoryItemImage>? images,
+    List<InventoryItemModel3D>? model3dFiles,
     DateTime? createdAt,
     DateTime? updatedAt,
     Map<String, dynamic>? customFieldValues,
@@ -248,6 +322,7 @@ class InventoryItem {
       quantity: quantity ?? this.quantity,
       minStock: minStock ?? this.minStock,
       images: finalImages,
+      model3dFiles: model3dFiles ?? this.model3dFiles,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       location: location,

@@ -387,7 +387,7 @@ class InventoryItemProvider with ChangeNotifier {
   // CRUD
   // ----------------------------------------------------------------------
 
-  Future<void> createInventoryItem(
+  Future<InventoryItem> createInventoryItem(
     BuildContext context,
     InventoryItem newItem, {
     FileData filesData = const [],
@@ -395,7 +395,10 @@ class InventoryItemProvider with ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      await _itemService.createInventoryItem(newItem, filesData: filesData);
+      final createdItem = await _itemService.createInventoryItem(
+        newItem,
+        filesData: filesData,
+      );
       await loadInventoryItems(
         containerId: newItem.containerId,
         assetTypeId: newItem.assetTypeId,
@@ -406,6 +409,7 @@ class InventoryItemProvider with ChangeNotifier {
         await AppUtils.trackAndToast(context, 'ITEM_WITH_LOCATION');
       }
       await AppUtils.trackAndToast(context, 'PRICE_REGISTERED');
+      return createdItem;
     } catch (e) {
       _isLoading = false;
       notifyListeners();

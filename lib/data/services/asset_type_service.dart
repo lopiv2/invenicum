@@ -29,6 +29,7 @@ class AssetTypeService {
     Uint8List? imageBytes,
     String? imageName,
     bool isSerialized = true,
+    String kind = 'standard',
   }) async {
     try {
       final url = '/containers/$containerId/asset-types';
@@ -37,6 +38,7 @@ class AssetTypeService {
       final formData = FormData.fromMap({
         'name': name,
         'isSerialized': isSerialized,
+        'kind': kind,
         'fieldDefinitions': jsonEncode(fieldDefinitionsJson),
         if (imageBytes != null && imageName != null)
           'files': MultipartFile.fromBytes(
@@ -60,9 +62,7 @@ class AssetTypeService {
           );
         }
       } else {
-        throw Exception(
-          'Error creating AssetType: ${response.statusCode}',
-        );
+        throw Exception('Error creating AssetType: ${response.statusCode}');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
@@ -105,6 +105,7 @@ class AssetTypeService {
     Uint8List? imageBytes,
     String? imageName,
     bool isSerialized = true,
+    String kind = 'standard',
     required bool removeExistingImage,
   }) async {
     try {
@@ -114,6 +115,7 @@ class AssetTypeService {
       final formData = FormData.fromMap({
         'name': name,
         'isSerialized': isSerialized,
+        'kind': kind,
         'fieldDefinitions': jsonEncode(fieldDefinitionsJson),
 
         // 2. Logic to upload a new image
@@ -136,9 +138,7 @@ class AssetTypeService {
         // Assume successful response returns the updated AssetType object in 'data'
         return AssetType.fromJson(responseData['data']);
       } else {
-        throw Exception(
-          'Error updating AssetType: ${response.statusCode}',
-        );
+        throw Exception('Error updating AssetType: ${response.statusCode}');
       }
     } on DioException catch (e) {
       if (e.response?.statusCode == 401) {
@@ -215,7 +215,9 @@ class AssetTypeService {
       if (e.response?.statusCode == 401) {
         throw Exception('Unauthorized. Please log in again.');
       } else if (e.response?.statusCode == 404) {
-        throw Exception('Asset type does not exist or has already been deleted.');
+        throw Exception(
+          'Asset type does not exist or has already been deleted.',
+        );
       }
       final message = e.response?.data['message'] ?? e.message;
       throw Exception('Error deleting asset type: $message');

@@ -27,6 +27,7 @@ import 'package:invenicum/screens/assets/local_widgets/candidate_selection_body.
 import 'package:invenicum/screens/assets/local_widgets/custom_fields_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/external_import_widget.dart';
 import 'package:invenicum/screens/assets/local_widgets/images_section.dart';
+import 'package:invenicum/screens/assets/local_widgets/model_3d_input_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/inventory_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/main_data_section.dart';
 import 'package:invenicum/screens/assets/local_widgets/save_asset_button.dart';
@@ -105,6 +106,8 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   late List<InventoryItemImage> _currentImages;
   List<String> _newImagePreviewUrls = [];
   final List<int> _imageIdsToDelete = [];
+  List<PlatformFile> _model3dFiles = [];
+  final _model3dPathController = TextEditingController();
 
   // ---------------------------------------------------------------------------
   // Imagen helpers
@@ -204,6 +207,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _serialController.text = item.serialNumber ?? '';
     _selectedLocationId = item.locationId;
     _currentImages = List.from(item.images);
+    _model3dFiles = [];
     _selectedCondition = item.condition;
     _marketValue = item.marketValue;
     _initializeDynamicFields(item);
@@ -292,6 +296,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     }
     _aiSearchController.dispose();
     _scrollController.dispose();
+    _model3dPathController.dispose();
     super.dispose();
   }
 
@@ -971,11 +976,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
 
     setState(() => _isSaving = true);
     try {
-      await itemProvider.updateAssetWithFiles(
+      final savedItem = await itemProvider.updateAssetWithFiles(
         updatedItem,
         filesToUpload: filesData,
         imageIdsToDelete: _imageIdsToDelete,
       );
+      await _upload3dModels(savedItem);
       await alertProvider.loadAlerts();
       if (mounted) {
         await itemProvider.loadInventoryItems(
@@ -1007,6 +1013,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       if (mounted) setState(() => _isSaving = false);
     }
   }
+
   void _handleScraperResults(Map<String, dynamic> results) {
     setState(() {
       // Name
@@ -1067,6 +1074,38 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // ---------------------------------------------------------------------------
   // BUILD
   // ---------------------------------------------------------------------------
+
+  Future<void> _upload3dModels(InventoryItem item) async {
+    if (_assetType?.kind != 'gallery3d') return;
+
+    try {
+      final service = context.read<InventoryItemService>();
+      for (var i = 0; i < _model3dFiles.length; i++) {
+        final file = _model3dFiles[i];
+        if (file.bytes != null) {
+          await service.uploadModel3D(
+            itemId: item.id,
+            bytes: file.bytes!,
+            filename: file.name,
+            order: i,
+          );
+        }
+      }
+
+      final path = _model3dPathController.text.trim();
+      if (path.isNotEmpty) {
+        await service.addServerModel3D(
+          itemId: item.id,
+          relativePath: path,
+          order: _model3dFiles.length,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ToastService.error('Error subiendo modelos 3D: ${e.toString()}');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -1155,11 +1194,24 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                       collapsible: false,
                       title: l10n.galleryTitle,
                       icon: Icons.camera_alt_outlined,
-                      child: ImagesSectionWidget(
-                        imageUrls: _allImageUrls,
-                        onAddImage: _addNewImages,
-                        onRemoveImage: _handleRemoveImage,
-                        onAddImageFromUrl: _addImageFromUrl,
+                      child: Column(
+                        children: [
+                          ImagesSectionWidget(
+                            imageUrls: _allImageUrls,
+                            onAddImage: _addNewImages,
+                            onRemoveImage: _handleRemoveImage,
+                            onAddImageFromUrl: _addImageFromUrl,
+                          ),
+                          if (_assetType?.kind == 'gallery3d') ...[
+                            const Divider(height: 32),
+                            Model3DInputSection(
+                              files: _model3dFiles,
+                              pathController: _model3dPathController,
+                              onFilesChanged: (files) =>
+                                  setState(() => _model3dFiles = files),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
 

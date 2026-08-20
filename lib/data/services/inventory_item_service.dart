@@ -81,6 +81,42 @@ class InventoryItemService {
     return await _apiService.getToken();
   }
 
+  Future<InventoryItemModel3D> uploadModel3D({
+    required int itemId,
+    required List<int> bytes,
+    required String filename,
+    int order = 0,
+  }) async {
+    final response = await _dio.post(
+      '/items/$itemId/models-3d/upload',
+      data: FormData.fromMap({
+        'order': order,
+        'model': MultipartFile.fromBytes(bytes, filename: filename),
+      }),
+    );
+    return InventoryItemModel3D.fromJson(
+      response.data['data'] as Map<String, dynamic>,
+    );
+  }
+
+  Future<InventoryItemModel3D> addServerModel3D({
+    required int itemId,
+    required String relativePath,
+    int order = 0,
+  }) async {
+    final response = await _dio.post(
+      '/items/$itemId/models-3d/path',
+      data: {'relativePath': relativePath, 'order': order},
+    );
+    return InventoryItemModel3D.fromJson(
+      response.data['data'] as Map<String, dynamic>,
+    );
+  }
+
+  Future<void> deleteModel3D(int modelId) async {
+    await _dio.delete('/items/models-3d/$modelId');
+  }
+
   // NEW CLONE METHOD
   Future<InventoryItem> cloneInventoryItem(InventoryItem item) async {
     // Ensure your HTTP client (e.g. Dio, http) uses the correct route
@@ -111,13 +147,16 @@ class InventoryItemService {
         options: Options(responseType: ResponseType.bytes),
       );
 
-      final contentType = response.headers.value('content-type') ?? 'image/jpeg';
+      final contentType =
+          response.headers.value('content-type') ?? 'image/jpeg';
       final bytes = response.data as List<int>;
       final base64String = base64Encode(bytes);
       return 'data:$contentType;base64,$base64String';
     } on DioException catch (e) {
       // Provide a friendly error message
-      throw Exception('Error descargando la imagen desde el servidor: ${e.message}');
+      throw Exception(
+        'Error descargando la imagen desde el servidor: ${e.message}',
+      );
     } catch (e) {
       throw Exception('Error descargando la imagen: $e');
     }
@@ -220,9 +259,7 @@ class InventoryItemService {
       formData.fields.add(MapEntry('containerId', item.containerId.toString()));
       formData.fields.add(MapEntry('assetTypeId', item.assetTypeId.toString()));
       formData.fields.add(MapEntry('quantity', item.quantity.toString()));
-      formData.fields.add(
-        MapEntry('minStock', item.minStock.toString()),
-      );
+      formData.fields.add(MapEntry('minStock', item.minStock.toString()));
       formData.fields.add(MapEntry('marketValue', item.marketValue.toString()));
 
       // 🔑 Handle locationId correctly: only add it if not null
@@ -280,9 +317,7 @@ class InventoryItemService {
       final response = await _dio.delete('/items/$itemId');
 
       if (response.statusCode != 204 && response.statusCode != 200) {
-        throw Exception(
-          'Error deleting asset: Code ${response.statusCode}',
-        );
+        throw Exception('Error deleting asset: Code ${response.statusCode}');
       }
     } on DioException {
       rethrow;

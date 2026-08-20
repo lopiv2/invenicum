@@ -16,6 +16,7 @@ import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/widgets/ui/asset_image_gallery_widget.dart';
 import 'package:invenicum/widgets/ui/price_history_chart_widget.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
+import 'package:invenicum/widgets/ui/model_3d_viewer.dart';
 
 class AssetDetailScreen extends StatefulWidget {
   final String containerId;
@@ -134,6 +135,27 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       child: AssetMarketStatusWidget(item: item, l10n: l10n),
                     ),
 
+                    if (item.model3dFiles.isNotEmpty)
+                      CollapsibleBentoBoxWidget(
+                        collapsible: false,
+                        width: 780,
+                        title: 'Galería 3D',
+                        icon: Icons.view_in_ar,
+                        child: Column(
+                          children: item.model3dFiles
+                              .map(
+                                (model) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 16),
+                                  child: Model3DViewer(
+                                    src: model.url,
+                                    title: model.originalName ?? 'Modelo 3D',
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+
                     CollapsibleBentoBoxWidget(
                       collapsible: false,
                       width: 1200,
@@ -144,8 +166,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                           if (provider.loadingHistory) {
                             return const SizedBox(
                               height: 200,
-                              child: Center(
-                                  child: AppLoadingIndicator()),
+                              child: Center(child: AppLoadingIndicator()),
                             );
                           }
                           return PriceHistoryChart(
@@ -185,24 +206,24 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
   }
 
   void _navigateToSibling(int offset) {
-  final itemProvider = context.read<InventoryItemProvider>();
-  final items = itemProvider.allInventoryItems;
-  if (items.isEmpty) return;
-  final int currentId = int.tryParse(widget.itemId) ?? 0;
-  final int currentIndex = items.indexWhere((i) => i.id == currentId);
-  if (currentIndex != -1) {
-    int nextIndex = (currentIndex + offset) % items.length;
-    if (nextIndex < 0) nextIndex = items.length - 1;
-    context.goNamed(
-      RouteNames.assetDetail,
-      pathParameters: {
-        'containerId': widget.containerId,
-        'assetTypeId': widget.assetTypeId,
-        'assetId': items[nextIndex].id.toString(),
-      },
-    );
+    final itemProvider = context.read<InventoryItemProvider>();
+    final items = itemProvider.allInventoryItems;
+    if (items.isEmpty) return;
+    final int currentId = int.tryParse(widget.itemId) ?? 0;
+    final int currentIndex = items.indexWhere((i) => i.id == currentId);
+    if (currentIndex != -1) {
+      int nextIndex = (currentIndex + offset) % items.length;
+      if (nextIndex < 0) nextIndex = items.length - 1;
+      context.goNamed(
+        RouteNames.assetDetail,
+        pathParameters: {
+          'containerId': widget.containerId,
+          'assetTypeId': widget.assetTypeId,
+          'assetId': items[nextIndex].id.toString(),
+        },
+      );
+    }
   }
-}
 
   void _showFullScreenImage(BuildContext context, String imageUrl) {
     showDialog(
@@ -220,8 +241,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
               top: 20,
               right: 20,
               child: IconButton(
-                icon:
-                    const Icon(Icons.close, color: Colors.white, size: 30),
+                icon: const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: () => Navigator.pop(context),
               ),
             ),
