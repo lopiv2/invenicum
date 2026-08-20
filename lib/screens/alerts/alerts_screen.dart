@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/alert.dart';
@@ -231,7 +232,7 @@ class _AlertsScreenState extends State<AlertsScreen>
                 ),
                 Expanded(
                   child: alertProvider.isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(child: AppLoadingIndicator())
                       : TabBarView(
                           controller: _tabController,
                           children: [

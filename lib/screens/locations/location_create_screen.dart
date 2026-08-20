@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // lib/screens/locations/location_create_screen.dart
 
 import 'package:flutter/material.dart';
@@ -107,7 +108,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
           title: Text(l10n.createNewLocationTitle),
           backgroundColor: Colors.teal,
         ),
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: AppLoadingIndicator()),
       );
     }
 
@@ -196,7 +197,7 @@ class _LocationCreateScreenState extends State<LocationCreateScreen> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
+                        child: AppLoadingIndicator(
                           color: Colors.white,
                           strokeWidth: 2,
                         ),

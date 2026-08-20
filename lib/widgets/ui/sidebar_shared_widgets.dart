@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 
 class AddIconButton extends StatelessWidget {
@@ -14,7 +15,7 @@ class AddIconButton extends StatelessWidget {
           ? const SizedBox(
               width: 16,
               height: 16,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: AppLoadingIndicator(strokeWidth: 2),
             )
           : Icon(
               Icons.add_circle_outline_rounded,

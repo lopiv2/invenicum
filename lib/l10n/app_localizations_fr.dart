@@ -1073,6 +1073,37 @@ class AppLocalizationsFr extends AppLocalizations {
   String get selectFontFamily => 'Sélectionnez la police de l\'application';
 
   @override
+  String get loadingAnimationLabel => 'Animation de chargement';
+
+  @override
+  String get selectLoadingAnimation =>
+      'Sélectionnez l\'animation de chargement de l\'application';
+
+  @override
+  String get loadingAnimationCircular => 'Circulaire';
+
+  @override
+  String get loadingAnimationFadingCircle => 'Cercle dégradé';
+
+  @override
+  String get loadingAnimationWave => 'Vague';
+
+  @override
+  String get loadingAnimationThreeBounce => 'Trois rebonds';
+
+  @override
+  String get loadingAnimationCubeGrid => 'Grille de cubes';
+
+  @override
+  String get loadingAnimationChasingDots => 'Points poursuivis';
+
+  @override
+  String get loadingAnimationRotatingCircle => 'Cercle rotatif';
+
+  @override
+  String get loadingAnimationHourGlass => 'Sablier';
+
+  @override
   String get fontDefault => 'Par défaut (Système)';
 
   @override

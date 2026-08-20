@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/utils/loading_animation.dart';
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
 import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/data/models/user_preferences.dart';
@@ -35,6 +36,7 @@ class PreferencesProvider with ChangeNotifier {
       _prefs.autoResetFieldsOnSaveAndContinue;
   bool get cloneBusterEnabled => _prefs.cloneBusterEnabled;
   String get selectedFontFamily => _prefs.font;
+  LoadingAnimation get loadingAnimation => _prefs.loadingAnimation;
   List<OverlayImageConfig> get crossToonConfigs => _prefs.crossToonConfigs;
 
   PreferencesProvider(this._preferencesService);
@@ -393,6 +395,27 @@ class PreferencesProvider with ChangeNotifier {
       _prefs = previousPrefs;
       notifyListeners();
       debugPrint('Error updating font family preference: $e');
+      rethrow;
+    }
+  }
+
+  Future<void> setLoadingAnimation(LoadingAnimation animation) async {
+    final previousPrefs = _prefs;
+
+    _prefs = _prefs.copyWith(loadingAnimation: animation);
+    notifyListeners();
+
+    try {
+      await _preferencesService.updatePreference(
+        'loadingAnimation',
+        animation.value,
+      );
+      _prefs = _prefs.copyWith(loadingAnimation: animation);
+      notifyListeners();
+    } catch (e) {
+      _prefs = previousPrefs;
+      notifyListeners();
+      debugPrint('Error updating loading animation preference: $e');
       rethrow;
     }
   }

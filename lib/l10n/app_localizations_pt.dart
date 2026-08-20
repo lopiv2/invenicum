@@ -1072,6 +1072,37 @@ class AppLocalizationsPt extends AppLocalizations {
   String get selectFontFamily => 'Selecionar a fonte da aplicação';
 
   @override
+  String get loadingAnimationLabel => 'Animação de carregamento';
+
+  @override
+  String get selectLoadingAnimation =>
+      'Selecionar a animação de carregamento da aplicação';
+
+  @override
+  String get loadingAnimationCircular => 'Circular';
+
+  @override
+  String get loadingAnimationFadingCircle => 'Círculo desaparecendo';
+
+  @override
+  String get loadingAnimationWave => 'Onda';
+
+  @override
+  String get loadingAnimationThreeBounce => 'Três saltos';
+
+  @override
+  String get loadingAnimationCubeGrid => 'Grade de cubos';
+
+  @override
+  String get loadingAnimationChasingDots => 'Pontos perseguidores';
+
+  @override
+  String get loadingAnimationRotatingCircle => 'Círculo giratório';
+
+  @override
+  String get loadingAnimationHourGlass => 'Ampulheta';
+
+  @override
   String get fontDefault => 'Padrão (Sistema)';
 
   @override

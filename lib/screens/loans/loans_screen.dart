@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // lib/screens/loans_screen.dart
 
 import 'dart:typed_data';
@@ -253,7 +254,7 @@ class _LoansScreenState extends State<LoansScreen> {
     if (isLoading && loanProvider.loans.isEmpty) {
       return const Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: AppLoadingIndicator()),
       );
     }
 

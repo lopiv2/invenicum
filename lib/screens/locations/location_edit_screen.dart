@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // lib/screens/locations/location_edit_screen.dart
 
 import 'package:flutter/material.dart';
@@ -185,7 +186,7 @@ class _LocationEditScreenState extends State<LocationEditScreen> {
                     ? const SizedBox(
                         width: 20,
                         height: 20,
-                        child: CircularProgressIndicator(
+                        child: AppLoadingIndicator(
                           color: Colors.white,
                           strokeWidth: 2,
                         ),

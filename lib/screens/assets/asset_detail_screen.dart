@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -80,7 +81,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
         appBar: AppBar(),
         body: Center(
           child: itemProvider.isLoading
-              ? const CircularProgressIndicator()
+              ? const AppLoadingIndicator()
               : Text(l10n.assetNotFound),
         ),
       );
@@ -144,7 +145,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                             return const SizedBox(
                               height: 200,
                               child: Center(
-                                  child: CircularProgressIndicator()),
+                                  child: AppLoadingIndicator()),
                             );
                           }
                           return PriceHistoryChart(

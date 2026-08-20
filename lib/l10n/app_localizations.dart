@@ -2026,6 +2026,66 @@ abstract class AppLocalizations {
   /// **'Select the application font'**
   String get selectFontFamily;
 
+  /// No description provided for @loadingAnimationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading animation'**
+  String get loadingAnimationLabel;
+
+  /// No description provided for @selectLoadingAnimation.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the application loading animation'**
+  String get selectLoadingAnimation;
+
+  /// No description provided for @loadingAnimationCircular.
+  ///
+  /// In en, this message translates to:
+  /// **'Circular'**
+  String get loadingAnimationCircular;
+
+  /// No description provided for @loadingAnimationFadingCircle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fading circle'**
+  String get loadingAnimationFadingCircle;
+
+  /// No description provided for @loadingAnimationWave.
+  ///
+  /// In en, this message translates to:
+  /// **'Wave'**
+  String get loadingAnimationWave;
+
+  /// No description provided for @loadingAnimationThreeBounce.
+  ///
+  /// In en, this message translates to:
+  /// **'Three bounce'**
+  String get loadingAnimationThreeBounce;
+
+  /// No description provided for @loadingAnimationCubeGrid.
+  ///
+  /// In en, this message translates to:
+  /// **'Cube grid'**
+  String get loadingAnimationCubeGrid;
+
+  /// No description provided for @loadingAnimationChasingDots.
+  ///
+  /// In en, this message translates to:
+  /// **'Chasing dots'**
+  String get loadingAnimationChasingDots;
+
+  /// No description provided for @loadingAnimationRotatingCircle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotating circle'**
+  String get loadingAnimationRotatingCircle;
+
+  /// No description provided for @loadingAnimationHourGlass.
+  ///
+  /// In en, this message translates to:
+  /// **'Hourglass'**
+  String get loadingAnimationHourGlass;
+
   /// No description provided for @fontDefault.
   ///
   /// In en, this message translates to:

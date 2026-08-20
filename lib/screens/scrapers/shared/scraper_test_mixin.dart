@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -104,7 +105,7 @@ mixin ScraperTestMixin<T extends StatefulWidget> on State<T> {
       title: '',
       body: const SizedBox(
         height: 80,
-        child: Center(child: CircularProgressIndicator()),
+        child: Center(child: AppLoadingIndicator()),
       ),
     );
 

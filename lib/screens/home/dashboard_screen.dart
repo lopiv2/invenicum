@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/dashboard_stats.dart';
@@ -78,7 +79,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 return const Center(
                   child: Padding(
                     padding: EdgeInsets.all(40.0),
-                    child: CircularProgressIndicator(),
+                    child: AppLoadingIndicator(),
                   ),
                 );
               }

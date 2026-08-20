@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // widgets/asset_counters_row.dart
 
 import 'package:flutter/material.dart';
@@ -135,7 +136,7 @@ class AssetCountersRow extends StatelessWidget {
               const SizedBox(
                 width: 12,
                 height: 12,
-                child: CircularProgressIndicator(
+                child: AppLoadingIndicator(
                   strokeWidth: 2,
                   color: Colors.grey,
                 ),
@@ -226,7 +227,7 @@ class AssetCountersRow extends StatelessWidget {
           ? const SizedBox(
               width: 14,
               height: 14,
-              child: CircularProgressIndicator(strokeWidth: 2),
+              child: AppLoadingIndicator(strokeWidth: 2),
             )
           : Icon(icon, size: 16, color: color.withValues(alpha: 0.8)),
       label: Container(

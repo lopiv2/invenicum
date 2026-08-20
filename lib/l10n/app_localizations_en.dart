@@ -1062,6 +1062,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get selectFontFamily => 'Select the application font';
 
   @override
+  String get loadingAnimationLabel => 'Loading animation';
+
+  @override
+  String get selectLoadingAnimation =>
+      'Select the application loading animation';
+
+  @override
+  String get loadingAnimationCircular => 'Circular';
+
+  @override
+  String get loadingAnimationFadingCircle => 'Fading circle';
+
+  @override
+  String get loadingAnimationWave => 'Wave';
+
+  @override
+  String get loadingAnimationThreeBounce => 'Three bounce';
+
+  @override
+  String get loadingAnimationCubeGrid => 'Cube grid';
+
+  @override
+  String get loadingAnimationChasingDots => 'Chasing dots';
+
+  @override
+  String get loadingAnimationRotatingCircle => 'Rotating circle';
+
+  @override
+  String get loadingAnimationHourGlass => 'Hourglass';
+
+  @override
   String get fontDefault => 'Default (System)';
 
   @override

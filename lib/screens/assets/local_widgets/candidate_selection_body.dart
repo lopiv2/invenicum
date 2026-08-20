@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/services/integrations_service.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -91,7 +92,7 @@ class _CandidateSelectionBodyState extends State<CandidateSelectionBody> {
         children: [
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: AppLoadingIndicator())
                 : _candidates.isEmpty
                     ? Center(child: Text(l10n.noResultsFound))
                     : GridView.builder(

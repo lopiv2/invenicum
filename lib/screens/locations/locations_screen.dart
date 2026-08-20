@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:graphview/GraphView.dart';
@@ -191,7 +192,7 @@ class _LocationsScreenState extends State<LocationsScreen>
       return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
-          child: CircularProgressIndicator(color: theme.primaryColor),
+          child: AppLoadingIndicator(color: theme.primaryColor),
         ),
       );
     }

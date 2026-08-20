@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
@@ -251,7 +252,7 @@ class _LowStockCardState extends State<LowStockCard> {
     return Center(
       child: Container(
         padding: const EdgeInsets.all(40),
-        child: const CircularProgressIndicator(strokeWidth: 2),
+        child: const AppLoadingIndicator(strokeWidth: 2),
       ),
     );
   }

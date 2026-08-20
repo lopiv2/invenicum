@@ -1,6 +1,7 @@
 import 'package:invenicum/data/models/notifications_preferences_model.dart';
 import 'package:invenicum/data/models/overlay_image_config_model.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/core/utils/loading_animation.dart';
 
 class UserPreferences {
   final int? id;
@@ -19,12 +20,13 @@ class UserPreferences {
   final bool autoResetFieldsOnSaveAndContinue;
   final bool cloneBusterEnabled;
   final String font;
+  final LoadingAnimation loadingAnimation;
   final List<OverlayImageConfig> crossToonConfigs;
 
   // ── Tema ────────────────────────────────────────────────────────────────────
-  final String? themeColor;      // e.g. '#55FFFF'
+  final String? themeColor; // e.g. '#55FFFF'
   final String? themeBrightness; // 'light' | 'dark'
-  final String? paletteId;       // 'cga' | 'ega' | 'scumm_crt' | null
+  final String? paletteId; // 'cga' | 'ega' | 'scumm_crt' | null
 
   UserPreferences({
     this.id,
@@ -42,6 +44,7 @@ class UserPreferences {
     this.autoResetFieldsOnSaveAndContinue = true,
     this.cloneBusterEnabled = false,
     this.font = 'Default',
+    this.loadingAnimation = LoadingAnimation.rotatingPlain,
     this.crossToonConfigs = const [],
     NotificationSettings? notifications,
     this.themeColor,
@@ -61,7 +64,8 @@ class UserPreferences {
       id: json['id'] as int?,
       language: json['language'] as String? ?? 'en',
       currency: json['currency'] as String? ?? AppCurrencies.defaultCurrency,
-      showAssetTypeLogo: json['showAssetTypeLogo'] ?? json['show_asset_type_logo'] ?? true,
+      showAssetTypeLogo:
+          json['showAssetTypeLogo'] ?? json['show_asset_type_logo'] ?? true,
       aiEnabled: (json['aiEnabled'] ?? json['ai_enabled'] ?? true) as bool,
       aiProvider: (json['aiProvider'] ?? json['ai_provider']) as String?,
       aiModel: (json['aiModel'] ?? json['ai_model']) as String?,
@@ -76,11 +80,15 @@ class UserPreferences {
           json['autoResetFieldsOnSaveAndContinue'] as bool? ?? true,
       cloneBusterEnabled: json['enableCloneBusterOmatic'] ?? false,
       font: json['font'] ?? 'Default',
+      loadingAnimation: LoadingAnimation.fromValue(
+        json['loadingAnimation'] as String?,
+      ),
       crossToonConfigs: json['crossToonConfigs'] != null
           ? (json['crossToonConfigs'] as List<dynamic>)
-              .map((e) =>
-                  OverlayImageConfig.fromJson(e as Map<String, dynamic>))
-              .toList()
+                .map(
+                  (e) => OverlayImageConfig.fromJson(e as Map<String, dynamic>),
+                )
+                .toList()
           : [],
       notifications: json['notifications'] != null
           ? NotificationSettings.fromJson(json['notifications'])
@@ -107,6 +115,7 @@ class UserPreferences {
       'autoResetFieldsOnSaveAndContinue': autoResetFieldsOnSaveAndContinue,
       'cloneBusterEnabled': cloneBusterEnabled,
       'font': font,
+      'loadingAnimation': loadingAnimation.value,
       'crossToonConfigs': crossToonConfigs.map((e) => e.toJson()).toList(),
       'updatedAt': updatedAt?.toIso8601String(),
       'notifications': notifications.toJson(),
@@ -117,10 +126,7 @@ class UserPreferences {
   }
 
   Map<String, dynamic> toVisualSettingsJson() {
-    return {
-      'useSystemTheme': useSystemTheme,
-      'isDarkMode': isDarkMode,
-    };
+    return {'useSystemTheme': useSystemTheme, 'isDarkMode': isDarkMode};
   }
 
   UserPreferences copyWith({
@@ -138,6 +144,7 @@ class UserPreferences {
     bool? autoResetFieldsOnSaveAndContinue,
     bool? cloneBusterEnabled,
     String? font,
+    LoadingAnimation? loadingAnimation,
     List<OverlayImageConfig>? crossToonConfigs,
     String? themeColor,
     String? themeBrightness,
@@ -156,9 +163,11 @@ class UserPreferences {
       useSystemTheme: useSystemTheme ?? this.useSystemTheme,
       isDarkMode: isDarkMode ?? this.isDarkMode,
       autoResetFieldsOnSaveAndContinue:
-          autoResetFieldsOnSaveAndContinue ?? this.autoResetFieldsOnSaveAndContinue,
+          autoResetFieldsOnSaveAndContinue ??
+          this.autoResetFieldsOnSaveAndContinue,
       cloneBusterEnabled: cloneBusterEnabled ?? this.cloneBusterEnabled,
       font: font ?? this.font,
+      loadingAnimation: loadingAnimation ?? this.loadingAnimation,
       crossToonConfigs: crossToonConfigs ?? this.crossToonConfigs,
       themeColor: themeColor ?? this.themeColor,
       themeBrightness: themeBrightness ?? this.themeBrightness,
@@ -177,6 +186,7 @@ class UserPreferences {
       autoResetFieldsOnSaveAndContinue: true,
       cloneBusterEnabled: false,
       font: 'Default',
+      loadingAnimation: LoadingAnimation.rotatingPlain,
       crossToonConfigs: const [],
       exchangeRates: {},
       notifications: NotificationSettings(),

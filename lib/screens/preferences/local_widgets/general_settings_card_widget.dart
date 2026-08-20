@@ -8,6 +8,7 @@ import 'package:invenicum/screens/preferences/local_widgets/clone_buster_switch_
 import 'package:invenicum/screens/preferences/local_widgets/currency_dropdown_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/font_family_dropdown_widget.dart';
 import 'package:invenicum/screens/preferences/local_widgets/language_dropdown_widget.dart';
+import 'package:invenicum/screens/preferences/local_widgets/loading_animation_dropdown_widget.dart';
 import 'package:provider/provider.dart';
 
 class GeneralSettingsCardWidget extends StatelessWidget {
@@ -94,10 +95,12 @@ class GeneralSettingsCardWidget extends StatelessWidget {
               title: Text(l10n.autoResetFieldsOnSaveAndContinue),
               subtitle: Text(l10n.autoResetFieldsOnSaveAndContinueDescription),
               secondary: const Icon(Icons.restart_alt_outlined),
-              value: context.watch<PreferencesProvider>()
+              value: context
+                  .watch<PreferencesProvider>()
                   .autoResetFieldsOnSaveAndContinue,
               onChanged: (val) => {
-                context.read<PreferencesProvider>()
+                context
+                    .read<PreferencesProvider>()
                     .setAutoResetFieldsOnSaveAndContinue(val),
                 ToastService.success(
                   AppLocalizations.of(context)!.preferencesUpdated,
@@ -127,10 +130,15 @@ class GeneralSettingsCardWidget extends StatelessWidget {
             ListTile(
               leading: const Icon(Icons.text_fields),
               title: Text(AppLocalizations.of(context)!.fontFamilyLabel),
-              subtitle: Text(
-                AppLocalizations.of(context)!.selectFontFamily,
-              ),
+              subtitle: Text(AppLocalizations.of(context)!.selectFontFamily),
               trailing: const FontFamilyDropdownWidget(),
+              onTap: null,
+            ),
+            ListTile(
+              leading: const Icon(Icons.hourglass_empty),
+              title: Text(l10n.loadingAnimationLabel),
+              subtitle: Text(l10n.selectLoadingAnimation),
+              trailing: const LoadingAnimationDropdownWidget(),
               onTap: null,
             ),
             if (prefsProvider.selectedCurrency != AppCurrencies.usd &&
@@ -214,7 +222,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                   return;
                 }
 
-                  // If linked, proceed normally
+                // If linked, proceed normally
                 try {
                   await prefsProvider.setAiEnabled(value);
                   ToastService.success(

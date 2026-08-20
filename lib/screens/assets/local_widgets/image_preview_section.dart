@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -48,7 +49,7 @@ class ImagePreviewSection extends StatelessWidget {
           child: SizedBox(
             width: 30, // Reducimos el tamaño del indicador
             height: 30,
-            child: CircularProgressIndicator(strokeWidth: 3),
+            child: AppLoadingIndicator(strokeWidth: 3),
           ),
         ),
         // Muestra un ícono de error si la carga falla (mejor que el crash)
@@ -82,7 +83,7 @@ class ImagePreviewSection extends StatelessWidget {
               isLoading
                   ? const SizedBox(
                       height: 100,
-                      child: Center(child: CircularProgressIndicator()),
+                      child: Center(child: AppLoadingIndicator()),
                     )
                   : TextField(
                       controller: urlController,
@@ -122,7 +123,7 @@ class ImagePreviewSection extends StatelessWidget {
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: AppLoadingIndicator(strokeWidth: 2),
                           )
                         : Text(l10n.addLabel),
                   ),

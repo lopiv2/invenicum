@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/container_provider.dart';
@@ -23,7 +24,7 @@ class _SidebarTreeSectionState extends State<SidebarTreeSection> {
             child: Center(
               child: Padding(
                 padding: EdgeInsets.all(20),
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: AppLoadingIndicator(strokeWidth: 2),
               ),
             ),
           );

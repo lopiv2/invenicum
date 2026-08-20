@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -351,7 +352,7 @@ class _AssetImportScreenState extends State<AssetImportScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const CircularProgressIndicator(),
+              const AppLoadingIndicator(),
               const SizedBox(height: 12),
               Text(l10n.loadingAssetType),
             ],
@@ -418,7 +419,7 @@ class _AssetImportScreenState extends State<AssetImportScreen> {
             ),
             const SizedBox(height: 20),
             if (_isLoading)
-              const Center(child: CircularProgressIndicator())
+              const Center(child: AppLoadingIndicator())
             else if (_csvHeaders.isEmpty)
               Center(
                 child: Padding(

@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:invenicum/data/models/store_plugin_model.dart';
@@ -86,7 +87,7 @@ class _PluginAdminScreenState extends State<PluginAdminScreen>
                 // 🚩 Cambiamos provider.installed.isEmpty por la lógica de tipos
                 if (provider.isLoading && provider.installed.isEmpty) {
                   return const Center(
-                    child: CircularProgressIndicator.adaptive(),
+                    child: AppLoadingIndicator(),
                   );
                 }
 

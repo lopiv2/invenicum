@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // lib/screens/asset_type_grid_screen.dart
 
 import 'package:flutter/material.dart';
@@ -115,7 +116,7 @@ class _AssetTypeGridScreenState extends State<AssetTypeGridScreen> {
     if (container == null) {
       if (containerProvider.isLoading) {
         return Center(
-          child: CircularProgressIndicator(color: theme.primaryColor),
+          child: AppLoadingIndicator(color: theme.primaryColor),
         );
       }
       return Center(

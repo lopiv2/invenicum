@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -288,7 +289,7 @@ class _SpritePreviewState extends State<_SpritePreview> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: AppLoadingIndicator(strokeWidth: 2, color: Colors.white),
                   )
                 : const Icon(Icons.download_rounded, color: Colors.white),
             onPressed: _saving ? null : _saveToDevice,

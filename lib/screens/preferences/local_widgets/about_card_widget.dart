@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
@@ -185,7 +186,7 @@ class AboutCardWidget extends StatelessWidget {
                                 SizedBox(
                                   width: 14,
                                   height: 14,
-                                  child: CircularProgressIndicator(
+                                  child: AppLoadingIndicator(
                                     strokeWidth: 2,
                                     color: stateColor,
                                   ),

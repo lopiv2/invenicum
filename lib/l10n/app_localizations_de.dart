@@ -1074,6 +1074,36 @@ class AppLocalizationsDe extends AppLocalizations {
   String get selectFontFamily => 'Schriftart der Anwendung auswählen';
 
   @override
+  String get loadingAnimationLabel => 'Ladeanimation';
+
+  @override
+  String get selectLoadingAnimation => 'Ladeanimation der Anwendung auswählen';
+
+  @override
+  String get loadingAnimationCircular => 'Kreisförmig';
+
+  @override
+  String get loadingAnimationFadingCircle => 'Verblassender Kreis';
+
+  @override
+  String get loadingAnimationWave => 'Welle';
+
+  @override
+  String get loadingAnimationThreeBounce => 'Drei Sprünge';
+
+  @override
+  String get loadingAnimationCubeGrid => 'Würfelraster';
+
+  @override
+  String get loadingAnimationChasingDots => 'Verfolgende Punkte';
+
+  @override
+  String get loadingAnimationRotatingCircle => 'Drehender Kreis';
+
+  @override
+  String get loadingAnimationHourGlass => 'Sanduhr';
+
+  @override
   String get fontDefault => 'Standard (System)';
 
   @override
