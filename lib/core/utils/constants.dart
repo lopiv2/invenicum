@@ -268,10 +268,7 @@ class AppIntegrations {
         id: rawg,
         name: 'RAWG',
         isDataSource: true,
-        image: Image.asset(
-          'assets/images/RAWG_logo.png',
-          height: 35,
-        ),
+        image: Image.asset('assets/images/RAWG_logo.png', height: 35),
         description: l10n.integrationRawgDesc,
         fields: [
           IntegrationField(
@@ -770,7 +767,8 @@ class VersionArt {
       versionName: 'The Powerful Man',
       versionLabel: 'v1.0.0',
       assetPath: 'assets/images/He-man.webp',
-      description: 'By the power of Grayskull, your inventory has never been more organized. '
+      description:
+          'By the power of Grayskull, your inventory has never been more organized. '
           'The most powerful man in the universe vanquishes clutter with a single swing.',
       size: 200,
     ),
@@ -778,7 +776,18 @@ class VersionArt {
       versionName: 'Crazy Mad Doctor',
       versionLabel: 'v1.1.0',
       assetPath: 'assets/images/doctorFred_dancing.webp',
-      description: 'The original and crazy mad scientist dancing his way into your inventory.',
+      description:
+          'The original and crazy mad scientist dancing his way into your inventory.',
+      size: 200,
+    ),
+    VersionArt(
+      versionName: 'Mighty Pirate',
+      versionLabel: 'v1.2.0',
+      assetPath: 'assets/images/guybrush_sword.webp',
+      description:
+          'How appropriate, you look like someone who could inventory '
+          'themselves out of any clutter. A Mighty Pirate '
+          'and master organizer, sails your collection to new horizons.',
       size: 200,
     ),
   ];
@@ -796,7 +805,9 @@ class VersionArt {
     final parts = appVersion.split('.');
     if (parts.length >= 2) {
       final majorMinor = 'v${parts[0]}.${parts[1]}';
-      return all.where((a) => a.versionLabel.startsWith(majorMinor)).firstOrNull;
+      return all
+          .where((a) => a.versionLabel.startsWith(majorMinor))
+          .firstOrNull;
     }
     return null;
   }
@@ -808,10 +819,13 @@ class VersionArt {
 enum OverlayZone {
   /// Near the top edge.
   top,
+
   /// Central area of the screen.
   middle,
+
   /// Near the bottom edge.
   bottom,
+
   /// Any random vertical position.
   random,
 }
@@ -824,11 +838,14 @@ enum OverlayZone {
 enum AnimationDirection {
   /// Sprite faces right. Animation moves left-to-right, no flip.
   leftToRight,
+
   /// Sprite faces left. Animation moves right-to-left, no flip.
   rightToLeft,
+
   /// Sprite faces right by convention. Movement direction is random;
   /// the image is flipped when moving left.
   alternate,
+
   /// Walks around the screen border: bottom → right → top → left → repeat.
   borderWalk,
 }
@@ -837,11 +854,11 @@ enum AnimationDirection {
 enum TurnMode {
   /// Sprite always turns at random intervals within [turnMinDelay, turnMaxDelay].
   on,
+
   /// Sprite never turns mid-animation.
   off,
+
   /// Each turn opportunity is decided randomly (≈ 50 % chance), with a
   /// fully random delay. [turnMinDelay] and [turnMaxDelay] are ignored.
   random,
 }
-
-

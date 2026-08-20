@@ -283,6 +283,7 @@ class ContainerProvider with ChangeNotifier {
     Uint8List? imageBytes,
     String? imageName,
     bool isSerialized = true,
+    String kind = 'standard',
     required bool removeExistingImage,
   }) async {
     try {
@@ -299,6 +300,7 @@ class ContainerProvider with ChangeNotifier {
             imageBytes: imageBytes,
             imageName: imageName,
             isSerialized: isSerialized,
+            kind: kind,
             removeExistingImage: removeExistingImage,
           );
 
@@ -419,6 +421,7 @@ class ContainerProvider with ChangeNotifier {
     Uint8List? imageBytes,
     String? imageName,
     bool isSerialized = true,
+    String kind = 'standard',
   }) async {
     try {
       // 1. Lógica de API
@@ -433,6 +436,7 @@ class ContainerProvider with ChangeNotifier {
             imageBytes: imageBytes,
             imageName: imageName,
             isSerialized: isSerialized,
+            kind: kind,
             // 🎯 CORRECCIÓN: Pasar la ID de la ubicación al servicio
           );
 

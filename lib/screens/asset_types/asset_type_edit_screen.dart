@@ -45,6 +45,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
   List<ListData> _availableDataLists = [];
   bool _isLoading = true;
   bool _isSerialized = true;
+  String _assetKind = 'standard';
   bool _isCollection = false;
 
   // Estado para la imagen
@@ -93,6 +94,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
 
       _nameController.text = assetType.name;
       _isSerialized = assetType.isSerialized; // Cargamos el estado real
+      _assetKind = assetType.kind;
       _fieldDefinitions = List.from(assetType.fieldDefinitions);
       _availableDataLists = container.dataLists;
       _currentAssetType = assetType;
@@ -104,7 +106,9 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
 
       setState(() => _isLoading = false);
     } catch (e) {
-      ToastService.error(AppLocalizations.of(context)!.assetTypeLoadError(e.toString()));
+      ToastService.error(
+        AppLocalizations.of(context)!.assetTypeLoadError(e.toString()),
+      );
       setState(() => _isLoading = false);
     }
   }
@@ -183,12 +187,15 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         assetTypeId: assetTypeIdInt,
         name: _nameController.text,
         isSerialized: _isSerialized, // IMPORTANTE: enviamos el cambio
+        kind: _assetKind,
         fieldDefinitions: _fieldDefinitions,
         imageBytes: newImageBytes,
         imageName: newImageName,
         removeExistingImage: _imageWasRemoved && !_isNewImageBase64,
       );
-      ToastService.success(AppLocalizations.of(context)!.assetTypeUpdateSuccess);
+      ToastService.success(
+        AppLocalizations.of(context)!.assetTypeUpdateSuccess,
+      );
       if (mounted) {
         context.goNamed(
           RouteNames.assetTypes,
@@ -196,7 +203,9 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
         );
       }
     } catch (e) {
-      ToastService.error(AppLocalizations.of(context)!.assetTypeUpdateError(e.toString()));
+      ToastService.error(
+        AppLocalizations.of(context)!.assetTypeUpdateError(e.toString()),
+      );
     }
   }
 
@@ -221,7 +230,9 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
               child: Column(
                 children: [
                   AssetTypeFormTitle(
-                    title: l10n.editAssetTypeTitle(_currentAssetType?.name ?? ''),
+                    title: l10n.editAssetTypeTitle(
+                      _currentAssetType?.name ?? '',
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -255,6 +266,29 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
                             ),
                             const SizedBox(height: 20),
                             AssetTypeNameField(controller: _nameController),
+                            const SizedBox(height: 24),
+                            DropdownButtonFormField<String>(
+                              value: _assetKind,
+                              decoration: const InputDecoration(
+                                labelText: 'Tipo de contenido',
+                                border: OutlineInputBorder(),
+                              ),
+                              items: const [
+                                DropdownMenuItem(
+                                  value: 'standard',
+                                  child: Text('Estándar'),
+                                ),
+                                DropdownMenuItem(
+                                  value: 'gallery3d',
+                                  child: Text('Galería 3D'),
+                                ),
+                              ],
+                              onChanged: (value) {
+                                if (value != null) {
+                                  setState(() => _assetKind = value);
+                                }
+                              },
+                            ),
                             const SizedBox(height: 24),
                             const Divider(),
                             const SizedBox(height: 16),
