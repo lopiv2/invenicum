@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // lib/widgets/main_layout.dart
 
 import 'package:collection/collection.dart';
@@ -256,7 +257,7 @@ class _MainLayoutState extends State<MainLayout> {
                         : colorScheme.surfaceContainerLowest,
                   ),
                   child: _isAnimating
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(child: AppLoadingIndicator())
                       : widget.child,
                 ),
               ),

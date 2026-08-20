@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // screens/preferences/local_widgets/ai_provider_card_widget.dart
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/constants.dart';
@@ -180,7 +181,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
 
             // ── Indicador de guardado ─────────────────────────────────────
             if (_isSaving)
-              const Center(child: CircularProgressIndicator(strokeWidth: 2))
+              const Center(child: AppLoadingIndicator(strokeWidth: 2))
             else
               // Muestra el estado actual como resumen
               Container(
@@ -241,7 +242,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                           ? const SizedBox(
                               width: 14,
                               height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: AppLoadingIndicator(strokeWidth: 2),
                             )
                           : const Icon(Icons.delete_sweep_outlined),
                       label: Text(l10n.purgeChatHistoryButton),

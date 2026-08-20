@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import 'package:invenicum/screens/asset_types/local_widgets/condition_badge_widget.dart';
@@ -146,7 +147,7 @@ class AssetMarketStatusWidget extends StatelessWidget {
                   ? const SizedBox(
                       width: 18,
                       height: 18,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      child: AppLoadingIndicator(strokeWidth: 2),
                     )
                   : const Icon(Icons.cloud_sync_rounded),
               label: Text(

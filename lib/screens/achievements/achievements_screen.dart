@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:ui'; // Necesario para ImageFilter (Glassmorphism)
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -42,7 +43,7 @@ void initState() {
     final List<AchievementDefinition> finalAchievements = achProv.achievements;
 
     if (achProv.isLoading && achProv.achievements.isEmpty) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: AppLoadingIndicator());
     }
 
     final theme = Theme.of(context);
@@ -158,7 +159,7 @@ void initState() {
         SizedBox(
           width: 50,
           height: 50,
-          child: CircularProgressIndicator(
+          child: AppLoadingIndicator(
             value: percentage,
             strokeWidth: 6,
             backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),

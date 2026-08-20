@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/inventory_ownership_utils.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
@@ -55,7 +56,7 @@ class _MarketValueEvolutionChartState
         if (inventoryProvider.isLoading && allItems.isEmpty) {
           return const SizedBox(
             height: 300,
-            child: Center(child: CircularProgressIndicator()),
+            child: Center(child: AppLoadingIndicator()),
           );
         }
 

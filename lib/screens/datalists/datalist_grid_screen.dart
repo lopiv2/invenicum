@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -97,7 +98,7 @@ class _DataListGridScreenState extends State<DataListGridScreen> {
         MediaQuery.of(context).size.width < 600 ? 16.0 : 32.0,
       ),
       child: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: AppLoadingIndicator())
           : Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

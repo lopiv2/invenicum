@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/providers/integrations_provider.dart';
@@ -126,7 +127,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                 const SizedBox(
                   width: 20,
                   height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: AppLoadingIndicator(strokeWidth: 2),
                 ),
             ],
           ),
@@ -265,7 +266,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                         ? const SizedBox(
                             width: 16,
                             height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: AppLoadingIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.bolt_outlined),
                     label: Text(

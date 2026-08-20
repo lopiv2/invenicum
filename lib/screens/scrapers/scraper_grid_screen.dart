@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // lib/screens/scrapers/scraper_grid_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -61,7 +62,7 @@ class _ScraperGridScreenState extends State<ScraperGridScreen> {
           ),
           const SizedBox(height: 24),
           provider.isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const Center(child: AppLoadingIndicator())
               : scrapers.isEmpty
               ? Center(child: Text(l10n.noScrapers))
               : Expanded(

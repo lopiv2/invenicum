@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 // widgets/asset_cylinder_gallery.dart
 
 import 'dart:async';
@@ -508,7 +509,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return const Center(
-                                child: CircularProgressIndicator(),
+                                child: AppLoadingIndicator(),
                               );
                             },
                             errorBuilder: (context, error, stackTrace) =>

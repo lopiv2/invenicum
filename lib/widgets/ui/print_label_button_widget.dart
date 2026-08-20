@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
@@ -133,7 +134,7 @@ class _LabelPrintDialogState extends State<_LabelPrintDialog> {
               ? const SizedBox(
                   width: 18,
                   height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: AppLoadingIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.print_rounded),
           label: Text(_isPrinting ? "Generando..." : "IMPRIMIR"),

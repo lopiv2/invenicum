@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -27,7 +28,7 @@ class AssetTypeActionButtons extends StatelessWidget {
               ? const SizedBox(
                   width: 20,
                   height: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2),
+                  child: AppLoadingIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.save),
           label: Text(

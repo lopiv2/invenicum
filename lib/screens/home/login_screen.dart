@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -85,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const CircularProgressIndicator(),
+              const AppLoadingIndicator(),
             ],
           ),
         ),
@@ -368,7 +369,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ? const SizedBox(
                                           height: 24,
                                           width: 24,
-                                          child: CircularProgressIndicator(
+                                          child: AppLoadingIndicator(
                                             strokeWidth: 2.5,
                                             valueColor:
                                                 AlwaysStoppedAnimation<Color>(

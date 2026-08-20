@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -83,7 +84,7 @@ class _AssetTemplateDetailScreenState extends State<AssetTemplateDetailScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     if (_isFetching) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: AppLoadingIndicator()));
     }
 
     if (_template == null) {

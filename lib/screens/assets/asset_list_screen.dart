@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -496,7 +497,7 @@ class _AssetListScreenState extends State<AssetListScreen>
         if (data.loading && data.items.isEmpty) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: CircularProgressIndicator()),
+            body: const Center(child: AppLoadingIndicator()),
           );
         }
 
@@ -732,7 +733,7 @@ class _AssetListScreenState extends State<AssetListScreen>
                             if (data.loading)
                               const Positioned.fill(
                                 child: Center(
-                                  child: CircularProgressIndicator(),
+                                  child: AppLoadingIndicator(),
                                 ),
                               ),
                           ],

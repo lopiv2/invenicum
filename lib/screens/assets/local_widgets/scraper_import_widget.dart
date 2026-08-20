@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/scraper.dart';
 import 'package:invenicum/data/services/scraper_service.dart';
@@ -218,7 +219,7 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
                     ? const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: AppLoadingIndicator(strokeWidth: 2),
                       )
                     : const Icon(Icons.play_arrow),
                 label: Text(l10n.scraperExtract),

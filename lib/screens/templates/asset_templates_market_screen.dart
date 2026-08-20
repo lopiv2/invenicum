@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -344,7 +345,7 @@ class _AssetTemplatesMarketScreenState
     final l10n = AppLocalizations.of(context)!;
     // 1. Estado de carga
     if (provider.isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: AppLoadingIndicator());
     }
 
     // 2. Estado de error
@@ -940,7 +941,7 @@ class _TemplateCard extends StatelessWidget {
                                           child: SizedBox(
                                             width: 15,
                                             height: 15,
-                                            child: CircularProgressIndicator(
+                                            child: AppLoadingIndicator(
                                               strokeWidth: 2,
                                             ),
                                           ),

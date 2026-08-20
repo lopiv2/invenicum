@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/services/report_service.dart';
@@ -85,7 +86,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 20),
                         child: Column(
                           children: [
-                            CircularProgressIndicator(
+                            AppLoadingIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 colorScheme.primary,
                               ),
@@ -159,7 +160,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                                 ? SizedBox(
                                     width: 20,
                                     height: 20,
-                                    child: CircularProgressIndicator(
+                                    child: AppLoadingIndicator(
                                       strokeWidth: 2,
                                       valueColor: AlwaysStoppedAnimation<Color>(
                                         colorScheme.onPrimary,

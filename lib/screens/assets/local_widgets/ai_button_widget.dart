@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 
@@ -89,7 +90,7 @@ class AiMagicBannerWidget extends StatelessWidget {
       return const SizedBox(
         width: 30,
         height: 30,
-        child: CircularProgressIndicator(
+        child: AppLoadingIndicator(
           color: Colors.white,
           strokeWidth: 3,
         ),

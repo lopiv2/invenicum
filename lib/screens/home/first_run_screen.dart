@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:invenicum/core/routing/route_names.dart';
@@ -841,7 +842,7 @@ class _PrimaryButton extends StatelessWidget {
             ? const SizedBox(
                 width: 22,
                 height: 22,
-                child: CircularProgressIndicator(
+                child: AppLoadingIndicator(
                   strokeWidth: 2.5,
                   valueColor:
                       AlwaysStoppedAnimation<Color>(Colors.white),

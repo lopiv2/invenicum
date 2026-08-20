@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
@@ -35,7 +36,7 @@ Future<T> runAsyncTask<T>(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CircularProgressIndicator(),
+            AppLoadingIndicator(),
             SizedBox(height: 20),
             Text(loadingMessage),
           ],

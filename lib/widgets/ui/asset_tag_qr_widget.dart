@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
@@ -134,7 +135,7 @@ class BentoPrintTile extends StatelessWidget {
             ? const SizedBox(
                 height: 20,
                 width: 20,
-                child: CircularProgressIndicator(strokeWidth: 2),
+                child: AppLoadingIndicator(strokeWidth: 2),
               )
             : const Text("IMPRIMIR AHORA"),
       ),

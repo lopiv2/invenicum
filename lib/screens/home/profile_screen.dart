@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:async';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:web/web.dart' as web;
@@ -434,7 +435,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             ? const SizedBox(
                 width: 20,
                 height: 20,
-                child: CircularProgressIndicator(
+                child: AppLoadingIndicator(
                   strokeWidth: 2,
                   color: Colors.white,
                 ),
@@ -608,7 +609,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: CircularProgressIndicator(
+                    child: AppLoadingIndicator(
                       strokeWidth: 2,
                       color: Colors.white,
                     ),

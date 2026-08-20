@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/inventory_ownership_utils.dart';
@@ -265,7 +266,7 @@ class _LocationValueDonutCard extends StatelessWidget {
           if (isLoading)
             const Padding(
               padding: EdgeInsets.symmetric(vertical: 40),
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(child: AppLoadingIndicator()),
             )
           else if (cells.isEmpty)
             Padding(

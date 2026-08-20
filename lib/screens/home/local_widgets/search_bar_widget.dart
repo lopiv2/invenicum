@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart'; // <--- ESTA LÍNEA CORRIGE EL ERROR
@@ -140,7 +141,7 @@ class _InvenicumSearchBarState extends State<InvenicumSearchBar> {
                   child: SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: AppLoadingIndicator(strokeWidth: 2),
                   ),
                 )
               : (_controller.text.isNotEmpty

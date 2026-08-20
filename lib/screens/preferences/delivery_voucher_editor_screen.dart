@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart'; // Restaurado FilePicker
 import 'package:flutter/material.dart';
@@ -209,7 +210,7 @@ Signature of Receiver     | Signature of Returner''';
   @override
   Widget build(BuildContext context) {
     if (_isInitialLoading) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: AppLoadingIndicator()));
     }
 
     return Scaffold(
@@ -313,7 +314,7 @@ Signature of Receiver     | Signature of Returner''';
                         ? const SizedBox(
                             width: 20,
                             height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
+                            child: AppLoadingIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.save),
                     label: Text(

@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 
 class CandidateCard extends StatefulWidget {
@@ -87,7 +88,7 @@ class _CandidateCardState extends State<CandidateCard> {
                                 child: const SizedBox(
                                   width: 24,
                                   height: 24,
-                                  child: CircularProgressIndicator(
+                                  child: AppLoadingIndicator(
                                     strokeWidth: 2,
                                   ),
                                 ),

@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
@@ -62,7 +63,7 @@ class SaveAssetFloatingButton extends StatelessWidget {
                         ? const SizedBox(
                             width: 24,
                             height: 24,
-                            child: CircularProgressIndicator(
+                            child: AppLoadingIndicator(
                               strokeWidth: 2.5,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 Colors.white,

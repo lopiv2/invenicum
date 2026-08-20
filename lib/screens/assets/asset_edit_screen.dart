@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:convert';
 
 import 'package:file_picker/file_picker.dart';
@@ -1079,7 +1080,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     final customFieldSuggestions = _buildCustomFieldSuggestions(itemProvider);
 
     if (_assetType == null || currentItem == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: AppLoadingIndicator()));
     }
 
     return Scaffold(

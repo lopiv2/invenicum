@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -1071,7 +1072,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     final liveLocations = liveContainer.locations;
 
     if (_assetType == null) {
-      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: AppLoadingIndicator()));
     }
 
     return Scaffold(

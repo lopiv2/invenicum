@@ -1,3 +1,4 @@
+import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/integration_field_type.dart';
 import 'package:invenicum/l10n/app_localizations.dart'; // Ajusta la ruta si es necesario
@@ -64,7 +65,7 @@ class ExternalImportWidget extends StatelessWidget {
             suffixIcon: isLoading
                 ? const Padding(
                     padding: EdgeInsets.all(12),
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: AppLoadingIndicator(strokeWidth: 2),
                   )
                 : IconButton(
                     icon: const Icon(Icons.search),
