@@ -1,4 +1,4 @@
-﻿{
+{
   "@aiExtractionError": {
     "placeholders": {
       "error": {
@@ -1447,12 +1447,16 @@
   "errorDeletingScraper": "Error al eliminar el scraper: {error}",
   "@confirmDeleteScraperMessage": {
     "placeholders": {
-      "name": { "type": "String" }
+      "name": {
+        "type": "String"
+      }
     }
   },
   "@errorDeletingScraper": {
     "placeholders": {
-      "error": { "type": "String" }
+      "error": {
+        "type": "String"
+      }
     }
   },
   "testScraper": "Probar",
@@ -1460,7 +1464,11 @@
   "runError": "Error al ejecutar la prueba: {error}",
   "ok": "Aceptar",
   "@runError": {
-    "placeholders": { "error": { "type": "String" } }
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
   },
   "enterYourNameValidation": "Introduce tu nombre.",
   "minTwoCharactersValidation": "Mínimo 2 caracteres.",
@@ -1806,5 +1814,113 @@
   "scraperImportTitle": "Importar con Scraper",
   "scraperClear": "Limpiar",
   "hideToolbar": "Ocultar",
-  "showToolbar": "Mostrar"
+  "showToolbar": "Mostrar",
+  "anniversaryTitle": "Recuerdos · Hace tiempo",
+  "anniversarySubtitle": "Tal día como hoy incorporaste {count} objetos a tu inventario",
+  "@anniversarySubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "anniversaryBadgeOneYear": "Hace 1 año",
+  "anniversaryBadgeYears": "Hace {count} años",
+  "@anniversaryBadgeYears": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "anniversaryMemories": "recuerdos",
+  "anniversaryItem": "objeto",
+  "anniversaryItems": "objetos",
+  "anniversaryDismiss": "Ocultar por hoy",
+  "anniversaryMore": "más",
+  "anniversaryDismissReset": "Dismiss reseteado — recargando...",
+  "anniversaryFlavor1": "¡Tu yo del pasado hizo un critical hit! {count} tesoros de hace {years} años han reaparecido.",
+  "@anniversaryFlavor1": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor2": "Hace {years} años, en una galaxia no tan lejana, añadiste {count} artefactos.",
+  "@anniversaryFlavor2": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor3": "¡Hace {years} años tu yo del pasado hizo un looteo legendario! {count} objetos entraron en la bóveda.",
+  "@anniversaryFlavor3": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor4": "Tu inventario hizo +{count} hace {years} años. El pasado te saluda.",
+  "@anniversaryFlavor4": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor5": "Viaje en el tiempo completado: {count} tesoros de {date} han vuelto.",
+  "@anniversaryFlavor5": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor6": "Logro desbloqueado: \"Recuerdo {years}a\" — {count} objetos",
+  "@anniversaryFlavor6": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

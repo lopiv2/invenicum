@@ -126,8 +126,10 @@ Signature of Receiver     | Signature of Returner''';
         _templateController.text,
         _logoBytes,
       );
+      if (!mounted) return;
       ToastService.success(AppLocalizations.of(context)!.configurationSaved);
     } catch (e) {
+      if (!mounted) return;
       ToastService.error(
         AppLocalizations.of(context)!.errorSaving(e.toString()),
       );

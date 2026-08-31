@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ToastService.success(AppLocalizations.of(context)!.loginSuccess);
           // Pequeña pausa para mostrar el mensaje de éxito
           await Future.delayed(const Duration(seconds: 1));
+          if (!mounted) return;
 
           // 🚩 LEER LA RUTA DE REDIRECCIÓN
           final state = GoRouterState.of(context);

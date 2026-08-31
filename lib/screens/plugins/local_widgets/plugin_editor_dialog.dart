@@ -229,8 +229,10 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
                       ],
                     );
 
-                    if (goToProfile == true && mounted) {
+                    if (goToProfile == true) {
+                      if (!context.mounted) return;
                       Navigator.pop(context);
+                      if (!context.mounted) return;
                       context.pushNamed(RouteNames.myProfile);
                     }
                     return;
@@ -245,7 +247,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
 
             // ───────────────── SLOT ─────────────────
             DropdownButtonFormField<String>(
-              value: _selectedSlot,
+              initialValue: _selectedSlot,
               decoration: InputDecoration(
                 labelText: l10n.slotLocationLabel,
                 border: const OutlineInputBorder(),

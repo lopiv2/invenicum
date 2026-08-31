@@ -6333,6 +6333,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show'**
   String get showToolbar;
+
+  /// No description provided for @anniversaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Memories · A year ago'**
+  String get anniversaryTitle;
+
+  /// No description provided for @anniversarySubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'On this day you added {count} items to your inventory'**
+  String anniversarySubtitle(int count);
+
+  /// No description provided for @anniversaryBadgeOneYear.
+  ///
+  /// In en, this message translates to:
+  /// **'1 year ago'**
+  String get anniversaryBadgeOneYear;
+
+  /// No description provided for @anniversaryBadgeYears.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} years ago'**
+  String anniversaryBadgeYears(int count);
+
+  /// No description provided for @anniversaryMemories.
+  ///
+  /// In en, this message translates to:
+  /// **'memories'**
+  String get anniversaryMemories;
+
+  /// No description provided for @anniversaryItem.
+  ///
+  /// In en, this message translates to:
+  /// **'item'**
+  String get anniversaryItem;
+
+  /// No description provided for @anniversaryItems.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
+  String get anniversaryItems;
+
+  /// No description provided for @anniversaryDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide for today'**
+  String get anniversaryDismiss;
+
+  /// No description provided for @anniversaryMore.
+  ///
+  /// In en, this message translates to:
+  /// **'more'**
+  String get anniversaryMore;
+
+  /// No description provided for @anniversaryDismissReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Dismiss reset — reloading...'**
+  String get anniversaryDismissReset;
+
+  /// No description provided for @anniversaryFlavor1.
+  ///
+  /// In en, this message translates to:
+  /// **'Your past self scored a critical hit! {count} treasures from {years} years ago have respawned.'**
+  String anniversaryFlavor1(int years, int count, String date);
+
+  /// No description provided for @anniversaryFlavor2.
+  ///
+  /// In en, this message translates to:
+  /// **'A long time ago in a galaxy not so far away, you added {count} artifacts {years} years ago.'**
+  String anniversaryFlavor2(int years, int count, String date);
+
+  /// No description provided for @anniversaryFlavor3.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporal critical hit: {count} items from {years} years ago have reappeared.'**
+  String anniversaryFlavor3(int years, int count, String date);
+
+  /// No description provided for @anniversaryFlavor4.
+  ///
+  /// In en, this message translates to:
+  /// **'Your inventory leveled up +{count} {years} years ago. The past says hi.'**
+  String anniversaryFlavor4(int years, int count, String date);
+
+  /// No description provided for @anniversaryFlavor5.
+  ///
+  /// In en, this message translates to:
+  /// **'Time travel complete: {count} treasures from {date} have returned.'**
+  String anniversaryFlavor5(int years, int count, String date);
+
+  /// No description provided for @anniversaryFlavor6.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement unlocked: \"{years}y Memory\" — {count} items'**
+  String anniversaryFlavor6(int years, int count, String date);
 }
 
 class _AppLocalizationsDelegate

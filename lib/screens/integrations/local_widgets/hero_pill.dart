@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HeroPill extends StatelessWidget {
-  const HeroPill({required this.icon, required this.label});
+  const HeroPill({super.key, required this.icon, required this.label});
 
   final IconData icon;
   final String label;

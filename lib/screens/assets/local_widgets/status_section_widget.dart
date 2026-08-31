@@ -27,7 +27,7 @@ class StatusSectionWidget extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: DropdownButtonFormField<ItemCondition>(
-              value: selectedCondition,
+              initialValue: selectedCondition,
               isExpanded: true, // Para que el badge tenga espacio
               decoration: InputDecoration(
                 labelText: l10n.itemStatusLabel,

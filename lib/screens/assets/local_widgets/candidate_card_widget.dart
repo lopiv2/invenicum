@@ -111,7 +111,7 @@ class _CandidateCardState extends State<CandidateCard> {
                               );
                             },
 
-                            errorBuilder: (_, __, ___) => Container(
+                            errorBuilder: (_, _, _) => Container(
                               color: Colors.grey.shade300,
                               child: const Icon(Icons.image_not_supported),
                             ),

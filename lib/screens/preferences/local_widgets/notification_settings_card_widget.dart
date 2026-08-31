@@ -44,7 +44,7 @@ class NotificationSettingsCardWidget extends StatelessWidget {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: channels.length,
-                onReorder: (oldIndex, newIndex) async{
+                onReorderItem: (oldIndex, newIndex) async{
                   prefsProv.reorderChannels(oldIndex, newIndex);
                   await AppUtils.trackAndToast(context, 'NOTIFICATION_REORDERED');
                 },

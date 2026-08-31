@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/achievements_model.dart';
 import 'package:invenicum/data/services/achievements_service.dart';

@@ -401,8 +401,9 @@ class CrossToonsCardWidget extends StatelessWidget {
                 FilledButton(
                   onPressed: () async {
                     if (existing == null &&
-                        (pickedBytes == null || pickedName == null))
+                        (pickedBytes == null || pickedName == null)) {
                       return;
+                    }
                     final config = OverlayImageConfig(
                       imagePath: existing?.imagePath ?? '',
                       direction: direction,
@@ -676,7 +677,7 @@ class _StaticPreviewState extends State<StaticPreview> {
         if (mounted) setState(() {});
       }
       completer.complete();
-    }, onError: (_, __) => completer.complete());
+    }, onError: (_, _) => completer.complete());
     stream.addListener(listener);
     await completer.future;
     stream.removeListener(listener);

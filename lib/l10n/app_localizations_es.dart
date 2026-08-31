@@ -3478,4 +3478,68 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get showToolbar => 'Mostrar';
+
+  @override
+  String get anniversaryTitle => 'Recuerdos · Hace tiempo';
+
+  @override
+  String anniversarySubtitle(int count) {
+    return 'Tal día como hoy incorporaste $count objetos a tu inventario';
+  }
+
+  @override
+  String get anniversaryBadgeOneYear => 'Hace 1 año';
+
+  @override
+  String anniversaryBadgeYears(int count) {
+    return 'Hace $count años';
+  }
+
+  @override
+  String get anniversaryMemories => 'recuerdos';
+
+  @override
+  String get anniversaryItem => 'objeto';
+
+  @override
+  String get anniversaryItems => 'objetos';
+
+  @override
+  String get anniversaryDismiss => 'Ocultar por hoy';
+
+  @override
+  String get anniversaryMore => 'más';
+
+  @override
+  String get anniversaryDismissReset => 'Dismiss reseteado — recargando...';
+
+  @override
+  String anniversaryFlavor1(int years, int count, String date) {
+    return '¡Tu yo del pasado hizo un critical hit! $count tesoros de hace $years años han reaparecido.';
+  }
+
+  @override
+  String anniversaryFlavor2(int years, int count, String date) {
+    return 'Hace $years años, en una galaxia no tan lejana, añadiste $count artefactos.';
+  }
+
+  @override
+  String anniversaryFlavor3(int years, int count, String date) {
+    return '¡Hace $years años tu yo del pasado hizo un looteo legendario! $count objetos entraron en la bóveda.';
+  }
+
+  @override
+  String anniversaryFlavor4(int years, int count, String date) {
+    return 'Tu inventario hizo +$count hace $years años. El pasado te saluda.';
+  }
+
+  @override
+  String anniversaryFlavor5(int years, int count, String date) {
+    return 'Viaje en el tiempo completado: $count tesoros de $date han vuelto.';
+  }
+
+  @override
+  String anniversaryFlavor6(int years, int count, String date) {
+    return 'Logro desbloqueado: \"Recuerdo ${years}a\" — $count objetos';
+  }
 }

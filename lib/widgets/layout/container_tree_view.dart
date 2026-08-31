@@ -192,7 +192,10 @@ class ContainerTreeView extends StatelessWidget {
         Offset.zero & overlay.size,
       ),
       items: _buildContextMenuItems(context),
-    ).then((result) => _handleContextAction(context, container, result));
+    ).then((result) {
+      if (!context.mounted) return;
+      _handleContextAction(context, container, result);
+    });
   }
 
   List<PopupMenuEntry<ContainerAction>> _buildContextMenuItems(

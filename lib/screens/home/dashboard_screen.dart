@@ -10,6 +10,7 @@ import 'package:invenicum/screens/home/local_widgets/charts/market_value_evoluti
 import 'package:invenicum/screens/home/local_widgets/expiring_loan_widget.dart';
 import 'package:invenicum/screens/home/local_widgets/location_value_heatmap.dart';
 import 'package:invenicum/screens/home/local_widgets/low_stock_card.dart';
+import 'package:invenicum/screens/home/local_widgets/anniversary_reminder_widget.dart';
 import 'package:invenicum/widgets/ui/stac_slot.dart';
 import 'package:invenicum/widgets/ui/stat_card.dart';
 import 'package:invenicum/screens/home/local_widgets/top_demanded_items_widget.dart';
@@ -70,7 +71,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
           const SizedBox(height: 24),
           const StacSlot(slotName: 'dashboard_top'),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
+          const AnniversaryReminderWidget(),
+          const SizedBox(height: 16),
 
           FutureBuilder<DashboardStats?>(
             future: _statsFuture,

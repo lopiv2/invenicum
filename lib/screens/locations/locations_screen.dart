@@ -16,7 +16,7 @@ class LocationsScreen extends StatefulWidget {
   final String containerId;
   const LocationsScreen({super.key, required this.containerId});
   @override
-  _LocationsScreenState createState() => _LocationsScreenState();
+  State<LocationsScreen> createState() => _LocationsScreenState();
 }
 
 class _LocationsScreenState extends State<LocationsScreen>

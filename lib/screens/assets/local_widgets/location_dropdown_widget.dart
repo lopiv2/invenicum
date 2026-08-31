@@ -108,6 +108,7 @@ class LocationDropdownField extends StatelessWidget {
         ),
       ],
     );
+    if (!context.mounted) return;
 
     if (newName == null || containerId == null) return;
 
@@ -121,6 +122,7 @@ class LocationDropdownField extends StatelessWidget {
         parentId: selectedParentId,
         context: context,
       );
+      if (!context.mounted) return;
 
       if (created != null) {
         // Añadimos la ubicación al ContainerNode en memoria ANTES de llamar
@@ -131,6 +133,7 @@ class LocationDropdownField extends StatelessWidget {
         ToastService.success(l10n.locationCreatedShort(newName!));
       }
     } catch (e) {
+      if (!context.mounted) return;
       ToastService.error(l10n.errorCreatingLocation(e.toString()));
     }
   }

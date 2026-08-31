@@ -41,8 +41,9 @@ class _AssetTypeMainContentState extends State<AssetTypeMainContent>
   Widget build(BuildContext context) {
     super.build(context);
 
-    if (widget.isGalleryMode)
+    if (widget.isGalleryMode) {
       return AssetCylinderGallery(items: widget.viewItems);
+    }
 
     return RepaintBoundary(
       child: widget._isListView

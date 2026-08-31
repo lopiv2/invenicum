@@ -11,6 +11,7 @@ class AssetFormLayout extends StatelessWidget {
   final Widget? scraperBento;
 
   const AssetFormLayout({
+    super.key,
     this.aiBanner,
     this.importBento,
     required this.mainDataBento,

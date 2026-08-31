@@ -3484,4 +3484,68 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get showToolbar => 'Einblenden';
+
+  @override
+  String get anniversaryTitle => 'Memories · A year ago';
+
+  @override
+  String anniversarySubtitle(int count) {
+    return 'On this day you added $count items to your inventory';
+  }
+
+  @override
+  String get anniversaryBadgeOneYear => '1 year ago';
+
+  @override
+  String anniversaryBadgeYears(int count) {
+    return '$count years ago';
+  }
+
+  @override
+  String get anniversaryMemories => 'memories';
+
+  @override
+  String get anniversaryItem => 'item';
+
+  @override
+  String get anniversaryItems => 'items';
+
+  @override
+  String get anniversaryDismiss => 'Hide for today';
+
+  @override
+  String get anniversaryMore => 'more';
+
+  @override
+  String get anniversaryDismissReset => 'Dismiss reset — reloading...';
+
+  @override
+  String anniversaryFlavor1(int years, int count, String date) {
+    return 'Your past self scored a critical hit! $count treasures from $years years ago have respawned.';
+  }
+
+  @override
+  String anniversaryFlavor2(int years, int count, String date) {
+    return 'A long time ago in a galaxy not so far away, you added $count artifacts $years years ago.';
+  }
+
+  @override
+  String anniversaryFlavor3(int years, int count, String date) {
+    return 'Temporal critical hit: $count items from $years years ago have reappeared.';
+  }
+
+  @override
+  String anniversaryFlavor4(int years, int count, String date) {
+    return 'Your inventory leveled up +$count $years years ago. The past says hi.';
+  }
+
+  @override
+  String anniversaryFlavor5(int years, int count, String date) {
+    return 'Time travel complete: $count treasures from $date have returned.';
+  }
+
+  @override
+  String anniversaryFlavor6(int years, int count, String date) {
+    return 'Achievement unlocked: \"${years}y Memory\" — $count items';
+  }
 }

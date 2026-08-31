@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
@@ -188,10 +190,11 @@ class _AssetTypeCardState extends State<AssetTypeCard> {
           );
         }
       } catch (e) {
-        if (context.mounted)
+        if (context.mounted) {
           ToastService.error(
             AppLocalizations.of(context)!.errorSaving(e.toString()),
           );
+        }
       }
     }
   }
@@ -294,7 +297,7 @@ class _AssetTypeCardState extends State<AssetTypeCard> {
               fit: BoxFit.cover,
               color: theme.colorScheme.scrim.withValues(alpha: 0.15),
               colorBlendMode: BlendMode.darken,
-              errorBuilder: (_, __, ___) => _buildPlaceholder(theme),
+              errorBuilder: (_, _, _) => _buildPlaceholder(theme),
             ),
           )
         else

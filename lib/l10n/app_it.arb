@@ -1,4 +1,4 @@
-﻿{
+{
   "@aiExtractionError": {
     "placeholders": {
       "error": {
@@ -1778,5 +1778,113 @@
   "scraperImportTitle": "Importazione scraper",
   "scraperClear": "Cancella",
   "hideToolbar": "Nascondi",
-  "showToolbar": "Mostra"
+  "showToolbar": "Mostra",
+  "anniversaryTitle": "Memories · A year ago",
+  "anniversarySubtitle": "On this day you added {count} items to your inventory",
+  "@anniversarySubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "anniversaryBadgeOneYear": "1 year ago",
+  "anniversaryBadgeYears": "{count} years ago",
+  "@anniversaryBadgeYears": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "anniversaryMemories": "memories",
+  "anniversaryItem": "item",
+  "anniversaryItems": "items",
+  "anniversaryDismiss": "Hide for today",
+  "anniversaryMore": "more",
+  "anniversaryDismissReset": "Dismiss reset — reloading...",
+  "anniversaryFlavor1": "Your past self scored a critical hit! {count} treasures from {years} years ago have respawned.",
+  "@anniversaryFlavor1": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor2": "A long time ago in a galaxy not so far away, you added {count} artifacts {years} years ago.",
+  "@anniversaryFlavor2": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor3": "Temporal critical hit: {count} items from {years} years ago have reappeared.",
+  "@anniversaryFlavor3": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor4": "Your inventory leveled up +{count} {years} years ago. The past says hi.",
+  "@anniversaryFlavor4": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor5": "Time travel complete: {count} treasures from {date} have returned.",
+  "@anniversaryFlavor5": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "anniversaryFlavor6": "Achievement unlocked: \"{years}y Memory\" — {count} items",
+  "@anniversaryFlavor6": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  }
 }

@@ -163,9 +163,8 @@ class PreferencesProvider with ChangeNotifier {
 
   // In preferences_provider.dart
 
-  // Drag and Drop logic
+  // Drag and Drop logic — onReorderItem already adjusts newIndex
   void reorderChannels(int oldIndex, int newIndex) {
-    if (newIndex > oldIndex) newIndex -= 1;
 
     // 1. Access the list inside the nested class
     final List<String> items = List.from(_prefs.notifications.channelOrder);

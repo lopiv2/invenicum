@@ -513,9 +513,7 @@ class _AssetPlutoTableState extends State<AssetPlutoTable> {
 
       for (var field in widget.assetType.fieldDefinitions) {
         final fieldKey = field.id.toString();
-        final dynamic rawValue =
-            item.customFieldValues?[field.id] ??
-            item.customFieldValues?[fieldKey];
+        final dynamic rawValue = item.customFieldValues?[fieldKey];
         cells[fieldKey] = TrinaCell(
           value: _parseCustomFieldValue(rawValue, field.type),
         );

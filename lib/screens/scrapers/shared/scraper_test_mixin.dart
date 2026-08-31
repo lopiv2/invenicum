@@ -21,7 +21,7 @@ import 'package:provider/provider.dart';
 ///   - [urlPattern]   → current pattern field value (nullable)
 ///
 /// Usage:
-///   class _MyState extends State<MyWidget> with ScraperTestMixin {
+///   class _MyState extends `State<MyWidget>` with ScraperTestMixin {
 ///     @override String get scraperName => _nameCtrl.text.trim();
 ///     @override String get scraperUrl  => _urlCtrl.text.trim();
 ///     @override String? get urlPattern => ...;
@@ -94,6 +94,7 @@ mixin ScraperTestMixin<T extends StatefulWidget> on State<T> {
     );
 
     if (testUrl == null || testUrl.isEmpty) return;
+    if (!context.mounted) return;
 
     // 2. Show loading — capture navigator BEFORE the async gap
     //    so we always close exactly the dialog we opened,
@@ -122,10 +123,10 @@ mixin ScraperTestMixin<T extends StatefulWidget> on State<T> {
       );
 
       // Close loading using the same navigator we captured above
-      if (mounted && navigator.canPop()) navigator.pop();
+      if (context.mounted && navigator.canPop()) navigator.pop();
 
       final pretty = const JsonEncoder.withIndent('  ').convert(result);
-      if (!mounted) return;
+      if (!context.mounted) return;
 
       await showAppDialog<void>(
         context: context,
@@ -139,8 +140,8 @@ mixin ScraperTestMixin<T extends StatefulWidget> on State<T> {
         ],
       );
     } catch (e) {
-      if (mounted && navigator.canPop()) navigator.pop();
-      if (!mounted) return;
+      if (context.mounted && navigator.canPop()) navigator.pop();
+      if (!context.mounted) return;
       ToastService.error(l10n.runError(e.toString()));
     }
   }

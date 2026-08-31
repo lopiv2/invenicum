@@ -9,13 +9,13 @@ class AssetDetailNavigationButtons extends StatelessWidget {
   final String? currentPosition;
 
   const AssetDetailNavigationButtons({
-    Key? key,
+    super.key,
     this.onPrevious,
     this.onNext,
     this.hasPrevious = false,
     this.hasNext = false,
     this.currentPosition,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,12 +84,11 @@ class _NavigationButton extends StatelessWidget {
   final bool goingBack;
 
   const _NavigationButton({
-    Key? key,
     required this.icon,
     required this.label,
     this.onPressed,
     required this.goingBack,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

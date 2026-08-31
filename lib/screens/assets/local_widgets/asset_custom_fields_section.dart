@@ -10,10 +10,10 @@ class AssetCustomFieldsSection extends StatelessWidget {
   final Map<String, dynamic>? customFieldValues;
 
   const AssetCustomFieldsSection({
-    Key? key,
+    super.key,
     required this.customFields,
     required this.customFieldValues,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,6 @@ class AssetCustomFieldsSection extends StatelessWidget {
     // Filtramos campos con valores
     final displayedFields = customFields.where((fieldDef) {
       final value = customFieldValues?[fieldDef.id.toString()] ??
-          customFieldValues?[fieldDef.id] ??
           customFieldValues?[fieldDef.name];
       return value != null && value.toString().isNotEmpty;
     }).toList();
@@ -62,7 +61,6 @@ class AssetCustomFieldsSection extends StatelessWidget {
           itemBuilder: (context, index) {
             final fieldDef = displayedFields[index];
             final value = customFieldValues?[fieldDef.id.toString()] ??
-                customFieldValues?[fieldDef.id] ??
                 customFieldValues?[fieldDef.name];
             return _buildFieldCard(context, fieldDef, value);
           },

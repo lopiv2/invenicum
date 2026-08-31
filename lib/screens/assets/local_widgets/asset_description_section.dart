@@ -5,9 +5,9 @@ class AssetDescriptionSection extends StatelessWidget {
   final String? description;
 
   const AssetDescriptionSection({
-    Key? key,
+    super.key,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

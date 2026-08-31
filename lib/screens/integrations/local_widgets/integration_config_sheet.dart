@@ -157,7 +157,7 @@ class _IntegrationConfigSheetState extends State<IntegrationConfigSheet> {
                   children: [
                     if (isDropdown) ...[
                       DropdownButtonFormField<String>(
-                        value: _dropdownValues[field.id],
+                        initialValue: _dropdownValues[field.id],
                         isExpanded: true,
                         decoration: InputDecoration(
                           labelText: field.label,

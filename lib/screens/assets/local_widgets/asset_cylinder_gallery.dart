@@ -355,15 +355,15 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
               _buildColorSlider(
                 label: 'Rojo',
 
-                value: tempColor.red.toDouble(),
+                value: (tempColor.r * 255.0),
 
                 onChanged: (value) {
                   setStateDialog(() {
                     tempColor = Color.fromARGB(
-                      tempColor.alpha,
+                      (tempColor.a * 255.0).round().clamp(0, 255),
                       value.toInt(),
-                      tempColor.green,
-                      tempColor.blue,
+                      (tempColor.g * 255.0).round().clamp(0, 255),
+                      (tempColor.b * 255.0).round().clamp(0, 255),
                     );
                   });
                 },
@@ -372,15 +372,15 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
               _buildColorSlider(
                 label: 'Verde',
 
-                value: tempColor.green.toDouble(),
+                value: (tempColor.g * 255.0),
 
                 onChanged: (value) {
                   setStateDialog(() {
                     tempColor = Color.fromARGB(
-                      tempColor.alpha,
-                      tempColor.red,
+                      (tempColor.a * 255.0).round().clamp(0, 255),
+                      (tempColor.r * 255.0).round().clamp(0, 255),
                       value.toInt(),
-                      tempColor.blue,
+                      (tempColor.b * 255.0).round().clamp(0, 255),
                     );
                   });
                 },
@@ -389,14 +389,14 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
               _buildColorSlider(
                 label: 'Azul',
 
-                value: tempColor.blue.toDouble(),
+                value: (tempColor.b * 255.0),
 
                 onChanged: (value) {
                   setStateDialog(() {
                     tempColor = Color.fromARGB(
-                      tempColor.alpha,
-                      tempColor.red,
-                      tempColor.green,
+                      (tempColor.a * 255.0).round().clamp(0, 255),
+                      (tempColor.r * 255.0).round().clamp(0, 255),
+                      (tempColor.g * 255.0).round().clamp(0, 255),
                       value.toInt(),
                     );
                   });

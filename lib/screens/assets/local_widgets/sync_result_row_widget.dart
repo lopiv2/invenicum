@@ -11,6 +11,7 @@ class SyncResultRow extends StatelessWidget {
   final int value;
 
   const SyncResultRow({
+    super.key,
     required this.icon,
     required this.color,
     required this.label,

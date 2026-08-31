@@ -79,6 +79,7 @@ class _AssetImportScreenState extends State<AssetImportScreen> {
     if (containerProvider.containers.isEmpty && !containerProvider.isLoading) {
       await containerProvider.loadContainers();
     }
+    if (!mounted) return;
 
     final locationProvider = context.read<LocationProvider>();
     await locationProvider.fetchLocations(cIdInt);

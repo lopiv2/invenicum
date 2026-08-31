@@ -203,7 +203,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                             AssetTypeNameField(controller: _nameController),
                             const SizedBox(height: 24),
                             DropdownButtonFormField<String>(
-                              value: _assetKind,
+                              initialValue: _assetKind,
                               decoration: const InputDecoration(
                                 labelText: 'Tipo de contenido',
                                 border: OutlineInputBorder(),

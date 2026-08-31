@@ -4,6 +4,7 @@ import 'integration_tile.dart';
 
 class IntegrationSection extends StatelessWidget {
   const IntegrationSection({
+    super.key,
     required this.section,
     required this.isLinked,
     required this.onTap,

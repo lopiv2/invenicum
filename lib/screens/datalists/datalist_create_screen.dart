@@ -50,9 +50,6 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
 
   void _moveItem(int oldIndex, int newIndex) {
     setState(() {
-      if (newIndex > oldIndex) {
-        newIndex -= 1;
-      }
       final item = _items.removeAt(oldIndex);
       _items.insert(newIndex, item);
     });
@@ -214,7 +211,7 @@ class _DataListCreateScreenState extends State<DataListCreateScreen> {
                           buildDefaultDragHandles: false,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          onReorder: _moveItem,
+                          onReorderItem: _moveItem,
                           children: _items.asMap().entries.map((entry) {
                             final index = entry.key;
                             final item = entry.value;

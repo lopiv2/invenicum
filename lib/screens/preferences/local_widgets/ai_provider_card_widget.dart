@@ -158,7 +158,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
                     ?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: 8),
             DropdownButtonFormField<String>(
-              value: validModel,
+              initialValue: validModel,
               isExpanded: true,
               decoration: InputDecoration(
                 border: OutlineInputBorder(
