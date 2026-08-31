@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class OrbitBadge extends StatelessWidget {
-  const OrbitBadge({required this.icon});
+  const OrbitBadge({super.key, required this.icon});
 
   final IconData icon;
 

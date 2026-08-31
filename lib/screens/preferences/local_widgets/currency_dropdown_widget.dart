@@ -98,6 +98,7 @@ class CurrencyDropdownWidget extends StatelessWidget {
     AppLocalizations l10n = AppLocalizations.of(context)!;
     try {
       await context.read<PreferencesProvider>().setCurrency(currencyCode);
+      if (!context.mounted) return;
       await AppUtils.trackAndToast(context, 'CURRENCY_CHANGED');
       ToastService.success("${l10n.currency}: $currencyCode"); 
     } catch (e) {

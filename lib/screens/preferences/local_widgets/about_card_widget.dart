@@ -45,8 +45,12 @@ class AboutCardWidget extends StatelessWidget {
         .map((e) => int.tryParse(e) ?? 0)
         .toList();
 
-    while (aBase.length < 3) aBase.add(0);
-    while (bBase.length < 3) bBase.add(0);
+    while (aBase.length < 3) {
+      aBase.add(0);
+    }
+    while (bBase.length < 3) {
+      bBase.add(0);
+    }
 
     for (int i = 0; i < 3; i++) {
       if (aBase[i] > bBase[i]) return 1;

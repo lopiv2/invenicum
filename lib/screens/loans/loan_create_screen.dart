@@ -273,8 +273,9 @@ class _LoanCreateScreenState extends State<LoanCreateScreen> {
               ),
               keyboardType: TextInputType.number,
               validator: (value) {
-                if (value == null || value.isEmpty)
+                if (value == null || value.isEmpty) {
                   return l10n.enterQuantity;
+                }
                 final n = int.tryParse(value);
                 if (n == null || n <= 0) return l10n.invalidQuantity;
                 if (n > _currentStock) return l10n.notEnoughStock;

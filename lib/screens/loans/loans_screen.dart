@@ -148,6 +148,7 @@ class _LoansScreenState extends State<LoansScreen> {
     try {
       final voucherService = context.read<VoucherService>();
       final config = await voucherService.getVoucherConfig();
+      if (!mounted) return;
 
       if (config == null) {
         ToastService.error(context.l10n.errorNoVoucherTemplate);
@@ -235,9 +236,11 @@ class _LoansScreenState extends State<LoansScreen> {
 
       await Printing.layoutPdf(
         onLayout: (format) => doc.save(),
-        name: 'Vale_${voucherIdStr}.pdf',
+        name: 'Vale_$voucherIdStr.pdf',
       );
+      if (!mounted) return;
     } catch (e) {
+      if (!mounted) return;
       ToastService.error("${context.l10n.errorGeneratingPDF}: $e");
     }
   }

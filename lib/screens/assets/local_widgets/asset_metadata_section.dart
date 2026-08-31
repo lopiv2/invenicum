@@ -8,11 +8,11 @@ class AssetMetadataSection extends StatelessWidget {
   final String? assetId;
 
   const AssetMetadataSection({
-    Key? key,
+    super.key,
     required this.createdAt,
     required this.updatedAt,
     required this.assetId,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

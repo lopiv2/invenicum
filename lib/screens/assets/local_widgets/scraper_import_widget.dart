@@ -50,11 +50,12 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
     try {
       final service = context.read<ScraperService>();
       final list = await service.getScrapers(widget.containerId);
-      if (mounted)
+      if (mounted) {
         setState(() {
           _scrapers = list;
           _loadingScrapers = false;
         });
+      }
     } catch (_) {
       if (mounted) setState(() => _loadingScrapers = false);
     }
@@ -164,7 +165,7 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
             children: [
               Expanded(
                 child: DropdownButtonFormField<Scraper>(
-                  value: _selectedScraper,
+                  initialValue: _selectedScraper,
                   decoration: InputDecoration(
                     labelText: l10n.scraperSelectLabel,
                     prefixIcon: Icon(

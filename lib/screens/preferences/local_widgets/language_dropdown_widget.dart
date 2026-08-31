@@ -81,8 +81,10 @@ class LanguageDropdownWidget extends StatelessWidget {
   Future<void> _changeLanguage(BuildContext context, String languageCode) async {
     try {
       await context.read<PreferencesProvider>().setLanguage(languageCode);
+      if (!context.mounted) return;
       ToastService.success(AppLocalizations.of(context)!.languageChanged);
     } catch (e) {
+      if (!context.mounted) return;
       final l10n = AppLocalizations.of(context)!;
       ToastService.error(l10n.errorChangingLanguage(e.toString()));
     }

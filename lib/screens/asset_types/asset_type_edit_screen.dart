@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'dart:convert';
 import 'dart:typed_data';
@@ -268,7 +270,7 @@ class _AssetTypeEditScreenState extends State<AssetTypeEditScreen> {
                             AssetTypeNameField(controller: _nameController),
                             const SizedBox(height: 24),
                             DropdownButtonFormField<String>(
-                              value: _assetKind,
+                              initialValue: _assetKind,
                               decoration: const InputDecoration(
                                 labelText: 'Tipo de contenido',
                                 border: OutlineInputBorder(),

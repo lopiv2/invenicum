@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'orbit_badge.dart';
 
 class HeroOrbitalArt extends StatelessWidget {
-  const HeroOrbitalArt();
+  const HeroOrbitalArt({super.key});
 
   @override
   Widget build(BuildContext context) {

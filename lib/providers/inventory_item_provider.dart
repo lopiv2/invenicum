@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';

@@ -307,6 +307,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   Future<void> _startScan() async {
     var status = await Permission.camera.status;
     if (status.isDenied) status = await Permission.camera.request();
+    if (!mounted) return;
     if (status.isGranted) {
       _handleBarcodeScan();
     } else {
@@ -614,6 +615,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
         url: url,
         fields: customFields,
       );
+      if (!mounted) return;
       setState(() {
         if (result['imageUrl'] != null &&
             result['imageUrl'].toString().startsWith('data:image')) {
@@ -767,6 +769,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       allowMultiple: true,
       withData: true,
     );
+    if (!mounted) return;
     if (result != null && result.files.isNotEmpty) {
       final List<String> newImageUrls = [];
       for (final file in result.files) {
@@ -988,6 +991,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
           containerId: cIdInt,
           assetTypeId: atIdInt,
         );
+        if (!mounted) return;
         ToastService.success(
           AppLocalizations.of(context)!.assetUpdated(updatedItem.name),
         );

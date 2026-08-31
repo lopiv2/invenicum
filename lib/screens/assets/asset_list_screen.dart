@@ -195,6 +195,7 @@ class _AssetListScreenState extends State<AssetListScreen>
     );
 
     if (confirmed != true) return;
+    if (!context.mounted) return;
 
     try {
       final summary = await runAsyncTask(
@@ -206,6 +207,7 @@ class _AssetListScreenState extends State<AssetListScreen>
         loadingMessage: l10n.syncingMarketPrices,
         errorMessage: l10n.couldNotSyncPrices,
       );
+      if (!context.mounted) return;
       await AppUtils.trackAndToast(
         context,
         'PRICE_REGISTERED',
@@ -298,9 +300,7 @@ class _AssetListScreenState extends State<AssetListScreen>
         ];
 
         for (final field in assetType.fieldDefinitions) {
-          final rawValue =
-              item.customFieldValues?[field.id] ??
-              item.customFieldValues?[field.id.toString()];
+          final rawValue = item.customFieldValues?[field.id.toString()];
 
           if (rawValue is Map || rawValue is List) {
             row.add(jsonEncode(rawValue));

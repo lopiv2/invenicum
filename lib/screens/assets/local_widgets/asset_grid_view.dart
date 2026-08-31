@@ -82,7 +82,7 @@ class _AssetGridViewState extends State<AssetGridView> {
         'assetId': item.id.toString(),
       },
     );
-    if (!mounted) return;
+    if (!context.mounted) return;
     try {
       await context.read<InventoryItemProvider>().loadInventoryItems(
         containerId: widget.containerId,
@@ -90,6 +90,7 @@ class _AssetGridViewState extends State<AssetGridView> {
         forceReload: true,
       );
     } catch (_) {
+      if (!context.mounted) return;
       ToastService.error(AppLocalizations.of(context)!.couldNotReloadList);
     }
   }
@@ -136,7 +137,7 @@ class _AssetGridViewState extends State<AssetGridView> {
       },
       extra: item,
     );
-    if (!mounted) return;
+    if (!context.mounted) return;
     try {
       await context.read<InventoryItemProvider>().loadInventoryItems(
         containerId: widget.containerId,
@@ -144,6 +145,7 @@ class _AssetGridViewState extends State<AssetGridView> {
         forceReload: true,
       );
     } catch (_) {
+      if (!context.mounted) return;
       ToastService.error(AppLocalizations.of(context)!.couldNotReloadList);
     }
   }

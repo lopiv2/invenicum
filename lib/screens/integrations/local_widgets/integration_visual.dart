@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class IntegrationVisual extends StatelessWidget {
   const IntegrationVisual({
+    super.key,
     this.icon,
     required this.image,
     required this.accent,

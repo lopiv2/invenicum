@@ -151,7 +151,9 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
   void _removeField(int index) {
     setState(() {
       _fields.removeAt(index);
-      for (var i = 0; i < _fields.length; i++) _fields[i]['order'] = i;
+      for (var i = 0; i < _fields.length; i++) {
+        _fields[i]['order'] = i;
+      }
     });
   }
 
@@ -233,13 +235,13 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
               Expanded(
                 child: ReorderableListView.builder(
                   itemCount: _fields.length,
-                  onReorder: (oldIndex, newIndex) {
+                  onReorderItem: (oldIndex, newIndex) {
                     setState(() {
-                      if (newIndex > oldIndex) newIndex -= 1;
                       final item = _fields.removeAt(oldIndex);
                       _fields.insert(newIndex, item);
-                      for (var i = 0; i < _fields.length; i++)
+                      for (var i = 0; i < _fields.length; i++) {
                         _fields[i]['order'] = i;
+                      }
                     });
                   },
                   itemBuilder: (context, index) {

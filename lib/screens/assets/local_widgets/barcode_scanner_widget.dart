@@ -116,9 +116,8 @@ class _BarcodeScannerWidgetState extends State<BarcodeScannerWidget> {
                         // Damos un pequeño margen de 100ms para que el audio arranque
                         // antes de cerrar la pantalla y destruir el controlador.
                         Future.delayed(const Duration(milliseconds: 100), () {
-                          if (mounted) {
-                            Navigator.pop(context, barcode);
-                          }
+                          if (!context.mounted) return;
+                          Navigator.pop(context, barcode);
                         });
                       }
                     },

@@ -113,6 +113,7 @@ class ImagePreviewSection extends StatelessWidget {
                               setState(() => isLoading = true);
                               try {
                                 await onAddImageFromUrl!(url);
+                                if (!context.mounted) return;
                                 Navigator.of(context).pop();
                               } catch (e) {
                                 setState(() => isLoading = false);

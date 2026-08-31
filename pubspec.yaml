@@ -68,6 +68,7 @@ dependencies:
   audioplayers: ^6.7.1
   trina_grid: ^2.2.2
   http_parser: ^4.1.2
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:

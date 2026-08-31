@@ -25,6 +25,12 @@ class ApiService {
     dio.options.receiveTimeout = Duration(
       milliseconds: Environment.receiveTimeout,
     );
+    // Desactiva el warning ruidoso de CORS en web (dio_web_adapter 2.2+)
+    // Antes no aparecía porque enableCORSWarning era false por defecto.
+    // Hace que "Authorization" no dispare el log de preflight.
+    try {
+      (dio.httpClientAdapter as dynamic).enableCORSWarning = false;
+    } catch (_) {}
 
     dio.interceptors.add(
       InterceptorsWrapper(

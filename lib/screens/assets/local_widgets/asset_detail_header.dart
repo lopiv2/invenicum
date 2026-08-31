@@ -12,12 +12,12 @@ class AssetDetailHeader extends StatefulWidget {
   final PreferencesProvider preferencesProvider;
 
   const AssetDetailHeader({
-    Key? key,
+    super.key,
     required this.item,
     this.onEdit,
     this.onImageTap,
     required this.preferencesProvider,
-  }) : super(key: key);
+  });
 
   @override
   State<AssetDetailHeader> createState() => _AssetDetailHeaderState();

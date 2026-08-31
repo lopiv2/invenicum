@@ -35,3 +35,9 @@ Uses server-provided images from `PreferencesProvider.crossToonConfigs`.
 - Turn mode: `TurnMode.off` / `TurnMode.on` / `TurnMode.random`
 - The `_buildPreview` in `cross_toons_card_widget.dart` has the same `images/` prefix issue as the overlay
 - `didUpdateWidget` added so when configs arrive from server (initially empty), the first cross-toon is scheduled
+
+## Correccion de problemas y cosas que hacer
+- Siempre, cuando acabes de darme la respuesta, corrige los problemas generados con la solución, si se puede, y no lo dejes
+- Si puedes, utiliza parametros de widgets que no este deprecados, y si los hay, a posteriori, hay que corregirlos
+- Siempre hay que traducir cadenas con ARB cuando se haga codigo nuevo, no hardcodear cadenas de texto
+- Siempre usar ToastService para notificaciones, no usar otra cosa.

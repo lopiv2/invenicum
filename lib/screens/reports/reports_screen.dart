@@ -267,7 +267,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<int>(
-            value: _selectedContainerId,
+            initialValue: _selectedContainerId,
             isExpanded: true,
             items: containerProvider.containers
                 .map(

@@ -130,7 +130,7 @@ class _CollapsibleBentoBoxWidgetState extends State<CollapsibleBentoBoxWidget>
             if (widget.collapsible)
               SizeTransition(
                 sizeFactor: _expandAnim,
-                axisAlignment: -1,
+                alignment: Alignment.topCenter,
                 child: _buildContent(horizontalPadding, theme),
               )
             else

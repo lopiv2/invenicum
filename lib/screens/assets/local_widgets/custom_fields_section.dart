@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:invenicum/core/utils/asset_form_utils.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
@@ -194,6 +193,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
         lastDate: DateTime(2100),
         locale: Localizations.localeOf(context),
       );
+      if (!context.mounted) return;
 
       if (picked != null) {
         final formatted = AppUtils.formatDate(context, picked);
