@@ -491,6 +491,7 @@
   "productUrlLabel": "URL del producto",
   "quantity": "Cantidad",
   "refresh": "Recargar datos",
+  "reorderTooltip": "Arrastrar para reordenar",
   "registerNewLoan": "Registrar Nuevo Préstamo",
   "reloadContainers": "Recargar contenedores",
   "reloadLocations": "Recargar ubicaciones",

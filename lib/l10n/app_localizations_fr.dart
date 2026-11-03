@@ -972,6 +972,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get refresh => 'Recharger les données';
 
   @override
+  String get reorderTooltip => 'Glisser pour réordonner';
+
+  @override
   String get registerNewLoan => 'Enregistrer un nouveau prêt';
 
   @override

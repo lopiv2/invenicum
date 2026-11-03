@@ -961,6 +961,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get refresh => 'Refresh data';
 
   @override
+  String get reorderTooltip => 'Drag to reorder';
+
+  @override
   String get registerNewLoan => 'Register New Loan';
 
   @override

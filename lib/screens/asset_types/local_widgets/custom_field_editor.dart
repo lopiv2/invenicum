@@ -13,6 +13,7 @@ class CustomFieldEditor extends StatefulWidget {
   final VoidCallback onDelete;
   final Function(CustomFieldDefinition)
   onUpdate; // Callback para notificar cambios
+  final Widget? dragHandle; // Tirador para reordenar (opcional)
 
   const CustomFieldEditor({
     super.key,
@@ -20,6 +21,7 @@ class CustomFieldEditor extends StatefulWidget {
     required this.availableDataLists,
     required this.onDelete,
     required this.onUpdate,
+    this.dragHandle,
   });
 
   @override
@@ -61,24 +63,23 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
 
   @override
   void didUpdateWidget(covariant CustomFieldEditor oldWidget) {
-  super.didUpdateWidget(oldWidget);
-  
-  if (widget.field != oldWidget.field) {
-    
-    if (_nameController.text != widget.field.name) {
-      _nameController.removeListener(_onNameChanged);
-      _nameController.text = widget.field.name;
-      _nameController.addListener(_onNameChanged);
-    }
+    super.didUpdateWidget(oldWidget);
 
-    _selectedType = widget.field.type;
-    _isRequired = widget.field.isRequired;
-    _selectedListDataId = widget.field.dataListId;
-    _isSummable = widget.field.isSummable;
-    _isCountable = widget.field.isCountable;
-    _isMonetary = widget.field.isMonetary;
+    if (widget.field != oldWidget.field) {
+      if (_nameController.text != widget.field.name) {
+        _nameController.removeListener(_onNameChanged);
+        _nameController.text = widget.field.name;
+        _nameController.addListener(_onNameChanged);
+      }
+
+      _selectedType = widget.field.type;
+      _isRequired = widget.field.isRequired;
+      _selectedListDataId = widget.field.dataListId;
+      _isSummable = widget.field.isSummable;
+      _isCountable = widget.field.isCountable;
+      _isMonetary = widget.field.isMonetary;
+    }
   }
-}
 
   void _onNameChanged() {
     setState(() {}); // Solo actualiza la cabecera del campo
@@ -150,6 +151,10 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             // --- Cabecera y Botón de Eliminar ---
             Row(
               children: [
+                if (widget.dragHandle != null) ...[
+                  widget.dragHandle!,
+                  const SizedBox(width: 4),
+                ],
                 Expanded(
                   child: ValueListenableBuilder<TextEditingValue>(
                     valueListenable: _nameController,
@@ -250,7 +255,10 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             const Divider(),
 
             // --- Opciones de Comportamiento del Campo ---
-            Text(l10n.fieldsOptions, style: Theme.of(context).textTheme.titleSmall),
+            Text(
+              l10n.fieldsOptions,
+              style: Theme.of(context).textTheme.titleSmall,
+            ),
 
             // 3. Campo Requerido (Switch)
             SwitchListTile(
@@ -269,9 +277,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
             // 🔑 4. Es Sumable (Visible solo para tipos numéricos)
             if (_isNumericType)
               SwitchListTile(
-                title: Text(
-                  l10n.isSummativeFieldLabel,
-                ),
+                title: Text(l10n.isSummativeFieldLabel),
                 value: _isSummable,
                 onChanged: (bool newValue) {
                   setState(() {
@@ -287,9 +293,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 _selectedType == CustomFieldType.price)
               SwitchListTile(
                 title: Text(l10n.isMonetaryValueLabel),
-                subtitle: Text(
-                  l10n.monetaryValueDescription,
-                ),
+                subtitle: Text(l10n.monetaryValueDescription),
                 value: _isMonetary,
                 activeThumbColor: Colors.green, // Color sugerente para dinero
                 onChanged: (bool newValue) {

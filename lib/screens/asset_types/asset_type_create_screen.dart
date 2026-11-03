@@ -36,6 +36,8 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
   final List<CustomFieldDefinition> _fieldDefinitions = [];
   List<ListData> _availableDataLists = [];
   bool _isLoadingLists = true;
+  // Ids temporales negativos para campos aún no guardados (claves estables).
+  int _nextTempFieldId = -1;
   String? _imagePreviewUrl;
   bool _isSerialized = true;
   String _assetKind = 'standard';
@@ -90,7 +92,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
     setState(() {
       _fieldDefinitions.add(
         CustomFieldDefinition(
-          id: 0,
+          id: _nextTempFieldId--,
           name: '',
           type: CustomFieldType.text,
           isRequired: false,
@@ -99,6 +101,14 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
           isMonetary: false,
         ),
       );
+    });
+  }
+
+  void _reorderFields(int oldIndex, int newIndex) {
+    // onReorderItem ya trae newIndex ajustado tras extraer el item.
+    setState(() {
+      final field = _fieldDefinitions.removeAt(oldIndex);
+      _fieldDefinitions.insert(newIndex, field);
     });
   }
 
@@ -281,6 +291,7 @@ class _AssetTypeCreateScreenState extends State<AssetTypeCreateScreen> {
                               () => _fieldDefinitions[index] = updatedField,
                             );
                           },
+                          onReorderFields: _reorderFields,
                         ),
                       ),
                     ],

@@ -491,6 +491,7 @@
   "productUrlLabel": "Product URL",
   "quantity": "Quantity",
   "refresh": "Refresh data",
+  "reorderTooltip": "Drag to reorder",
   "registerNewLoan": "Register New Loan",
   "reloadContainers": "Reload containers",
   "reloadLocations": "Reload locations",
