@@ -7,11 +7,15 @@ import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 class StatusSectionWidget extends StatelessWidget {
   final ItemCondition selectedCondition;
   final ValueChanged<ItemCondition> onConditionChanged;
+  final TextEditingController marketValueController;
+  final String currencyLabel;
 
   const StatusSectionWidget({
     super.key,
     required this.selectedCondition,
     required this.onConditionChanged,
+    required this.marketValueController,
+    required this.currencyLabel,
   });
 
   @override
@@ -31,7 +35,8 @@ class StatusSectionWidget extends StatelessWidget {
               isExpanded: true, // Para que el badge tenga espacio
               decoration: InputDecoration(
                 labelText: l10n.itemStatusLabel,
-                border: const OutlineInputBorder(), // Opcional: para que encaje con tu estilo
+                border:
+                    const OutlineInputBorder(), // Opcional: para que encaje con tu estilo
               ),
               // Esta propiedad define cómo se ve el ítem seleccionado cuando el menú está cerrado
               selectedItemBuilder: (BuildContext context) {
@@ -45,12 +50,28 @@ class StatusSectionWidget extends StatelessWidget {
               items: ItemCondition.values.map((condition) {
                 return DropdownMenuItem(
                   value: condition,
-                  child: ConditionBadgeWidget(condition: condition), // 🚀 Usamos el badge aquí
+                  child: ConditionBadgeWidget(
+                    condition: condition,
+                  ), // 🚀 Usamos el badge aquí
                 );
               }).toList(),
               onChanged: (val) {
                 if (val != null) onConditionChanged(val);
               },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: TextFormField(
+              controller: marketValueController,
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              decoration: InputDecoration(
+                labelText: l10n.marketValueField,
+                suffixText: currencyLabel,
+                border: const OutlineInputBorder(),
+              ),
             ),
           ),
         ],
