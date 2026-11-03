@@ -28,7 +28,6 @@ class GlassDropdown<T> extends StatelessWidget {
           value: value,
           items: items,
           onChanged: onChanged,
-          isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
           dropdownColor: Theme.of(
             context,
