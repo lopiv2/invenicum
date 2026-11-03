@@ -344,6 +344,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get chooseFile => 'Scegli File';
 
   @override
+  String get clear => 'Cancella';
+
+  @override
   String get clearCounter => 'Cancella contatore';
 
   @override

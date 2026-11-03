@@ -303,6 +303,7 @@
   "cancel": "Annuler",
   "centerView": "Vue centrale",
   "chooseFile": "Choisir un fichier",
+  "clear": "Effacer",
   "clearCounter": "Effacer le compteur",
   "collectionContainerInfo": "Les conteneurs de collection ont des barres de suivi de collection, une valeur investie, une valeur marchande et une vue d'exposition",
   "collectionFieldsConfigured": "Champs de collection configurés.",
