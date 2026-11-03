@@ -64,56 +64,76 @@ class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        border: Border(
-          top: BorderSide(color: theme.dividerColor, width: 1),
-        ),
-      ),
-      child: Row(
-        children: [
-          Text(l10n.rowsPerPageTitle, style: theme.textTheme.bodySmall),
-          const SizedBox(width: 6),
-          ..._pageSizes.map((size) => _buildPageSizeButton(size)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: TrinaPagination(widget.stateManager),
-          ),
-          Container(
-            width: 1,
-            height: 24,
-            color: theme.dividerColor,
-            margin: const EdgeInsets.symmetric(horizontal: 12),
-          ),
-          Text(l10n.goToPageLabel, style: theme.textTheme.bodySmall),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 56,
-            height: 30,
-            child: TextField(
-              controller: _pageController,
-              keyboardType: TextInputType.number,
-              textAlign: TextAlign.center,
-              style: theme.textTheme.bodySmall,
-              decoration: InputDecoration(
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                hintText: '$_currentPage',
-                hintStyle:
-                    theme.textTheme.bodySmall?.copyWith(color: theme.hintColor),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // On narrow screens the full row does not fit: allow horizontal
+        // scrolling instead of overflowing.
+        final isNarrow = constraints.maxWidth < 560;
+
+        final content = Row(
+          mainAxisSize: isNarrow ? MainAxisSize.min : MainAxisSize.max,
+          children: [
+            Text(l10n.rowsPerPageTitle, style: theme.textTheme.bodySmall),
+            const SizedBox(width: 6),
+            ..._pageSizes.map((size) => _buildPageSizeButton(size)),
+            const SizedBox(width: 12),
+            if (isNarrow)
+              TrinaPagination(widget.stateManager)
+            else
+              Expanded(child: TrinaPagination(widget.stateManager)),
+            Container(
+              width: 1,
+              height: 24,
+              color: theme.dividerColor,
+              margin: const EdgeInsets.symmetric(horizontal: 12),
+            ),
+            Text(l10n.goToPageLabel, style: theme.textTheme.bodySmall),
+            const SizedBox(width: 8),
+            SizedBox(
+              width: 56,
+              height: 30,
+              child: TextField(
+                controller: _pageController,
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall,
+                decoration: InputDecoration(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  hintText: '$_currentPage',
+                  hintStyle: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.hintColor,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(6),
+                  ),
                 ),
+                onSubmitted: _goToPage,
               ),
-              onSubmitted: _goToPage,
+            ),
+            const SizedBox(width: 6),
+            Text('/ $_totalPages', style: theme.textTheme.bodySmall),
+          ],
+        );
+
+        return Container(
+          height: isNarrow ? null : 50,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          decoration: BoxDecoration(
+            border: Border(
+              top: BorderSide(color: theme.dividerColor, width: 1),
             ),
           ),
-          const SizedBox(width: 6),
-          Text('/ $_totalPages', style: theme.textTheme.bodySmall),
-        ],
-      ),
+          child: isNarrow
+              ? SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: content,
+                )
+              : content,
+        );
+      },
     );
   }
 
