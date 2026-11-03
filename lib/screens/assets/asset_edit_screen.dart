@@ -73,6 +73,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   late TextEditingController _minStockController;
   late TextEditingController _barcodeController;
   late TextEditingController _serialController;
+  late TextEditingController _marketValueController;
   late FocusNode _nameAutocompleteFocusNode;
   final Map<int, FocusNode> _dynamicAutocompleteFocusNodes = {};
 
@@ -134,6 +135,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _minStockController = TextEditingController();
     _barcodeController = TextEditingController();
     _serialController = TextEditingController();
+    _marketValueController = TextEditingController();
     _nameAutocompleteFocusNode = FocusNode();
     _dynamicControllers = {};
     _selectedLocationId = currentItem?.locationId;
@@ -210,6 +212,10 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _model3dFiles = [];
     _selectedCondition = item.condition;
     _marketValue = item.marketValue;
+    final localMarketValue = context.read<PreferencesProvider>().convertPrice(
+      item.marketValue,
+    );
+    _marketValueController.text = localMarketValue.toStringAsFixed(2);
     _initializeDynamicFields(item);
     setState(() => _isInitialized = true);
   }
@@ -297,6 +303,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     _aiSearchController.dispose();
     _scrollController.dispose();
     _model3dPathController.dispose();
+    _marketValueController.dispose();
     super.dispose();
   }
 
@@ -428,6 +435,12 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
             }
             _descriptionController.text = baseDescription;
           });
+          if (_marketValueController.text.trim().isEmpty && _marketValue > 0) {
+            final localValue = context.read<PreferencesProvider>().convertPrice(
+              _marketValue,
+            );
+            _marketValueController.text = localValue.toStringAsFixed(2);
+          }
 
           // Automatic mapping
           final Map<String, dynamic> aiFields = Map<String, dynamic>.from(
@@ -844,6 +857,16 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
   // Save asset
   // ---------------------------------------------------------------------------
 
+  /// Manual market value (local currency) takes precedence over enriched data.
+  /// Clearing the field resets the market value to zero.
+  double _resolveMarketValue(PreferencesProvider preferences) {
+    final text = _marketValueController.text.trim().replaceAll(',', '.');
+    if (text.isEmpty) return 0.0;
+    final localValue = double.tryParse(text);
+    if (localValue == null) return _marketValue;
+    return preferences.convertToBase(localValue);
+  }
+
   Future<void> _saveAsset() async {
     if (_isSaving) return;
     if (!AssetFormUtils.validateForm(_formKey) ||
@@ -937,7 +960,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
       name: _nameController.text.trim(),
       description: _descriptionController.text.trim(),
       condition: _selectedCondition,
-      marketValue: _marketValue,
+      marketValue: _resolveMarketValue(preferences),
       customFieldValues: updatedCustomValues,
       images: _currentImages,
     );
@@ -1224,6 +1247,10 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                       selectedCondition: _selectedCondition,
                       onConditionChanged: (val) =>
                           setState(() => _selectedCondition = val),
+                      marketValueController: _marketValueController,
+                      currencyLabel: context
+                          .watch<PreferencesProvider>()
+                          .selectedCurrency,
                     ),
 
                     // ── Stock y Codificación ──

@@ -72,6 +72,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
   final _quantityController = TextEditingController(text: '1');
   final _minStockController = TextEditingController(text: '1');
   final _aiSearchController = TextEditingController();
+  final _marketValueController = TextEditingController();
   final FocusNode _nameAutocompleteFocusNode = FocusNode();
   final Map<int, FocusNode> _customAutocompleteFocusNodes = {};
   bool _isEnrichLoading = false;
@@ -247,6 +248,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           }
           _highlightedFields.addAll(['name', 'description', 'barcode']);
         });
+        _syncMarketValueController();
         ToastService.success(AppLocalizations.of(context)!.cloudDataFound);
       }
     } catch (e) {
@@ -337,6 +339,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           }
           _descriptionController.text = baseDescription;
         });
+        _syncMarketValueController();
 
         // 2) Automatic mapping for known fields
         final Map<String, dynamic> aiFields = Map<String, dynamic>.from(
@@ -662,6 +665,28 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     };
   }
 
+  /// Manual market value (local currency) takes precedence over enriched data.
+  /// An empty field keeps the value coming from enrich/barcode lookups.
+  double _resolveMarketValue(PreferencesProvider prefsProvider) {
+    final text = _marketValueController.text.trim().replaceAll(',', '.');
+    if (text.isEmpty) return _marketValue;
+    final localValue = double.tryParse(text);
+    if (localValue == null) return _marketValue;
+    return prefsProvider.convertToBase(localValue);
+  }
+
+  /// Shows the enriched market value in the manual field so the user can
+  /// review or adjust it. Never overwrites what the user already typed.
+  void _syncMarketValueController() {
+    if (!mounted) return;
+    if (_marketValueController.text.trim().isNotEmpty) return;
+    if (_marketValue <= 0) return;
+    final localValue = context.read<PreferencesProvider>().convertPrice(
+      _marketValue,
+    );
+    _marketValueController.text = localValue.toStringAsFixed(2);
+  }
+
   Future<void> _saveAsset() async {
     if (_isSaving) return;
     final l10n = AppLocalizations.of(context)!;
@@ -716,7 +741,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       name: _nameController.text.trim(),
       condition: _selectedCondition,
       description: _descriptionController.text.trim(),
-      marketValue: _marketValue,
+      marketValue: _resolveMarketValue(prefsProvider),
       customFieldValues: customFieldValues,
     );
 
@@ -873,7 +898,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
       name: _nameController.text.trim(),
       condition: _selectedCondition,
       description: _descriptionController.text.trim(),
-      marketValue: _marketValue,
+      marketValue: _resolveMarketValue(prefsProvider),
       customFieldValues: customFieldValues,
     );
 
@@ -940,6 +965,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
           _minStockController.text = '1';
           _selectedCondition = ItemCondition.loose;
           _marketValue = 0.0;
+          _marketValueController.clear();
           for (var entry in _customControllers.entries) {
             entry.value.clear();
           }
@@ -1078,6 +1104,7 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
     _quantityController.dispose();
     _minStockController.dispose();
     _aiSearchController.dispose();
+    _marketValueController.dispose();
     _scrollController.dispose();
     _model3dPathController.dispose();
     _nameAutocompleteFocusNode.dispose();
@@ -1222,6 +1249,10 @@ class _AssetCreateScreenState extends State<AssetCreateScreen>
                         selectedCondition: _selectedCondition,
                         onConditionChanged: (val) =>
                             setState(() => _selectedCondition = val),
+                        marketValueController: _marketValueController,
+                        currencyLabel: context
+                            .watch<PreferencesProvider>()
+                            .selectedCurrency,
                       ),
 
                       // ── Row 3b: Stock and Codification ──
