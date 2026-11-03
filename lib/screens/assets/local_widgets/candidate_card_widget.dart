@@ -6,6 +6,7 @@ class CandidateCard extends StatefulWidget {
   final String subtitle;
   final VoidCallback? onTap;
   final bool isSelected;
+  final bool isCompact;
 
   const CandidateCard({
     super.key,
@@ -13,6 +14,7 @@ class CandidateCard extends StatefulWidget {
     required this.subtitle,
     this.onTap,
     this.isSelected = false,
+    this.isCompact = false,
   });
 
   @override
@@ -28,6 +30,10 @@ class _CandidateCardState extends State<CandidateCard> {
     final name = widget.candidate['name']?.toString() ?? '';
 
     final isActive = _isHovered || widget.isSelected;
+
+    if (widget.isCompact) {
+      return _buildCompactCard(context, image, name, isActive);
+    }
 
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -49,12 +55,12 @@ class _CandidateCardState extends State<CandidateCard> {
                   BoxShadow(
                     color: Theme.of(
                       context,
-                    ).colorScheme.primary.withValues(alpha:0.6),
+                    ).colorScheme.primary.withValues(alpha: 0.6),
                     blurRadius: 20,
                     spreadRadius: 2,
                   ),
                 BoxShadow(
-                  color: Colors.black.withValues(alpha:isActive ? 0.25 : 0.12),
+                  color: Colors.black.withValues(alpha: isActive ? 0.25 : 0.12),
                   blurRadius: isActive ? 16 : 10,
                   offset: const Offset(0, 6),
                 ),
@@ -75,47 +81,7 @@ class _CandidateCardState extends State<CandidateCard> {
                   // 🖼️ Imagen con lazy + fade-in
                   Positioned.fill(
                     child: image != null && image.isNotEmpty
-                        ? Image.network(
-                            image,
-                            fit: BoxFit.cover,
-
-                            // ⚡ Lazy loading
-                            loadingBuilder: (context, child, progress) {
-                              if (progress == null) return child;
-                              return Container(
-                                color: Colors.grey.shade300,
-                                alignment: Alignment.center,
-                                child: const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: AppLoadingIndicator(
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              );
-                            },
-
-                            // ✨ Fade-in cuando carga
-                            frameBuilder: (context, child, frame, _) {
-                              if (frame == null) {
-                                return AnimatedOpacity(
-                                  opacity: 0,
-                                  duration: const Duration(milliseconds: 300),
-                                  child: child,
-                                );
-                              }
-                              return AnimatedOpacity(
-                                opacity: 1,
-                                duration: const Duration(milliseconds: 300),
-                                child: child,
-                              );
-                            },
-
-                            errorBuilder: (_, _, _) => Container(
-                              color: Colors.grey.shade300,
-                              child: const Icon(Icons.image_not_supported),
-                            ),
-                          )
+                        ? _buildCandidateImage(image)
                         : Container(color: Colors.grey.shade300),
                   ),
 
@@ -127,7 +93,7 @@ class _CandidateCardState extends State<CandidateCard> {
                           begin: Alignment.bottomCenter,
                           end: Alignment.center,
                           colors: [
-                            Colors.black.withValues(alpha:0.75),
+                            Colors.black.withValues(alpha: 0.75),
                             Colors.transparent,
                           ],
                         ),
@@ -158,7 +124,7 @@ class _CandidateCardState extends State<CandidateCard> {
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
-                              color: Colors.white.withValues(alpha:0.85),
+                              color: Colors.white.withValues(alpha: 0.85),
                               fontSize: 12,
                             ),
                           ),
@@ -170,6 +136,119 @@ class _CandidateCardState extends State<CandidateCard> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCompactCard(
+    BuildContext context,
+    String? image,
+    String name,
+    bool isActive,
+  ) {
+    final theme = Theme.of(context);
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: isActive ? theme.colorScheme.primary : Colors.transparent,
+              width: 2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.12),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(12),
+                ),
+                child: SizedBox(
+                  width: 76,
+                  height: 104,
+                  child: image != null && image.isNotEmpty
+                      ? _buildCandidateImage(image)
+                      : Container(color: Colors.grey.shade300),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        softWrap: true,
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      if (widget.subtitle.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        Text(
+                          widget.subtitle,
+                          softWrap: true,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCandidateImage(String image) {
+    return Image.network(
+      image,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, progress) {
+        if (progress == null) return child;
+        return Container(
+          color: Colors.grey.shade300,
+          alignment: Alignment.center,
+          child: const SizedBox(
+            width: 24,
+            height: 24,
+            child: AppLoadingIndicator(strokeWidth: 2),
+          ),
+        );
+      },
+      frameBuilder: (context, child, frame, _) {
+        return AnimatedOpacity(
+          opacity: frame == null ? 0 : 1,
+          duration: const Duration(milliseconds: 300),
+          child: child,
+        );
+      },
+      errorBuilder: (_, _, _) => Container(
+        color: Colors.grey.shade300,
+        child: const Icon(Icons.image_not_supported),
       ),
     );
   }
