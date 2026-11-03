@@ -78,7 +78,12 @@ class _TrinaPaginationFooterState extends State<TrinaPaginationFooter> {
             ..._pageSizes.map((size) => _buildPageSizeButton(size)),
             const SizedBox(width: 12),
             if (isNarrow)
-              TrinaPagination(widget.stateManager)
+              SizedBox(
+                // The horizontal scroll view gives its child unbounded width;
+                // TrinaPagination needs a finite width for its own layout.
+                width: 180,
+                child: TrinaPagination(widget.stateManager),
+              )
             else
               Expanded(child: TrinaPagination(widget.stateManager)),
             Container(
