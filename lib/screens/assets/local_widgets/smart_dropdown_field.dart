@@ -81,10 +81,14 @@ class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
   }
 
   void _closeOverlay() {
+    _removeOverlay();
+    if (mounted) setState(() {});
+  }
+
+  void _removeOverlay() {
     _overlayEntry?.remove();
     _overlayEntry = null;
     _isOpen = false;
-    if (mounted) setState(() {});
   }
 
   void _onItemSelected(String? raw) {
@@ -222,7 +226,8 @@ class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
 
   @override
   void dispose() {
-    _closeOverlay();
+    // No setState here: the element is already defunct during unmount.
+    _removeOverlay();
     super.dispose();
   }
 
