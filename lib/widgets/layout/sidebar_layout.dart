@@ -25,10 +25,15 @@ class SidebarLayout extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [colorScheme.surface, colorScheme.primary.withValues(alpha: 0.05)],
+          colors: [
+            colorScheme.surface,
+            colorScheme.primary.withValues(alpha: 0.05),
+          ],
         ),
         border: Border(
-          right: BorderSide(color: colorScheme.outlineVariant.withValues(alpha: 0.4)),
+          right: BorderSide(
+            color: colorScheme.outlineVariant.withValues(alpha: 0.4),
+          ),
         ),
       ),
       child: SafeArea(
@@ -86,12 +91,13 @@ class SidebarLayout extends StatelessWidget {
                         routeName: RouteNames.templates,
                         onTap: () => context.goNamed(RouteNames.templates),
                       ),
-                      SidebarNavButton(
-                        icon: Icons.extension_outlined,
-                        title: AppLocalizations.of(context)!.plugins,
-                        routeName: RouteNames.plugins,
-                        onTap: () => context.goNamed(RouteNames.plugins),
-                      ),
+                      // Plugins oculto mientras está en construcción.
+                      // SidebarNavButton(
+                      //   icon: Icons.extension_outlined,
+                      //   title: AppLocalizations.of(context)!.plugins,
+                      //   routeName: RouteNames.plugins,
+                      //   onTap: () => context.goNamed(RouteNames.plugins),
+                      // ),
                       SidebarNavButton(
                         icon: Icons.notifications_none_rounded,
                         title: AppLocalizations.of(context)!.alerts,
@@ -119,7 +125,8 @@ class SidebarLayout extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
               child: WebpAnimatorVersion(
-                versionArt: VersionArt.findByVersion(Environment.appVersion) ??
+                versionArt:
+                    VersionArt.findByVersion(Environment.appVersion) ??
                     VersionArt.all.last,
                 appVersion: Environment.appVersion,
               ),
