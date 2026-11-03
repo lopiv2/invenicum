@@ -65,7 +65,7 @@ class _DateFieldWidgetState extends State<_DateFieldWidget> {
         controller: widget.controller,
         label: widget.fieldDef.name,
         icon: Icons.calendar_today_outlined,
-        hint: 'DD/MM/YYYY',
+        hint: l10n.dateFormatHint,
         helper: widget.fieldDef.isRequired ? l10n.obligatory : null,
         readOnly: true,
         onTap: widget.onTap,
@@ -370,6 +370,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
   Widget _buildTextField(BuildContext context, CustomFieldDefinition fieldDef) {
     final controller = customControllers[fieldDef.id];
     final preferences = context.read<PreferencesProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     if (controller == null) return const SizedBox.shrink();
 
@@ -384,7 +385,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
       if (fieldDef.isRequired && (value == null || value.isEmpty)) {
         return AppLocalizations.of(context)!.requiredFieldValidation;
       }
-      return fieldDef.type.validateValue(value);
+      return fieldDef.type.validateValue(value, l10n: l10n);
     }
 
     CommonFormField buildBaseField({
@@ -403,7 +404,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
             ? '${preferences.getSymbolForCurrency(preferences.selectedCurrency)} '
             : null,
         hint: AssetFormUtils.getHintText(fieldDef.type),
-        helper: fieldDef.isRequired ? 'Obligatorio' : null,
+        helper: fieldDef.isRequired ? l10n.obligatory : null,
         keyboardType: fieldDef.type.keyboardType,
         inputFormatters: inputFormatters,
         highlighted: highlightedFields.contains(fieldDef.name),

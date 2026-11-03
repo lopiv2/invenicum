@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/constants.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import '../../../providers/preferences_provider.dart';
 
@@ -20,6 +21,7 @@ class PriceDisplayWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final preferences = context.watch<PreferencesProvider>();
+    final l10n = AppLocalizations.of(context)!;
 
     // 1. Convert the value from DB (USD) to a number
     final double dbValue = double.tryParse(value?.toString() ?? '0') ?? 0.0;
@@ -35,7 +37,7 @@ class PriceDisplayWidget extends StatelessWidget {
     );
 
     return Tooltip(
-      message: 'Original: $originalUsdText USD',
+      message: l10n.originalPriceTooltip(originalUsdText),
       child: Text(
         formattedPrice,
         style:

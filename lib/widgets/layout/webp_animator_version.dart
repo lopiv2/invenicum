@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -53,6 +54,7 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final size = widget.versionArt.size;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -63,17 +65,16 @@ class _WebpAnimatorVersionState extends State<WebpAnimatorVersion> {
           children: [
             Text(
               widget.appVersion != null
-                  ? 'v${widget.appVersion} "${widget.versionArt.versionName}"'
-                  : '${widget.versionArt.versionLabel} "${widget.versionArt.versionName}"',
-              style: TextStyle(
-                fontSize: 14,
-                color: colorScheme.outline,
-              ),
+                  ? 'v${widget.appVersion} "${widget.versionArt.displayName(l10n)}"'
+                  : '${widget.versionArt.versionLabel} "${widget.versionArt.displayName(l10n)}"',
+              style: TextStyle(fontSize: 14, color: colorScheme.outline),
             ),
             const SizedBox(width: 4),
             IconButton(
               icon: Icon(
-                _isPlaying ? Icons.pause_circle_filled : Icons.play_circle_filled,
+                _isPlaying
+                    ? Icons.pause_circle_filled
+                    : Icons.play_circle_filled,
               ),
               iconSize: 18,
               visualDensity: VisualDensity.compact,

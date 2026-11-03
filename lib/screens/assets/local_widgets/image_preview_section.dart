@@ -88,8 +88,8 @@ class ImagePreviewSection extends StatelessWidget {
                   : TextField(
                       controller: urlController,
                       decoration: InputDecoration(
-                        hintText: 'https://example.com/image.jpg',
-                        labelText: 'URL',
+                        hintText: l10n.imageUrlExampleHint,
+                        labelText: l10n.urlLabel,
                         suffixIcon: const Icon(Icons.link),
                         border: const OutlineInputBorder(),
                       ),

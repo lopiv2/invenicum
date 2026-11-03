@@ -66,9 +66,11 @@ class SidebarContainerHeader extends StatelessWidget {
           result['description'].isEmpty ? null : result['description'],
           isCollection: result['isCollection'],
         );
-        ToastService.success('Contenedor creado');
+        ToastService.success(
+          l10n.containerCreated(result['name']?.toString() ?? ''),
+        );
       } catch (e) {
-        ToastService.error('Error: $e');
+        ToastService.error(l10n.errorWithMessage(e.toString()));
       }
     }
   }

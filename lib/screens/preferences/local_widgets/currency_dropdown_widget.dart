@@ -102,7 +102,7 @@ class CurrencyDropdownWidget extends StatelessWidget {
       await AppUtils.trackAndToast(context, 'CURRENCY_CHANGED');
       ToastService.success("${l10n.currency}: $currencyCode"); 
     } catch (e) {
-      ToastService.error("Error: ${e.toString()}");
+      ToastService.error(l10n.errorWithMessage(e.toString()));
     }
   }
 }

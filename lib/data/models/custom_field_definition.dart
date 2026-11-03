@@ -1,16 +1,9 @@
 // lib/models/custom_field_definition.dart
 
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
-enum CustomFieldType {
-  text,
-  number,
-  date,
-  dropdown,
-  boolean,
-  url,
-  price,
-}
+enum CustomFieldType { text, number, date, dropdown, boolean, url, price }
 
 extension CustomFieldTypeExtension on CustomFieldType {
   // 🔑 1. IDENTIFICADOR TÉCNICO (Usado para la API, DB, y validación en el Backend)
@@ -22,22 +15,22 @@ extension CustomFieldTypeExtension on CustomFieldType {
 
   // 🗣️ 2. NOMBRE VISUAL (Reemplaza la propiedad 'name' anterior, usado para la UI)
   /// Devuelve el nombre del tipo de campo para mostrar en la interfaz de usuario (traducido).
-  String get displayName {
+  String displayName(AppLocalizations l10n) {
     switch (this) {
       case CustomFieldType.text:
-        return 'Texto';
+        return l10n.fieldTypeText;
       case CustomFieldType.number:
-        return 'Número';
+        return l10n.fieldTypeNumber;
       case CustomFieldType.date:
-        return 'Fecha';
+        return l10n.fieldTypeDate;
       case CustomFieldType.dropdown:
-        return 'Desplegable';
+        return l10n.fieldTypeDropdown;
       case CustomFieldType.boolean:
-        return 'Sí/No (Booleano)'; // El valor traducido para la UI
+        return l10n.fieldTypeBoolean;
       case CustomFieldType.url:
-        return 'URL';
+        return l10n.fieldTypeUrl;
       case CustomFieldType.price:
-        return 'Precio';
+        return l10n.fieldTypePrice;
     }
   }
 
@@ -57,7 +50,9 @@ extension CustomFieldTypeExtension on CustomFieldType {
           lowerCaseType.contains('si/no')) {
         return CustomFieldType.boolean;
       }
-      debugPrint('Error: Tipo de campo desconocido "$typeString". Usando texto.');
+      debugPrint(
+        'Error: Tipo de campo desconocido "$typeString". Usando texto.',
+      );
       return CustomFieldType.text; // Valor de fallback seguro
     }
   }
@@ -68,7 +63,10 @@ extension CustomFieldTypeExtension on CustomFieldType {
       case CustomFieldType.number:
         return TextInputType.number;
       case CustomFieldType.price:
-        return TextInputType.numberWithOptions(decimal: true, signed: false); // Mejorado
+        return TextInputType.numberWithOptions(
+          decimal: true,
+          signed: false,
+        ); // Mejorado
       case CustomFieldType.url:
         return TextInputType.url;
       case CustomFieldType.date:
@@ -79,23 +77,22 @@ extension CustomFieldTypeExtension on CustomFieldType {
   }
 
   /// Valida el valor según el tipo de campo
-  String? validateValue(String? value) {
+  String? validateValue(String? value, {required AppLocalizations l10n}) {
     if (value == null || value.isEmpty) return null; // No validar si está vacío
 
     switch (this) {
       case CustomFieldType.url:
         // Patrón mejorado para URLs (simplificado)
-        final urlPattern =
-            RegExp(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$');
+        final urlPattern = RegExp(r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$');
         if (!urlPattern.hasMatch(value)) {
-          return 'Introduce una URL válida';
+          return l10n.validationValidUrl;
         }
         break;
       case CustomFieldType.price:
         // Permite comas o puntos como separador decimal
         final pricePattern = RegExp(r'^\d+([.,]\d{0,2})?$');
         if (!pricePattern.hasMatch(value)) {
-          return 'Introduce un precio válido (ej: 123.45)';
+          return l10n.validationValidPrice;
         }
         break;
       default:

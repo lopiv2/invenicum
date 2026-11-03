@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/utils/constants.dart';
 import '../../data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class SpriteVaultScreen extends StatefulWidget {
   const SpriteVaultScreen({super.key});
@@ -22,6 +23,7 @@ class _SpriteVaultScreenState extends State<SpriteVaultScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: scheme.surface,
@@ -35,7 +37,7 @@ class _SpriteVaultScreenState extends State<SpriteVaultScreen> {
                 FaIcon(FontAwesomeIcons.skull, color: scheme.primary, size: 28),
                 const SizedBox(width: 12),
                 Text(
-                  'Sprite Vault™',
+                  l10n.spriteVaultTitle,
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: scheme.onSurface,
@@ -45,24 +47,28 @@ class _SpriteVaultScreenState extends State<SpriteVaultScreen> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Browse and preview every major-version sprite.',
+              l10n.spriteVaultSubtitle,
               style: TextStyle(color: scheme.onSurfaceVariant),
             ),
             const Divider(height: 32),
-            Expanded(child: _buildGrid(context, scheme)),
+            Expanded(child: _buildGrid(context, scheme, l10n)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildGrid(BuildContext context, ColorScheme scheme) {
+  Widget _buildGrid(
+    BuildContext context,
+    ColorScheme scheme,
+    AppLocalizations l10n,
+  ) {
     final arts = VersionArt.all;
 
     if (arts.isEmpty) {
       return Center(
         child: Text(
-          'No sprites yet. Stay tuned for future versions!',
+          l10n.spriteVaultEmpty,
           style: TextStyle(color: scheme.onSurfaceVariant),
         ),
       );
@@ -107,6 +113,7 @@ class _SpriteCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final size = art.size;
+    final l10n = AppLocalizations.of(context)!;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -141,14 +148,17 @@ class _SpriteCard extends StatelessWidget {
                   children: [
                     if (isCurrent)
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         margin: const EdgeInsets.only(bottom: 4),
                         decoration: BoxDecoration(
                           color: scheme.primaryContainer,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          'CURRENT',
+                          l10n.spriteVaultCurrentBadge,
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -165,16 +175,16 @@ class _SpriteCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '"${art.versionName}"',
+                      '"${art.displayName(l10n)}"',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    if (art.description.isNotEmpty) ...[
+                    if (art.displayDescription(l10n).isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
-                        art.description,
+                        art.displayDescription(l10n),
                         style: TextStyle(
                           fontSize: 13,
                           color: scheme.onSurfaceVariant,
@@ -186,10 +196,7 @@ class _SpriteCard extends StatelessWidget {
                   ],
                 ),
               ),
-              Icon(
-                Icons.chevron_right,
-                color: scheme.onSurfaceVariant,
-              ),
+              Icon(Icons.chevron_right, color: scheme.onSurfaceVariant),
             ],
           ),
         ),
@@ -237,6 +244,7 @@ class _SpritePreviewState extends State<_SpritePreview> {
   }
 
   Future<void> _saveToDevice() async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() => _saving = true);
     try {
       final data = await rootBundle.load(widget.art.assetPath);
@@ -250,12 +258,12 @@ class _SpritePreviewState extends State<_SpritePreview> {
         await launchUrl(uri);
       } else {
         if (mounted) {
-          ToastService.success('Saved to ${file.path}');
+          ToastService.success(l10n.spriteSavedToPath(file.path));
         }
       }
     } catch (e) {
       if (mounted) {
-        ToastService.error('Could not save: $e');
+        ToastService.error(l10n.spriteSaveError(e.toString()));
       }
     } finally {
       if (mounted) setState(() => _saving = false);
@@ -265,6 +273,7 @@ class _SpritePreviewState extends State<_SpritePreview> {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size.width * 0.25;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.black87,
@@ -289,7 +298,10 @@ class _SpritePreviewState extends State<_SpritePreview> {
                 ? const SizedBox(
                     width: 20,
                     height: 20,
-                    child: AppLoadingIndicator(strokeWidth: 2, color: Colors.white),
+                    child: AppLoadingIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   )
                 : const Icon(Icons.download_rounded, color: Colors.white),
             onPressed: _saving ? null : _saveToDevice,
@@ -315,20 +327,20 @@ class _SpritePreviewState extends State<_SpritePreview> {
               ),
               const SizedBox(height: 4),
               Text(
-                '"${widget.art.versionName}"',
+                '"${widget.art.displayName(l10n)}"',
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-              if (widget.art.description.isNotEmpty) ...[
+              if (widget.art.displayDescription(l10n).isNotEmpty) ...[
                 const SizedBox(height: 8),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Text(
                     maxLines: 3,
-                    widget.art.description,
+                    widget.art.displayDescription(l10n),
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 14,

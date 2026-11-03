@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart'; // Importante para acceder al provider
 import '../../data/models/price_history_point.dart';
 import '../../providers/preferences_provider.dart'; // Asegúrate de que la ruta es correcta
@@ -15,11 +16,12 @@ class PriceHistoryChart extends StatelessWidget {
     // 🔑 Accedemos a las preferencias para convertir los precios
     final preferencesProvider = context.watch<PreferencesProvider>();
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     if (history.isEmpty) {
-      return const SizedBox(
+      return SizedBox(
         height: 200,
-        child: Center(child: Text("No hay historial de precios disponible")),
+        child: Center(child: Text(l10n.noPriceHistory)),
       );
     }
 
@@ -29,7 +31,7 @@ class PriceHistoryChart extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Text(
-            "Evolución del precio (${preferencesProvider.selectedCurrency})",
+            l10n.priceEvolutionTitle(preferencesProvider.selectedCurrency),
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
             ),

@@ -139,7 +139,7 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                       CollapsibleBentoBoxWidget(
                         collapsible: false,
                         width: 780,
-                        title: 'Galería 3D',
+                        title: l10n.gallery3dTitle,
                         icon: Icons.view_in_ar,
                         child: Column(
                           children: item.model3dFiles
@@ -148,7 +148,8 @@ class _AssetDetailScreenState extends State<AssetDetailScreen> {
                                   padding: const EdgeInsets.only(bottom: 16),
                                   child: Model3DViewer(
                                     src: model.url,
-                                    title: model.originalName ?? 'Modelo 3D',
+                                    title:
+                                        model.originalName ?? l10n.model3dTitle,
                                   ),
                                 ),
                               )

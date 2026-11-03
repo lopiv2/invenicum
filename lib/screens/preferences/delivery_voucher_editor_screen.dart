@@ -36,23 +36,17 @@ class _DeliveryVoucherEditorScreenState
 
   // Your original default text
   String _getDefaultTemplate() {
-    return '''Item: {itemName}
-Quantity: {quantity}
-
-Borrower: {borrowerName}
-Email: {borrowerEmail}
-Phone: {borrowerPhone}
-
-Loan Date: {loanDate}
-Expected Return Date: {expectedReturnDate}
-
-Notes: {notes}
-
-_________________________ | _________________________
-Signature of Deliverer    | Signature of Receiver''
-
-_________________________ | _________________________
-Signature of Receiver     | Signature of Returner''';
+    final l10n = AppLocalizations.of(context)!;
+    return l10n.voucherDefaultTemplate(
+      '{itemName}',
+      '{quantity}',
+      '{borrowerName}',
+      '{borrowerEmail}',
+      '{borrowerPhone}',
+      '{loanDate}',
+      '{expectedReturnDate}',
+      '{notes}',
+    );
   }
 
   // Initial load of data from the backend
@@ -96,7 +90,9 @@ Signature of Receiver     | Signature of Returner''';
         // Show error if file is larger than 1MB
         if (!mounted) return;
         ToastService.error(
-          'El archivo es muy pesado (${sizeInMb.toStringAsFixed(2)} MB). El máximo es 1 MB.',
+          AppLocalizations.of(
+            context,
+          )!.voucherLogoTooHeavy(sizeInMb.toStringAsFixed(2)),
         );
         return;
       }
@@ -151,16 +147,16 @@ Signature of Receiver     | Signature of Returner''';
 
     String processedText = _templateController.text
         .replaceAll('{voucherId}', voucherId)
-        .replaceAll('{itemName}', 'Example Item')
+        .replaceAll('{itemName}', l10n.previewItemName)
         .replaceAll('{quantity}', '1')
-        .replaceAll('{borrowerName}', 'John Doe')
-        .replaceAll('{borrowerEmail}', 'john.doe@example.com')
-        .replaceAll('{borrowerPhone}', '+34 600 000 000')
-        .replaceAll('{loanDate}', '10/01/2024');
+        .replaceAll('{borrowerName}', l10n.previewBorrowerName)
+        .replaceAll('{borrowerEmail}', l10n.previewBorrowerEmail)
+        .replaceAll('{borrowerPhone}', l10n.previewBorrowerPhone)
+        .replaceAll('{loanDate}', l10n.previewLoanDate);
     // Additional optional placeholders
     processedText = processedText
-        .replaceAll('{expectedReturnDate}', '17/01/2024')
-        .replaceAll('{notes}', 'Handle with care');
+        .replaceAll('{expectedReturnDate}', l10n.previewReturnDate)
+        .replaceAll('{notes}', l10n.previewNotes);
 
     doc.addPage(
       pw.Page(

@@ -60,9 +60,11 @@ void showThemePickerModal(BuildContext context, ThemeProvider provider) {
                 children: [
                   const Icon(Icons.computer, size: 16),
                   const SizedBox(width: 6),
-                  const Text(
-                    'Retro',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.retroThemesSection,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                 ],
               ),

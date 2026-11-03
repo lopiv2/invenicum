@@ -1,3 +1,5 @@
+import 'package:invenicum/l10n/app_localizations.dart';
+
 class StorePlugin {
   final String id;
   final String name;
@@ -35,8 +37,12 @@ class StorePlugin {
   factory StorePlugin.fromJson(
     Map<String, dynamic> json, {
     String? currentUserGithub,
+    AppLocalizations? l10n,
   }) {
-    final String pluginAuthor = json['author']?.toString() ?? 'Anónimo';
+    final String pluginAuthor =
+        json['author']?.toString() ??
+        l10n?.storePluginAnonymousAuthor ??
+        'Anónimo';
 
     // Normalización de la UI integrada en el modelo
     Map<String, dynamic>? processedUi;
@@ -53,7 +59,7 @@ class StorePlugin {
 
     return StorePlugin(
       id: json['id']?.toString() ?? '',
-      name: json['name'] ?? 'Sin nombre',
+      name: json['name'] ?? l10n?.storePluginUnnamed ?? 'Sin nombre',
       author: pluginAuthor,
       version: json['version'] ?? '1.0.0',
       description: json['description'] ?? '',
@@ -88,7 +94,12 @@ class StorePlugin {
     };
   }
 
-  StorePlugin copyWith({bool? isActive, Map<String, dynamic>? ui, required String version, required bool hasUpdate}) {
+  StorePlugin copyWith({
+    bool? isActive,
+    Map<String, dynamic>? ui,
+    required String version,
+    required bool hasUpdate,
+  }) {
     return StorePlugin(
       id: id,
       name: name,

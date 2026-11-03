@@ -229,7 +229,7 @@ class GeneralSettingsCardWidget extends StatelessWidget {
                     value ? l10n.aiProviderUpdated : l10n.aiProviderUpdated,
                   );
                 } catch (e) {
-                  ToastService.error("Error al actualizar la preferencia");
+                  ToastService.error(l10n.errorUpdatingPreference);
                 }
               },
             ),

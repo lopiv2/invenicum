@@ -1888,5 +1888,755 @@
         "type": "String"
       }
     }
-  }
+  },
+  "scrapers": "Scraper",
+  "newScraperLabel": "Neuer Scraper",
+  "noScrapers": "Keine Scraper vorhanden. Erstelle einen neuen.",
+  "confirmDeleteScraper": "Scraper löschen",
+  "confirmDeleteScraperMessage": "Bist du sicher, dass du den Scraper \"{name}\" löschen willst? Diese Aktion kann nicht rückgängig gemacht werden.",
+  "scraperDeletedSuccess": "Scraper erfolgreich gelöscht.",
+  "errorDeletingScraper": "Fehler beim Löschen des Scrapers: {error}",
+  "testScraper": "Testen",
+  "runResultTitle": "Testergebnis",
+  "runError": "Fehler beim Ausführen des Tests: {error}",
+  "ok": "OK",
+  "themeSnowy": "Verschneit",
+  "themeFiesta": "Fiesta!",
+  "themeMatrix": "Matrix",
+  "themeVolcano": "Vulkan",
+  "@confirmDeleteScraperMessage": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@errorDeletingScraper": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "@runError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "mapFieldsManuallyTitle": "Felder manuell zuordnen",
+  "mapToHint": "Zuordnen zu...",
+  "pageIndicator": "Seite {page}",
+  "@pageIndicator": {
+    "placeholders": {
+      "page": {
+        "type": "String"
+      }
+    }
+  },
+  "dataSourceLabel": "Datenquelle",
+  "searchExampleHint": "Z. B.: Pikachu, Catan, Don Quijote...",
+  "imageUrlExampleHint": "https://example.com/image.jpg",
+  "urlLabel": "URL",
+  "addGlbModelsButton": "GLB-Modelle hinzufügen",
+  "serverControlledPathLabel": "Serverkontrollierter Pfad",
+  "modelPathExampleHint": "models3d/catalogo/modelo.glb",
+  "modelRelativePathHelp": "Verwende einen relativen Pfad im 3D-Modellverzeichnis.",
+  "gallery3dTitle": "3D-Galerie",
+  "model3dTitle": "3D-Modell",
+  "opacityPercentLabel": "Deckkraft: {value} %",
+  "@opacityPercentLabel": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "predefinedColorsTitle": "Vordefinierte Farben",
+  "customColorTitle": "Benutzerdefinierte Farbe",
+  "colorRed": "Rot",
+  "colorGreen": "Grün",
+  "colorBlue": "Blau",
+  "acceptButton": "Übernehmen",
+  "dateFormatHint": "TT.MM.JJJJ",
+  "errorWithMessage": "Fehler: {detail}",
+  "@errorWithMessage": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "unnamedField": "Unbenannt",
+  "fieldWithNameHeader": "Feld: „{name}“",
+  "@fieldWithNameHeader": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fieldNameLabel": "Feldname",
+  "dataTypeLabel": "Datentyp",
+  "mustSelectListForDropdown": "Für Dropdown-Felder muss eine Liste ausgewählt werden.",
+  "imageSelectedMessage": "Bild ausgewählt",
+  "imageRemovedMessage": "Bild entfernt",
+  "contentTypeLabel": "Inhaltstyp",
+  "contentTypeStandard": "Standard",
+  "assetTypeImageTitle": "Bild des Asset-Typs",
+  "serializedTooltipMessage": "Ein serialisierter Typ verwaltet jede Einheit als unabhängigen Datensatz. Das bedeutet nicht unbedingt eine echte Werksseriennummer.\n\nEin nicht serialisierter Typ erlaubt das Gruppieren von Mengen in einem Datensatz. In Sammlungscontainern können Besitz- und Wunschfelder nur für nicht serialisierte Typen konfiguriert werden.",
+  "serializedEnabledSubtitle": "Jede Einheit wird als unabhängiger Datensatz verwaltet.",
+  "nonSerializedSubtitle": "Ermöglicht das Gruppieren von Mengen in einem Datensatz.",
+  "sidebarScrapersCount": "Scraper ({count})",
+  "@sidebarScrapersCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "menuTooltip": "Menü",
+  "spriteVaultTitle": "Sprite Vault™",
+  "inventoryLabelTitle": "Inventaretikett",
+  "printLabelButton": "ETIKETT DRUCKEN",
+  "printNowButton": "JETZT DRUCKEN",
+  "configurePrintTitle": "Drucken konfigurieren",
+  "labelSizeField": "Etikettengröße",
+  "labelSizeSmall": "Klein (S) - 25x15mm",
+  "labelSizeMedium": "Mittel (M) - 50x30mm",
+  "labelSizeLarge": "Groß (L) - 75x50mm",
+  "labelSizeBadgeLarge": "Groß",
+  "labelSizeBadgeStandard": "Standard",
+  "generatingLabel": "Wird generiert...",
+  "printButton": "DRUCKEN",
+  "noPriceHistory": "Keine Preisverlaufsdaten verfügbar.",
+  "priceEvolutionTitle": "Preisentwicklung ({currency})",
+  "@priceEvolutionTitle": {
+    "placeholders": {
+      "currency": {
+        "type": "String"
+      }
+    }
+  },
+  "originalPriceTooltip": "Original: {value} USD",
+  "@originalPriceTooltip": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "open3dModelButton": "3D-Modell öffnen",
+  "spriteVaultSubtitle": "Stöbere und zeige Sprites jeder Hauptversion an.",
+  "spriteVaultEmpty": "Noch keine Sprites. Bleib dran für zukünftige Versionen!",
+  "spriteVaultCurrentBadge": "AKTUELL",
+  "spriteSavedToPath": "Gespeichert unter {path}",
+  "@spriteSavedToPath": {
+    "placeholders": {
+      "path": {
+        "type": "String"
+      }
+    }
+  },
+  "spriteSaveError": "Konnte nicht gespeichert werden: {error}",
+  "@spriteSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "fallbackLocationName": "Standort {id}",
+  "@fallbackLocationName": {
+    "placeholders": {
+      "id": {
+        "type": "String"
+      }
+    }
+  },
+  "otherLocationsContainer": "Restliche Standorte",
+  "otherLocationsLabel": "Andere Standorte",
+  "additionalLocationsCount": "{count} weitere Standorte",
+  "@additionalLocationsCount": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "aiDefaultCollectionName": "Neue Sammlung",
+  "aiDefaultCategory": "Allgemein",
+  "aiDefaultFieldName": "Feld",
+  "loansCountTooltip": "{count} Ausleihen",
+  "@loansCountTooltip": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "loansCountAxis": "ANZAHL AUSLEIHEN",
+  "mostRequestedAxis": "MEISTGEFRAGTE ARTIKEL",
+  "noActivityInPeriod": "Keine Aktivität in diesem Zeitraum.",
+  "voucherLogoTooHeavy": "Die Datei ist zu groß ({size} MB). Maximum 1 MB.",
+  "@voucherLogoTooHeavy": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "voucherDefaultTemplate": "Artikel: {itemName}\nMenge: {quantity}\n\nAusleiher: {borrowerName}\nE-Mail: {borrowerEmail}\nTelefon: {borrowerPhone}\n\nAusleihdatum: {loanDate}\nVoraussichtliches Rückgabedatum: {expectedReturnDate}\n\nNotizen: {notes}\n\n_________________________ | _________________________\nUnterschrift Übergebender    | Unterschrift Empfänger",
+  "@voucherDefaultTemplate": {
+    "placeholders": {
+      "itemName": {
+        "type": "String"
+      },
+      "quantity": {
+        "type": "String"
+      },
+      "borrowerName": {
+        "type": "String"
+      },
+      "borrowerEmail": {
+        "type": "String"
+      },
+      "borrowerPhone": {
+        "type": "String"
+      },
+      "loanDate": {
+        "type": "String"
+      },
+      "expectedReturnDate": {
+        "type": "String"
+      },
+      "notes": {
+        "type": "String"
+      }
+    }
+  },
+  "previewItemName": "Beispielartikel",
+  "previewBorrowerName": "Max Mustermann",
+  "previewBorrowerEmail": "max.mustermann@beispiel.com",
+  "previewBorrowerPhone": "+49 170 000000",
+  "previewLoanDate": "10.01.2024",
+  "previewReturnDate": "17.01.2024",
+  "previewNotes": "Vorsichtig behandeln",
+  "retroThemesSection": "Retro",
+  "saveErrorWithDetail": "Fehler beim Speichern: {error}",
+  "@saveErrorWithDetail": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdatingPreference": "Fehler beim Aktualisieren der Einstellung.",
+  "scraperTestFieldTitle": "Feld testen",
+  "scraperTestIntro": "Gib eine URL ein, die zum Scraper-Muster {pattern} passt, um das Feld „{name}“ zu testen.",
+  "@scraperTestIntro": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "pattern": {
+        "type": "String"
+      }
+    }
+  },
+  "scraperTestPatternLabel": "Muster: {pattern}",
+  "@scraperTestPatternLabel": {
+    "placeholders": {
+      "pattern": {
+        "type": "String"
+      }
+    }
+  },
+  "scraperTestUrlLabel": "Zu testende URL",
+  "scraperTestUrlHint": "https://beispiel.com/items/123",
+  "scraperEditTitle": "Scraper bearbeiten",
+  "scraperFieldXpathLabel": "XPath",
+  "scraperUrlPatternLabel": "URL-Muster (optional)",
+  "scraperFieldsSection": "Felder",
+  "scraperNoFields": "Noch keine Felder. Füge oben eines hinzu.",
+  "searchTagHint": "Tag suchen...",
+  "filterLogicAnd": "UND",
+  "filterLogicOr": "ODER",
+  "pluginJsonFormatError": "Formatfehler: {error}",
+  "@pluginJsonFormatError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginTemplateDefaultName": "Neues Plugin",
+  "achievementUnlockedHeader": "Erfolg freigeschaltet",
+  "githubLinkedSuccess": "GitHub erfolgreich verknüpft.",
+  "sessionExpired": "Sitzung abgelaufen.",
+  "passwordUpdateFailed": "Passwort konnte nicht aktualisiert werden.",
+  "searchSubtitleContainer": "Container",
+  "searchSubtitleCategoryIn": "Kategorie in {container}",
+  "@searchSubtitleCategoryIn": {
+    "placeholders": {
+      "container": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoName": "Unbenannt",
+  "searchSubtitleAssetIn": "Asset in {container}",
+  "@searchSubtitleAssetIn": {
+    "placeholders": {
+      "container": {
+        "type": "String"
+      }
+    }
+  },
+  "errorContainerNotFound": "Container nicht gefunden.",
+  "errorDatalistNotFound": "Datenliste nicht gefunden.",
+  "itemNoBarcodeError": "Artikel nicht gefunden oder Barcode leer.",
+  "pluginStatusInstall": "Installieren",
+  "pluginStatusUpdate": "Aktualisieren",
+  "pluginStatusInstalled": "Installiert",
+  "pluginChangesSent": "Änderungen erfolgreich gesendet.",
+  "pluginEditError": "Fehler beim Verarbeiten der Bearbeitung.",
+  "pluginUpdatedToVersion": "v{version} erfolgreich aktualisiert.",
+  "@pluginUpdatedToVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginUpdateDownloadFailed": "Aktualisierung konnte nicht heruntergeladen werden.",
+  "pluginInstalledWithName": "{name} installiert.",
+  "@pluginInstalledWithName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "pluginInstallFailed": "Installation fehlgeschlagen.",
+  "pluginUninstalled": "Plugin deinstalliert.",
+  "pluginUninstallError": "Fehler beim Deinstallieren.",
+  "pluginActivated": "Plugin aktiviert.",
+  "pluginDeactivated": "Plugin deaktiviert.",
+  "pluginStatusChangeError": "Fehler beim Ändern des Status.",
+  "pluginSaved": "Plugin erfolgreich gespeichert.",
+  "pluginSaveError": "Fehler beim Speichern des Plugins.",
+  "pluginDeletedGlobally": "Plugin global gelöscht.",
+  "pluginDeleteFailed": "Konnte nicht gelöscht werden.",
+  "storePluginAnonymousAuthor": "Anonym",
+  "storePluginUnnamed": "Unbenannt",
+  "fieldTypeText": "Text",
+  "fieldTypeNumber": "Nummer",
+  "fieldTypeDate": "Datum",
+  "fieldTypeDropdown": "Dropdown",
+  "fieldTypeBoolean": "Ja/Nein (Boolean)",
+  "fieldTypeUrl": "URL",
+  "fieldTypePrice": "Preis",
+  "validationValidUrl": "Gib eine gültige URL ein.",
+  "validationValidPrice": "Gib einen gültigen Preis ein (z. B.: 123,45).",
+  "hintIntegerNumber": "Gib eine ganze Zahl ein.",
+  "hintPriceExample": "Gib einen Preis ein (z. B.: 123,45).",
+  "hintDateFormat": "TT.MM.JJJJ",
+  "hintYesNo": "Ja/Nein",
+  "hintEnterValue": "Gib den Wert ein.",
+  "integrationFieldApiKey": "API-Schlüssel",
+  "integrationFieldBotToken": "Bot-Token",
+  "integrationFieldChatId": "Chat-ID",
+  "integrationFieldResendKey": "Resend-API-Schlüssel",
+  "versionArtPowerfulManName": "Der Mächtige Mann",
+  "versionArtPowerfulManDesc": "Bei der Macht von Grayskull war dein Inventar noch nie so organisiert. Der mächtigste Mann des Universums besiegt das Chaos mit einem einzigen Schwung.",
+  "versionArtMadDoctorName": "Verrückter Doktor",
+  "versionArtMadDoctorDesc": "Der originale verrückte Wissenschaftler, der sich in dein Inventar tanzt.",
+  "versionArtPirateName": "Mächtiger Pirat",
+  "versionArtPirateDesc": "Wie passend, du siehst aus wie jemand, der sich aus jedem Chaos heraus inventarisieren könnte. Ein mächtiger Pirat und Meisterorganisator segelt deine Sammlung zu neuen Horizonten.",
+  "retroMenuTitle": "[ MENÜ ]",
+  "sdkCurrentUserName": "Aktueller Benutzer: {name}",
+  "@sdkCurrentUserName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sdkGuest": "Gast",
+  "sdkActionDone": "Aktion ausgeführt.",
+  "sessionClosed": "Sitzung geschlossen.",
+  "errorOpenMail": "E-Mail-App konnte nicht geöffnet werden.",
+  "errorConnection": "Verbindungsfehler: {message}",
+  "@errorConnection": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUnexpected": "Unerwarteter Fehler: {message}",
+  "@errorUnexpected": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUnauthorizedLogin": "Nicht autorisiert. Bitte erneut anmelden.",
+  "crosstoonsDirectionLeftToRight": "Von links nach rechts",
+  "crosstoonsDirectionRightToLeft": "Von rechts nach links",
+  "crosstoonsDirectionAlternate": "Abwechselnd",
+  "crosstoonsDirectionBorderWalk": "Randlauf",
+  "crosstoonsZoneTop": "Oben",
+  "crosstoonsZoneMiddle": "Mitte",
+  "crosstoonsZoneBottom": "Unten",
+  "crosstoonsZoneRandom": "Zufällig",
+  "crosstoonsTurnOn": "An",
+  "crosstoonsTurnOff": "Aus",
+  "crosstoonsTurnRandom": "Zufällig",
+  "errorFetchLocationsCode": "Fehler beim Abrufen der Standorte: {code}",
+  "@errorFetchLocationsCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreateLocationCode": "Fehler beim Erstellen des Standorts: {code}",
+  "@errorCreateLocationCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdateLocationCode": "Fehler beim Aktualisieren des Standorts: {code}",
+  "@errorUpdateLocationCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleteLocationCode": "Fehler beim Löschen des Standorts: {code}",
+  "@errorDeleteLocationCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorLocationNotFound": "Standort nicht gefunden.",
+  "errorLocationMissingData": "Erfolgreiche API-Antwort, aber das Standortobjekt fehlt oder ist null.",
+  "errorLocationUpdateMissingData": "Erfolgreiche API-Antwort, aber das aktualisierte Standortobjekt fehlt oder ist null.",
+  "errorFetchMarketCode": "Fehler beim Abrufen des Marktes: {code}",
+  "@errorFetchMarketCode": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorTemplateNotFound": "Vorlage nicht gefunden.",
+  "errorPublishTemplate": "Fehler beim Veröffentlichen.",
+  "reportPreviewError": "Fehler beim Abrufen der Berichtsvorschau: {detail}",
+  "@reportPreviewError": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "reportHistoryError": "Fehler beim Abrufen des Berichtsverlaufs: {detail}",
+  "@reportHistoryError": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDownloadError": "Fehler beim Herunterladen des Berichts: {detail}",
+  "@reportDownloadError": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "reportDeleteError": "Fehler beim Löschen des Berichts: {detail}",
+  "@reportDeleteError": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFetchLoans": "Fehler beim Abrufen der Ausleihen.",
+  "errorReturnItem": "Fehler bei der Rückgabe des Artikels.",
+  "errorLoanReturn": "Fehler während der Rückgabe.",
+  "errorDeleteLoan": "Ausleihe konnte nicht gelöscht werden.",
+  "errorLoanStats": "Fehler beim Abrufen der Statistiken.",
+  "errorDownloadImageServer": "Fehler beim Herunterladen des Bildes vom Server: {detail}",
+  "@errorDownloadImageServer": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDownloadImage": "Fehler beim Herunterladen des Bildes: {detail}",
+  "@errorDownloadImage": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorNoDataServer": "Keine Daten vom Server erhalten.",
+  "errorFetchItems": "Unerwarteter Fehler beim Abrufen der Artikel: {detail}",
+  "@errorFetchItems": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreateAsset": "Fehler beim Erstellen des Assets: {detail}",
+  "@errorCreateAsset": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdateAsset": "Fehler beim Aktualisieren des Assets: {detail}",
+  "@errorUpdateAsset": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleteAsset": "Fehler beim Löschen des Assets: {detail}",
+  "@errorDeleteAsset": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorBatchImport": "Fehler beim Stapelimport von Assets: {detail}",
+  "@errorBatchImport": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorMarketValue": "Fehler beim Abrufen des Marktwertes.",
+  "errorPriceHistory": "Fehler beim Abrufen des Preisverlaufs.",
+  "errorServerCommunication": "Fehler bei der Kommunikation mit dem Server.",
+  "errorAiUnexpectedResponse": "Unerwartete Serverantwort: {type}",
+  "@errorAiUnexpectedResponse": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAiUnknown": "Unbekannter KI-Fehler.",
+  "errorAiNoData": "Der Server hat keine extrahierten Daten zurückgegeben. Prüfe, ob die URL erreichbar ist.",
+  "errorAiInvalidFormat": "Ungültiges Datenformat: {type} statt eines JSON-Objekts erhalten.",
+  "@errorAiInvalidFormat": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAiService": "KI-Dienstfehler.",
+  "errorAiSuggest": "KI-Vorschlagsfehler.",
+  "errorMissingDataField": "Die Serverantwort enthält nicht das Feld „data“.",
+  "errorUnauthorizedSession": "Nicht autorisiert: Sitzung abgelaufen oder Token ungültig.",
+  "errorResourceNotFound": "Ressource nicht gefunden ({context}).",
+  "@errorResourceNotFound": {
+    "placeholders": {
+      "context": {
+        "type": "String"
+      }
+    }
+  },
+  "errorContextDetail": "Fehler in {context}: {message}",
+  "@errorContextDetail": {
+    "placeholders": {
+      "context": {
+        "type": "String"
+      },
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCustomListNotFound": "Benutzerdefinierte Liste nicht gefunden.",
+  "errorStatsMissing": "Die API meldete Erfolg, aber das Statistikobjekt fehlt oder ist null.",
+  "errorFetchStats": "Fehler beim Abrufen der Statistiken: {detail}",
+  "@errorFetchStats": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFetchScrapers": "Fehler beim Abrufen der Scraper: {code}",
+  "@errorFetchScrapers": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreateScraper": "Fehler beim Erstellen des Scrapers: {code}",
+  "@errorCreateScraper": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdateScraper": "Fehler beim Aktualisieren des Scrapers: {code}",
+  "@errorUpdateScraper": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleteScraper": "Fehler beim Löschen des Scrapers: {code}",
+  "@errorDeleteScraper": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAddScraperField": "Fehler beim Hinzufügen des Felds: {code}",
+  "@errorAddScraperField": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorRunScraperAdhoc": "Fehler beim Ausführen des Ad-hoc-Scrapers: {code}",
+  "@errorRunScraperAdhoc": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "errorFetchAssetType": "Fehler beim Abrufen des Asset-Typs: {detail}",
+  "@errorFetchAssetType": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreateAssetType": "Fehler beim Erstellen des Asset-Typs: {detail}",
+  "@errorCreateAssetType": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdateAssetType": "Fehler beim Aktualisieren des Asset-Typs: {detail}",
+  "@errorUpdateAssetType": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleteAssetType": "Fehler beim Löschen des Asset-Typs: {detail}",
+  "@errorDeleteAssetType": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorAssetTypeGone": "Der Asset-Typ existiert nicht oder wurde bereits gelöscht.",
+  "errorFetchAlerts": "Fehler beim Abrufen der Hinweise: {detail}",
+  "@errorFetchAlerts": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorPreferenceUpdate": "Fehler beim Aktualisieren der Einstellung: {detail}",
+  "@errorPreferenceUpdate": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorCreateCrossToon": "Fehler beim Erstellen des Cross-Toons: {detail}",
+  "@errorCreateCrossToon": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorUpdateCrossToon": "Fehler beim Aktualisieren des Cross-Toons: {detail}",
+  "@errorUpdateCrossToon": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorDeleteCrossToon": "Fehler beim Löschen des Cross-Toons: {detail}",
+  "@errorDeleteCrossToon": {
+    "placeholders": {
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorSaveIntegration": "Fehler beim Speichern der Integration {itype}: {detail}",
+  "@errorSaveIntegration": {
+    "placeholders": {
+      "itype": {
+        "type": "String"
+      },
+      "detail": {
+        "type": "String"
+      }
+    }
+  },
+  "errorEnrichItem": "Fehler beim Anreichern des Artikels.",
+  "errorProcessSelectedResult": "Fehler beim Verarbeiten des ausgewählten Ergebnisses.",
+  "errorCreateAdmin": "Fehler beim Erstellen des Administrators.",
+  "errorChangePassword": "Fehler beim Ändern des Passworts.",
+  "errorInvalidVersion": "Ungültige Versionsprüfungsantwort.",
+  "errorCheckVersion": "Fehler beim Prüfen der App-Version.",
+  "errorAuthFailed": "Authentifizierungsfehler.",
+  "errorUnexpectedStatus": "Unerwarteter Status: {status}",
+  "@errorUnexpectedStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "errorPurgeHistory": "Fehler beim Löschen des Chatverlaufs.",
+  "errorDeleteSystemTheme": "Systemstandardthemes können nicht gelöscht werden.",
+  "errorDeleteThemeDb": "Fehler beim Löschen des Themes aus der Datenbank."
 }

@@ -1,7 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/service_l10n.dart';
 import 'package:invenicum/core/utils/common_functions.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/models/inventory_item_response.dart';
@@ -53,6 +55,10 @@ class InventoryItemProvider with ChangeNotifier {
   bool get isItemsCacheDisabledForDebug => _disableItemsCacheForDebug;
 
   InventoryItemProvider(this._itemService, this._printService);
+
+  /// Localizations resolved from the global navigator context.
+  /// Null only when the app tree is not built yet.
+  AppLocalizations? get _l10n => serviceL10n();
 
   @override
   void dispose() {
@@ -310,7 +316,7 @@ class InventoryItemProvider with ChangeNotifier {
     if (itemToSync == null ||
         itemToSync.barcode == null ||
         itemToSync.barcode!.trim().isEmpty) {
-      throw 'Item not found or barcode is empty.';
+      throw _l10n?.itemNoBarcodeError ?? 'item-no-barcode';
     }
 
     // 3. Proceso de sincronización normal

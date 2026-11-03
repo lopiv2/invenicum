@@ -44,14 +44,16 @@ mixin ScraperTestMixin<T extends StatefulWidget> on State<T> {
     // 1. Ask for test URL
     final testUrl = await showAppDialog<String>(
       context: context,
-      title: 'Test field',
+      title: l10n.scraperTestFieldTitle,
       body: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Introduce una URL que coincida con el patrón del scraper '
-            'para probar el campo "${f['name']}".',
+            l10n.scraperTestIntro(
+              (f['name'] ?? '').toString(),
+              urlPattern ?? '',
+            ),
             style: Theme.of(context).textTheme.bodySmall,
           ),
           const SizedBox(height: 12),
@@ -59,20 +61,20 @@ mixin ScraperTestMixin<T extends StatefulWidget> on State<T> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: Text(
-                'Patrón: $urlPattern',
+                l10n.scraperTestPatternLabel(urlPattern!),
                 style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.outline,
-                      fontFamily: 'monospace',
-                    ),
+                  color: Theme.of(context).colorScheme.outline,
+                  fontFamily: 'monospace',
+                ),
               ),
             ),
           TextField(
             controller: testUrlController,
             autofocus: true,
-            decoration: const InputDecoration(
-              labelText: 'URL a probar',
-              hintText: 'https://ejemplo.com/items/123',
-              prefixIcon: Icon(Icons.link_outlined),
+            decoration: InputDecoration(
+              labelText: l10n.scraperTestUrlLabel,
+              hintText: l10n.scraperTestUrlHint,
+              prefixIcon: const Icon(Icons.link_outlined),
             ),
             keyboardType: TextInputType.url,
             onSubmitted: (_) =>
@@ -83,12 +85,12 @@ mixin ScraperTestMixin<T extends StatefulWidget> on State<T> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(null),
-          child: const Text('Cancelar'),
+          child: Text(l10n.cancel),
         ),
         FilledButton(
           onPressed: () =>
               Navigator.of(context).pop(testUrlController.text.trim()),
-          child: const Text('Probar'),
+          child: Text(l10n.testScraper),
         ),
       ],
     );

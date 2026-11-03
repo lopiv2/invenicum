@@ -1,15 +1,22 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:invenicum/core/utils/service_l10n.dart';
 import 'package:invenicum/data/models/store_plugin_model.dart';
 import 'package:invenicum/data/models/user_data_model.dart';
 import 'package:invenicum/data/services/plugin_service.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class PluginProvider extends ChangeNotifier {
   final PluginService _service;
   UserData? _currentUser;
 
   PluginProvider(this._service);
+
+  /// Localizations resolved from the global navigator context.
+  /// Null only when the app tree is not built yet (in which case
+  /// toasts could not be displayed anyway).
+  AppLocalizations? get _l10n => serviceL10n();
 
   List<StorePlugin> _installed = [];
   List<StorePlugin> _community = [];
@@ -30,7 +37,11 @@ class PluginProvider extends ChangeNotifier {
   // --- LÓGICA DE TIENDA Y ESTADO ---
 
   /// Compara un plugin de la comunidad con los instalados localmente (Recuperado)
-  String getStorePluginStatus(String id, String? version) {
+  String getStorePluginStatus(
+    AppLocalizations l10n,
+    String id,
+    String? version,
+  ) {
     final localPlugin = _installed.firstWhere(
       (p) => p.id == id,
       orElse: () => StorePlugin(
@@ -43,14 +54,14 @@ class PluginProvider extends ChangeNotifier {
       ),
     );
 
-    if (localPlugin.id.isEmpty) return "Instalar";
+    if (localPlugin.id.isEmpty) return l10n.pluginStatusInstall;
 
     // Si las versiones no coinciden, permite actualizar
     if (version != null && localPlugin.version != version) {
-      return "Actualizar";
+      return l10n.pluginStatusUpdate;
     }
 
-    return "Instalado";
+    return l10n.pluginStatusInstalled;
   }
 
   // --- ACCIONES CORE ---
@@ -68,12 +79,24 @@ class PluginProvider extends ChangeNotifier {
       final nuevosComunidadRaw = await _service.getCommunityPlugins();
 
       _installed = nuevosInstaladosRaw
-          .map((p) => StorePlugin.fromJson(p, currentUserGithub: githubUser))
+          .map(
+            (p) => StorePlugin.fromJson(
+              p,
+              currentUserGithub: githubUser,
+              l10n: _l10n,
+            ),
+          )
           .toList();
 
       final idsVistos = <String>{};
       _community = nuevosComunidadRaw
-          .map((p) => StorePlugin.fromJson(p, currentUserGithub: githubUser))
+          .map(
+            (p) => StorePlugin.fromJson(
+              p,
+              currentUserGithub: githubUser,
+              l10n: _l10n,
+            ),
+          )
           .where((p) => idsVistos.add(p.id))
           .toList();
 
@@ -107,9 +130,11 @@ class PluginProvider extends ChangeNotifier {
       await _service.updatePlugin(plugin.id, data);
 
       await refresh(force: true);
-      ToastService.success("Cambios enviados correctamente");
+      final l10n0 = _l10n;
+      if (l10n0 != null) ToastService.success(l10n0.pluginChangesSent);
     } catch (e) {
-      ToastService.error("Error al procesar la edición");
+      final l10n1 = _l10n;
+      if (l10n1 != null) ToastService.error(l10n1.pluginEditError);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -140,11 +165,15 @@ class PluginProvider extends ChangeNotifier {
       }
 
       await refresh(force: true);
-      ToastService.success(
-        "¡v${plugin.latestVersion} actualizada correctamente!",
-      );
+      final l10n2 = _l10n;
+      if (l10n2 != null) {
+        ToastService.success(
+          l10n2.pluginUpdatedToVersion(plugin.latestVersion),
+        );
+      }
     } catch (e) {
-      ToastService.error("Fallo al descargar la actualización");
+      final l10n3 = _l10n;
+      if (l10n3 != null) ToastService.error(l10n3.pluginUpdateDownloadFailed);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -159,9 +188,13 @@ class PluginProvider extends ChangeNotifier {
       await Future.delayed(const Duration(milliseconds: 800));
       _installed = [];
       await refresh(force: true);
-      ToastService.success("${plugin.name} instalado");
+      final l10n4 = _l10n;
+      if (l10n4 != null) {
+        ToastService.success(l10n4.pluginInstalledWithName(plugin.name));
+      }
     } catch (e) {
-      ToastService.error("Fallo al instalar");
+      final l10n5 = _l10n;
+      if (l10n5 != null) ToastService.error(l10n5.pluginInstallFailed);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -173,9 +206,11 @@ class PluginProvider extends ChangeNotifier {
     try {
       await _service.uninstallPlugin(pluginId);
       await refresh(force: true);
-      ToastService.success("Plugin desinstalado");
+      final l10n6 = _l10n;
+      if (l10n6 != null) ToastService.success(l10n6.pluginUninstalled);
     } catch (e) {
-      ToastService.error("Error al desinstalar");
+      final l10n7 = _l10n;
+      if (l10n7 != null) ToastService.error(l10n7.pluginUninstallError);
     }
   }
 
@@ -184,16 +219,26 @@ class PluginProvider extends ChangeNotifier {
     if (index == -1) return;
 
     final original = _installed[index];
-    _installed[index] = original.copyWith(isActive: status, version: '', hasUpdate: false);
+    _installed[index] = original.copyWith(
+      isActive: status,
+      version: '',
+      hasUpdate: false,
+    );
     notifyListeners();
 
     try {
       await _service.toggleUserPlugin(id, status);
-      ToastService.success(status ? "Plugin activado" : "Plugin desactivado");
+      final l10n8 = _l10n;
+      if (l10n8 != null) {
+        ToastService.success(
+          status ? l10n8.pluginActivated : l10n8.pluginDeactivated,
+        );
+      }
     } catch (e) {
       _installed[index] = original;
       notifyListeners();
-      ToastService.error("Error al cambiar estado");
+      final l10n9 = _l10n;
+      if (l10n9 != null) ToastService.error(l10n9.pluginStatusChangeError);
     }
   }
 
@@ -206,9 +251,11 @@ class PluginProvider extends ChangeNotifier {
       }
       await _service.createPlugin(data);
       await refresh(force: true);
-      ToastService.success("Plugin guardado correctamente");
+      final l10n10 = _l10n;
+      if (l10n10 != null) ToastService.success(l10n10.pluginSaved);
     } catch (e) {
-      ToastService.error("Error al guardar el plugin");
+      final l10n11 = _l10n;
+      if (l10n11 != null) ToastService.error(l10n11.pluginSaveError);
     }
   }
 
@@ -216,9 +263,11 @@ class PluginProvider extends ChangeNotifier {
     try {
       await _service.deletePlugin(id, deleteFromGitHub);
       await refresh(force: true);
-      ToastService.success("Plugin eliminado globalmente");
+      final l10n12 = _l10n;
+      if (l10n12 != null) ToastService.success(l10n12.pluginDeletedGlobally);
     } catch (e) {
-      ToastService.error("No se pudo eliminar");
+      final l10n13 = _l10n;
+      if (l10n13 != null) ToastService.error(l10n13.pluginDeleteFailed);
     }
   }
 

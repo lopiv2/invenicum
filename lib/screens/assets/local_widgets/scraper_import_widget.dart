@@ -123,6 +123,7 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
   }
 
   Future<void> _run() async {
+    final l10n = AppLocalizations.of(context)!;
     final url = _urlController.text.trim();
     final fields = _effectiveFields;
     if (url.isEmpty || _selectedScraper == null || fields.isEmpty) return;
@@ -143,7 +144,7 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
       widget.onResults(results);
     } catch (e) {
       if (mounted) {
-        ToastService.error('Error: $e');
+        ToastService.error(l10n.errorWithMessage(e.toString()));
       }
     } finally {
       if (mounted) setState(() => _loading = false);

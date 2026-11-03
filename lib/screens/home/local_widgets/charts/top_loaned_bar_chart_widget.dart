@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class TopLoanedBarChartContent extends StatelessWidget {
   final Map<String, int> topItems;
@@ -26,8 +27,16 @@ class TopLoanedBarChartContent extends StatelessWidget {
         BarChartData(
           alignment: BarChartAlignment.spaceAround,
           maxY: (maxCount * 1.4).toDouble(),
-          barTouchData: _buildBarTouchData(itemNames, isDark),
-          titlesData: _buildTitlesData(itemNames, isDark),
+          barTouchData: _buildBarTouchData(
+            itemNames,
+            isDark,
+            AppLocalizations.of(context)!,
+          ),
+          titlesData: _buildTitlesData(
+            itemNames,
+            isDark,
+            AppLocalizations.of(context)!,
+          ),
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
@@ -60,7 +69,11 @@ class TopLoanedBarChartContent extends StatelessWidget {
   }
 }
 
-BarTouchData _buildBarTouchData(List<String> names, bool isDark) {
+BarTouchData _buildBarTouchData(
+  List<String> names,
+  bool isDark,
+  AppLocalizations l10n,
+) {
   return BarTouchData(
     touchTooltipData: BarTouchTooltipData(
       getTooltipColor: (_) =>
@@ -71,7 +84,7 @@ BarTouchData _buildBarTouchData(List<String> names, bool isDark) {
           const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           children: [
             TextSpan(
-              text: '${rod.toY.toInt()} préstamos',
+              text: l10n.loansCountTooltip(rod.toY.toInt().toString()),
               style: TextStyle(
                 color: Colors.white.withValues(alpha: 0.8),
                 fontWeight: FontWeight.normal,
@@ -85,13 +98,17 @@ BarTouchData _buildBarTouchData(List<String> names, bool isDark) {
   );
 }
 
-FlTitlesData _buildTitlesData(List<String> names, bool isDark) {
+FlTitlesData _buildTitlesData(
+  List<String> names,
+  bool isDark,
+  AppLocalizations l10n,
+) {
   return FlTitlesData(
     show: true,
     // --- EJE VERTICAL (PRÉSTAMOS) ---
     leftTitles: AxisTitles(
-      axisNameWidget: const Text(
-        "CANTIDAD DE PRÉSTAMOS",
+      axisNameWidget: Text(
+        l10n.loansCountAxis,
         style: TextStyle(
           fontSize: 9,
           fontWeight: FontWeight.bold,
@@ -110,10 +127,10 @@ FlTitlesData _buildTitlesData(List<String> names, bool isDark) {
     ),
     // --- EJE HORIZONTAL (ARTÍCULOS) ---
     bottomTitles: AxisTitles(
-      axisNameWidget: const Padding(
-        padding: EdgeInsets.only(top: 10),
+      axisNameWidget: Padding(
+        padding: const EdgeInsets.only(top: 10),
         child: Text(
-          "ARTÍCULOS MÁS SOLICITADOS",
+          l10n.mostRequestedAxis,
           style: TextStyle(
             fontSize: 9,
             fontWeight: FontWeight.bold,

@@ -10,6 +10,35 @@ import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/preferences_provider.dart';
 import 'package:provider/provider.dart';
 
+String crosstoonsDirectionLabelOf(
+  AppLocalizations l10n,
+  AnimationDirection direction,
+) {
+  return switch (direction) {
+    AnimationDirection.leftToRight => l10n.crosstoonsDirectionLeftToRight,
+    AnimationDirection.rightToLeft => l10n.crosstoonsDirectionRightToLeft,
+    AnimationDirection.alternate => l10n.crosstoonsDirectionAlternate,
+    AnimationDirection.borderWalk => l10n.crosstoonsDirectionBorderWalk,
+  };
+}
+
+String crosstoonsZoneLabelOf(AppLocalizations l10n, OverlayZone zone) {
+  return switch (zone) {
+    OverlayZone.top => l10n.crosstoonsZoneTop,
+    OverlayZone.middle => l10n.crosstoonsZoneMiddle,
+    OverlayZone.bottom => l10n.crosstoonsZoneBottom,
+    OverlayZone.random => l10n.crosstoonsZoneRandom,
+  };
+}
+
+String crosstoonsTurnModeLabelOf(AppLocalizations l10n, TurnMode mode) {
+  return switch (mode) {
+    TurnMode.on => l10n.crosstoonsTurnOn,
+    TurnMode.off => l10n.crosstoonsTurnOff,
+    TurnMode.random => l10n.crosstoonsTurnRandom,
+  };
+}
+
 class CrossToonsCardWidget extends StatelessWidget {
   const CrossToonsCardWidget({super.key});
 
@@ -283,7 +312,12 @@ class CrossToonsCardWidget extends StatelessWidget {
                         isDense: true,
                       ),
                       items: AnimationDirection.values.map((d) {
-                        return DropdownMenuItem(value: d, child: Text(d.name));
+                        return DropdownMenuItem(
+                          value: d,
+                          child: Text(
+                            crosstoonsDirectionLabelOf(l10n, d),
+                          ),
+                        );
                       }).toList(),
                       onChanged: (v) {
                         if (v != null) {
@@ -304,7 +338,10 @@ class CrossToonsCardWidget extends StatelessWidget {
                         isDense: true,
                       ),
                       items: OverlayZone.values.map((z) {
-                        return DropdownMenuItem(value: z, child: Text(z.name));
+                        return DropdownMenuItem(
+                          value: z,
+                          child: Text(crosstoonsZoneLabelOf(l10n, z)),
+                        );
                       }).toList(),
                       onChanged: direction == AnimationDirection.borderWalk
                           ? null
@@ -355,7 +392,10 @@ class CrossToonsCardWidget extends StatelessWidget {
                         isDense: true,
                       ),
                       items: TurnMode.values.map((t) {
-                        return DropdownMenuItem(value: t, child: Text(t.name));
+                        return DropdownMenuItem(
+                          value: t,
+                          child: Text(crosstoonsTurnModeLabelOf(l10n, t)),
+                        );
                       }).toList(),
                       onChanged: (v) {
                         if (v != null) setDialogState(() => turnMode = v);
@@ -597,7 +637,7 @@ class _PreviewAnimationState extends State<_PreviewAnimation>
         ),
         const SizedBox(height: 4),
         Text(
-          '${widget.direction.name} · ${widget.speed.inSeconds}s',
+          '${crosstoonsDirectionLabelOf(AppLocalizations.of(context)!, widget.direction)} · ${widget.speed.inSeconds}s',
           style: TextStyle(fontSize: 11, color: Theme.of(context).hintColor),
         ),
       ],
@@ -763,7 +803,7 @@ class _CrossToonTile extends StatelessWidget {
             ),
             title: Text(fileName, style: const TextStyle(fontSize: 14)),
             subtitle: Text(
-              '${config.direction.name} · ${config.zone.name} · ${config.speed.inSeconds}s',
+              '${crosstoonsDirectionLabelOf(l10n, config.direction)} · ${crosstoonsZoneLabelOf(l10n, config.zone)} · ${config.speed.inSeconds}s',
               style: TextStyle(
                 fontSize: 11,
                 color: Theme.of(context).hintColor,

@@ -49,8 +49,9 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
     super.initState();
     _nameController = TextEditingController(text: widget.initial.name);
     _urlController = TextEditingController(text: widget.initial.url);
-    _patternController =
-        TextEditingController(text: widget.initial.urlPattern ?? '');
+    _patternController = TextEditingController(
+      text: widget.initial.urlPattern ?? '',
+    );
     for (final f in widget.initial.fields) {
       _fields.add({
         'id': f.id,
@@ -75,24 +76,29 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
     if (!_formKey.currentState!.validate()) return;
     try {
       await context.read<ScraperProvider>().updateScraper(
-            containerId: int.parse(widget.containerId),
-            scraperId: int.parse(widget.scraperId),
-            name: _nameController.text.trim(),
-            url: _urlController.text.trim(),
-            urlPattern: urlPattern,
-            fields: _fields
-                .map((f) => {
-                      if (f.containsKey('id')) 'id': f['id'],
-                      'name': f['name'] ?? '',
-                      'xpath': f['xpath'] ?? '',
-                      'order': f['order'] ?? 0,
-                    })
-                .toList(),
-          );
+        containerId: int.parse(widget.containerId),
+        scraperId: int.parse(widget.scraperId),
+        name: _nameController.text.trim(),
+        url: _urlController.text.trim(),
+        urlPattern: urlPattern,
+        fields: _fields
+            .map(
+              (f) => {
+                if (f.containsKey('id')) 'id': f['id'],
+                'name': f['name'] ?? '',
+                'xpath': f['xpath'] ?? '',
+                'order': f['order'] ?? 0,
+              },
+            )
+            .toList(),
+      );
       if (!mounted) return;
       context.go('/container/${widget.containerId}/scrapers');
     } catch (e) {
-      ToastService.error('Error: $e');
+      if (!mounted) return;
+      ToastService.error(
+        AppLocalizations.of(context)!.errorWithMessage(e.toString()),
+      );
     }
   }
 
@@ -114,28 +120,32 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
 
     final result = await showAppDialog<bool>(
       context: context,
-      title: 'Edit field',
+      title: AppLocalizations.of(context)!.scraperEditTitle,
       body: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: nameController,
-            decoration: const InputDecoration(labelText: 'Name'),
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context)!.name,
+            ),
           ),
           TextField(
             controller: xpathController,
-            decoration: const InputDecoration(labelText: 'XPath'),
+            decoration: InputDecoration(
+              labelText: AppLocalizations.of(context)!.scraperFieldXpathLabel,
+            ),
           ),
         ],
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text('Cancel'),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          child: const Text('Save'),
+          child: Text(AppLocalizations.of(context)!.save),
         ),
       ],
     );
@@ -168,69 +178,76 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Edit Scraper',
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold)),
+            Text(
+              l10n.scraperEditTitle,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 16),
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Required' : null,
+              decoration: InputDecoration(labelText: l10n.name),
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? l10n.requiredFieldValidation
+                  : null,
             ),
             const SizedBox(height: 8),
             TextFormField(
               controller: _urlController,
-              decoration: const InputDecoration(
-                labelText: 'URL',
-                hintText: 'https://example.com/page',
-                prefixIcon: Icon(Icons.link_outlined),
+              decoration: InputDecoration(
+                labelText: l10n.scraperUrlLabel,
+                hintText: l10n.scraperUrlHint,
+                prefixIcon: const Icon(Icons.link_outlined),
               ),
               keyboardType: TextInputType.url,
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Required' : null,
+              validator: (v) => v == null || v.trim().isEmpty
+                  ? l10n.requiredFieldValidation
+                  : null,
             ),
             const SizedBox(height: 8),
             TextFormField(
               controller: _patternController,
-              decoration: const InputDecoration(
-                labelText: 'URL pattern (optional)',
+              decoration: InputDecoration(
+                labelText: l10n.scraperUrlPatternLabel,
                 hintText: '/items/\\d+',
-                prefixIcon: Icon(Icons.filter_alt_outlined),
+                prefixIcon: const Icon(Icons.filter_alt_outlined),
               ),
             ),
             const SizedBox(height: 16),
-            Text('Fields', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              l10n.scraperFieldsSection,
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _fieldNameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Field name'),
+                    decoration: InputDecoration(labelText: l10n.fieldNameLabel),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: TextField(
                     controller: _fieldXpathController,
-                    decoration: const InputDecoration(labelText: 'XPath'),
+                    decoration: InputDecoration(
+                      labelText: l10n.scraperFieldXpathLabel,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 FilledButton.icon(
                   onPressed: _addField,
                   icon: const Icon(Icons.add),
-                  label: const Text('Add'),
+                  label: Text(l10n.addLabel),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             if (_fields.isEmpty)
-              const Text('No fields yet. Add one above.')
+              Text(l10n.scraperNoFields)
             else
               Expanded(
                 child: ReorderableListView.builder(
@@ -279,12 +296,12 @@ class _ScraperEditScreenState extends State<ScraperEditScreen>
                 FilledButton.icon(
                   onPressed: _save,
                   icon: const Icon(Icons.save),
-                  label: const Text('Save'),
+                  label: Text(l10n.save),
                 ),
                 const SizedBox(width: 12),
                 OutlinedButton(
                   onPressed: () => context.pop(),
-                  child: const Text('Cancel'),
+                  child: Text(l10n.cancel),
                 ),
               ],
             ),
