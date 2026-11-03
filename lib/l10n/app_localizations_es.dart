@@ -973,6 +973,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get refresh => 'Recargar datos';
 
   @override
+  String get reorderTooltip => 'Arrastrar para reordenar';
+
+  @override
   String get registerNewLoan => 'Registrar Nuevo Préstamo';
 
   @override

@@ -973,6 +973,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get refresh => 'Daten neu laden';
 
   @override
+  String get reorderTooltip => 'Zum Neuordnen ziehen';
+
+  @override
   String get registerNewLoan => 'Neue Ausleihe registrieren';
 
   @override

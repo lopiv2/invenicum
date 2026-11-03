@@ -13,6 +13,7 @@ class CustomFieldDefinition {
   final bool isSummable; // Para acumulados físicos (ej: kg, litros)
   final bool isCountable; // Para contar cuántos items tienen este campo
   final bool isMonetary; // 💰 NUEVO: Para valor económico real (Precio, Costo)
+  final int order; // Orden visual dentro del tipo de activo
 
   const CustomFieldDefinition({
     this.id,
@@ -24,6 +25,7 @@ class CustomFieldDefinition {
     this.isSummable = false,
     this.isCountable = false,
     this.isMonetary = false, // Por defecto false
+    this.order = 0,
   });
 
   // ----------------------------------------------------------------
@@ -40,6 +42,7 @@ class CustomFieldDefinition {
     bool? isSummable,
     bool? isCountable,
     bool? isMonetary,
+    int? order,
   }) {
     final isDataListIdSentinel = dataListId is _Sentinel;
 
@@ -53,6 +56,7 @@ class CustomFieldDefinition {
       isSummable: isSummable ?? this.isSummable,
       isCountable: isCountable ?? this.isCountable,
       isMonetary: isMonetary ?? this.isMonetary,
+      order: order ?? this.order,
     );
   }
 
@@ -86,6 +90,7 @@ class CustomFieldDefinition {
           false,
       isMonetary:
           json['isMonetary'] as bool? ?? json['is_monetary'] as bool? ?? false,
+      order: (json['order'] as num?)?.toInt() ?? 0,
     );
   }
 
@@ -103,6 +108,7 @@ class CustomFieldDefinition {
       if (isCountable) 'isCountable': true,
       if (isMonetary) 'isMonetary': true,
       if (dataListId != null) 'dataListId': dataListId,
+      'order': order,
       if (options != null && options!.isNotEmpty) 'options': options,
       // No solemos enviar 'options' al crear AssetType porque el back usa dataListId
     };
@@ -116,6 +122,7 @@ class CustomFieldDefinition {
       'isSummable': isSummable,
       'isMonetary': isMonetary,
       'isCountable': isCountable,
+      'order': order,
       // Enviamos las opciones solo si es dropdown
       'options': (type == CustomFieldType.dropdown) ? (options ?? []) : null,
       // 🚩 IMPORTANTE: Aquí NO mandamos 'id' ni 'dataListId'

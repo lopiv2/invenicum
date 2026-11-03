@@ -288,8 +288,11 @@ class ContainerProvider with ChangeNotifier {
   }) async {
     try {
       // 1. ... (Lógica de API)
+      // El orden visual es la posición en la lista.
       final fieldDefinitionsJson = fieldDefinitions
-          .map((def) => def.toJson())
+          .asMap()
+          .entries
+          .map((entry) => entry.value.copyWith(order: entry.key).toJson())
           .toList();
 
       final AssetType updatedAssetTypeFromApi = await _assetTypeService
@@ -425,8 +428,11 @@ class ContainerProvider with ChangeNotifier {
   }) async {
     try {
       // 1. Lógica de API
+      // El orden visual es la posición en la lista.
       final fieldDefinitionsJson = fieldDefinitions
-          .map((def) => def.toJson())
+          .asMap()
+          .entries
+          .map((entry) => entry.value.copyWith(order: entry.key).toJson())
           .toList();
       final AssetType newAssetTypeFromApi = await _assetTypeService
           .createAssetType(

@@ -1846,6 +1846,12 @@ abstract class AppLocalizations {
   /// **'Refresh data'**
   String get refresh;
 
+  /// No description provided for @reorderTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder'**
+  String get reorderTooltip;
+
   /// No description provided for @registerNewLoan.
   ///
   /// In en, this message translates to:

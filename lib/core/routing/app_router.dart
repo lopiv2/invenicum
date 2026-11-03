@@ -59,9 +59,10 @@ import 'package:invenicum/core/routing/route_names.dart';
 
 // Services
 import 'package:invenicum/data/services/dashboard_service.dart';
+import 'package:invenicum/core/routing/navigator_key.dart';
 import 'package:stac/stac.dart';
 
-final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+export 'package:invenicum/core/routing/navigator_key.dart';
 
 /// Helper to wrap protected screens with the app layout (sidebar, header, etc.).
 Widget _layout(Widget child) => MainLayout(child: child);

@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:invenicum/core/routing/app_router.dart';
+import 'package:invenicum/core/routing/navigator_key.dart';
 
 enum ToastType { success, info, error, achievement }
 
