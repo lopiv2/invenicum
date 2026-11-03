@@ -867,6 +867,34 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
     return preferences.convertToBase(localValue);
   }
 
+  /// Reordena los campos del tipo de activo y persiste el orden en el backend.
+  Future<void> _reorderCustomFields(int oldIndex, int newIndex) async {
+    final type = _assetType;
+    if (type == null) return;
+    final reordered = List.of(type.fieldDefinitions);
+    final field = reordered.removeAt(oldIndex);
+    reordered.insert(newIndex, field);
+    setState(() => _assetType = type.copyWith(fieldDefinitions: reordered));
+    try {
+      await context.read<ContainerProvider>().updateAssetType(
+        containerId: int.parse(widget.containerId),
+        assetTypeId: int.parse(widget.assetTypeId),
+        name: type.name,
+        fieldDefinitions: reordered,
+        isSerialized: type.isSerialized,
+        kind: type.kind,
+        removeExistingImage: false,
+      );
+    } catch (e) {
+      if (mounted) {
+        setState(() => _assetType = type);
+        ToastService.error(
+          AppLocalizations.of(context)!.assetTypeUpdateError(e.toString()),
+        );
+      }
+    }
+  }
+
   Future<void> _saveAsset() async {
     if (_isSaving) return;
     if (!AssetFormUtils.validateForm(_formKey) ||
@@ -1296,6 +1324,7 @@ class _AssetEditScreenState extends State<AssetEditScreen> {
                                   customFieldSuggestions,
                               autocompleteFocusNodesByField:
                                   _dynamicAutocompleteFocusNodes,
+                              onReorderFields: _reorderCustomFields,
                             ),
                           )
                         : null,

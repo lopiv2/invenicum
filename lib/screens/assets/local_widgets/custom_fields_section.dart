@@ -100,6 +100,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
   final Map<int, List<String>> autocompleteSuggestionsByField;
   final Map<int, FocusNode> autocompleteFocusNodesByField;
   final String containerId;
+  final void Function(int oldIndex, int newIndex)? onReorderFields;
 
   const CustomFieldsSectionWidget({
     super.key,
@@ -115,6 +116,7 @@ class CustomFieldsSectionWidget extends StatelessWidget {
     this.autocompleteSuggestionsByField = const {},
     this.autocompleteFocusNodesByField = const {},
     required this.containerId, // Asegúrate de pasar el containerId al crear este widget
+    this.onReorderFields,
   });
 
   @override
@@ -151,28 +153,84 @@ class CustomFieldsSectionWidget extends StatelessWidget {
             title: l10n.customFields,
             icon: Icons.tune_outlined,
           ),
-          ...fieldDefinitions.map((fieldDef) {
-            if (fieldDef.type == CustomFieldType.boolean) {
-              return _buildBooleanField(context, fieldDef, l10n);
-            }
+          if (onReorderFields == null)
+            ...fieldDefinitions.map((fieldDef) {
+              if (fieldDef.type == CustomFieldType.boolean) {
+                return _buildBooleanField(context, fieldDef, l10n);
+              }
 
-            if (fieldDef.type == CustomFieldType.dropdown) {
-              return _buildDropdownField(l10n, context, fieldDef, containerId);
-            }
+              if (fieldDef.type == CustomFieldType.dropdown) {
+                return _buildDropdownField(
+                  l10n,
+                  context,
+                  fieldDef,
+                  containerId,
+                );
+              }
 
-            if (fieldDef.type == CustomFieldType.date) {
-              return _buildDateField(
-                context,
-                fieldDef,
-                customControllers.putIfAbsent(
-                  fieldDef.id!,
-                  () => TextEditingController(),
-                ),
-              );
-            }
+              if (fieldDef.type == CustomFieldType.date) {
+                return _buildDateField(
+                  context,
+                  fieldDef,
+                  customControllers.putIfAbsent(
+                    fieldDef.id!,
+                    () => TextEditingController(),
+                  ),
+                );
+              }
 
-            return _buildTextField(context, fieldDef);
-          }),
+              return _buildTextField(context, fieldDef);
+            })
+          else
+            ReorderableListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              buildDefaultDragHandles: false,
+              itemCount: fieldDefinitions.length,
+              onReorderItem: onReorderFields,
+              itemBuilder: (context, index) {
+                final fieldDef = fieldDefinitions[index];
+                final Widget row;
+                if (fieldDef.type == CustomFieldType.boolean) {
+                  row = _buildBooleanField(context, fieldDef, l10n);
+                } else if (fieldDef.type == CustomFieldType.dropdown) {
+                  row = _buildDropdownField(
+                    l10n,
+                    context,
+                    fieldDef,
+                    containerId,
+                  );
+                } else if (fieldDef.type == CustomFieldType.date) {
+                  row = _buildDateField(
+                    context,
+                    fieldDef,
+                    customControllers.putIfAbsent(
+                      fieldDef.id!,
+                      () => TextEditingController(),
+                    ),
+                  );
+                } else {
+                  row = _buildTextField(context, fieldDef);
+                }
+                return Row(
+                  key: ValueKey('asset-field-${fieldDef.id}'),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16, right: 4),
+                      child: ReorderableDragStartListener(
+                        index: index,
+                        child: Tooltip(
+                          message: l10n.reorderTooltip,
+                          child: const Icon(Icons.drag_handle, size: 20),
+                        ),
+                      ),
+                    ),
+                    Expanded(child: row),
+                  ],
+                );
+              },
+            ),
         ],
       ),
     );
@@ -233,26 +291,28 @@ class CustomFieldsSectionWidget extends StatelessWidget {
             color: colorScheme.outlineVariant.withValues(alpha: 0.5),
           ),
         ),
-        child: Material(type: MaterialType.transparency, child: CheckboxListTile(
-          title: Text(
-            fieldDef.name,
-            style: const TextStyle(fontWeight: FontWeight.w500),
+        child: Material(
+          type: MaterialType.transparency,
+          child: CheckboxListTile(
+            title: Text(
+              fieldDef.name,
+              style: const TextStyle(fontWeight: FontWeight.w500),
+            ),
+            subtitle: fieldDef.isRequired
+                ? Text(
+                    l10n.optional,
+                    style: TextStyle(color: colorScheme.primary, fontSize: 12),
+                  )
+                : null,
+            value: booleanFieldValues[fieldDef.id] ?? false,
+            onChanged: (bool? newValue) {
+              onBooleanChanged(fieldDef.id!, newValue);
+            },
+            controlAffinity: ListTileControlAffinity.leading,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+            ),
           ),
-          subtitle: fieldDef.isRequired
-              ? Text(
-                  l10n.optional,
-                  style: TextStyle(color: colorScheme.primary, fontSize: 12),
-                )
-              : null,
-          value: booleanFieldValues[fieldDef.id] ?? false,
-          onChanged: (bool? newValue) {
-            onBooleanChanged(fieldDef.id!, newValue);
-          },
-          controlAffinity: ListTileControlAffinity.leading,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-          ),
-        ),
         ),
       ),
     );
