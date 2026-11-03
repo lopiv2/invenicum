@@ -85,6 +85,19 @@ class _CandidateSelectionBodyState extends State<CandidateSelectionBody> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final useListLayout = MediaQuery.sizeOf(context).width < 600;
+
+    Widget buildCandidateCard(int index, {required bool compact}) {
+      final candidate = _candidates[index];
+      return CandidateCard(
+        candidate: candidate,
+        subtitle: widget.buildCandidateSubtitle(candidate),
+        isSelected: _selectedId == candidate['id'],
+        isCompact: compact,
+        onTap: () => Navigator.of(context).pop(candidate),
+      );
+    }
+
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 500),
       child: Column(
@@ -94,30 +107,27 @@ class _CandidateSelectionBodyState extends State<CandidateSelectionBody> {
             child: _isLoading
                 ? const Center(child: AppLoadingIndicator())
                 : _candidates.isEmpty
-                    ? Center(child: Text(l10n.noResultsFound))
-                    : GridView.builder(
-                        shrinkWrap: true,
-                        itemCount: _candidates.length,
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                ? Center(child: Text(l10n.noResultsFound))
+                : useListLayout
+                ? ListView.separated(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    itemCount: _candidates.length,
+                    separatorBuilder: (_, _) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) =>
+                        buildCandidateCard(index, compact: true),
+                  )
+                : GridView.builder(
+                    itemCount: _candidates.length,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,
                           crossAxisSpacing: 12,
                           mainAxisSpacing: 12,
                           childAspectRatio: 0.7,
                         ),
-                        itemBuilder: (context, index) {
-                          final candidate = _candidates[index];
-                          final subtitle =
-                              widget.buildCandidateSubtitle(candidate);
-                          return CandidateCard(
-                            candidate: candidate,
-                            subtitle: subtitle,
-                            isSelected: _selectedId == candidate['id'],
-                            onTap: () =>
-                                Navigator.of(context).pop(candidate),
-                          );
-                        },
-                      ),
+                    itemBuilder: (context, index) =>
+                        buildCandidateCard(index, compact: false),
+                  ),
           ),
           if (_candidates.isNotEmpty)
             Padding(
