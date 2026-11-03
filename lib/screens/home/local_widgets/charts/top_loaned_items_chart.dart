@@ -76,13 +76,17 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
       children: [
         _buildIconBadge(Icons.bar_chart_rounded, Colors.indigoAccent),
         const SizedBox(width: 12),
-        Text(
-          AppLocalizations.of(context)!.topLoanedItems.toUpperCase(),
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
-            color: Colors.grey,
+        Expanded(
+          child: Text(
+            AppLocalizations.of(context)!.topLoanedItems.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+              color: Colors.grey,
+            ),
           ),
         ),
       ],
