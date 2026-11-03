@@ -115,7 +115,7 @@ class AppIntegrations {
         fields: [
           IntegrationField(
             id: 'apiKey',
-            label: 'API Key',
+            label: l10n.integrationFieldApiKey,
             type: IntegrationFieldType.password,
             helperText: l10n.helperGeminiKey,
           ),
@@ -138,7 +138,7 @@ class AppIntegrations {
         fields: [
           IntegrationField(
             id: 'apiKey',
-            label: 'API Key',
+            label: l10n.integrationFieldApiKey,
             type: IntegrationFieldType.password,
             helperText: l10n.integrationOpenaiApiKeyHint,
           ),
@@ -160,7 +160,7 @@ class AppIntegrations {
         fields: [
           IntegrationField(
             id: 'apiKey',
-            label: 'API Key',
+            label: l10n.integrationFieldApiKey,
             type: IntegrationFieldType.password,
             helperText: l10n.integrationClaudeApiKeyHint,
           ),
@@ -184,13 +184,13 @@ class AppIntegrations {
         fields: [
           IntegrationField(
             id: 'botToken', // Previously 'bot_token'
-            label: 'Bot Token',
+            label: l10n.integrationFieldBotToken,
             type: IntegrationFieldType.password,
             helperText: l10n.integrationTelegramBotTokenHint,
           ),
           IntegrationField(
             id: 'chatId', // Previously 'chat_id'
-            label: 'Chat ID',
+            label: l10n.integrationFieldChatId,
             type: IntegrationFieldType.text,
             helperText: l10n.integrationTelegramChatIdHint,
           ),
@@ -205,7 +205,7 @@ class AppIntegrations {
         fields: [
           IntegrationField(
             id: 'apiKey', // sensitiveIds will automatically hide it
-            label: 'Resend API Key',
+            label: l10n.integrationFieldResendKey,
             type: IntegrationFieldType.password,
             helperText: l10n.integrationEmailApiKeyHint,
           ),
@@ -309,7 +309,7 @@ class AppIntegrations {
         fields: [
           IntegrationField(
             id: 'api_key',
-            label: 'API Key',
+            label: l10n.integrationFieldApiKey,
             type: IntegrationFieldType.password,
           ),
         ],
@@ -324,7 +324,7 @@ class AppIntegrations {
           // Field for the user to paste their UPCitemdb API Key
           IntegrationField(
             id: 'apiKey',
-            label: 'API Key (user_key)',
+            label: l10n.integrationFieldApiKey,
             type: IntegrationFieldType.password,
           ),
         ],
@@ -795,6 +795,27 @@ class VersionArt {
   /// Look up the [VersionArt] whose [versionName] matches [name].
   static VersionArt? findByName(String name) {
     return all.where((a) => a.versionName == name).firstOrNull;
+  }
+
+  /// Localized display name (the raw [versionName] stays stable for lookups).
+  String displayName(AppLocalizations l10n) {
+    return switch (versionLabel) {
+      'v1.0.0' => l10n.versionArtPowerfulManName,
+      'v1.1.0' => l10n.versionArtMadDoctorName,
+      'v1.2.0' => l10n.versionArtPirateName,
+      _ => versionName,
+    };
+  }
+
+  /// Localized description (empty when the entry has none).
+  String displayDescription(AppLocalizations l10n) {
+    if (description.isEmpty) return '';
+    return switch (versionLabel) {
+      'v1.0.0' => l10n.versionArtPowerfulManDesc,
+      'v1.1.0' => l10n.versionArtMadDoctorDesc,
+      'v1.2.0' => l10n.versionArtPirateDesc,
+      _ => description,
+    };
   }
 
   /// Derive the [VersionArt] from a semver [appVersion] (e.g. `"1.1.2"`).

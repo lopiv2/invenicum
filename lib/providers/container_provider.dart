@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:invenicum/core/utils/service_l10n.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/data/models/asset_type_model.dart';
 import 'package:invenicum/data/models/location.dart';
 import 'package:invenicum/data/models/container_node.dart';
@@ -22,6 +24,10 @@ class ContainerProvider with ChangeNotifier {
     this._locationService,
     this._scraperService,
   );
+
+  /// Localizations resolved from the global navigator context.
+  /// Null only when the app tree is not built yet.
+  AppLocalizations? get _l10n => serviceL10n();
 
   // 1. La variable de estado privada que almacena los datos
   List<ContainerNode> _containers = [];
@@ -127,8 +133,10 @@ class ContainerProvider with ChangeNotifier {
       final index = _containers.indexWhere((c) => c.id == containerId);
 
       if (index == -1) {
+        final id = containerId.toString();
         throw Exception(
-          'Container with ID $containerId not found in local state.',
+          _l10n?.containerNotFoundError(id) ??
+              'Container with ID $containerId not found in local state.',
         );
       }
 
@@ -311,7 +319,10 @@ class ContainerProvider with ChangeNotifier {
       final containerIndex = _containers.indexWhere((c) => c.id == containerId);
 
       if (containerIndex == -1) {
-        throw Exception('Container with ID $containerId not found.');
+        throw Exception(
+          _l10n?.containerNotFoundError(containerId.toString()) ??
+              'Container with ID $containerId not found.',
+        );
       }
 
       final originalContainer = _containers[containerIndex];
@@ -359,7 +370,10 @@ class ContainerProvider with ChangeNotifier {
     }
   }
 
-  Future<List<Map<String, dynamic>>> searchAll(String query) async {
+  Future<List<Map<String, dynamic>>> searchAll(
+    String query, {
+    required AppLocalizations l10n,
+  }) async {
     if (query.isEmpty) return [];
     final String q = query.toLowerCase();
     List<Map<String, dynamic>> results = [];
@@ -371,7 +385,7 @@ class ContainerProvider with ChangeNotifier {
       if (container.name.toLowerCase().contains(q)) {
         results.add({
           'name': container.name,
-          'subtitle': 'Contenedor',
+          'subtitle': l10n.searchSubtitleContainer,
           'icon': Icons.inventory_2_rounded,
           'route': '/container/${container.id}/asset-types',
         });
@@ -382,7 +396,7 @@ class ContainerProvider with ChangeNotifier {
         if (type.name.toLowerCase().contains(q)) {
           results.add({
             'name': type.name,
-            'subtitle': 'Categoría en ${container.name}',
+            'subtitle': l10n.searchSubtitleCategoryIn(container.name),
             'icon': Icons.category_rounded,
             'route': '/container/${container.id}/asset-types/${type.id}/assets',
           });
@@ -399,8 +413,10 @@ class ContainerProvider with ChangeNotifier {
         for (var item in apiItems) {
           // Mapeamos la respuesta de la API al fordadmato del desplegable
           results.add({
-            'name': item['name'] ?? 'No name',
-            'subtitle': 'Activo en ${item['container_name']}',
+            'name': item['name'] ?? l10n.searchNoName,
+            'subtitle': l10n.searchSubtitleAssetIn(
+              '${item['container_name'] ?? ''}',
+            ),
             'icon': Icons.precision_manufacturing_outlined,
             // Construimos la ruta dinámica según tu estructura de GoRouter
             'route':
@@ -449,7 +465,10 @@ class ContainerProvider with ChangeNotifier {
       // 2. Actualizar el estado local
       final index = _containers.indexWhere((c) => c.id == containerId);
       if (index == -1) {
-        throw Exception('Container with ID $containerId not found.');
+        throw Exception(
+          _l10n?.containerNotFoundError(containerId.toString()) ??
+              'Container with ID $containerId not found.',
+        );
       }
 
       final originalContainer = _containers[index];
@@ -500,11 +519,15 @@ class ContainerProvider with ChangeNotifier {
     required String value,
   }) async {
     final containerIndex = _containers.indexWhere((c) => c.id == containerId);
-    if (containerIndex == -1) throw Exception('Container not found');
+    if (containerIndex == -1) {
+      throw Exception(_l10n?.errorContainerNotFound ?? 'Container not found');
+    }
 
     final container = _containers[containerIndex];
     final listIndex = container.dataLists.indexWhere((l) => l.id == listId);
-    if (listIndex == -1) throw Exception('DataList not found');
+    if (listIndex == -1) {
+      throw Exception(_l10n?.errorDatalistNotFound ?? 'DataList not found');
+    }
 
     final list = container.dataLists[listIndex];
     final updatedItems = [...list.items, value];
@@ -534,11 +557,15 @@ class ContainerProvider with ChangeNotifier {
   List<String> getDataListItems(int containerId, int listId) {
     final container = _containers.firstWhere(
       (c) => c.id == containerId,
-      orElse: () => throw Exception('Container $containerId not found'),
+      orElse: () => throw Exception(
+        _l10n?.errorContainerNotFound ?? 'Container $containerId not found',
+      ),
     );
     final list = container.dataLists.firstWhere(
       (l) => l.id == listId,
-      orElse: () => throw Exception('DataList $listId not found'),
+      orElse: () => throw Exception(
+        _l10n?.errorDatalistNotFound ?? 'DataList $listId not found',
+      ),
     );
     return list.items;
   }
@@ -559,7 +586,9 @@ class ContainerProvider with ChangeNotifier {
       );
 
       final index = _containers.indexWhere((c) => c.id == containerId);
-      if (index == -1) throw Exception('Container not found');
+      if (index == -1) {
+        throw Exception(_l10n?.errorContainerNotFound ?? 'Container not found');
+      }
 
       final container = _containers[index];
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/custom_field_definition.dart';
 import 'package:invenicum/data/models/custom_field_definition_model.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 class ApiFieldMappingDialog extends StatefulWidget {
   final Map<String, dynamic> unmappedFields;
@@ -29,11 +30,12 @@ class _ApiFieldMappingDialogState extends State<ApiFieldMappingDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final nonDropdownFields = widget.availableFields
         .where((f) => f.type != CustomFieldType.dropdown)
         .toList();
     return AlertDialog(
-      title: const Text('Map fields manually'),
+      title: Text(l10n.mapFieldsManuallyTitle),
       content: SizedBox(
         width: 400,
         child: Column(
@@ -54,12 +56,9 @@ class _ApiFieldMappingDialogState extends State<ApiFieldMappingDialog> {
                   const SizedBox(width: 12),
                   DropdownButton<CustomFieldDefinition>(
                     value: _selectedMappings[fieldKey],
-                    hint: const Text('Map to...'),
+                    hint: Text(l10n.mapToHint),
                     items: nonDropdownFields.map((f) {
-                      return DropdownMenuItem(
-                        value: f,
-                        child: Text(f.name),
-                      );
+                      return DropdownMenuItem(value: f, child: Text(f.name));
                     }).toList(),
                     onChanged: (val) {
                       setState(() {
@@ -76,7 +75,7 @@ class _ApiFieldMappingDialogState extends State<ApiFieldMappingDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton(
           onPressed: () {
@@ -88,7 +87,7 @@ class _ApiFieldMappingDialogState extends State<ApiFieldMappingDialog> {
             });
             Navigator.of(context).pop(result);
           },
-          child: const Text('Apply'),
+          child: Text(l10n.apply),
         ),
       ],
     );

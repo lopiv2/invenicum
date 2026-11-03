@@ -2977,39 +2977,39 @@ class AppLocalizationsIt extends AppLocalizations {
   String get elementDeletedSuccess => 'Elemento eliminato con successo';
 
   @override
-  String get scrapers => 'Scrapers';
+  String get scrapers => 'Scraper';
 
   @override
-  String get newScraperLabel => 'New scraper';
+  String get newScraperLabel => 'Nuovo scraper';
 
   @override
-  String get noScrapers => 'There are no scrapers. Create a new one.';
+  String get noScrapers => 'Nessuno scraper. Creane uno nuovo.';
 
   @override
-  String get confirmDeleteScraper => 'Delete Scraper';
+  String get confirmDeleteScraper => 'Elimina scraper';
 
   @override
   String confirmDeleteScraperMessage(String name) {
-    return 'Are you sure you want to delete scraper \"$name\"? This action cannot be undone.';
+    return 'Sei sicuro di voler eliminare lo scraper \"$name\"? Questa azione non può essere annullata.';
   }
 
   @override
-  String get scraperDeletedSuccess => 'Scraper deleted successfully.';
+  String get scraperDeletedSuccess => 'Scraper eliminato con successo.';
 
   @override
   String errorDeletingScraper(String error) {
-    return 'Error deleting scraper: $error';
+    return 'Errore durante l\'eliminazione dello scraper: $error';
   }
 
   @override
-  String get testScraper => 'Test';
+  String get testScraper => 'Prova';
 
   @override
-  String get runResultTitle => 'Test result';
+  String get runResultTitle => 'Risultato del test';
 
   @override
   String runError(String error) {
-    return 'Error running test: $error';
+    return 'Errore durante l\'esecuzione del test: $error';
   }
 
   @override
@@ -3210,16 +3210,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get themeDeepNight => 'Notte profonda';
 
   @override
-  String get themeSnowy => 'Snowy';
+  String get themeSnowy => 'Innevato';
 
   @override
-  String get themeFiesta => 'Party!';
+  String get themeFiesta => 'Festa!';
 
   @override
   String get themeMatrix => 'Matrix';
 
   @override
-  String get themeVolcano => 'Volcano';
+  String get themeVolcano => 'Vulcano';
 
   @override
   String get themePipboy3000Notes =>
@@ -3560,4 +3560,902 @@ class AppLocalizationsIt extends AppLocalizations {
   String anniversaryFlavor6(int years, int count, String date) {
     return 'Achievement unlocked: \"${years}y Memory\" — $count items';
   }
+
+  @override
+  String get mapFieldsManuallyTitle => 'Mappa manualmente i campi';
+
+  @override
+  String get mapToHint => 'Mappa a...';
+
+  @override
+  String pageIndicator(String page) {
+    return 'Pagina $page';
+  }
+
+  @override
+  String get dataSourceLabel => 'Origine dati';
+
+  @override
+  String get searchExampleHint => 'Es.: Pikachu, Catan, Don Chisciotte...';
+
+  @override
+  String get imageUrlExampleHint => 'https://example.com/image.jpg';
+
+  @override
+  String get urlLabel => 'URL';
+
+  @override
+  String get addGlbModelsButton => 'Aggiungi modelli GLB';
+
+  @override
+  String get serverControlledPathLabel => 'Percorso controllato dal server';
+
+  @override
+  String get modelPathExampleHint => 'models3d/catalogo/modelo.glb';
+
+  @override
+  String get modelRelativePathHelp =>
+      'Usa un percorso relativo nella cartella dei modelli 3D.';
+
+  @override
+  String get gallery3dTitle => 'Galleria 3D';
+
+  @override
+  String get model3dTitle => 'Modello 3D';
+
+  @override
+  String opacityPercentLabel(String value) {
+    return 'Opacità: $value%';
+  }
+
+  @override
+  String get predefinedColorsTitle => 'Colori predefiniti';
+
+  @override
+  String get customColorTitle => 'Colore personalizzato';
+
+  @override
+  String get colorRed => 'Rosso';
+
+  @override
+  String get colorGreen => 'Verde';
+
+  @override
+  String get colorBlue => 'Blu';
+
+  @override
+  String get acceptButton => 'Accetta';
+
+  @override
+  String get dateFormatHint => 'GG/MM/AAAA';
+
+  @override
+  String errorWithMessage(String detail) {
+    return 'Errore: $detail';
+  }
+
+  @override
+  String get unnamedField => 'Senza nome';
+
+  @override
+  String fieldWithNameHeader(String name) {
+    return 'Campo: \"$name\"';
+  }
+
+  @override
+  String get fieldNameLabel => 'Nome del campo';
+
+  @override
+  String get dataTypeLabel => 'Tipo di dato';
+
+  @override
+  String get mustSelectListForDropdown =>
+      'Devi selezionare una lista per i campi a discesa.';
+
+  @override
+  String get imageSelectedMessage => 'Immagine selezionata';
+
+  @override
+  String get imageRemovedMessage => 'Immagine rimossa';
+
+  @override
+  String get contentTypeLabel => 'Tipo di contenuto';
+
+  @override
+  String get contentTypeStandard => 'Standard';
+
+  @override
+  String get assetTypeImageTitle => 'Immagine del tipo di asset';
+
+  @override
+  String get serializedTooltipMessage =>
+      'Un tipo serializzato gestisce ogni unità come un record indipendente. Non implica necessariamente un vero numero di serie di fabbrica.\n\nUn tipo non serializzato permette di raggruppare le quantità in un unico record. Nei contenitori collezione, i campi di possesso e desiderati possono essere configurati solo su tipi non serializzati.';
+
+  @override
+  String get serializedEnabledSubtitle =>
+      'Ogni unità è gestita come un record indipendente.';
+
+  @override
+  String get nonSerializedSubtitle =>
+      'Permette di raggruppare le quantità in un unico record.';
+
+  @override
+  String sidebarScrapersCount(String count) {
+    return 'Scraper ($count)';
+  }
+
+  @override
+  String get menuTooltip => 'Menu';
+
+  @override
+  String get spriteVaultTitle => 'Sprite Vault™';
+
+  @override
+  String get inventoryLabelTitle => 'Etichetta inventario';
+
+  @override
+  String get printLabelButton => 'STAMPA ETICHETTA';
+
+  @override
+  String get printNowButton => 'STAMPA ORA';
+
+  @override
+  String get configurePrintTitle => 'Configura stampa';
+
+  @override
+  String get labelSizeField => 'Dimensione etichetta';
+
+  @override
+  String get labelSizeSmall => 'Piccola (S) - 25x15mm';
+
+  @override
+  String get labelSizeMedium => 'Media (M) - 50x30mm';
+
+  @override
+  String get labelSizeLarge => 'Grande (L) - 75x50mm';
+
+  @override
+  String get labelSizeBadgeLarge => 'Grande';
+
+  @override
+  String get labelSizeBadgeStandard => 'Standard';
+
+  @override
+  String get generatingLabel => 'Generazione...';
+
+  @override
+  String get printButton => 'STAMPA';
+
+  @override
+  String get noPriceHistory => 'Nessuna cronologia prezzi disponibile.';
+
+  @override
+  String priceEvolutionTitle(String currency) {
+    return 'Andamento del prezzo ($currency)';
+  }
+
+  @override
+  String originalPriceTooltip(String value) {
+    return 'Originale: $value USD';
+  }
+
+  @override
+  String get open3dModelButton => 'Apri modello 3D';
+
+  @override
+  String get spriteVaultSubtitle =>
+      'Sfoglia e visualizza in anteprima gli sprite di ogni versione principale.';
+
+  @override
+  String get spriteVaultEmpty =>
+      'Ancora nessuno sprite. Resta sintonizzato per le future versioni!';
+
+  @override
+  String get spriteVaultCurrentBadge => 'ATTUALE';
+
+  @override
+  String spriteSavedToPath(String path) {
+    return 'Salvato in $path';
+  }
+
+  @override
+  String spriteSaveError(String error) {
+    return 'Impossibile salvare: $error';
+  }
+
+  @override
+  String fallbackLocationName(String id) {
+    return 'Posizione $id';
+  }
+
+  @override
+  String get otherLocationsContainer => 'Resto delle posizioni';
+
+  @override
+  String get otherLocationsLabel => 'Altre posizioni';
+
+  @override
+  String additionalLocationsCount(String count) {
+    return '$count altre posizioni';
+  }
+
+  @override
+  String get aiDefaultCollectionName => 'Nuova collezione';
+
+  @override
+  String get aiDefaultCategory => 'Generale';
+
+  @override
+  String get aiDefaultFieldName => 'Campo';
+
+  @override
+  String loansCountTooltip(String count) {
+    return '$count prestiti';
+  }
+
+  @override
+  String get loansCountAxis => 'NUMERO DI PRESTITI';
+
+  @override
+  String get mostRequestedAxis => 'ARTICOLI PIÙ RICHIESTI';
+
+  @override
+  String get noActivityInPeriod => 'Nessuna attività in questo periodo.';
+
+  @override
+  String voucherLogoTooHeavy(String size) {
+    return 'Il file è troppo pesante ($size MB). Massimo 1 MB.';
+  }
+
+  @override
+  String voucherDefaultTemplate(
+    String itemName,
+    String quantity,
+    String borrowerName,
+    String borrowerEmail,
+    String borrowerPhone,
+    String loanDate,
+    String expectedReturnDate,
+    String notes,
+  ) {
+    return 'Articolo: $itemName\nQuantità: $quantity\n\nDestinatario: $borrowerName\nEmail: $borrowerEmail\nTelefono: $borrowerPhone\n\nData prestito: $loanDate\nData reso prevista: $expectedReturnDate\n\nNote: $notes\n\n_________________________ | _________________________\nFirma di chi consegna    | Firma di chi riceve';
+  }
+
+  @override
+  String get previewItemName => 'Articolo di esempio';
+
+  @override
+  String get previewBorrowerName => 'Mario Rossi';
+
+  @override
+  String get previewBorrowerEmail => 'mario.rossi@esempio.com';
+
+  @override
+  String get previewBorrowerPhone => '+39 333 000 0000';
+
+  @override
+  String get previewLoanDate => '10/01/2024';
+
+  @override
+  String get previewReturnDate => '17/01/2024';
+
+  @override
+  String get previewNotes => 'Maneggiare con cura';
+
+  @override
+  String get retroThemesSection => 'Retrò';
+
+  @override
+  String saveErrorWithDetail(String error) {
+    return 'Errore durante il salvataggio: $error';
+  }
+
+  @override
+  String get errorUpdatingPreference =>
+      'Errore durante l\'aggiornamento della preferenza.';
+
+  @override
+  String get scraperTestFieldTitle => 'Prova campo';
+
+  @override
+  String scraperTestIntro(String name, String pattern) {
+    return 'Inserisci un URL che corrisponde al pattern dello scraper $pattern per testare il campo \"$name\".';
+  }
+
+  @override
+  String scraperTestPatternLabel(String pattern) {
+    return 'Pattern: $pattern';
+  }
+
+  @override
+  String get scraperTestUrlLabel => 'URL da testare';
+
+  @override
+  String get scraperTestUrlHint => 'https://esempio.com/items/123';
+
+  @override
+  String get scraperEditTitle => 'Modifica scraper';
+
+  @override
+  String get scraperFieldXpathLabel => 'XPath';
+
+  @override
+  String get scraperUrlPatternLabel => 'Pattern URL (facoltativo)';
+
+  @override
+  String get scraperFieldsSection => 'Campi';
+
+  @override
+  String get scraperNoFields => 'Ancora nessun campo. Aggiungine uno sopra.';
+
+  @override
+  String get searchTagHint => 'Cerca tag...';
+
+  @override
+  String get filterLogicAnd => 'E';
+
+  @override
+  String get filterLogicOr => 'O';
+
+  @override
+  String pluginJsonFormatError(String error) {
+    return 'Errore di formato: $error';
+  }
+
+  @override
+  String get pluginTemplateDefaultName => 'Nuovo plugin';
+
+  @override
+  String get achievementUnlockedHeader => 'Traguardo sbloccato';
+
+  @override
+  String get githubLinkedSuccess => 'GitHub collegato con successo.';
+
+  @override
+  String get sessionExpired => 'Sessione scaduta.';
+
+  @override
+  String get passwordUpdateFailed => 'Impossibile aggiornare la password.';
+
+  @override
+  String get searchSubtitleContainer => 'Contenitore';
+
+  @override
+  String searchSubtitleCategoryIn(String container) {
+    return 'Categoria in $container';
+  }
+
+  @override
+  String get searchNoName => 'Senza nome';
+
+  @override
+  String searchSubtitleAssetIn(String container) {
+    return 'Asset in $container';
+  }
+
+  @override
+  String get errorContainerNotFound => 'Contenitore non trovato.';
+
+  @override
+  String get errorDatalistNotFound => 'Elenco dati non trovato.';
+
+  @override
+  String get itemNoBarcodeError =>
+      'Articolo non trovato o codice a barre vuoto.';
+
+  @override
+  String get pluginStatusInstall => 'Installa';
+
+  @override
+  String get pluginStatusUpdate => 'Aggiorna';
+
+  @override
+  String get pluginStatusInstalled => 'Installato';
+
+  @override
+  String get pluginChangesSent => 'Modifiche inviate con successo.';
+
+  @override
+  String get pluginEditError =>
+      'Errore durante l\'elaborazione della modifica.';
+
+  @override
+  String pluginUpdatedToVersion(String version) {
+    return 'v$version aggiornata con successo.';
+  }
+
+  @override
+  String get pluginUpdateDownloadFailed =>
+      'Download dell\'aggiornamento non riuscito.';
+
+  @override
+  String pluginInstalledWithName(String name) {
+    return '$name installato.';
+  }
+
+  @override
+  String get pluginInstallFailed => 'Installazione non riuscita.';
+
+  @override
+  String get pluginUninstalled => 'Plugin disinstallato.';
+
+  @override
+  String get pluginUninstallError => 'Errore durante la disinstallazione.';
+
+  @override
+  String get pluginActivated => 'Plugin attivato.';
+
+  @override
+  String get pluginDeactivated => 'Plugin disattivato.';
+
+  @override
+  String get pluginStatusChangeError => 'Errore durante il cambio di stato.';
+
+  @override
+  String get pluginSaved => 'Plugin salvato con successo.';
+
+  @override
+  String get pluginSaveError => 'Errore durante il salvataggio del plugin.';
+
+  @override
+  String get pluginDeletedGlobally => 'Plugin eliminato globalmente.';
+
+  @override
+  String get pluginDeleteFailed => 'Impossibile eliminare.';
+
+  @override
+  String get storePluginAnonymousAuthor => 'Anonimo';
+
+  @override
+  String get storePluginUnnamed => 'Senza nome';
+
+  @override
+  String get fieldTypeText => 'Testo';
+
+  @override
+  String get fieldTypeNumber => 'Numero';
+
+  @override
+  String get fieldTypeDate => 'Data';
+
+  @override
+  String get fieldTypeDropdown => 'Menu a discesa';
+
+  @override
+  String get fieldTypeBoolean => 'Sì/No (Booleano)';
+
+  @override
+  String get fieldTypeUrl => 'URL';
+
+  @override
+  String get fieldTypePrice => 'Prezzo';
+
+  @override
+  String get validationValidUrl => 'Inserisci un URL valido.';
+
+  @override
+  String get validationValidPrice =>
+      'Inserisci un prezzo valido (es.: 123.45).';
+
+  @override
+  String get hintIntegerNumber => 'Inserisci un numero intero.';
+
+  @override
+  String get hintPriceExample => 'Inserisci un prezzo (es.: 123.45).';
+
+  @override
+  String get hintDateFormat => 'GG/MM/AAAA';
+
+  @override
+  String get hintYesNo => 'Sì/No';
+
+  @override
+  String get hintEnterValue => 'Inserisci il valore.';
+
+  @override
+  String get integrationFieldApiKey => 'Chiave API';
+
+  @override
+  String get integrationFieldBotToken => 'Token del bot';
+
+  @override
+  String get integrationFieldChatId => 'ID chat';
+
+  @override
+  String get integrationFieldResendKey => 'Chiave API di Resend';
+
+  @override
+  String get versionArtPowerfulManName => 'L\'Uomo Potente';
+
+  @override
+  String get versionArtPowerfulManDesc =>
+      'Per il potere di Grayskull, il tuo inventario non è mai stato così organizzato. L\'uomo più potente dell\'universo sconfigge il disordine con un solo colpo.';
+
+  @override
+  String get versionArtMadDoctorName => 'Dottore Pazzo';
+
+  @override
+  String get versionArtMadDoctorDesc =>
+      'L\'originale e folle scienziato che balla fino al tuo inventario.';
+
+  @override
+  String get versionArtPirateName => 'Pirata Possente';
+
+  @override
+  String get versionArtPirateDesc =>
+      'Quanto è appropriato, sembri qualcuno capace di inventariare per uscire da qualsiasi disordine. Un Pirata Possente e maestro organizzatore, guida la tua collezione verso nuovi orizzonti.';
+
+  @override
+  String get retroMenuTitle => '[ MENU ]';
+
+  @override
+  String sdkCurrentUserName(String name) {
+    return 'Utente corrente: $name';
+  }
+
+  @override
+  String get sdkGuest => 'Ospite';
+
+  @override
+  String get sdkActionDone => 'Azione eseguita.';
+
+  @override
+  String get sessionClosed => 'Sessione chiusa.';
+
+  @override
+  String get errorOpenMail => 'Impossibile aprire l\'app di posta.';
+
+  @override
+  String errorConnection(String message) {
+    return 'Errore di connessione: $message';
+  }
+
+  @override
+  String errorUnexpected(String message) {
+    return 'Errore imprevisto: $message';
+  }
+
+  @override
+  String get errorUnauthorizedLogin => 'Non autorizzato. Accedi di nuovo.';
+
+  @override
+  String get crosstoonsDirectionLeftToRight => 'Da sinistra a destra';
+
+  @override
+  String get crosstoonsDirectionRightToLeft => 'Da destra a sinistra';
+
+  @override
+  String get crosstoonsDirectionAlternate => 'Alternato';
+
+  @override
+  String get crosstoonsDirectionBorderWalk => 'Giro del bordo';
+
+  @override
+  String get crosstoonsZoneTop => 'Alto';
+
+  @override
+  String get crosstoonsZoneMiddle => 'Centro';
+
+  @override
+  String get crosstoonsZoneBottom => 'Basso';
+
+  @override
+  String get crosstoonsZoneRandom => 'Casuale';
+
+  @override
+  String get crosstoonsTurnOn => 'Attivo';
+
+  @override
+  String get crosstoonsTurnOff => 'Disattivo';
+
+  @override
+  String get crosstoonsTurnRandom => 'Casuale';
+
+  @override
+  String errorFetchLocationsCode(String code) {
+    return 'Errore durante il recupero delle posizioni: $code';
+  }
+
+  @override
+  String errorCreateLocationCode(String code) {
+    return 'Errore durante la creazione della posizione: $code';
+  }
+
+  @override
+  String errorUpdateLocationCode(String code) {
+    return 'Errore durante l\'aggiornamento della posizione: $code';
+  }
+
+  @override
+  String errorDeleteLocationCode(String code) {
+    return 'Errore durante l\'eliminazione della posizione: $code';
+  }
+
+  @override
+  String get errorLocationNotFound => 'Posizione non trovata.';
+
+  @override
+  String get errorLocationMissingData =>
+      'Risposta API riuscita, ma l\'oggetto posizione è mancante o nullo.';
+
+  @override
+  String get errorLocationUpdateMissingData =>
+      'Risposta API riuscita, ma l\'oggetto posizione aggiornata è mancante o nullo.';
+
+  @override
+  String errorFetchMarketCode(String code) {
+    return 'Errore durante il recupero del mercato: $code';
+  }
+
+  @override
+  String get errorTemplateNotFound => 'Modello non trovato.';
+
+  @override
+  String get errorPublishTemplate => 'Errore durante la pubblicazione.';
+
+  @override
+  String reportPreviewError(String detail) {
+    return 'Errore durante il recupero dell\'anteprima del report: $detail';
+  }
+
+  @override
+  String reportHistoryError(String detail) {
+    return 'Errore durante il recupero della cronologia dei report: $detail';
+  }
+
+  @override
+  String reportDownloadError(String detail) {
+    return 'Errore durante il download del report: $detail';
+  }
+
+  @override
+  String reportDeleteError(String detail) {
+    return 'Errore durante l\'eliminazione del report: $detail';
+  }
+
+  @override
+  String get errorFetchLoans => 'Errore durante il recupero dei prestiti.';
+
+  @override
+  String get errorReturnItem =>
+      'Errore durante la restituzione dell\'articolo.';
+
+  @override
+  String get errorLoanReturn => 'Errore durante la restituzione.';
+
+  @override
+  String get errorDeleteLoan => 'Impossibile eliminare il prestito.';
+
+  @override
+  String get errorLoanStats => 'Errore durante il recupero delle statistiche.';
+
+  @override
+  String errorDownloadImageServer(String detail) {
+    return 'Errore durante il download dell\'immagine dal server: $detail';
+  }
+
+  @override
+  String errorDownloadImage(String detail) {
+    return 'Errore durante il download dell\'immagine: $detail';
+  }
+
+  @override
+  String get errorNoDataServer => 'Nessun dato ricevuto dal server.';
+
+  @override
+  String errorFetchItems(String detail) {
+    return 'Errore imprevisto durante il recupero degli articoli: $detail';
+  }
+
+  @override
+  String errorCreateAsset(String detail) {
+    return 'Errore durante la creazione dell\'asset: $detail';
+  }
+
+  @override
+  String errorUpdateAsset(String detail) {
+    return 'Errore durante l\'aggiornamento dell\'asset: $detail';
+  }
+
+  @override
+  String errorDeleteAsset(String detail) {
+    return 'Errore durante l\'eliminazione dell\'asset: $detail';
+  }
+
+  @override
+  String errorBatchImport(String detail) {
+    return 'Errore durante l\'importazione massiva degli asset: $detail';
+  }
+
+  @override
+  String get errorMarketValue =>
+      'Errore durante il recupero del valore di mercato.';
+
+  @override
+  String get errorPriceHistory =>
+      'Errore durante il recupero della cronologia dei prezzi.';
+
+  @override
+  String get errorServerCommunication =>
+      'Errore di comunicazione con il server.';
+
+  @override
+  String errorAiUnexpectedResponse(String type) {
+    return 'Risposta inattesa del server: $type';
+  }
+
+  @override
+  String get errorAiUnknown => 'Errore IA sconosciuto.';
+
+  @override
+  String get errorAiNoData =>
+      'Il server non ha restituito dati estratti. Verifica che l\'URL sia accessibile.';
+
+  @override
+  String errorAiInvalidFormat(String type) {
+    return 'Formato dati non valido: ricevuto $type invece di un oggetto JSON.';
+  }
+
+  @override
+  String get errorAiService => 'Errore del servizio IA.';
+
+  @override
+  String get errorAiSuggest => 'Errore di suggerimento IA.';
+
+  @override
+  String get errorMissingDataField =>
+      'La risposta del server non contiene il campo \"data\".';
+
+  @override
+  String get errorUnauthorizedSession =>
+      'Non autorizzato: sessione scaduta o token non valido.';
+
+  @override
+  String errorResourceNotFound(String context) {
+    return 'Risorsa non trovata ($context).';
+  }
+
+  @override
+  String errorContextDetail(String context, String message) {
+    return 'Errore in $context: $message';
+  }
+
+  @override
+  String get errorCustomListNotFound => 'Elenco personalizzato non trovato.';
+
+  @override
+  String get errorStatsMissing =>
+      'L\'API ha restituito successo ma l\'oggetto statistiche è mancante o nullo.';
+
+  @override
+  String errorFetchStats(String detail) {
+    return 'Errore durante il recupero delle statistiche: $detail';
+  }
+
+  @override
+  String errorFetchScrapers(String code) {
+    return 'Errore durante il recupero degli scraper: $code';
+  }
+
+  @override
+  String errorCreateScraper(String code) {
+    return 'Errore durante la creazione dello scraper: $code';
+  }
+
+  @override
+  String errorUpdateScraper(String code) {
+    return 'Errore durante l\'aggiornamento dello scraper: $code';
+  }
+
+  @override
+  String errorDeleteScraper(String code) {
+    return 'Errore durante l\'eliminazione dello scraper: $code';
+  }
+
+  @override
+  String errorAddScraperField(String code) {
+    return 'Errore durante l\'aggiunta del campo: $code';
+  }
+
+  @override
+  String errorRunScraperAdhoc(String code) {
+    return 'Errore durante l\'esecuzione dello scraper ad-hoc: $code';
+  }
+
+  @override
+  String errorFetchAssetType(String detail) {
+    return 'Errore durante il recupero del tipo di asset: $detail';
+  }
+
+  @override
+  String errorCreateAssetType(String detail) {
+    return 'Errore durante la creazione del tipo di asset: $detail';
+  }
+
+  @override
+  String errorUpdateAssetType(String detail) {
+    return 'Errore durante l\'aggiornamento del tipo di asset: $detail';
+  }
+
+  @override
+  String errorDeleteAssetType(String detail) {
+    return 'Errore durante l\'eliminazione del tipo di asset: $detail';
+  }
+
+  @override
+  String get errorAssetTypeGone =>
+      'Il tipo di asset non esiste o è già stato eliminato.';
+
+  @override
+  String errorFetchAlerts(String detail) {
+    return 'Errore durante il recupero degli avvisi: $detail';
+  }
+
+  @override
+  String errorPreferenceUpdate(String detail) {
+    return 'Errore durante l\'aggiornamento della preferenza: $detail';
+  }
+
+  @override
+  String errorCreateCrossToon(String detail) {
+    return 'Errore durante la creazione del cross-toon: $detail';
+  }
+
+  @override
+  String errorUpdateCrossToon(String detail) {
+    return 'Errore durante l\'aggiornamento del cross-toon: $detail';
+  }
+
+  @override
+  String errorDeleteCrossToon(String detail) {
+    return 'Errore durante l\'eliminazione del cross-toon: $detail';
+  }
+
+  @override
+  String errorSaveIntegration(String itype, String detail) {
+    return 'Errore durante il salvataggio dell\'integrazione $itype: $detail';
+  }
+
+  @override
+  String get errorEnrichItem =>
+      'Errore durante l\'arricchimento dell\'articolo.';
+
+  @override
+  String get errorProcessSelectedResult =>
+      'Errore durante l\'elaborazione del risultato selezionato.';
+
+  @override
+  String get errorCreateAdmin =>
+      'Errore durante la creazione dell\'amministratore.';
+
+  @override
+  String get errorChangePassword => 'Errore durante il cambio della password.';
+
+  @override
+  String get errorInvalidVersion =>
+      'Risposta di controllo versione non valida.';
+
+  @override
+  String get errorCheckVersion =>
+      'Errore durante il controllo della versione dell\'app.';
+
+  @override
+  String get errorAuthFailed => 'Errore di autenticazione.';
+
+  @override
+  String errorUnexpectedStatus(String status) {
+    return 'Stato imprevisto: $status';
+  }
+
+  @override
+  String get errorPurgeHistory =>
+      'Errore durante l\'eliminazione della cronologia chat.';
+
+  @override
+  String get errorDeleteSystemTheme =>
+      'Impossibile eliminare i temi di sistema predefiniti.';
+
+  @override
+  String get errorDeleteThemeDb =>
+      'Errore durante l\'eliminazione del tema dal database.';
 }

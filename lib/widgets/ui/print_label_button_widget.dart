@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/retro/retro_dialog_helper.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/providers/inventory_item_provider.dart';
 import 'package:invenicum/widgets/ui/asset_tag_qr_widget.dart';
 import 'package:provider/provider.dart';
@@ -16,10 +17,10 @@ class LabelSize {
   LabelSize(this.name, this.width, this.height, this.code);
 }
 
-final List<LabelSize> labelSizes = [
-  LabelSize("Pequeña (S) - 25x15mm", 25, 15, "S"),
-  LabelSize("Estándar (M) - 50x30mm", 50, 30, "M"),
-  LabelSize("Grande (L) - 75x50mm", 75, 50, "L"),
+List<LabelSize> labelSizesOf(AppLocalizations l10n) => [
+  LabelSize(l10n.labelSizeSmall, 25, 15, "S"),
+  LabelSize(l10n.labelSizeMedium, 50, 30, "M"),
+  LabelSize(l10n.labelSizeLarge, 75, 50, "L"),
 ];
 
 class PrintLabelButton extends StatelessWidget {
@@ -41,12 +42,13 @@ class PrintLabelButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: fullWidth ? double.infinity : null,
       child: ElevatedButton.icon(
         onPressed: () => showPreview(context, item),
         icon: const Icon(Icons.qr_code_2_rounded),
-        label: const Text("IMPRIMIR ETIQUETA"),
+        label: Text(l10n.printLabelButton),
       ),
     );
   }
@@ -61,47 +63,52 @@ class _LabelPrintDialog extends StatefulWidget {
 }
 
 class _LabelPrintDialogState extends State<_LabelPrintDialog> {
-  LabelSize _selectedSize = labelSizes[1];
+  LabelSize? _selectedSize;
   bool _isPrinting = false;
 
   Future<void> _handlePrint() async {
     final provider = context.read<InventoryItemProvider>();
+    final l10n = AppLocalizations.of(context)!;
+    final size = _selectedSize ?? labelSizesOf(l10n)[1];
     setState(() => _isPrinting = true);
     try {
       await provider.printLabel(
         widget.item.id.toString(),
-        width: _selectedSize.width,
-        height: _selectedSize.height,
+        width: size.width,
+        height: size.height,
       );
       if (!mounted) return;
       Navigator.of(context).pop();
     } catch (e) {
       if (!mounted) return;
       setState(() => _isPrinting = false);
-      ToastService.error('Error al imprimir: $e');
+      ToastService.error(l10n.errorWithMessage(e.toString()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final sizes = labelSizesOf(l10n);
+    final selected = _selectedSize ?? sizes[1];
     return AlertDialog(
-      title: const Text("Configurar Impresión"),
+      title: Text(l10n.configurePrintTitle),
       content: SizedBox(
         width: 320,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             DropdownButtonFormField<LabelSize>(
-              initialValue: _selectedSize,
-              decoration: const InputDecoration(
-                labelText: "Tamaño de etiqueta",
+              initialValue: selected,
+              decoration: InputDecoration(
+                labelText: l10n.labelSizeField,
                 border: OutlineInputBorder(),
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 8,
                 ),
               ),
-              items: labelSizes.map((size) {
+              items: sizes.map((size) {
                 return DropdownMenuItem(
                   value: size,
                   child: Text(size.name),
@@ -117,8 +124,8 @@ class _LabelPrintDialogState extends State<_LabelPrintDialog> {
             BentoPrintTile(
               item: widget.item,
               showButton: false,
-              widthMm: _selectedSize.width,
-              heightMm: _selectedSize.height,
+              widthMm: selected.width,
+              heightMm: selected.height,
             ),
           ],
         ),
@@ -126,7 +133,7 @@ class _LabelPrintDialogState extends State<_LabelPrintDialog> {
       actions: [
         TextButton(
           onPressed: _isPrinting ? null : () => Navigator.of(context).pop(),
-          child: const Text("CANCELAR"),
+          child: Text(l10n.cancel),
         ),
         ElevatedButton.icon(
           onPressed: _isPrinting ? null : _handlePrint,
@@ -137,7 +144,9 @@ class _LabelPrintDialogState extends State<_LabelPrintDialog> {
                   child: AppLoadingIndicator(strokeWidth: 2),
                 )
               : const Icon(Icons.print_rounded),
-          label: Text(_isPrinting ? "Generando..." : "IMPRIMIR"),
+          label: Text(
+            _isPrinting ? l10n.generatingLabel : l10n.printButton,
+          ),
         ),
       ],
     );

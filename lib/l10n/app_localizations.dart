@@ -6441,6 +6441,1473 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Achievement unlocked: \"{years}y Memory\" — {count} items'**
   String anniversaryFlavor6(int years, int count, String date);
+
+  /// No description provided for @mapFieldsManuallyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Map fields manually'**
+  String get mapFieldsManuallyTitle;
+
+  /// No description provided for @mapToHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Map to...'**
+  String get mapToHint;
+
+  /// No description provided for @pageIndicator.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page}'**
+  String pageIndicator(String page);
+
+  /// No description provided for @dataSourceLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Data source'**
+  String get dataSourceLabel;
+
+  /// No description provided for @searchExampleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g.: Pikachu, Catan, Don Quixote...'**
+  String get searchExampleHint;
+
+  /// No description provided for @imageUrlExampleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://example.com/image.jpg'**
+  String get imageUrlExampleHint;
+
+  /// No description provided for @urlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'URL'**
+  String get urlLabel;
+
+  /// No description provided for @addGlbModelsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add GLB models'**
+  String get addGlbModelsButton;
+
+  /// No description provided for @serverControlledPathLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Server-controlled path'**
+  String get serverControlledPathLabel;
+
+  /// No description provided for @modelPathExampleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'models3d/catalogo/modelo.glb'**
+  String get modelPathExampleHint;
+
+  /// No description provided for @modelRelativePathHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Use a relative path inside the 3D models directory.'**
+  String get modelRelativePathHelp;
+
+  /// No description provided for @gallery3dTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'3D Gallery'**
+  String get gallery3dTitle;
+
+  /// No description provided for @model3dTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'3D Model'**
+  String get model3dTitle;
+
+  /// No description provided for @opacityPercentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Opacity: {value}%'**
+  String opacityPercentLabel(String value);
+
+  /// No description provided for @predefinedColorsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Predefined colors'**
+  String get predefinedColorsTitle;
+
+  /// No description provided for @customColorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom color'**
+  String get customColorTitle;
+
+  /// No description provided for @colorRed.
+  ///
+  /// In en, this message translates to:
+  /// **'Red'**
+  String get colorRed;
+
+  /// No description provided for @colorGreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Green'**
+  String get colorGreen;
+
+  /// No description provided for @colorBlue.
+  ///
+  /// In en, this message translates to:
+  /// **'Blue'**
+  String get colorBlue;
+
+  /// No description provided for @acceptButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get acceptButton;
+
+  /// No description provided for @dateFormatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'DD/MM/YYYY'**
+  String get dateFormatHint;
+
+  /// No description provided for @errorWithMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {detail}'**
+  String errorWithMessage(String detail);
+
+  /// No description provided for @unnamedField.
+  ///
+  /// In en, this message translates to:
+  /// **'Unnamed'**
+  String get unnamedField;
+
+  /// No description provided for @fieldWithNameHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Field: \"{name}\"'**
+  String fieldWithNameHeader(String name);
+
+  /// No description provided for @fieldNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Field name'**
+  String get fieldNameLabel;
+
+  /// No description provided for @dataTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Data type'**
+  String get dataTypeLabel;
+
+  /// No description provided for @mustSelectListForDropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'You must select a list for dropdown fields.'**
+  String get mustSelectListForDropdown;
+
+  /// No description provided for @imageSelectedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image selected'**
+  String get imageSelectedMessage;
+
+  /// No description provided for @imageRemovedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Image removed'**
+  String get imageRemovedMessage;
+
+  /// No description provided for @contentTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Content type'**
+  String get contentTypeLabel;
+
+  /// No description provided for @contentTypeStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get contentTypeStandard;
+
+  /// No description provided for @assetTypeImageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset Type Image'**
+  String get assetTypeImageTitle;
+
+  /// No description provided for @serializedTooltipMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A serialized type manages each unit as an independent record. It does not necessarily imply a real factory serial number.\n\nA non-serialized type allows grouping quantities in a single record. In collection containers, possession and wishlist fields can only be configured on non-serialized types.'**
+  String get serializedTooltipMessage;
+
+  /// No description provided for @serializedEnabledSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Each unit is managed as an independent record.'**
+  String get serializedEnabledSubtitle;
+
+  /// No description provided for @nonSerializedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allows grouping quantities in a single record.'**
+  String get nonSerializedSubtitle;
+
+  /// No description provided for @sidebarScrapersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrapers ({count})'**
+  String sidebarScrapersCount(String count);
+
+  /// No description provided for @menuTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menuTooltip;
+
+  /// No description provided for @spriteVaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sprite Vault™'**
+  String get spriteVaultTitle;
+
+  /// No description provided for @inventoryLabelTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Inventory Label'**
+  String get inventoryLabelTitle;
+
+  /// No description provided for @printLabelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'PRINT LABEL'**
+  String get printLabelButton;
+
+  /// No description provided for @printNowButton.
+  ///
+  /// In en, this message translates to:
+  /// **'PRINT NOW'**
+  String get printNowButton;
+
+  /// No description provided for @configurePrintTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Configure Printing'**
+  String get configurePrintTitle;
+
+  /// No description provided for @labelSizeField.
+  ///
+  /// In en, this message translates to:
+  /// **'Label size'**
+  String get labelSizeField;
+
+  /// No description provided for @labelSizeSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small (S) - 25x15mm'**
+  String get labelSizeSmall;
+
+  /// No description provided for @labelSizeMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium (M) - 50x30mm'**
+  String get labelSizeMedium;
+
+  /// No description provided for @labelSizeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large (L) - 75x50mm'**
+  String get labelSizeLarge;
+
+  /// No description provided for @labelSizeBadgeLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get labelSizeBadgeLarge;
+
+  /// No description provided for @labelSizeBadgeStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard'**
+  String get labelSizeBadgeStandard;
+
+  /// No description provided for @generatingLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Generating...'**
+  String get generatingLabel;
+
+  /// No description provided for @printButton.
+  ///
+  /// In en, this message translates to:
+  /// **'PRINT'**
+  String get printButton;
+
+  /// No description provided for @noPriceHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No price history available.'**
+  String get noPriceHistory;
+
+  /// No description provided for @priceEvolutionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Price evolution ({currency})'**
+  String priceEvolutionTitle(String currency);
+
+  /// No description provided for @originalPriceTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Original: {value} USD'**
+  String originalPriceTooltip(String value);
+
+  /// No description provided for @open3dModelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open 3D model'**
+  String get open3dModelButton;
+
+  /// No description provided for @spriteVaultSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse and preview every major-version sprite.'**
+  String get spriteVaultSubtitle;
+
+  /// No description provided for @spriteVaultEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No sprites yet. Stay tuned for future versions!'**
+  String get spriteVaultEmpty;
+
+  /// No description provided for @spriteVaultCurrentBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'CURRENT'**
+  String get spriteVaultCurrentBadge;
+
+  /// No description provided for @spriteSavedToPath.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to {path}'**
+  String spriteSavedToPath(String path);
+
+  /// No description provided for @spriteSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save: {error}'**
+  String spriteSaveError(String error);
+
+  /// No description provided for @fallbackLocationName.
+  ///
+  /// In en, this message translates to:
+  /// **'Location {id}'**
+  String fallbackLocationName(String id);
+
+  /// No description provided for @otherLocationsContainer.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest of locations'**
+  String get otherLocationsContainer;
+
+  /// No description provided for @otherLocationsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Other locations'**
+  String get otherLocationsLabel;
+
+  /// No description provided for @additionalLocationsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} additional locations'**
+  String additionalLocationsCount(String count);
+
+  /// No description provided for @aiDefaultCollectionName.
+  ///
+  /// In en, this message translates to:
+  /// **'New Collection'**
+  String get aiDefaultCollectionName;
+
+  /// No description provided for @aiDefaultCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get aiDefaultCategory;
+
+  /// No description provided for @aiDefaultFieldName.
+  ///
+  /// In en, this message translates to:
+  /// **'Field'**
+  String get aiDefaultFieldName;
+
+  /// No description provided for @loansCountTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} loans'**
+  String loansCountTooltip(String count);
+
+  /// No description provided for @loansCountAxis.
+  ///
+  /// In en, this message translates to:
+  /// **'NUMBER OF LOANS'**
+  String get loansCountAxis;
+
+  /// No description provided for @mostRequestedAxis.
+  ///
+  /// In en, this message translates to:
+  /// **'MOST REQUESTED ITEMS'**
+  String get mostRequestedAxis;
+
+  /// No description provided for @noActivityInPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'No activity in this period.'**
+  String get noActivityInPeriod;
+
+  /// No description provided for @voucherLogoTooHeavy.
+  ///
+  /// In en, this message translates to:
+  /// **'The file is too heavy ({size} MB). Maximum is 1 MB.'**
+  String voucherLogoTooHeavy(String size);
+
+  /// No description provided for @voucherDefaultTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Item: {itemName}\nQuantity: {quantity}\n\nBorrower: {borrowerName}\nEmail: {borrowerEmail}\nPhone: {borrowerPhone}\n\nLoan Date: {loanDate}\nExpected Return Date: {expectedReturnDate}\n\nNotes: {notes}\n\n_________________________ | _________________________\nSignature of Deliverer    | Signature of Receiver'**
+  String voucherDefaultTemplate(
+    String itemName,
+    String quantity,
+    String borrowerName,
+    String borrowerEmail,
+    String borrowerPhone,
+    String loanDate,
+    String expectedReturnDate,
+    String notes,
+  );
+
+  /// No description provided for @previewItemName.
+  ///
+  /// In en, this message translates to:
+  /// **'Example Item'**
+  String get previewItemName;
+
+  /// No description provided for @previewBorrowerName.
+  ///
+  /// In en, this message translates to:
+  /// **'John Doe'**
+  String get previewBorrowerName;
+
+  /// No description provided for @previewBorrowerEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'john.doe@example.com'**
+  String get previewBorrowerEmail;
+
+  /// No description provided for @previewBorrowerPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'+1 555 000 1234'**
+  String get previewBorrowerPhone;
+
+  /// No description provided for @previewLoanDate.
+  ///
+  /// In en, this message translates to:
+  /// **'01/10/2024'**
+  String get previewLoanDate;
+
+  /// No description provided for @previewReturnDate.
+  ///
+  /// In en, this message translates to:
+  /// **'01/17/2024'**
+  String get previewReturnDate;
+
+  /// No description provided for @previewNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Handle with care'**
+  String get previewNotes;
+
+  /// No description provided for @retroThemesSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Retro'**
+  String get retroThemesSection;
+
+  /// No description provided for @saveErrorWithDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving: {error}'**
+  String saveErrorWithDetail(String error);
+
+  /// No description provided for @errorUpdatingPreference.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating preference.'**
+  String get errorUpdatingPreference;
+
+  /// No description provided for @scraperTestFieldTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Test field'**
+  String get scraperTestFieldTitle;
+
+  /// No description provided for @scraperTestIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a URL that matches the scraper pattern {pattern} to test the \"{name}\" field.'**
+  String scraperTestIntro(String name, String pattern);
+
+  /// No description provided for @scraperTestPatternLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Pattern: {pattern}'**
+  String scraperTestPatternLabel(String pattern);
+
+  /// No description provided for @scraperTestUrlLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'URL to test'**
+  String get scraperTestUrlLabel;
+
+  /// No description provided for @scraperTestUrlHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://example.com/items/123'**
+  String get scraperTestUrlHint;
+
+  /// No description provided for @scraperEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit scraper'**
+  String get scraperEditTitle;
+
+  /// No description provided for @scraperFieldXpathLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'XPath'**
+  String get scraperFieldXpathLabel;
+
+  /// No description provided for @scraperUrlPatternLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'URL pattern (optional)'**
+  String get scraperUrlPatternLabel;
+
+  /// No description provided for @scraperFieldsSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Fields'**
+  String get scraperFieldsSection;
+
+  /// No description provided for @scraperNoFields.
+  ///
+  /// In en, this message translates to:
+  /// **'No fields yet. Add one above.'**
+  String get scraperNoFields;
+
+  /// No description provided for @searchTagHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search tag...'**
+  String get searchTagHint;
+
+  /// No description provided for @filterLogicAnd.
+  ///
+  /// In en, this message translates to:
+  /// **'AND'**
+  String get filterLogicAnd;
+
+  /// No description provided for @filterLogicOr.
+  ///
+  /// In en, this message translates to:
+  /// **'OR'**
+  String get filterLogicOr;
+
+  /// No description provided for @pluginJsonFormatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Format error: {error}'**
+  String pluginJsonFormatError(String error);
+
+  /// No description provided for @pluginTemplateDefaultName.
+  ///
+  /// In en, this message translates to:
+  /// **'New Plugin'**
+  String get pluginTemplateDefaultName;
+
+  /// No description provided for @achievementUnlockedHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Achievement Unlocked'**
+  String get achievementUnlockedHeader;
+
+  /// No description provided for @githubLinkedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub linked successfully.'**
+  String get githubLinkedSuccess;
+
+  /// No description provided for @sessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Session expired.'**
+  String get sessionExpired;
+
+  /// No description provided for @passwordUpdateFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update password.'**
+  String get passwordUpdateFailed;
+
+  /// No description provided for @searchSubtitleContainer.
+  ///
+  /// In en, this message translates to:
+  /// **'Container'**
+  String get searchSubtitleContainer;
+
+  /// No description provided for @searchSubtitleCategoryIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Category in {container}'**
+  String searchSubtitleCategoryIn(String container);
+
+  /// No description provided for @searchNoName.
+  ///
+  /// In en, this message translates to:
+  /// **'No name'**
+  String get searchNoName;
+
+  /// No description provided for @searchSubtitleAssetIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset in {container}'**
+  String searchSubtitleAssetIn(String container);
+
+  /// No description provided for @errorContainerNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Container not found.'**
+  String get errorContainerNotFound;
+
+  /// No description provided for @errorDatalistNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Data list not found.'**
+  String get errorDatalistNotFound;
+
+  /// No description provided for @itemNoBarcodeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Item not found or barcode is empty.'**
+  String get itemNoBarcodeError;
+
+  /// No description provided for @pluginStatusInstall.
+  ///
+  /// In en, this message translates to:
+  /// **'Install'**
+  String get pluginStatusInstall;
+
+  /// No description provided for @pluginStatusUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get pluginStatusUpdate;
+
+  /// No description provided for @pluginStatusInstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Installed'**
+  String get pluginStatusInstalled;
+
+  /// No description provided for @pluginChangesSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes sent successfully.'**
+  String get pluginChangesSent;
+
+  /// No description provided for @pluginEditError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error processing the edit.'**
+  String get pluginEditError;
+
+  /// No description provided for @pluginUpdatedToVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'v{version} updated successfully.'**
+  String pluginUpdatedToVersion(String version);
+
+  /// No description provided for @pluginUpdateDownloadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to download the update.'**
+  String get pluginUpdateDownloadFailed;
+
+  /// No description provided for @pluginInstalledWithName.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} installed.'**
+  String pluginInstalledWithName(String name);
+
+  /// No description provided for @pluginInstallFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to install.'**
+  String get pluginInstallFailed;
+
+  /// No description provided for @pluginUninstalled.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugin uninstalled.'**
+  String get pluginUninstalled;
+
+  /// No description provided for @pluginUninstallError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error uninstalling.'**
+  String get pluginUninstallError;
+
+  /// No description provided for @pluginActivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugin activated.'**
+  String get pluginActivated;
+
+  /// No description provided for @pluginDeactivated.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugin deactivated.'**
+  String get pluginDeactivated;
+
+  /// No description provided for @pluginStatusChangeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error changing status.'**
+  String get pluginStatusChangeError;
+
+  /// No description provided for @pluginSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugin saved successfully.'**
+  String get pluginSaved;
+
+  /// No description provided for @pluginSaveError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving the plugin.'**
+  String get pluginSaveError;
+
+  /// No description provided for @pluginDeletedGlobally.
+  ///
+  /// In en, this message translates to:
+  /// **'Plugin deleted globally.'**
+  String get pluginDeletedGlobally;
+
+  /// No description provided for @pluginDeleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete.'**
+  String get pluginDeleteFailed;
+
+  /// No description provided for @storePluginAnonymousAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Anonymous'**
+  String get storePluginAnonymousAuthor;
+
+  /// No description provided for @storePluginUnnamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unnamed'**
+  String get storePluginUnnamed;
+
+  /// No description provided for @fieldTypeText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get fieldTypeText;
+
+  /// No description provided for @fieldTypeNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get fieldTypeNumber;
+
+  /// No description provided for @fieldTypeDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get fieldTypeDate;
+
+  /// No description provided for @fieldTypeDropdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Dropdown'**
+  String get fieldTypeDropdown;
+
+  /// No description provided for @fieldTypeBoolean.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes/No (Boolean)'**
+  String get fieldTypeBoolean;
+
+  /// No description provided for @fieldTypeUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'URL'**
+  String get fieldTypeUrl;
+
+  /// No description provided for @fieldTypePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get fieldTypePrice;
+
+  /// No description provided for @validationValidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid URL.'**
+  String get validationValidUrl;
+
+  /// No description provided for @validationValidPrice.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid price (e.g.: 123.45).'**
+  String get validationValidPrice;
+
+  /// No description provided for @hintIntegerNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an integer number.'**
+  String get hintIntegerNumber;
+
+  /// No description provided for @hintPriceExample.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a price (e.g.: 123.45).'**
+  String get hintPriceExample;
+
+  /// No description provided for @hintDateFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'DD/MM/YYYY'**
+  String get hintDateFormat;
+
+  /// No description provided for @hintYesNo.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes/No'**
+  String get hintYesNo;
+
+  /// No description provided for @hintEnterValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the value.'**
+  String get hintEnterValue;
+
+  /// No description provided for @integrationFieldApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key'**
+  String get integrationFieldApiKey;
+
+  /// No description provided for @integrationFieldBotToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Bot Token'**
+  String get integrationFieldBotToken;
+
+  /// No description provided for @integrationFieldChatId.
+  ///
+  /// In en, this message translates to:
+  /// **'Chat ID'**
+  String get integrationFieldChatId;
+
+  /// No description provided for @integrationFieldResendKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend API Key'**
+  String get integrationFieldResendKey;
+
+  /// No description provided for @versionArtPowerfulManName.
+  ///
+  /// In en, this message translates to:
+  /// **'The Powerful Man'**
+  String get versionArtPowerfulManName;
+
+  /// No description provided for @versionArtPowerfulManDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'By the power of Grayskull, your inventory has never been more organized. The most powerful man in the universe vanquishes clutter with a single swing.'**
+  String get versionArtPowerfulManDesc;
+
+  /// No description provided for @versionArtMadDoctorName.
+  ///
+  /// In en, this message translates to:
+  /// **'Crazy Mad Doctor'**
+  String get versionArtMadDoctorName;
+
+  /// No description provided for @versionArtMadDoctorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The original and crazy mad scientist dancing his way into your inventory.'**
+  String get versionArtMadDoctorDesc;
+
+  /// No description provided for @versionArtPirateName.
+  ///
+  /// In en, this message translates to:
+  /// **'Mighty Pirate'**
+  String get versionArtPirateName;
+
+  /// No description provided for @versionArtPirateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'How appropriate, you look like someone who could inventory themselves out of any clutter. A Mighty Pirate and master organizer, sails your collection to new horizons.'**
+  String get versionArtPirateDesc;
+
+  /// No description provided for @retroMenuTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'[ MENU ]'**
+  String get retroMenuTitle;
+
+  /// No description provided for @sdkCurrentUserName.
+  ///
+  /// In en, this message translates to:
+  /// **'Current user: {name}'**
+  String sdkCurrentUserName(String name);
+
+  /// No description provided for @sdkGuest.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get sdkGuest;
+
+  /// No description provided for @sdkActionDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Action executed.'**
+  String get sdkActionDone;
+
+  /// No description provided for @sessionClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Session closed.'**
+  String get sessionClosed;
+
+  /// No description provided for @errorOpenMail.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the mail app.'**
+  String get errorOpenMail;
+
+  /// No description provided for @errorConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection error: {message}'**
+  String errorConnection(String message);
+
+  /// No description provided for @errorUnexpected.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected error: {message}'**
+  String errorUnexpected(String message);
+
+  /// No description provided for @errorUnauthorizedLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Unauthorized. Please log in again.'**
+  String get errorUnauthorizedLogin;
+
+  /// No description provided for @crosstoonsDirectionLeftToRight.
+  ///
+  /// In en, this message translates to:
+  /// **'Left to right'**
+  String get crosstoonsDirectionLeftToRight;
+
+  /// No description provided for @crosstoonsDirectionRightToLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'Right to left'**
+  String get crosstoonsDirectionRightToLeft;
+
+  /// No description provided for @crosstoonsDirectionAlternate.
+  ///
+  /// In en, this message translates to:
+  /// **'Alternate'**
+  String get crosstoonsDirectionAlternate;
+
+  /// No description provided for @crosstoonsDirectionBorderWalk.
+  ///
+  /// In en, this message translates to:
+  /// **'Border walk'**
+  String get crosstoonsDirectionBorderWalk;
+
+  /// No description provided for @crosstoonsZoneTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Top'**
+  String get crosstoonsZoneTop;
+
+  /// No description provided for @crosstoonsZoneMiddle.
+  ///
+  /// In en, this message translates to:
+  /// **'Middle'**
+  String get crosstoonsZoneMiddle;
+
+  /// No description provided for @crosstoonsZoneBottom.
+  ///
+  /// In en, this message translates to:
+  /// **'Bottom'**
+  String get crosstoonsZoneBottom;
+
+  /// No description provided for @crosstoonsZoneRandom.
+  ///
+  /// In en, this message translates to:
+  /// **'Random'**
+  String get crosstoonsZoneRandom;
+
+  /// No description provided for @crosstoonsTurnOn.
+  ///
+  /// In en, this message translates to:
+  /// **'On'**
+  String get crosstoonsTurnOn;
+
+  /// No description provided for @crosstoonsTurnOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get crosstoonsTurnOff;
+
+  /// No description provided for @crosstoonsTurnRandom.
+  ///
+  /// In en, this message translates to:
+  /// **'Random'**
+  String get crosstoonsTurnRandom;
+
+  /// No description provided for @errorFetchLocationsCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching locations: {code}'**
+  String errorFetchLocationsCode(String code);
+
+  /// No description provided for @errorCreateLocationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating location: {code}'**
+  String errorCreateLocationCode(String code);
+
+  /// No description provided for @errorUpdateLocationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating location: {code}'**
+  String errorUpdateLocationCode(String code);
+
+  /// No description provided for @errorDeleteLocationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting location: {code}'**
+  String errorDeleteLocationCode(String code);
+
+  /// No description provided for @errorLocationNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Location not found.'**
+  String get errorLocationNotFound;
+
+  /// No description provided for @errorLocationMissingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful API response, but the location object is missing or null.'**
+  String get errorLocationMissingData;
+
+  /// No description provided for @errorLocationUpdateMissingData.
+  ///
+  /// In en, this message translates to:
+  /// **'Successful API response, but the updated location object is missing or null.'**
+  String get errorLocationUpdateMissingData;
+
+  /// No description provided for @errorFetchMarketCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching the market: {code}'**
+  String errorFetchMarketCode(String code);
+
+  /// No description provided for @errorTemplateNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Template not found.'**
+  String get errorTemplateNotFound;
+
+  /// No description provided for @errorPublishTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Error publishing.'**
+  String get errorPublishTemplate;
+
+  /// No description provided for @reportPreviewError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching report preview: {detail}'**
+  String reportPreviewError(String detail);
+
+  /// No description provided for @reportHistoryError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching report history: {detail}'**
+  String reportHistoryError(String detail);
+
+  /// No description provided for @reportDownloadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error downloading the report: {detail}'**
+  String reportDownloadError(String detail);
+
+  /// No description provided for @reportDeleteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting the report: {detail}'**
+  String reportDeleteError(String detail);
+
+  /// No description provided for @errorFetchLoans.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching loans.'**
+  String get errorFetchLoans;
+
+  /// No description provided for @errorReturnItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Error returning item.'**
+  String get errorReturnItem;
+
+  /// No description provided for @errorLoanReturn.
+  ///
+  /// In en, this message translates to:
+  /// **'Error during return.'**
+  String get errorLoanReturn;
+
+  /// No description provided for @errorDeleteLoan.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not delete the loan.'**
+  String get errorDeleteLoan;
+
+  /// No description provided for @errorLoanStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching statistics.'**
+  String get errorLoanStats;
+
+  /// No description provided for @errorDownloadImageServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Error downloading image from server: {detail}'**
+  String errorDownloadImageServer(String detail);
+
+  /// No description provided for @errorDownloadImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Error downloading image: {detail}'**
+  String errorDownloadImage(String detail);
+
+  /// No description provided for @errorNoDataServer.
+  ///
+  /// In en, this message translates to:
+  /// **'No data received from server.'**
+  String get errorNoDataServer;
+
+  /// No description provided for @errorFetchItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected error fetching items: {detail}'**
+  String errorFetchItems(String detail);
+
+  /// No description provided for @errorCreateAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating asset: {detail}'**
+  String errorCreateAsset(String detail);
+
+  /// No description provided for @errorUpdateAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating asset: {detail}'**
+  String errorUpdateAsset(String detail);
+
+  /// No description provided for @errorDeleteAsset.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting asset: {detail}'**
+  String errorDeleteAsset(String detail);
+
+  /// No description provided for @errorBatchImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Error importing assets in batch: {detail}'**
+  String errorBatchImport(String detail);
+
+  /// No description provided for @errorMarketValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching market value.'**
+  String get errorMarketValue;
+
+  /// No description provided for @errorPriceHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching price history.'**
+  String get errorPriceHistory;
+
+  /// No description provided for @errorServerCommunication.
+  ///
+  /// In en, this message translates to:
+  /// **'Error communicating with server.'**
+  String get errorServerCommunication;
+
+  /// No description provided for @errorAiUnexpectedResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected server response: {type}'**
+  String errorAiUnexpectedResponse(String type);
+
+  /// No description provided for @errorAiUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown AI error.'**
+  String get errorAiUnknown;
+
+  /// No description provided for @errorAiNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'The server did not return extracted data. Check that the URL is accessible.'**
+  String get errorAiNoData;
+
+  /// No description provided for @errorAiInvalidFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid data format: received {type} instead of a JSON object.'**
+  String errorAiInvalidFormat(String type);
+
+  /// No description provided for @errorAiService.
+  ///
+  /// In en, this message translates to:
+  /// **'AI service error.'**
+  String get errorAiService;
+
+  /// No description provided for @errorAiSuggest.
+  ///
+  /// In en, this message translates to:
+  /// **'AI suggest error.'**
+  String get errorAiSuggest;
+
+  /// No description provided for @errorMissingDataField.
+  ///
+  /// In en, this message translates to:
+  /// **'Server response does not contain the \"data\" field.'**
+  String get errorMissingDataField;
+
+  /// No description provided for @errorUnauthorizedSession.
+  ///
+  /// In en, this message translates to:
+  /// **'Unauthorized: session expired or invalid token.'**
+  String get errorUnauthorizedSession;
+
+  /// No description provided for @errorResourceNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Resource not found ({context}).'**
+  String errorResourceNotFound(String context);
+
+  /// No description provided for @errorContextDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Error in {context}: {message}'**
+  String errorContextDetail(String context, String message);
+
+  /// No description provided for @errorCustomListNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom list not found.'**
+  String get errorCustomListNotFound;
+
+  /// No description provided for @errorStatsMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'API returned success but the statistics object is missing or null.'**
+  String get errorStatsMissing;
+
+  /// No description provided for @errorFetchStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching statistics: {detail}'**
+  String errorFetchStats(String detail);
+
+  /// No description provided for @errorFetchScrapers.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching scrapers: {code}'**
+  String errorFetchScrapers(String code);
+
+  /// No description provided for @errorCreateScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating scraper: {code}'**
+  String errorCreateScraper(String code);
+
+  /// No description provided for @errorUpdateScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating scraper: {code}'**
+  String errorUpdateScraper(String code);
+
+  /// No description provided for @errorDeleteScraper.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting scraper: {code}'**
+  String errorDeleteScraper(String code);
+
+  /// No description provided for @errorAddScraperField.
+  ///
+  /// In en, this message translates to:
+  /// **'Error adding field: {code}'**
+  String errorAddScraperField(String code);
+
+  /// No description provided for @errorRunScraperAdhoc.
+  ///
+  /// In en, this message translates to:
+  /// **'Error running ad-hoc scraper: {code}'**
+  String errorRunScraperAdhoc(String code);
+
+  /// No description provided for @errorFetchAssetType.
+  ///
+  /// In en, this message translates to:
+  /// **'Error fetching Asset Type: {detail}'**
+  String errorFetchAssetType(String detail);
+
+  /// No description provided for @errorCreateAssetType.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating Asset Type: {detail}'**
+  String errorCreateAssetType(String detail);
+
+  /// No description provided for @errorUpdateAssetType.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating Asset Type: {detail}'**
+  String errorUpdateAssetType(String detail);
+
+  /// No description provided for @errorDeleteAssetType.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting Asset Type: {detail}'**
+  String errorDeleteAssetType(String detail);
+
+  /// No description provided for @errorAssetTypeGone.
+  ///
+  /// In en, this message translates to:
+  /// **'Asset type does not exist or has already been deleted.'**
+  String get errorAssetTypeGone;
+
+  /// No description provided for @errorFetchAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Error when fetching alerts: {detail}'**
+  String errorFetchAlerts(String detail);
+
+  /// No description provided for @errorPreferenceUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating preference: {detail}'**
+  String errorPreferenceUpdate(String detail);
+
+  /// No description provided for @errorCreateCrossToon.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating cross-toon: {detail}'**
+  String errorCreateCrossToon(String detail);
+
+  /// No description provided for @errorUpdateCrossToon.
+  ///
+  /// In en, this message translates to:
+  /// **'Error updating cross-toon: {detail}'**
+  String errorUpdateCrossToon(String detail);
+
+  /// No description provided for @errorDeleteCrossToon.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting cross-toon: {detail}'**
+  String errorDeleteCrossToon(String detail);
+
+  /// No description provided for @errorSaveIntegration.
+  ///
+  /// In en, this message translates to:
+  /// **'Error saving integration {itype}: {detail}'**
+  String errorSaveIntegration(String itype, String detail);
+
+  /// No description provided for @errorEnrichItem.
+  ///
+  /// In en, this message translates to:
+  /// **'Error enriching item.'**
+  String get errorEnrichItem;
+
+  /// No description provided for @errorProcessSelectedResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Error processing selected result.'**
+  String get errorProcessSelectedResult;
+
+  /// No description provided for @errorCreateAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating administrator.'**
+  String get errorCreateAdmin;
+
+  /// No description provided for @errorChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Error changing password.'**
+  String get errorChangePassword;
+
+  /// No description provided for @errorInvalidVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid version check response.'**
+  String get errorInvalidVersion;
+
+  /// No description provided for @errorCheckVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Error checking app version.'**
+  String get errorCheckVersion;
+
+  /// No description provided for @errorAuthFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Authentication error.'**
+  String get errorAuthFailed;
+
+  /// No description provided for @errorUnexpectedStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Unexpected status: {status}'**
+  String errorUnexpectedStatus(String status);
+
+  /// No description provided for @errorPurgeHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Error purging chat history.'**
+  String get errorPurgeHistory;
+
+  /// No description provided for @errorDeleteSystemTheme.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete system default themes.'**
+  String get errorDeleteSystemTheme;
+
+  /// No description provided for @errorDeleteThemeDb.
+  ///
+  /// In en, this message translates to:
+  /// **'Error deleting theme from database.'**
+  String get errorDeleteThemeDb;
 }
 
 class _AppLocalizationsDelegate

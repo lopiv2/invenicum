@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:invenicum/core/utils/service_l10n.dart';
 import 'package:invenicum/data/services/toast_service.dart';
 import '../data/models/user_data_model.dart';
 import '../data/models/login_response.dart';
@@ -36,7 +37,10 @@ class AuthProvider with ChangeNotifier {
       if (isAuthenticated) {
         _handleSessionExpired(); // Esto pone _user y _token a null inmediatamente
 
-        ToastService.error('Sesión expirada');
+        final l10n = serviceL10n();
+        if (l10n != null) {
+          ToastService.error(l10n.sessionExpired);
+        }
       }
     };
     _initialize(skipTokenInit: tokenAlreadyInitialized);
@@ -139,7 +143,9 @@ class AuthProvider with ChangeNotifier {
 
       // 2. Si el servicio no lanzó excepción pero devolvió false
       if (!success) {
-        throw Exception("No se pudo actualizar la contraseña.");
+        throw Exception(
+          serviceL10n()?.passwordUpdateFailed ?? 'password-update-failed',
+        );
       }
 
       return true; // Todo salió bien
@@ -355,7 +361,9 @@ class AuthProvider with ChangeNotifier {
       }
       return response;
     } catch (e) {
-      return LoginResponse(success: false, message: "Error: $e");
+      final message =
+          serviceL10n()?.errorWithMessage(e.toString()) ?? e.toString();
+      return LoginResponse(success: false, message: message);
     } finally {
       _isLoading = false;
       notifyListeners();

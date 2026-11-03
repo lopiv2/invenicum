@@ -45,7 +45,10 @@ class _InvenicumSearchBarState extends State<InvenicumSearchBar> {
     _debounce = Timer(const Duration(milliseconds: 500), () async {
       setState(() => _isSearching = true); // Mostramos carga
 
-      final results = await context.read<ContainerProvider>().searchAll(query);
+      final results = await context.read<ContainerProvider>().searchAll(
+        query,
+        l10n: AppLocalizations.of(context)!,
+      );
 
       if (!mounted) return;
 
@@ -134,7 +137,8 @@ class _InvenicumSearchBarState extends State<InvenicumSearchBar> {
         controller: _controller,
         onChanged: _onSearchChanged,
         decoration: InputDecoration(
-          hintText: l10n.lookForContainersOrAssets, // 👈 Traducción: Buscar contenedores o activos...
+          hintText: l10n
+              .lookForContainersOrAssets, // 👈 Traducción: Buscar contenedores o activos...
           suffixIcon: _isSearching
               ? const Padding(
                   padding: EdgeInsets.all(12.0),

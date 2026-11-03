@@ -1,6 +1,7 @@
 import 'package:invenicum/widgets/ui/app_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/inventory_item.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:invenicum/widgets/ui/bento_box_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -74,7 +75,7 @@ class BentoPrintTile extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                _buildSizeBadge(),
+                _buildSizeBadge(context),
               ],
             ),
           ),
@@ -87,7 +88,7 @@ class BentoPrintTile extends StatelessWidget {
     return CollapsibleBentoBoxWidget(
       collapsible: false,
       width: 350,
-      title: "Etiqueta de Inventario",
+      title: AppLocalizations.of(context)!.inventoryLabelTitle,
       icon: Icons.print_outlined,
       child: Column(
         children: [
@@ -99,7 +100,8 @@ class BentoPrintTile extends StatelessWidget {
     );
   }
 
-  Widget _buildSizeBadge() {
+  Widget _buildSizeBadge(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
@@ -108,7 +110,7 @@ class BentoPrintTile extends StatelessWidget {
       ),
       child: Text(
         // 3. Texto dinámico basado en los mm seleccionados
-        "${widthMm.toInt()}x${heightMm.toInt()}mm ${widthMm > 60 ? 'Large' : 'Standard'}",
+        "${widthMm.toInt()}x${heightMm.toInt()}mm ${widthMm > 60 ? l10n.labelSizeBadgeLarge : l10n.labelSizeBadgeStandard}",
         style: const TextStyle(
           fontSize: 8,
           fontWeight: FontWeight.w600,
@@ -119,6 +121,7 @@ class BentoPrintTile extends StatelessWidget {
   }
 
   Widget _buildPrintButton(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -137,7 +140,7 @@ class BentoPrintTile extends StatelessWidget {
                 width: 20,
                 child: AppLoadingIndicator(strokeWidth: 2),
               )
-            : const Text("IMPRIMIR AHORA"),
+            : Text(l10n.printNowButton),
       ),
     );
   }

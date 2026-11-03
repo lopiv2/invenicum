@@ -29,7 +29,8 @@ class LocationValueHeatmap extends StatelessWidget {
         );
 
         final locationIndex = _buildLocationIndex(containerProvider.containers);
-        final cells = _buildCells(ownedItems, locationIndex);
+        final l10n = AppLocalizations.of(context)!;
+        final cells = _buildCells(ownedItems, locationIndex, l10n);
 
         return _LocationValueDonutCard(
           cells: cells.take(maxRows).toList(),
@@ -79,6 +80,7 @@ class LocationValueHeatmap extends StatelessWidget {
   List<_HeatmapCellData> _buildCells(
     List<InventoryItem> items,
     Map<String, _LocationMeta> locationIndex,
+    AppLocalizations l10n,
   ) {
     final grouped = <String, _HeatmapCellData>{};
 
@@ -89,9 +91,9 @@ class LocationValueHeatmap extends StatelessWidget {
       final meta =
           locationIndex[key] ??
           _LocationMeta(
-            containerName: 'Contenedor ${item.containerId}',
-            locationName: 'Ubicación ${item.locationId}',
-            locationPath: 'Ubicación ${item.locationId}',
+            containerName: l10n.containerFallback(item.containerId.toString()),
+            locationName: l10n.fallbackLocationName(item.locationId.toString()),
+            locationPath: l10n.fallbackLocationName(item.locationId.toString()),
           );
 
       final value = _resolveItemValue(item);
@@ -151,7 +153,8 @@ class _LocationValueDonutCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final sections = _buildSections(cells, maxSlices);
+    final l10n = AppLocalizations.of(context)!;
+    final sections = _buildSections(cells, maxSlices, l10n);
     final totalValue = cells.fold<double>(
       0,
       (sum, cell) => sum + cell.totalValue,
@@ -326,6 +329,7 @@ class _LocationValueDonutCard extends StatelessWidget {
   List<_ChartSectionData> _buildSections(
     List<_HeatmapCellData> cells,
     int maxSlices,
+    AppLocalizations l10n,
   ) {
     const palette = <Color>[
       Color(0xFFCF7A32),
@@ -366,9 +370,11 @@ class _LocationValueDonutCard extends StatelessWidget {
         _ChartSectionData(
           cell: _HeatmapCellData(
             key: 'others',
-            containerName: 'Resto de ubicaciones',
-            locationName: 'Otras ubicaciones',
-            locationPath: '${remaining.length} ubicaciones adicionales',
+            containerName: l10n.otherLocationsContainer,
+            locationName: l10n.otherLocationsLabel,
+            locationPath: l10n.additionalLocationsCount(
+              remaining.length.toString(),
+            ),
             totalValue: otherValue,
             totalQuantity: otherQuantity,
             totalEntries: otherEntries,

@@ -125,7 +125,7 @@ class _AssetTemplatesMarketScreenState
                           });
                         },
                         decoration: InputDecoration(
-                          hintText: 'Buscar tag...',
+                          hintText: l10n.searchTagHint,
                           prefixIcon: const Icon(Icons.search_rounded),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -152,7 +152,12 @@ class _AssetTemplatesMarketScreenState
                                     const SizedBox(height: 6),
                                 itemBuilder: (context, index) {
                                   final tag = filteredTags[index];
-                                  final palette = _buildTagPalette(tag, isDark: Theme.of(sheetContext).brightness == Brightness.dark);
+                                  final palette = _buildTagPalette(
+                                    tag,
+                                    isDark:
+                                        Theme.of(sheetContext).brightness ==
+                                        Brightness.dark,
+                                  );
 
                                   return Material(
                                     color: Colors.transparent,
@@ -443,10 +448,7 @@ class _AssetTemplatesMarketScreenState
                   alignment: Alignment.centerRight,
                   child: IconButton(
                     onPressed: () => provider.fetchMarketTemplates(),
-                    icon: Icon(
-                      Icons.refresh_rounded,
-                      color: marketAccent,
-                    ),
+                    icon: Icon(Icons.refresh_rounded, color: marketAccent),
                     tooltip: l10n.refreshMarketTooltip,
                   ),
                 ),
@@ -473,11 +475,7 @@ class _AssetTemplatesMarketScreenState
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Icons.hub_rounded,
-                        size: 40,
-                        color: marketAccent,
-                      ),
+                      Icon(Icons.hub_rounded, size: 40, color: marketAccent),
                       const SizedBox(height: 8),
                       Text(
                         l10n.invenicumCommunity,
@@ -495,10 +493,7 @@ class _AssetTemplatesMarketScreenState
                     top: 0,
                     child: IconButton(
                       onPressed: () => provider.fetchMarketTemplates(),
-                      icon: Icon(
-                        Icons.refresh_rounded,
-                        color: marketAccent,
-                      ),
+                      icon: Icon(Icons.refresh_rounded, color: marketAccent),
                       tooltip: l10n.refreshMarketTooltip,
                     ),
                   ),
@@ -529,7 +524,7 @@ class _AssetTemplatesMarketScreenState
           const SizedBox(height: 16),
 
           // --- CHIPS CENTRADOS ---
-          _buildActiveFiltersChips(isDark: isDark),
+          _buildActiveFiltersChips(context, isDark: isDark),
         ],
       ),
     );
@@ -564,23 +559,23 @@ class _AssetTemplatesMarketScreenState
                 Row(
                   children: [
                     const SizedBox(width: 8),
-                    Icon(
-                      Icons.search_rounded,
-                      color: marketAccent,
-                      size: 22,
-                    ),
+                    Icon(Icons.search_rounded, color: marketAccent, size: 22),
                     const SizedBox(width: 10),
                     Expanded(
                       child: TextField(
                         controller: _searchController,
                         onChanged: (value) =>
                             setState(() => searchQuery = value),
-                        style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: theme.colorScheme.onSurface,
+                        ),
                         decoration: InputDecoration(
                           hintText: l10n.searchByTemplateName,
                           border: InputBorder.none,
                           hintStyle: TextStyle(
-                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.7),
                             fontSize: 14,
                           ),
                           isDense: true,
@@ -620,23 +615,24 @@ class _AssetTemplatesMarketScreenState
           : Row(
               children: [
                 const SizedBox(width: 18),
-                Icon(
-                  Icons.search_rounded,
-                  color: marketAccent,
-                  size: 22,
-                ),
+                Icon(Icons.search_rounded, color: marketAccent, size: 22),
                 const SizedBox(width: 12),
 
                 Expanded(
                   child: TextField(
                     controller: _searchController,
                     onChanged: (value) => setState(() => searchQuery = value),
-                    style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: theme.colorScheme.onSurface,
+                    ),
                     decoration: InputDecoration(
                       hintText: l10n.searchByTemplateName,
                       border: InputBorder.none,
                       hintStyle: TextStyle(
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onSurfaceVariant.withValues(
+                          alpha: 0.7,
+                        ),
                         fontSize: 14,
                       ),
                       isDense: true,
@@ -677,7 +673,8 @@ class _AssetTemplatesMarketScreenState
     );
   }
 
-  Widget _buildActiveFiltersChips({bool isDark = false}) {
+  Widget _buildActiveFiltersChips(BuildContext context, {bool isDark = false}) {
+    final l10n = AppLocalizations.of(context)!;
     final showLogicToggle = _selectedTags.length > 1;
 
     return AnimatedSwitcher(
@@ -697,16 +694,19 @@ class _AssetTemplatesMarketScreenState
                     Padding(
                       padding: const EdgeInsets.only(bottom: 10),
                       child: SegmentedButton<bool>(
-                        segments: const [
+                        segments: [
                           ButtonSegment<bool>(
                             value: true,
-                            label: Text('AND'),
-                            icon: Icon(Icons.join_full_rounded, size: 16),
+                            label: Text(l10n.filterLogicAnd),
+                            icon: const Icon(Icons.join_full_rounded, size: 16),
                           ),
                           ButtonSegment<bool>(
                             value: false,
-                            label: Text('OR'),
-                            icon: Icon(Icons.call_split_rounded, size: 16),
+                            label: Text(l10n.filterLogicOr),
+                            icon: const Icon(
+                              Icons.call_split_rounded,
+                              size: 16,
+                            ),
                           ),
                         ],
                         selected: {_matchAllSelectedTags},
@@ -838,9 +838,7 @@ class _TemplateCard extends StatelessWidget {
                             ? Icons.verified_user
                             : Icons.copy_all,
                         size: 40,
-                        color: template.isOfficial
-                            ? indigo
-                            : teal,
+                        color: template.isOfficial ? indigo : teal,
                       ),
                     ),
                   ),
@@ -854,7 +852,9 @@ class _TemplateCard extends StatelessWidget {
                         vertical: 4,
                       ),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.6,
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
@@ -927,8 +927,8 @@ class _TemplateCard extends StatelessWidget {
                                     // Si falla, imprime el error exacto en consola para ver qué dice
                                     if (kDebugMode) {
                                       debugPrint(
-                                      "Avatar load error ${template.id}: $error",
-                                    );
+                                        "Avatar load error ${template.id}: $error",
+                                      );
                                     }
                                     return _buildInitial(theme);
                                   },
@@ -948,7 +948,9 @@ class _TemplateCard extends StatelessWidget {
                                         );
                                       },
                                 )
-                              : _buildInitial(theme), // 🚩 Si la URL es nula o vacía
+                              : _buildInitial(
+                                  theme,
+                                ), // 🚩 Si la URL es nula o vacía
                         ),
                       ),
                       const SizedBox(width: 6),

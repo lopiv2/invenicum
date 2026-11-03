@@ -54,7 +54,7 @@ class AssetMarketStatusWidget extends StatelessWidget {
       children: [
         _buildInfoRow(
           l10n.quantity,
-          "${item.quantity} unidades",
+          "${item.quantity} ${l10n.unitsLabel}",
           Icons.inventory_2_outlined,
           theme,
         ),

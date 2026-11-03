@@ -159,11 +159,12 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                   child: ValueListenableBuilder<TextEditingValue>(
                     valueListenable: _nameController,
                     builder: (context, value, child) {
+                      final l10n = AppLocalizations.of(context)!;
                       final displayName = value.text.isEmpty
-                          ? 'Sin nombre'
+                          ? l10n.unnamedField
                           : value.text;
                       return Text(
-                        'Campo: "$displayName"',
+                        l10n.fieldWithNameHeader(displayName),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -175,7 +176,7 @@ class _CustomFieldEditorState extends State<CustomFieldEditor> {
                 IconButton(
                   icon: const Icon(Icons.delete, color: Colors.red),
                   onPressed: widget.onDelete,
-                  tooltip: 'Eliminar campo',
+                  tooltip: AppLocalizations.of(context)!.deleteFieldTooltip,
                 ),
               ],
             ),

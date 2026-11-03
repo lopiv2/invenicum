@@ -140,10 +140,10 @@ class _CandidateSelectionBodyState extends State<CandidateSelectionBody> {
                         ? () => _goToPage(_page - 1)
                         : null,
                     icon: const Icon(Icons.chevron_left),
-                    label: const Text('Anterior'),
+                    label: Text(l10n.previous),
                   ),
                   Text(
-                    'Página $_page',
+                    l10n.pageIndicator(_page.toString()),
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                   TextButton.icon(
@@ -151,7 +151,7 @@ class _CandidateSelectionBodyState extends State<CandidateSelectionBody> {
                         ? () => _goToPage(_page + 1)
                         : null,
                     icon: const Icon(Icons.chevron_right),
-                    label: const Text('Siguiente'),
+                    label: Text(l10n.next),
                   ),
                 ],
               ),

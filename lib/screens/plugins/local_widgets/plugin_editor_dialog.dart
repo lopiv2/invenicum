@@ -42,7 +42,9 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
         _jsonError = null; // JSON válido
       } catch (e) {
         // Extraemos solo el mensaje relevante del error de formato
-        _jsonError = "Format error: ${e.toString().split(':').last}";
+        _jsonError = AppLocalizations.of(
+          context,
+        )!.pluginJsonFormatError(e.toString().split(':').last);
       }
     });
   }
@@ -78,7 +80,7 @@ class _PluginEditorDialogState extends State<PluginEditorDialog> {
 
     final uiJson = widget.plugin?['ui'] != null
         ? const JsonEncoder.withIndent('  ').convert(widget.plugin!['ui'])
-        : '{\n  "type": "container",\n  "child": {\n    "type": "text",\n    "data": "Nuevo Plugin"\n  }\n}';
+        : '{\n  "type": "container",\n  "child": {\n    "type": "text",\n    "data": "${AppLocalizations.of(context)!.pluginTemplateDefaultName}"\n  }\n}';
     _uiController = TextEditingController(text: uiJson);
   }
 

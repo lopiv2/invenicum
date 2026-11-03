@@ -162,12 +162,13 @@ GoRouter createAppRouter(
           }
 
           if (code != null) {
+            final l10n = AppLocalizations.of(context)!;
             WidgetsBinding.instance.addPostFrameCallback((_) async {
               final authProvider = context.read<AuthProvider>();
               final success = await authProvider.linkGitHubAccount(code!);
               if (success) {
                 html.window.history.replaceState(null, '', '/#/myprofile');
-                ToastService.success("GitHub vinculado correctamente");
+                ToastService.success(l10n.githubLinkedSuccess);
               }
             });
           }

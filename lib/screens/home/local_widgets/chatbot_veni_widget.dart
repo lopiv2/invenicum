@@ -129,7 +129,10 @@ class _VeniChatbotState extends State<VeniChatbot> {
           "🧠 templateData resolved: name=${templateData['name']} fields=${templateData['fields']?.length ?? 0}",
         );
 
-        final draft = _mapAiDataToTemplate(templateData);
+        final draft = _mapAiDataToTemplate(
+          templateData,
+          AppLocalizations.of(context)!,
+        );
         debugPrint("✅ Draft: ${draft.name} — ${draft.fields.length} fields");
 
         // Delay so Veni shows its message before navigating
@@ -144,15 +147,18 @@ class _VeniChatbotState extends State<VeniChatbot> {
     }
   }
 
-  AssetTemplate _mapAiDataToTemplate(Map<String, dynamic> data) {
+  AssetTemplate _mapAiDataToTemplate(
+    Map<String, dynamic> data,
+    AppLocalizations l10n,
+  ) {
     // 1. Extract the field list from the AI
     final List<dynamic> rawFields = data['fields'] ?? [];
 
     return AssetTemplate(
       id: 'draft_${DateTime.now().millisecondsSinceEpoch}', // Temporary ID for the UI
-      name: data['name'] ?? 'Nueva Colección',
+      name: data['name'] ?? l10n.aiDefaultCollectionName,
       description: data['description'] ?? '',
-      category: data['category'] ?? 'General',
+      category: data['category'] ?? l10n.aiDefaultCategory,
       author: 'Veni AI',
       tags: List<String>.from(data['tags'] ?? []),
       // 2. Map to your field list using the CustomFieldDefinition model
@@ -161,7 +167,7 @@ class _VeniChatbotState extends State<VeniChatbot> {
 
         return CustomFieldDefinition(
           id: null, // New fields don't have a database ID yet
-          name: map['name'] ?? 'Campo',
+          name: map['name'] ?? l10n.aiDefaultFieldName,
           // 3. Convert the AI string to the CustomFieldType enum
           type: _parseAiFieldType(map['type']),
           // Support 'isRequired' or 'required' in case the AI varies the name
@@ -245,8 +251,7 @@ class _VeniChatbotState extends State<VeniChatbot> {
               },
               child: AppBar(
                 backgroundColor: theme.primaryColor,
-                automaticallyImplyLeading:
-                    false, // Remove automatic back arrow
+                automaticallyImplyLeading: false, // Remove automatic back arrow
                 title: Row(
                   children: [
                     const Icon(

@@ -36,7 +36,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
   bool _isPlaying = false;
   bool _isHovering = false;
   double _rotationSpeed = 3.0; // Segundos por cada salto
-  
+
   // Variables para el color de fondo de la tarjeta
   Color _cardBackgroundColor = Colors.white;
   double _cardOpacity = 1.0;
@@ -101,7 +101,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
         bool isPortrait = orientation == Orientation.portrait;
         return Column(
           children: [
-            _buildControls(),
+            _buildControls(context),
             Expanded(
               child: ScrollConfiguration(
                 behavior: MouseDraggableScrollBehavior(),
@@ -135,7 +135,8 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
     );
   }
 
-  Widget _buildControls() {
+  Widget _buildControls(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
@@ -158,10 +159,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                 height: 50,
                 decoration: BoxDecoration(
                   color: _cardBackgroundColor.withValues(alpha: _cardOpacity),
-                  border: Border.all(
-                    color: Colors.grey.shade400,
-                    width: 2,
-                  ),
+                  border: Border.all(color: Colors.grey.shade400, width: 2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Material(
@@ -169,10 +167,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                   child: InkWell(
                     onTap: _showColorPicker,
                     borderRadius: BorderRadius.circular(12),
-                    child: const Icon(
-                      Icons.palette,
-                      color: Colors.grey,
-                    ),
+                    child: const Icon(Icons.palette, color: Colors.grey),
                   ),
                 ),
               ),
@@ -183,7 +178,9 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                   min: 0.5,
                   max: 10.0,
                   divisions: 19,
-                  label: AppLocalizations.of(context)!.rotationSpeedLabel(_rotationSpeed.toStringAsFixed(1)),
+                  label: AppLocalizations.of(
+                    context,
+                  )!.rotationSpeedLabel(_rotationSpeed.toStringAsFixed(1)),
                   onChanged: (val) => setState(() {
                     _rotationSpeed = val;
                     if (_isPlaying) _startAutoPlay();
@@ -199,7 +196,9 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
               SizedBox(
                 width: 100,
                 child: Text(
-                  'Opacidad: ${(_cardOpacity * 100).toStringAsFixed(0)}%',
+                  l10n.opacityPercentLabel(
+                    (_cardOpacity * 100).toStringAsFixed(0),
+                  ),
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
@@ -223,214 +222,201 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
   }
 
   void _showColorPicker() {
-  Color tempColor = _cardBackgroundColor;
+    Color tempColor = _cardBackgroundColor;
+    final l10n = AppLocalizations.of(context)!;
 
-  showAppDialog(
-    context: context,
+    showAppDialog(
+      context: context,
 
-    title: AppLocalizations.of(context)!.selectColor,
+      title: l10n.selectColor,
 
-    body: StatefulBuilder(
-      builder: (context, setStateDialog) {
-        return SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Título
-              const Text(
-                'Colores Predefinidos',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+      body: StatefulBuilder(
+        builder: (context, setStateDialog) {
+          return SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Título
+                Text(
+                  l10n.predefinedColorsTitle,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-              ),
 
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // Colores rápidos
-              Wrap(
-                spacing: 10,
-                runSpacing: 10,
-                children: [
-                  Colors.white,
-                  Colors.grey.shade100,
-                  Colors.blue.shade50,
-                  Colors.amber.shade50,
-                  Colors.red.shade50,
-                  Colors.green.shade50,
-                  Colors.purple.shade50,
-                  Colors.pink.shade50,
-                ].map((color) {
-                  final isSelected =
-                      tempColor == color;
+                // Colores rápidos
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children:
+                      [
+                        Colors.white,
+                        Colors.grey.shade100,
+                        Colors.blue.shade50,
+                        Colors.amber.shade50,
+                        Colors.red.shade50,
+                        Colors.green.shade50,
+                        Colors.purple.shade50,
+                        Colors.pink.shade50,
+                      ].map((color) {
+                        final isSelected = tempColor == color;
 
-                  return GestureDetector(
-                    onTap: () {
-                      setStateDialog(() {
-                        tempColor = color;
-                      });
-                    },
+                        return GestureDetector(
+                          onTap: () {
+                            setStateDialog(() {
+                              tempColor = color;
+                            });
+                          },
 
-                    child: Container(
-                      width: 50,
-                      height: 50,
+                          child: Container(
+                            width: 50,
+                            height: 50,
 
-                      decoration: BoxDecoration(
-                        color: color,
+                            decoration: BoxDecoration(
+                              color: color,
 
-                        borderRadius:
-                            BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(10),
 
-                        border: Border.all(
-                          color: isSelected
-                              ? Colors.black
-                              : Colors.grey.shade300,
+                              border: Border.all(
+                                color: isSelected
+                                    ? Colors.black
+                                    : Colors.grey.shade300,
 
-                          width: isSelected ? 3 : 1,
-                        ),
+                                width: isSelected ? 3 : 1,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                ),
+
+                const SizedBox(height: 24),
+
+                Divider(color: Colors.grey.shade300),
+
+                const SizedBox(height: 16),
+
+                // Título custom
+                Text(
+                  l10n.customColorTitle,
+
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Preview
+                Container(
+                  width: double.infinity,
+                  height: 80,
+
+                  decoration: BoxDecoration(
+                    color: tempColor,
+
+                    borderRadius: BorderRadius.circular(12),
+
+                    border: Border.all(color: Colors.grey.shade300, width: 2),
+                  ),
+
+                  child: Center(
+                    child: Text(
+                      tempColor
+                          .toARGB32()
+                          .toRadixString(16)
+                          .padLeft(8, '0')
+                          .toUpperCase(),
+
+                      style: TextStyle(
+                        color: _getContrainingColor(tempColor),
+
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
                       ),
                     ),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 24),
-
-              Divider(
-                color: Colors.grey.shade300,
-              ),
-
-              const SizedBox(height: 16),
-
-              // Título custom
-              const Text(
-                'Color Personalizado',
-
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-
-              const SizedBox(height: 12),
-
-              // Preview
-              Container(
-                width: double.infinity,
-                height: 80,
-
-                decoration: BoxDecoration(
-                  color: tempColor,
-
-                  borderRadius:
-                      BorderRadius.circular(12),
-
-                  border: Border.all(
-                    color: Colors.grey.shade300,
-                    width: 2,
                   ),
                 ),
 
-                child: Center(
-                  child: Text(
-                    tempColor
-                        .toARGB32()
-                        .toRadixString(16)
-                        .padLeft(8, '0')
-                        .toUpperCase(),
+                const SizedBox(height: 16),
 
-                    style: TextStyle(
-                      color: _getContrainingColor(
-                        tempColor,
-                      ),
+                // RGB
+                _buildColorSlider(
+                  label: l10n.colorRed,
 
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
+                  value: (tempColor.r * 255.0),
+
+                  onChanged: (value) {
+                    setStateDialog(() {
+                      tempColor = Color.fromARGB(
+                        (tempColor.a * 255.0).round().clamp(0, 255),
+                        value.toInt(),
+                        (tempColor.g * 255.0).round().clamp(0, 255),
+                        (tempColor.b * 255.0).round().clamp(0, 255),
+                      );
+                    });
+                  },
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                _buildColorSlider(
+                  label: l10n.colorGreen,
 
-              // RGB
-              _buildColorSlider(
-                label: 'Rojo',
+                  value: (tempColor.g * 255.0),
 
-                value: (tempColor.r * 255.0),
+                  onChanged: (value) {
+                    setStateDialog(() {
+                      tempColor = Color.fromARGB(
+                        (tempColor.a * 255.0).round().clamp(0, 255),
+                        (tempColor.r * 255.0).round().clamp(0, 255),
+                        value.toInt(),
+                        (tempColor.b * 255.0).round().clamp(0, 255),
+                      );
+                    });
+                  },
+                ),
 
-                onChanged: (value) {
-                  setStateDialog(() {
-                    tempColor = Color.fromARGB(
-                      (tempColor.a * 255.0).round().clamp(0, 255),
-                      value.toInt(),
-                      (tempColor.g * 255.0).round().clamp(0, 255),
-                      (tempColor.b * 255.0).round().clamp(0, 255),
-                    );
-                  });
-                },
-              ),
+                _buildColorSlider(
+                  label: l10n.colorBlue,
 
-              _buildColorSlider(
-                label: 'Verde',
+                  value: (tempColor.b * 255.0),
 
-                value: (tempColor.g * 255.0),
-
-                onChanged: (value) {
-                  setStateDialog(() {
-                    tempColor = Color.fromARGB(
-                      (tempColor.a * 255.0).round().clamp(0, 255),
-                      (tempColor.r * 255.0).round().clamp(0, 255),
-                      value.toInt(),
-                      (tempColor.b * 255.0).round().clamp(0, 255),
-                    );
-                  });
-                },
-              ),
-
-              _buildColorSlider(
-                label: 'Azul',
-
-                value: (tempColor.b * 255.0),
-
-                onChanged: (value) {
-                  setStateDialog(() {
-                    tempColor = Color.fromARGB(
-                      (tempColor.a * 255.0).round().clamp(0, 255),
-                      (tempColor.r * 255.0).round().clamp(0, 255),
-                      (tempColor.g * 255.0).round().clamp(0, 255),
-                      value.toInt(),
-                    );
-                  });
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    ),
-
-    actions: [
-      TextButton(
-        onPressed: () =>
-            Navigator.of(context).pop(),
-
-        child: const Text('Cancelar'),
-      ),
-
-      ElevatedButton(
-        onPressed: () {
-          setState(() {
-            _cardBackgroundColor = tempColor;
-          });
-
-          Navigator.of(context).pop();
+                  onChanged: (value) {
+                    setStateDialog(() {
+                      tempColor = Color.fromARGB(
+                        (tempColor.a * 255.0).round().clamp(0, 255),
+                        (tempColor.r * 255.0).round().clamp(0, 255),
+                        (tempColor.g * 255.0).round().clamp(0, 255),
+                        value.toInt(),
+                      );
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
         },
-
-        child: const Text('Aceptar'),
       ),
-    ],
-  );
-}
-  
+
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+
+          child: Text(l10n.cancel),
+        ),
+
+        ElevatedButton(
+          onPressed: () {
+            setState(() {
+              _cardBackgroundColor = tempColor;
+            });
+
+            Navigator.of(context).pop();
+          },
+
+          child: Text(l10n.acceptButton),
+        ),
+      ],
+    );
+  }
+
   Widget _buildColorSlider({
     required String label,
     required double value,
@@ -443,7 +429,10 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(label, style: const TextStyle(fontSize: 12)),
-            Text(value.toInt().toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            Text(
+              value.toInt().toString(),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            ),
           ],
         ),
         Slider(
@@ -457,7 +446,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
       ],
     );
   }
-  
+
   Color _getContrainingColor(Color color) {
     final luminance = color.computeLuminance();
     return luminance > 0.5 ? Colors.black : Colors.white;
@@ -478,8 +467,12 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
           cursor: SystemMouseCursors
               .grab, // 👈 Cambia el puntero a una "mano" al pasar por encima
           child: Container(
-            width: isPortrait ? MediaQuery.of(context).size.width * 0.75 : MediaQuery.of(context).size.width * 0.8,
-            height: isPortrait ? MediaQuery.of(context).size.height * 0.35 : MediaQuery.of(context).size.height * 0.8,
+            width: isPortrait
+                ? MediaQuery.of(context).size.width * 0.75
+                : MediaQuery.of(context).size.width * 0.8,
+            height: isPortrait
+                ? MediaQuery.of(context).size.height * 0.35
+                : MediaQuery.of(context).size.height * 0.8,
             margin: const EdgeInsets.symmetric(vertical: 10),
             decoration: BoxDecoration(
               color: _cardBackgroundColor.withValues(alpha: _cardOpacity),
@@ -508,9 +501,7 @@ class _AssetCylinderGalleryState extends State<AssetCylinderGallery> {
                             fit: BoxFit.contain,
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
-                              return const Center(
-                                child: AppLoadingIndicator(),
-                              );
+                              return const Center(child: AppLoadingIndicator());
                             },
                             errorBuilder: (context, error, stackTrace) =>
                                 const Icon(

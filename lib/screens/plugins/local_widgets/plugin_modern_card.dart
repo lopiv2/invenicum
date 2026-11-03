@@ -402,6 +402,7 @@ class ModernPluginCard extends StatelessWidget {
     PluginProvider provider,
     String action,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
     // 🚩 Agregamos async para esperar al diálogo
     switch (action) {
       case 'edit':
@@ -417,7 +418,7 @@ class ModernPluginCard extends StatelessWidget {
           final updatedPlugin = StorePlugin.fromJson({
             ...plugin.toJson(), // Mantenemos ID, autor, etc.
             ...result, // Sobrescribimos con los cambios del diálogo
-          });
+          }, l10n: l10n);
 
           // 3. Llamamos al método del provider que gestionará el PUT o el PR
           await provider.editMyPluginMetadata(updatedPlugin);
@@ -453,26 +454,28 @@ class ModernPluginCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.red.withValues(alpha: 0.1)),
                 ),
-                child: Material(type: MaterialType.transparency, child: CheckboxListTile(
-                  title: Text(
-                    l10n.deleteFromGithubLabel,
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+                child: Material(
+                  type: MaterialType.transparency,
+                  child: CheckboxListTile(
+                    title: Text(
+                      l10n.deleteFromGithubLabel,
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
+                    subtitle: Text(
+                      l10n.deleteFromGithubSubtitle,
+                      style: TextStyle(fontSize: 11),
+                    ),
+                    value: deleteFromGitHub,
+                    onChanged: (val) => setState(() => deleteFromGitHub = val!),
+                    controlAffinity: ListTileControlAffinity.leading,
+                    activeColor: Colors.red,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                   ),
-                  subtitle: Text(
-                    l10n.deleteFromGithubSubtitle,
-                    style: TextStyle(fontSize: 11),
-                  ),
-                  value: deleteFromGitHub,
-                  onChanged: (val) => setState(() => deleteFromGitHub = val!),
-                  controlAffinity: ListTileControlAffinity.leading,
-                  activeColor: Colors.red,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                 ),
-              ),
               ),
             ],
           ],

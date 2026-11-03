@@ -59,7 +59,7 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
               ),
               const SizedBox(height: 32),
               topItems.isEmpty
-                  ? _buildEmptyState(isDark)
+                  ? _buildEmptyState(context, isDark)
                   : TopLoanedBarChartContent(
                       topItems: topItems,
                       isDark: isDark,
@@ -100,12 +100,13 @@ class _TopLoanedItemsChartState extends State<TopLoanedItemsChart> {
     );
   }
 
-  Widget _buildEmptyState(bool isDark) {
+  Widget _buildEmptyState(BuildContext context, bool isDark) {
+    final l10n = AppLocalizations.of(context)!;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 40),
         child: Text(
-          'Sin actividad en este período',
+          l10n.noActivityInPeriod,
           style: TextStyle(
             color: Colors.grey.withValues(alpha: 0.5),
             fontStyle: FontStyle.italic,

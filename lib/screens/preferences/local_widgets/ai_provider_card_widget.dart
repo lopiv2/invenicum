@@ -31,7 +31,7 @@ class _AiProviderCardWidgetState extends State<AiProviderCardWidget> {
       await prov.updateAiProvider(provider, model);
       if (mounted) ToastService.success(l10n.aiProviderUpdated);
     } catch (e) {
-      if (mounted) ToastService.error('Error al guardar: $e');
+      if (mounted) ToastService.error(l10n.errorWithMessage(e.toString()));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:invenicum/core/utils/retro/retro_theme_extension.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 
 Future<T?> showAppBottomSheet<T>({
   required BuildContext context,
@@ -18,8 +19,8 @@ Future<T?> showAppBottomSheet<T>({
         decoration: BoxDecoration(
           color: retro.messageBox,
           border: Border(
-            top:   BorderSide(color: retro.border, width: 2),
-            left:  BorderSide(color: retro.border, width: 2),
+            top: BorderSide(color: retro.border, width: 2),
+            left: BorderSide(color: retro.border, width: 2),
             right: BorderSide(color: retro.border, width: 2),
           ),
         ),
@@ -32,7 +33,7 @@ Future<T?> showAppBottomSheet<T>({
               color: retro.titleBar,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               child: Text(
-                '[ MENU ]',
+                AppLocalizations.of(context)!.retroMenuTitle,
                 style: TextStyle(
                   color: retro.titleText,
                   fontFamily: 'monospace',

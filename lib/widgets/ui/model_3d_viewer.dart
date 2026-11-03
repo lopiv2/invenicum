@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:invenicum/config/environment.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -8,7 +9,7 @@ class Model3DViewer extends StatelessWidget {
   const Model3DViewer({
     super.key,
     required this.src,
-    this.title = '3D model',
+    required this.title,
     this.height = 360,
   });
 
@@ -44,7 +45,7 @@ class Model3DViewer extends StatelessWidget {
           child: FilledButton.icon(
             onPressed: _openExternally,
             icon: const Icon(Icons.open_in_new),
-            label: const Text('Abrir modelo 3D'),
+            label: Text(AppLocalizations.of(context)!.open3dModelButton),
           ),
         ),
       );

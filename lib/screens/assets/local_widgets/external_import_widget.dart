@@ -31,9 +31,9 @@ class ExternalImportWidget extends StatelessWidget {
         final dropdown = DropdownButtonFormField<String>(
           initialValue: selectedSource,
           isExpanded: true,
-          decoration: const InputDecoration(
-            labelText: "Fuente de datos",
-            prefixIcon: Icon(Icons.api),
+          decoration: InputDecoration(
+            labelText: l10n.dataSourceLabel,
+            prefixIcon: const Icon(Icons.api),
           ),
           items: availableSources
               .map(
@@ -41,7 +41,13 @@ class ExternalImportWidget extends StatelessWidget {
                   value: source.id,
                   child: Row(
                     children: [
-                      SizedBox(width: 20, child: source.icon ?? source.image ?? const SizedBox.shrink()),
+                      SizedBox(
+                        width: 20,
+                        child:
+                            source.icon ??
+                            source.image ??
+                            const SizedBox.shrink(),
+                      ),
                       SizedBox(width: MediaQuery.of(context).size.width * 0.02),
                       Flexible(
                         child: Text(
@@ -61,7 +67,7 @@ class ExternalImportWidget extends StatelessWidget {
           controller: searchController,
           decoration: InputDecoration(
             labelText: l10n.searchByName,
-            hintText: "Ex: Pikachu, Catan, El Quijote...",
+            hintText: l10n.searchExampleHint,
             suffixIcon: isLoading
                 ? const Padding(
                     padding: EdgeInsets.all(12),
