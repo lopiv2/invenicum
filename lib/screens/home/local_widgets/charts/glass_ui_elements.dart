@@ -28,10 +28,13 @@ class GlassDropdown<T> extends StatelessWidget {
           value: value,
           items: items,
           onChanged: onChanged,
+          isExpanded: true,
           icon: const Icon(Icons.keyboard_arrow_down_rounded, size: 18),
-          dropdownColor: Theme.of(context).cardColor, // Evita fondos negros feos
+          dropdownColor: Theme.of(
+            context,
+          ).cardColor, // Evita fondos negros feos
           style: TextStyle(
-            fontWeight: FontWeight.bold, 
+            fontWeight: FontWeight.bold,
             fontSize: 13,
             color: Theme.of(context).textTheme.bodyMedium?.color,
           ),

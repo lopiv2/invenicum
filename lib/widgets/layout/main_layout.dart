@@ -34,6 +34,9 @@ class _MainLayoutState extends State<MainLayout> {
   late Offset _veniPosition;
   bool _isInitialized = false;
   bool _isAnimating = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _routeListenerAdded = false;
+  Listenable? _routerListenable;
 
   @override
   void didChangeDependencies() {
@@ -44,6 +47,23 @@ class _MainLayoutState extends State<MainLayout> {
       _veniPosition = Offset(size.width - 60, size.height - 20);
       _isInitialized = true;
     }
+    if (!_routeListenerAdded) {
+      _routerListenable = GoRouter.of(context).routerDelegate;
+      _routerListenable!.addListener(_closeDrawerOnNavigate);
+      _routeListenerAdded = true;
+    }
+  }
+
+  @override
+  void dispose() {
+    _routerListenable?.removeListener(_closeDrawerOnNavigate);
+    _routerListenable = null;
+    _routeListenerAdded = false;
+    super.dispose();
+  }
+
+  void _closeDrawerOnNavigate() {
+    _scaffoldKey.currentState?.closeDrawer();
   }
 
   @override
@@ -124,17 +144,25 @@ class _MainLayoutState extends State<MainLayout> {
   Widget build(BuildContext context) {
     final aiEnabled = context.watch<PreferencesProvider>().aiEnabled;
     final colorScheme = Theme.of(context).colorScheme;
-    final retroTheme = Theme.of(context).extension<RetroThemeExtension>()?.retro;
+    final retroTheme = Theme.of(
+      context,
+    ).extension<RetroThemeExtension>()?.retro;
     final size = MediaQuery.of(context).size;
 
     final showFAB = aiEnabled && !_isChatOpen;
     final showChat = aiEnabled && _isChatOpen;
+    // On narrow screens the fixed sidebar would eat most of the width,
+    // so it becomes an overlay drawer instead of a side panel.
+    final isNarrow = size.width < 720;
+    final showSidePanel = _isSidebarVisible && !isNarrow;
 
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: isNarrow ? const Drawer(child: SidebarLayout()) : null,
       body: Stack(
         clipBehavior: Clip.none,
         children: [
-          _buildBaseApp(context),
+          _buildBaseApp(context, showSidePanel),
 
           // CrossToons that float across the screen - fetched from the server
           FloatingOverlayImage(
@@ -208,8 +236,11 @@ class _MainLayoutState extends State<MainLayout> {
                         onPressed: () => setState(() => _isChatOpen = true),
                         label: const Text('Veni'),
                         icon: const Icon(Icons.auto_awesome_rounded),
-                        backgroundColor: retroTheme?.buttonOk ?? colorScheme.primary,
-                        foregroundColor: retroTheme != null ? Colors.black : colorScheme.onPrimary,
+                        backgroundColor:
+                            retroTheme?.buttonOk ?? colorScheme.primary,
+                        foregroundColor: retroTheme != null
+                            ? Colors.black
+                            : colorScheme.onPrimary,
                       ),
                     ),
                   ),
@@ -223,16 +254,23 @@ class _MainLayoutState extends State<MainLayout> {
   }
 
   // Helper method to keep the build clean
-  Widget _buildBaseApp(BuildContext context) {
+  Widget _buildBaseApp(BuildContext context, bool showSidePanel) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final colorScheme = theme.colorScheme;
+    final isNarrow = MediaQuery.sizeOf(context).width < 720;
 
     return Column(
       children: [
         MainHeader(
-          isSidebarVisible: _isSidebarVisible,
-          onToggleSidebar: () => setState(() => _handleToggleSidebar()),
+          isSidebarVisible: showSidePanel,
+          onToggleSidebar: () {
+            if (isNarrow) {
+              _scaffoldKey.currentState?.openDrawer();
+            } else {
+              setState(() => _handleToggleSidebar());
+            }
+          },
         ),
         Expanded(
           child: Row(
@@ -240,7 +278,7 @@ class _MainLayoutState extends State<MainLayout> {
               AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
                 curve: Curves.easeInOut,
-                width: _isSidebarVisible ? 250 : 0,
+                width: showSidePanel ? 250 : 0,
                 child: OverflowBox(
                   // Prevents children from trying to re-layout due to lack of space
                   minWidth: 250,

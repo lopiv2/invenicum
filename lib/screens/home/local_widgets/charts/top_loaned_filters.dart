@@ -22,15 +22,22 @@ class TopLoanedFilters extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        GlassDropdown<int>(
-          value: selectedYear,
-          items: years
-              .map((y) => DropdownMenuItem(value: y, child: Text('$y')))
-              .toList(),
-          onChanged: (v) => onYearChanged(v!),
+        Flexible(
+          child: GlassDropdown<int>(
+            value: selectedYear,
+            items: years
+                .map((y) => DropdownMenuItem(value: y, child: Text('$y')))
+                .toList(),
+            onChanged: (v) => onYearChanged(v!),
+          ),
         ),
         const SizedBox(width: 12),
-        MonthDropdown(selectedMonth: selectedMonth, onChanged: onMonthChanged),
+        Flexible(
+          child: MonthDropdown(
+            selectedMonth: selectedMonth,
+            onChanged: onMonthChanged,
+          ),
+        ),
       ],
     );
   }
