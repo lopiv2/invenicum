@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:invenicum/data/models/scraper.dart';
 import 'package:invenicum/data/services/scraper_service.dart';
 import 'package:invenicum/data/services/toast_service.dart';
+import 'package:invenicum/screens/assets/local_widgets/scraper_field_chips.dart';
 import 'package:invenicum/l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 
@@ -26,10 +27,14 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
   Scraper? _selectedScraper;
   bool _loading = false;
   bool _loadingScrapers = true;
+  final Set<int> _excludedFieldIds = {};
 
   void clearUrl() {
     _urlController.clear();
-    setState(() => _selectedScraper = null);
+    setState(() {
+      _selectedScraper = null;
+      _excludedFieldIds.clear();
+    });
   }
 
   @override
@@ -92,13 +97,35 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
     }
 
     if (match != null && match != _selectedScraper) {
-      setState(() => _selectedScraper = match);
+      setState(() {
+        _selectedScraper = match;
+        _excludedFieldIds.clear();
+      });
     }
+  }
+
+  void _toggleField(int fieldId) {
+    setState(() {
+      if (_excludedFieldIds.contains(fieldId)) {
+        _excludedFieldIds.remove(fieldId);
+      } else {
+        _excludedFieldIds.add(fieldId);
+      }
+    });
+  }
+
+  List<ScraperField> get _effectiveFields {
+    final scraper = _selectedScraper;
+    if (scraper == null) return const [];
+    return scraper.fields
+        .where((f) => !_excludedFieldIds.contains(f.id))
+        .toList();
   }
 
   Future<void> _run() async {
     final url = _urlController.text.trim();
-    if (url.isEmpty || _selectedScraper == null) return;
+    final fields = _effectiveFields;
+    if (url.isEmpty || _selectedScraper == null || fields.isEmpty) return;
 
     setState(() => _loading = true);
     try {
@@ -107,7 +134,7 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
         name: _selectedScraper!.name,
         url: url,
         urlPattern: _selectedScraper!.urlPattern,
-        fields: _selectedScraper!.fields
+        fields: fields
             .map(
               (f) => {'name': f.name, 'xpath': f.xpath, 'order': f.order ?? 0},
             )
@@ -141,10 +168,7 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
             hintText: l10n.scraperUrlHint,
             prefixIcon: const Icon(Icons.link_outlined),
             suffixIcon: _urlController.text.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: clearUrl,
-                  )
+                ? IconButton(icon: const Icon(Icons.clear), onPressed: clearUrl)
                 : null,
           ),
         ),
@@ -204,7 +228,10 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
                         ),
                       )
                       .toList(),
-                  onChanged: (s) => setState(() => _selectedScraper = s),
+                  onChanged: (s) => setState(() {
+                    _selectedScraper = s;
+                    _excludedFieldIds.clear();
+                  }),
                   hint: Text(l10n.scraperSelectHint),
                 ),
               ),
@@ -213,7 +240,8 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
                 onPressed:
                     (_selectedScraper != null &&
                         _urlController.text.trim().isNotEmpty &&
-                        !_loading)
+                        !_loading &&
+                        _effectiveFields.isNotEmpty)
                     ? _run
                     : null,
                 icon: _loading
@@ -249,14 +277,17 @@ class ScraperImportWidgetState extends State<ScraperImportWidget> {
                   padding: EdgeInsets.zero,
                   materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                ...(_selectedScraper!.fields.map(
-                  (f) => Chip(
-                    label: Text(f.name, style: theme.textTheme.labelSmall),
-                    padding: EdgeInsets.zero,
-                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  ),
-                )),
               ],
+            ),
+          ),
+        // Field selector chips (tap to exclude/include from the scrape)
+        if (hasMatch && _selectedScraper!.fields.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: ScraperFieldChips(
+              fields: _selectedScraper!.fields,
+              excludedFieldIds: _excludedFieldIds,
+              onToggleField: _toggleField,
             ),
           ),
       ],
