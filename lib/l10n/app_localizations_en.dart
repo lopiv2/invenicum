@@ -336,6 +336,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get chooseFile => 'Choose File';
 
   @override
+  String get clear => 'Clear';
+
+  @override
   String get clearCounter => 'Clear Counter';
 
   @override

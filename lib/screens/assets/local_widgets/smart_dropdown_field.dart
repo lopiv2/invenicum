@@ -186,7 +186,7 @@ class _AppDropdownFieldState<T> extends State<AppDropdownField<T>> {
       suffixIcon: widget.selectedValue != null
           ? IconButton(
               icon: const Icon(Icons.clear, size: 18),
-              tooltip: 'Limpiar',
+              tooltip: l10n.clear,
               onPressed: () {
                 widget.onChanged(null);
                 _formFieldKey.currentState?.didChange(null);

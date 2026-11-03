@@ -342,6 +342,9 @@ class AppLocalizationsPt extends AppLocalizations {
   String get chooseFile => 'Escolher arquivo';
 
   @override
+  String get clear => 'Limpar';
+
+  @override
   String get clearCounter => 'Limpar contador';
 
   @override

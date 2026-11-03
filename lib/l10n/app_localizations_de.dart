@@ -344,6 +344,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get chooseFile => 'Datei auswählen';
 
   @override
+  String get clear => 'Löschen';
+
+  @override
   String get clearCounter => 'Zähler zurücksetzen';
 
   @override

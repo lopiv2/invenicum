@@ -343,6 +343,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get chooseFile => 'Elegir Archivo';
 
   @override
+  String get clear => 'Limpiar';
+
+  @override
   String get clearCounter => 'Limpiar Contador';
 
   @override

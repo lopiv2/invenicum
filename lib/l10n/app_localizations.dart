@@ -718,6 +718,12 @@ abstract class AppLocalizations {
   /// **'Choose File'**
   String get chooseFile;
 
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
   /// No description provided for @clearCounter.
   ///
   /// In en, this message translates to:

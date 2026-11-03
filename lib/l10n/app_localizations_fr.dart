@@ -343,6 +343,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chooseFile => 'Choisir un fichier';
 
   @override
+  String get clear => 'Effacer';
+
+  @override
   String get clearCounter => 'Effacer le compteur';
 
   @override
